@@ -12,7 +12,7 @@ var (
 
 var (
 	Focal = Vec{0, 0, -1}
-	Horiz = 10.0
+	Horiz = 50.0
 )
 
 func main() {
@@ -26,7 +26,11 @@ func main() {
 		img[i] = make([]float64, W)
 	}
 
-	scene := cubeFrame().RotY(-0.5).Transl(0, -0.2, 2)
+	sinc := Shape(func(r Vec) bool {
+		R := math.Sqrt(r.X*r.X+r.Z*r.Z) * 5
+		return r.Y < 2*math.Sin(R)/R
+	})
+	scene := sinc.Intersect(Slab(4, 2, 4)).RotY(-0.4).RotX(-0.5).Transl(0, 0, 8).RotX(-0.2)
 
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
@@ -37,7 +41,7 @@ func main() {
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
 
-			l := Vec{0.2, 0.8, -1}.Normalized().Mul(1.2)
+			l := Vec{0.2, 0.8, -1}.Normalized().Mul(1)
 			n, ok := Normal(r, scene)
 			v := n.Dot(l) + 0.02
 			if v < 0 {
@@ -63,7 +67,8 @@ func cubeFrame() Shape {
 		Z = 1
 		D = 0.2
 	)
-	return Slab(X, Y, Z).Sub(Slab(X, Y-D, Z-D)).Sub(Slab(X-D, Y, Z-D)).Sub(Slab(X-D, Y-D, Z))
+	frame := Slab(X, Y, Z).Sub(Slab(X, Y-D, Z-D)).Sub(Slab(X-D, Y, Z-D)).Sub(Slab(X-D, Y-D, Z))
+	return frame.RotY(-0.5).Transl(0, -0.2, 2)
 }
 
 const (
@@ -89,8 +94,9 @@ func Bisect(r Ray, s Shape) (Vec, bool) {
 
 	out := in - fine
 
-	assert(!s(r.At(out)))
-	assert(s(r.At(in)))
+	if s(r.At(out)) || !s(r.At(in)) {
+		return Vec{}, false
+	}
 
 	for math.Abs(in-out)/(in+out) > tol {
 		mid := (in + out) / 2
