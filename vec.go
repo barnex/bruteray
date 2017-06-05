@@ -37,3 +37,10 @@ func (v Vec) Normalized() Vec {
 	}
 	return v.Div(l)
 }
+
+func (a Vec) Cross(b Vec) Vec {
+	x := a.Y*b.Z - a.Z*b.Y
+	y := a.Z*b.X - a.X*b.Z
+	z := a.X*b.Y - a.Y*b.X
+	return Vec{x, y, z}
+}

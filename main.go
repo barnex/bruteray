@@ -29,15 +29,23 @@ func main() {
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
 
-			y0 := (float64(i) - H/2 + 0.5) / H
+			y0 := (-float64(i) + H/2 + 0.5) / H
 			x0 := (float64(j) - W/2 + 0.5) / H
 
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
 
-			inter, ok := Bisect(r, scene)
+			l := Vec{0.2, 0.8, -1}.Normalized()
+			n, ok := Normal(r, scene)
+			v := n.Dot(l) + 0.02
+			if v < 0 {
+				v = 0
+			}
+			if v > 1 {
+				v = 1
+			}
 			if ok {
-				img[i][j] = inter.Z * 2
+				img[i][j] = v
 			}
 
 		}
@@ -81,6 +89,31 @@ func Bisect(r Ray, s Shape) (Vec, bool) {
 		}
 	}
 	return r.At(in), true
+}
+
+func Normal(r Ray, s Shape) (Vec, bool) {
+	c, ok := Bisect(r, s)
+	if !ok {
+		return Vec{}, false
+	}
+
+	ra := r
+	ra.Dir = ra.Dir.Add(Vec{1e-3, 0, 0})
+	a, okA := Bisect(ra, s)
+
+	rb := r
+	rb.Dir = rb.Dir.Add(Vec{0, 1e-3, 0})
+	b, okB := Bisect(rb, s)
+
+	if !okA || !okB {
+		return Vec{}, false
+	}
+
+	a = a.Sub(c)
+	b = b.Sub(c)
+
+	return b.Cross(a).Normalized(), true
+
 }
 
 type Ray struct {
