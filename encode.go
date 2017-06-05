@@ -1,10 +1,16 @@
 package main
 
 import (
+	"flag"
 	"image"
 	"image/color"
-	"image/png"
+	"image/jpeg"
+	"math"
 	"os"
+)
+
+var (
+	quality = flag.Int("q", 80, "JPEG quality")
 )
 
 func Encode(img [][]float64, fname string) error {
@@ -13,13 +19,22 @@ func Encode(img [][]float64, fname string) error {
 		return err
 	}
 	defer f.Close()
-	return png.Encode(f, Gray(img))
+	return jpeg.Encode(f, Gray(img), &jpeg.Options{Quality: *quality})
 }
 
 type Gray [][]float64
 
 func (g Gray) At(i, j int) color.Color {
-	return color.Gray16{uint16(g[j][i] * ((1 << 16) - 1))}
+	c := g[j][i]
+	if c < 0 {
+		return color.NRGBA{R: 0, G: 0, B: 255, A: 255}
+	}
+	if c > 1 {
+		return color.NRGBA{R: 255, G: 0, B: 0, A: 255}
+	}
+	//c = srgb(c)
+	v := uint8(c * ((1 << 8) - 1))
+	return color.RGBA{v, v, v, 255}
 }
 
 func (g Gray) Bounds() image.Rectangle {
@@ -28,4 +43,17 @@ func (g Gray) Bounds() image.Rectangle {
 
 func (g Gray) ColorModel() color.Model {
 	return nil
+}
+
+// linear to sRGB gamma curve
+// https://en.wikipedia.org/wiki/SRGB
+func srgb(c float64) float64 {
+	if c <= 0.0031308 {
+		return 12.92 * c
+	}
+	c = 1.055*math.Pow(c, 1./2.4) - 0.05
+	if c > 1 {
+		return 1
+	}
+	return c
 }
