@@ -5,9 +5,9 @@ import (
 	"math"
 )
 
-const (
-	W = 300
-	H = 200
+var (
+	width  = flag.Int("w", 300, "canvas width")
+	height = flag.Int("h", 200, "canvas height")
 )
 
 var (
@@ -18,24 +18,26 @@ var (
 func main() {
 
 	flag.Parse()
+	W := *width
+	H := *height
 
 	img := make([][]float64, H)
 	for i := range img {
 		img[i] = make([]float64, W)
 	}
 
-	scene := Sphere(0.5).Transl(0, 0, 0.5)
+	scene := cubeFrame().RotY(-0.5).Transl(0, -0.2, 2)
 
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
 
-			y0 := (-float64(i) + H/2 + 0.5) / H
-			x0 := (float64(j) - W/2 + 0.5) / H
+			y0 := (-float64(i) + float64(H)/2 + 0.5) / float64(H)
+			x0 := (float64(j) - float64(W)/2 + 0.5) / float64(H)
 
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
 
-			l := Vec{0.2, 0.8, -1}.Normalized()
+			l := Vec{0.2, 0.8, -1}.Normalized().Mul(1.2)
 			n, ok := Normal(r, scene)
 			v := n.Dot(l) + 0.02
 			if v < 0 {
@@ -52,6 +54,16 @@ func main() {
 	}
 
 	Encode(img, "out.jpg")
+}
+
+func cubeFrame() Shape {
+	const (
+		X = 1
+		Y = 0.5
+		Z = 1
+		D = 0.2
+	)
+	return Slab(X, Y, Z).Sub(Slab(X, Y-D, Z-D)).Sub(Slab(X-D, Y, Z-D)).Sub(Slab(X-D, Y-D, Z))
 }
 
 const (
