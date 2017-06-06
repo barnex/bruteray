@@ -14,10 +14,6 @@ var (
 	progressive = flag.Int("p", 16, "progressively increase resolution")
 )
 
-var (
-	Focal = Vec{0, 0, -1}
-)
-
 // stats
 var (
 	nShade = 1
@@ -31,6 +27,11 @@ const (
 
 const deg = math.Pi / 180
 
+var (
+	Focal = Vec{0, 0, -1}
+	scene *Scene
+)
+
 func main() {
 	Init()
 	start := time.Now()
@@ -38,15 +39,15 @@ func main() {
 	const H = 2
 	sp := coolSphere().RotX(-30*deg).Transl(0, 0, 6)
 	sl := Slab(8, 0.1, 8).Transl(0, -H, 0).RotX(-30*deg).Transl(0, 0, 6)
-	s := &Scene{
+	scene = &Scene{
 		light: Vec{9, 3, -5},
 		amb:   0.2,
-		objs:  []Shape{sp, sl},
+		objs:  []Obj{{sp, ShadeDiffuse()}, {sl, WithShadow(ShadeFlat(0.3))}},
 	}
 
 	img := MakeImage(*width, *height)
 
-	Render(s, img)
+	Render(scene, img)
 	fmt.Println(nShade, "evals", time.Since(start))
 }
 
@@ -86,15 +87,48 @@ func refine(sc *Scene, img [][]float64, sub int, first bool) {
 type Scene struct {
 	light Vec
 	amb   float64
-	objs  []Shape
+	objs  []Obj
 }
 
-func Nearest(s []Shape, r Ray) (int, float64) {
+type Obj struct {
+	Shape
+	Shader ShaderFunc
+}
+
+type ShaderFunc func(p, normal Vec, r Ray) float64
+
+func ShadeFlat(v float64) ShaderFunc {
+	return func(p, n Vec, r Ray) float64 {
+		return v
+	}
+}
+
+func ShadeDiffuse() ShaderFunc {
+	return func(p, n Vec, r Ray) float64 {
+		d := scene.light.Sub(p).Normalized()
+		return 0.8*n.Dot(d) + scene.amb
+	}
+}
+
+func WithShadow(sf ShaderFunc) ShaderFunc {
+	return func(p, n Vec, r Ray) float64 {
+
+		d := scene.light.Sub(p).Normalized()
+
+		secondary := Ray{p.MAdd(0.01, d), d}
+		if !intersAny(secondary, scene.objs) {
+			return sf(p, n, r) // not occluded, original shader
+		}
+		return scene.amb // occluded: ambient light
+	}
+}
+
+func Nearest(s []Obj, r Ray) (int, float64) {
 	nearest := -1
 	nearestZ := math.Inf(1)
 
 	for i, s := range s {
-		z, ok := Inters(r, s)
+		z, ok := Inters(r, s.Shape)
 		if ok && z < nearestZ {
 			nearestZ = z
 			nearest = i
@@ -109,20 +143,17 @@ func PixelShade(sc *Scene, r Ray) float64 {
 	if i == -1 {
 		return 0
 	}
-	shape := sc.objs[i]
+	obj := sc.objs[i]
+	shape := obj.Shape
 
 	c, n, ok := Normal(r, shape)
 	if !ok {
 		return 0
 	}
-	d := sc.light.Sub(c).Normalized()
 
-	secondary := Ray{c.MAdd(0.01, d), d}
-	v := sc.amb
-	if !intersAny(secondary, sc.objs) {
-		v = 0.8*n.Dot(d) + sc.amb
-	}
-	v = clip(v, 0, 1)
+	v := obj.Shader(c, n, r)
+
+	//v = clip(v, 0, 1)
 	return v
 }
 
@@ -131,9 +162,9 @@ func inters(r Ray, s Shape) bool {
 	return ok
 }
 
-func intersAny(r Ray, s []Shape) bool {
+func intersAny(r Ray, s []Obj) bool {
 	for _, s := range s {
-		if inters(r, s) {
+		if inters(r, s.Shape) {
 			return true
 		}
 	}
