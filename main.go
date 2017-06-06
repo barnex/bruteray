@@ -34,7 +34,7 @@ func main() {
 	}
 
 	scene := coolSphere().RotX(-30*deg).Transl(0,0,6)
-	amb := 0.1
+	amb := 0.2
 
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
@@ -53,7 +53,7 @@ func main() {
 			secondary := Ray{c.MAdd(0.01, d), d}
 			v := amb
 			if !inters(secondary, scene){
-				v = n.Dot(d) + amb
+				v = 0.8*n.Dot(d) + amb
 			}
 
 			if v < 0 {
@@ -74,13 +74,17 @@ func main() {
 
 func coolSphere() Shape {
 	const (
-		R = 1
+		R = 2
 		H = 2
-		D = 0.2
+		D = 0.85
 	)
 	base := Slab(8, 0.1, 8).Transl(0, -H, 0)
-	return CylinderZ(R, H).RotX(90*deg).Add(base)
-	//return frame.RotY(-0.5).Transl(0, -0.2, 2)
+	s := Sphere(R)
+	s = s.Sub(CylinderZ(R-D, H))
+	s = s.Sub(CylinderZ(R-D, H).RotX(90*deg))
+	s = s.Sub(CylinderZ(R-D, H).RotY(90*deg))
+	s = s.RotY(-20*deg)
+	return s.Add(base)
 }
 
 func cubeFrame() Shape {

@@ -10,7 +10,7 @@ func Sphere(r float64) Shape {
 
 func Ellipsoid(rx, ry, rz float64) Shape {
 	return func(r Vec) bool {
-		return sqr(r.X/rx)+sqr(r.Y/ry)+sqr(r.Z/rz) <= 1./2.
+		return sqr(r.X/rx)+sqr(r.Y/ry)+sqr(r.Z/rz) <= 1
 	}
 }
 
