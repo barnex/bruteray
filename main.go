@@ -39,7 +39,7 @@ func main() {
 	sp := coolSphere().RotX(-30*deg).Transl(0, 0, 6)
 	sl := Slab(8, 0.1, 8).Transl(0, -H, 0).RotX(-30*deg).Transl(0, 0, 6)
 	s := &Scene{
-		light: Vec{-2, 4, 1},
+		light: Vec{9, 3, -5},
 		amb:   0.2,
 		objs:  []Shape{sp, sl},
 	}
@@ -89,8 +89,28 @@ type Scene struct {
 	objs  []Shape
 }
 
+func Nearest(s []Shape, r Ray) (int, float64) {
+	nearest := -1
+	nearestZ := math.Inf(1)
+
+	for i, s := range s {
+		z, ok := Inters(r, s)
+		if ok && z < nearestZ {
+			nearestZ = z
+			nearest = i
+		}
+	}
+
+	return nearest, nearestZ
+}
+
 func PixelShade(sc *Scene, r Ray) float64 {
-	shape := sc.objs[0]
+	i, _ := Nearest(sc.objs, r)
+	if i == -1 {
+		return 0
+	}
+	shape := sc.objs[i]
+
 	c, n, ok := Normal(r, shape)
 	if !ok {
 		return 0
@@ -99,7 +119,7 @@ func PixelShade(sc *Scene, r Ray) float64 {
 
 	secondary := Ray{c.MAdd(0.01, d), d}
 	v := sc.amb
-	if !inters(secondary, shape) {
+	if !intersAny(secondary, sc.objs) {
 		v = 0.8*n.Dot(d) + sc.amb
 	}
 	v = clip(v, 0, 1)
@@ -109,6 +129,15 @@ func PixelShade(sc *Scene, r Ray) float64 {
 func inters(r Ray, s Shape) bool {
 	_, ok := Inters(r, s)
 	return ok
+}
+
+func intersAny(r Ray, s []Shape) bool {
+	for _, s := range s {
+		if inters(r, s) {
+			return true
+		}
+	}
+	return false
 }
 
 func Inters(r Ray, s Shape) (float64, bool) {
