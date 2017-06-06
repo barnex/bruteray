@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	width  = flag.Int("w", 300, "canvas width")
-	height = flag.Int("h", 200, "canvas height")
+	width    = flag.Int("w", 300, "canvas width")
+	height   = flag.Int("h", 200, "canvas height")
+	focalLen = flag.Float64("f", 1, "focal length")
 )
 
 var (
@@ -16,100 +17,79 @@ var (
 
 const (
 	Horiz = 20.0
-	fine = 0.02
-	tol  = 1e-9
+	fine  = 0.02
+	tol   = 1e-9
 )
 
-const deg = math.Pi/180
+const deg = math.Pi / 180
 
 func main() {
 
 	flag.Parse()
 	W := *width
 	H := *height
+	Focal = Vec{0, 0, -*focalLen}
 
 	img := make([][]float64, H)
 	for i := range img {
 		img[i] = make([]float64, W)
 	}
 
-	scene := coolSphere().RotX(-30*deg).Transl(0,0,6)
-	amb := 0.2
+	s := &Scene{
+		light: Vec{3, 2, 2},
+		amb:   0.2,
+		shape: coolSphere().RotX(-30*deg).Transl(0, 0, 6),
+	}
 
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
-
 			y0 := (-float64(i) + float64(H)/2 + 0.5) / float64(H)
 			x0 := (float64(j) - float64(W)/2 + 0.5) / float64(H)
-
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
-
-			l := Vec{3, 2, 2}
-
-			c, n, ok := Normal(r, scene)
-			d := l.Sub(c).Normalized()
-
-			secondary := Ray{c.MAdd(0.01, d), d}
-			v := amb
-			if !inters(secondary, scene){
-				v = 0.8*n.Dot(d) + amb
-			}
-
-			if v < 0 {
-				v = 0
-			}
-			if v > 1 {
-				v = 1
-			}
-			if ok {
-				img[i][j] = v
-			}
-
+			img[i][j] = PixelShade(s, r)
 		}
 	}
 
 	Encode(img, "out.jpg")
 }
 
-func coolSphere() Shape {
-	const (
-		R = 2
-		H = 2
-		D = 0.85
-	)
-	base := Slab(8, 0.1, 8).Transl(0, -H, 0)
-	s := Sphere(R)
-	s = s.Sub(CylinderZ(R-D, H))
-	s = s.Sub(CylinderZ(R-D, H).RotX(90*deg))
-	s = s.Sub(CylinderZ(R-D, H).RotY(90*deg))
-	s = s.RotY(-20*deg)
-	return s.Add(base)
+func PixelShade(scene *Scene, r Ray) float64 {
+
+	c, n, ok := Normal(r, scene.shape)
+	if !ok {
+		return 0
+	}
+	d := scene.light.Sub(c).Normalized()
+
+	secondary := Ray{c.MAdd(0.01, d), d}
+	v := scene.amb
+	if !inters(secondary, scene.shape) {
+		v = 0.8*n.Dot(d) + scene.amb
+	}
+	v = clip(v, 0, 1)
+	return v
 }
 
-func cubeFrame() Shape {
-	const (
-		X = 1
-		Y = 0.5
-		Z = 1
-		D = 0.2
-	)
-	frame := Slab(X, Y, Z).Sub(Slab(X, Y-D, Z-D)).Sub(Slab(X-D, Y, Z-D)).Sub(Slab(X-D, Y-D, Z))
-	return frame.RotY(-0.5).Transl(0, -0.2, 2)
+func clip(v, min, max float64) float64 {
+	if v < 0 {
+		v = 0
+	}
+	if v > 1 {
+		v = 1
+	}
+	return v
 }
 
-func sinc() Shape{
-	sinc := Shape(func(r Vec) bool {
-		R := math.Sqrt(r.X*r.X+r.Z*r.Z) * 5
-		return r.Y < 2*math.Sin(R)/R
-	})
-	return sinc.Intersect(Slab(4, 2, 4)).RotY(-0.4).RotX(-0.5).Transl(0, 0, 8).RotX(-0.2)
+type Scene struct {
+	light Vec
+	amb   float64
+	shape Shape
 }
 
-
-func inters(r Ray, s Shape)  bool {
-	_, ok := Inters(r,s)
-return ok
+func inters(r Ray, s Shape) bool {
+	_, ok := Inters(r, s)
+	return ok
 }
 
 func Inters(r Ray, s Shape) (float64, bool) {
