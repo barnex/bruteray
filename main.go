@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"math"
+	"time"
 )
 
 var (
@@ -17,6 +18,11 @@ var (
 	Focal = Vec{0, 0, -1}
 )
 
+// stats
+var (
+	nShade = 1
+)
+
 const (
 	Horiz = 20.0
 	fine  = 0.02
@@ -27,6 +33,7 @@ const deg = math.Pi / 180
 
 func main() {
 	Init()
+	start := time.Now()
 
 	s := &Scene{
 		light: Vec{-2, 4, 1},
@@ -37,12 +44,7 @@ func main() {
 	img := MakeImage(*width, *height)
 
 	Render(s, img)
-	fmt.Println(nShade, "evals")
-}
-
-func Init() {
-	flag.Parse()
-	Focal = Vec{0, 0, -*focalLen}
+	fmt.Println(nShade, "evals", time.Since(start))
 }
 
 func MakeImage(W, H int) [][]float64 {
@@ -83,7 +85,11 @@ func refine(s *Scene, img [][]float64, sub int, first bool) {
 	}
 }
 
-var nShade = 1
+type Scene struct {
+	light Vec
+	amb   float64
+	shape Shape
+}
 
 func PixelShade(scene *Scene, r Ray) float64 {
 	nShade++
@@ -100,22 +106,6 @@ func PixelShade(scene *Scene, r Ray) float64 {
 	}
 	v = clip(v, 0, 1)
 	return v
-}
-
-func clip(v, min, max float64) float64 {
-	if v < 0 {
-		v = 0
-	}
-	if v > 1 {
-		v = 1
-	}
-	return v
-}
-
-type Scene struct {
-	light Vec
-	amb   float64
-	shape Shape
 }
 
 func inters(r Ray, s Shape) bool {
@@ -182,17 +172,23 @@ func Normal(r Ray, s Shape) (Vec, Vec, bool) {
 
 }
 
-type Ray struct {
-	Start Vec
-	Dir   Vec
-}
-
-func (r *Ray) At(t float64) Vec {
-	return r.Start.Add(r.Dir.Mul(t))
+func clip(v, min, max float64) float64 {
+	if v < 0 {
+		v = 0
+	}
+	if v > 1 {
+		v = 1
+	}
+	return v
 }
 
 func assert(t bool) {
 	if !t {
 		panic("assertion failed")
 	}
+}
+
+func Init() {
+	flag.Parse()
+	Focal = Vec{0, 0, -*focalLen}
 }
