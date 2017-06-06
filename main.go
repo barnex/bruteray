@@ -2,13 +2,15 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"math"
 )
 
 var (
-	width    = flag.Int("w", 300, "canvas width")
-	height   = flag.Int("h", 200, "canvas height")
-	focalLen = flag.Float64("f", 1, "focal length")
+	width       = flag.Int("w", 300, "canvas width")
+	height      = flag.Int("h", 200, "canvas height")
+	focalLen    = flag.Float64("f", 1, "focal length")
+	progressive = flag.Int("p", 16, "progressively increase resolution")
 )
 
 var (
@@ -27,14 +29,15 @@ func main() {
 	Init()
 
 	s := &Scene{
-		light: Vec{3, 2, 2},
+		light: Vec{-2, 4, 1},
 		amb:   0.2,
 		shape: coolSphere().RotX(-30*deg).Transl(0, 0, 6),
 	}
 
 	img := MakeImage(*width, *height)
+
 	Render(s, img)
-	Encode(img, "out.jpg")
+	fmt.Println(nShade, "evals")
 }
 
 func Init() {
@@ -51,21 +54,39 @@ func MakeImage(W, H int) [][]float64 {
 }
 
 func Render(s *Scene, img [][]float64) {
+	for sub := *progressive; sub > 0; sub /= 2 {
+		refine(s, img, sub, sub == *progressive)
+		Encode(img, "out.jpg")
+	}
+}
+
+func refine(s *Scene, img [][]float64, sub int, first bool) {
 	W := *width
 	H := *height
-	for i := 0; i < H; i++ {
-		for j := 0; j < W; j++ {
+	for i := 0; i < H; i += sub {
+		fmt.Println(sub, i, "/", H)
+		for j := 0; j < W; j += sub {
+			if i%(2*sub) == 0 && j%(2*sub) == 0 && !first {
+				continue
+			}
 			y0 := (-float64(i) + float64(H)/2 + 0.5) / float64(H)
 			x0 := (float64(j) - float64(W)/2 + 0.5) / float64(H)
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
-			img[i][j] = PixelShade(s, r)
+			v := PixelShade(s, r)
+			for I := i; I < i+sub && I < H; I++ {
+				for J := j; J < j+sub && J < W; J++ {
+					img[I][J] = v
+				}
+			}
 		}
 	}
 }
 
-func PixelShade(scene *Scene, r Ray) float64 {
+var nShade = 1
 
+func PixelShade(scene *Scene, r Ray) float64 {
+	nShade++
 	c, n, ok := Normal(r, scene.shape)
 	if !ok {
 		return 0
@@ -142,11 +163,11 @@ func Normal(r Ray, s Shape) (Vec, Vec, bool) {
 	}
 
 	ra := r
-	ra.Dir = ra.Dir.Add(Vec{1e-3, 0, 0})
+	ra.Dir = ra.Dir.Add(Vec{1e-5, 0, 0})
 	a, okA := Bisect(ra, s)
 
 	rb := r
-	rb.Dir = rb.Dir.Add(Vec{0, 1e-3, 0})
+	rb.Dir = rb.Dir.Add(Vec{0, 1e-5, 0})
 	b, okB := Bisect(rb, s)
 
 	if !okA || !okB {
