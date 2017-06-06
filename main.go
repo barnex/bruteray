@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	width       = flag.Int("w", 300, "canvas width")
-	height      = flag.Int("h", 200, "canvas height")
+	width       = flag.Int("w", 1024, "canvas width")
+	height      = flag.Int("h", 768, "canvas height")
 	focalLen    = flag.Float64("f", 1, "focal length")
 	progressive = flag.Int("p", 16, "progressively increase resolution")
 )
@@ -35,24 +35,19 @@ func main() {
 	Init()
 	start := time.Now()
 
+	const H = 2
+	sp := coolSphere().RotX(-30*deg).Transl(0, 0, 6)
+	sl := Slab(8, 0.1, 8).Transl(0, -H, 0).RotX(-30*deg).Transl(0, 0, 6)
 	s := &Scene{
 		light: Vec{-2, 4, 1},
 		amb:   0.2,
-		shape: coolSphere().RotX(-30*deg).Transl(0, 0, 6),
+		objs:  []Shape{sp, sl},
 	}
 
 	img := MakeImage(*width, *height)
 
 	Render(s, img)
 	fmt.Println(nShade, "evals", time.Since(start))
-}
-
-func MakeImage(W, H int) [][]float64 {
-	img := make([][]float64, H)
-	for i := range img {
-		img[i] = make([]float64, W)
-	}
-	return img
 }
 
 func Render(s *Scene, img [][]float64) {
@@ -62,20 +57,23 @@ func Render(s *Scene, img [][]float64) {
 	}
 }
 
-func refine(s *Scene, img [][]float64, sub int, first bool) {
+func refine(sc *Scene, img [][]float64, sub int, first bool) {
 	W := *width
 	H := *height
 	for i := 0; i < H; i += sub {
-		fmt.Println(sub, i, "/", H)
+		fmt.Printf("%.1f%%\n", float64(100*nShade)/float64((W+1)*(H+1)))
 		for j := 0; j < W; j += sub {
 			if i%(2*sub) == 0 && j%(2*sub) == 0 && !first {
 				continue
 			}
+			nShade++
 			y0 := (-float64(i) + float64(H)/2 + 0.5) / float64(H)
 			x0 := (float64(j) - float64(W)/2 + 0.5) / float64(H)
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
-			v := PixelShade(s, r)
+
+			v := PixelShade(sc, r)
+
 			for I := i; I < i+sub && I < H; I++ {
 				for J := j; J < j+sub && J < W; J++ {
 					img[I][J] = v
@@ -88,21 +86,21 @@ func refine(s *Scene, img [][]float64, sub int, first bool) {
 type Scene struct {
 	light Vec
 	amb   float64
-	shape Shape
+	objs  []Shape
 }
 
-func PixelShade(scene *Scene, r Ray) float64 {
-	nShade++
-	c, n, ok := Normal(r, scene.shape)
+func PixelShade(sc *Scene, r Ray) float64 {
+	shape := sc.objs[0]
+	c, n, ok := Normal(r, shape)
 	if !ok {
 		return 0
 	}
-	d := scene.light.Sub(c).Normalized()
+	d := sc.light.Sub(c).Normalized()
 
 	secondary := Ray{c.MAdd(0.01, d), d}
-	v := scene.amb
-	if !inters(secondary, scene.shape) {
-		v = 0.8*n.Dot(d) + scene.amb
+	v := sc.amb
+	if !inters(secondary, shape) {
+		v = 0.8*n.Dot(d) + sc.amb
 	}
 	v = clip(v, 0, 1)
 	return v
@@ -170,6 +168,14 @@ func Normal(r Ray, s Shape) (Vec, Vec, bool) {
 	n := b.Cross(a).Normalized()
 	return c, n, true
 
+}
+
+func MakeImage(W, H int) [][]float64 {
+	img := make([][]float64, H)
+	for i := range img {
+		img[i] = make([]float64, W)
+	}
+	return img
 }
 
 func clip(v, min, max float64) float64 {

@@ -10,13 +10,12 @@ func coolSphere() Shape {
 		H = 2
 		D = 0.85
 	)
-	base := Slab(8, 0.1, 8).Transl(0, -H, 0)
 	s := Sphere(R)
 	s = s.Sub(CylinderZ(R-D, H))
 	s = s.Sub(CylinderZ(R-D, H).RotX(90 * deg))
 	s = s.Sub(CylinderZ(R-D, H).RotY(90 * deg))
 	s = s.RotY(-20 * deg)
-	return s.Add(base)
+	return s
 }
 
 func cubeFrame() Shape {
