@@ -12,8 +12,15 @@ var (
 
 var (
 	Focal = Vec{0, 0, -1}
-	Horiz = 50.0
 )
+
+const (
+	Horiz = 20.0
+	fine = 0.02
+	tol  = 1e-9
+)
+
+const deg = math.Pi/180
 
 func main() {
 
@@ -26,11 +33,8 @@ func main() {
 		img[i] = make([]float64, W)
 	}
 
-	sinc := Shape(func(r Vec) bool {
-		R := math.Sqrt(r.X*r.X+r.Z*r.Z) * 5
-		return r.Y < 2*math.Sin(R)/R
-	})
-	scene := sinc.Intersect(Slab(4, 2, 4)).RotY(-0.4).RotX(-0.5).Transl(0, 0, 8).RotX(-0.2)
+	scene := coolSphere().RotX(-30*deg).Transl(0,0,6)
+	amb := 0.1
 
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
@@ -41,9 +45,17 @@ func main() {
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
 
-			l := Vec{0.2, 0.8, -1}.Normalized().Mul(1)
-			n, ok := Normal(r, scene)
-			v := n.Dot(l) + 0.02
+			l := Vec{3, 2, 2}
+
+			c, n, ok := Normal(r, scene)
+			d := l.Sub(c).Normalized()
+
+			secondary := Ray{c.MAdd(0.01, d), d}
+			v := amb
+			if !inters(secondary, scene){
+				v = n.Dot(d) + amb
+			}
+
 			if v < 0 {
 				v = 0
 			}
@@ -60,6 +72,17 @@ func main() {
 	Encode(img, "out.jpg")
 }
 
+func coolSphere() Shape {
+	const (
+		R = 1
+		H = 2
+		D = 0.2
+	)
+	base := Slab(8, 0.1, 8).Transl(0, -H, 0)
+	return CylinderZ(R, H).RotX(90*deg).Add(base)
+	//return frame.RotY(-0.5).Transl(0, -0.2, 2)
+}
+
 func cubeFrame() Shape {
 	const (
 		X = 1
@@ -71,10 +94,19 @@ func cubeFrame() Shape {
 	return frame.RotY(-0.5).Transl(0, -0.2, 2)
 }
 
-const (
-	fine = 0.01
-	tol  = 1e-12
-)
+func sinc() Shape{
+	sinc := Shape(func(r Vec) bool {
+		R := math.Sqrt(r.X*r.X+r.Z*r.Z) * 5
+		return r.Y < 2*math.Sin(R)/R
+	})
+	return sinc.Intersect(Slab(4, 2, 4)).RotY(-0.4).RotX(-0.5).Transl(0, 0, 8).RotX(-0.2)
+}
+
+
+func inters(r Ray, s Shape)  bool {
+	_, ok := Inters(r,s)
+return ok
+}
 
 func Inters(r Ray, s Shape) (float64, bool) {
 	for t := 0.0; t < Horiz; t += fine {
@@ -109,10 +141,10 @@ func Bisect(r Ray, s Shape) (Vec, bool) {
 	return r.At(in), true
 }
 
-func Normal(r Ray, s Shape) (Vec, bool) {
+func Normal(r Ray, s Shape) (Vec, Vec, bool) {
 	c, ok := Bisect(r, s)
 	if !ok {
-		return Vec{}, false
+		return Vec{}, Vec{}, false
 	}
 
 	ra := r
@@ -124,13 +156,14 @@ func Normal(r Ray, s Shape) (Vec, bool) {
 	b, okB := Bisect(rb, s)
 
 	if !okA || !okB {
-		return Vec{}, false
+		return Vec{}, Vec{}, false
 	}
 
 	a = a.Sub(c)
 	b = b.Sub(c)
 
-	return b.Cross(a).Normalized(), true
+	n := b.Cross(a).Normalized()
+	return c, n, true
 
 }
 

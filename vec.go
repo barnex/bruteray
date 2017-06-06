@@ -10,6 +10,10 @@ func (a Vec) Add(b Vec) Vec {
 	return Vec{a.X + b.X, a.Y + b.Y, a.Z + b.Z}
 }
 
+func (a Vec) MAdd(s float64, b Vec) Vec {
+	return Vec{a.X + s*b.X, a.Y + s*b.Y, a.Z + s*b.Z}
+}
+
 func (a Vec) Sub(b Vec) Vec {
 	return Vec{a.X - b.X, a.Y - b.Y, a.Z - b.Z}
 }

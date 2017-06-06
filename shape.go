@@ -14,6 +14,13 @@ func Ellipsoid(rx, ry, rz float64) Shape {
 	}
 }
 
+func CylinderZ(radius, semiH float64) Shape{
+	r2 := sqr(radius)
+	return func(r Vec) bool {
+		return r.Z > -semiH && r.Z < semiH && sqr(r.X)+sqr(r.Y) <= r2
+	}
+}
+
 func sqr(x float64) float64 { return x * x }
 
 func Slab(rx, ry, rz float64) Shape {
