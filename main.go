@@ -24,16 +24,7 @@ const (
 const deg = math.Pi / 180
 
 func main() {
-
-	flag.Parse()
-	W := *width
-	H := *height
-	Focal = Vec{0, 0, -*focalLen}
-
-	img := make([][]float64, H)
-	for i := range img {
-		img[i] = make([]float64, W)
-	}
+	Init()
 
 	s := &Scene{
 		light: Vec{3, 2, 2},
@@ -41,6 +32,27 @@ func main() {
 		shape: coolSphere().RotX(-30*deg).Transl(0, 0, 6),
 	}
 
+	img := MakeImage(*width, *height)
+	Render(s, img)
+	Encode(img, "out.jpg")
+}
+
+func Init() {
+	flag.Parse()
+	Focal = Vec{0, 0, -*focalLen}
+}
+
+func MakeImage(W, H int) [][]float64 {
+	img := make([][]float64, H)
+	for i := range img {
+		img[i] = make([]float64, W)
+	}
+	return img
+}
+
+func Render(s *Scene, img [][]float64) {
+	W := *width
+	H := *height
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
 			y0 := (-float64(i) + float64(H)/2 + 0.5) / float64(H)
@@ -50,8 +62,6 @@ func main() {
 			img[i][j] = PixelShade(s, r)
 		}
 	}
-
-	Encode(img, "out.jpg")
 }
 
 func PixelShade(scene *Scene, r Ray) float64 {
