@@ -15,11 +15,6 @@ var (
 	progressive = flag.Int("p", 16, "progressively increase resolution")
 )
 
-// stats
-var (
-	nShade = 1
-)
-
 const (
 	Horiz = 20.0
 	fine  = 0.02
@@ -49,7 +44,7 @@ func main() {
 	img := MakeImage(*width, *height)
 
 	Render(scene, img)
-	fmt.Println(nShade, "evals", time.Since(start))
+	fmt.Println("done,", time.Since(start))
 }
 
 func Render(s *Scene, img [][]float64) {
@@ -62,8 +57,9 @@ func Render(s *Scene, img [][]float64) {
 func refine(sc *Scene, img [][]float64, sub int, first bool) {
 	W := *width
 	H := *height
+	nShade := 0
 	for i := 0; i < H; i += sub {
-		fmt.Printf("%.1f%%\n", float64(100*nShade)/float64((W+1)*(H+1)))
+		fmt.Printf("%.1f%%\n\u001B[F", float64(100*nShade)/float64((W+1)*(H+1)))
 		for j := 0; j < W; j += sub {
 			if i%(2*sub) == 0 && j%(2*sub) == 0 && !first {
 				continue
