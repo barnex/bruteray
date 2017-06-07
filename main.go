@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"math"
+	"math/rand"
 	"time"
 )
 
@@ -42,7 +43,7 @@ func main() {
 	scene = &Scene{
 		light: Vec{9, 3, -5},
 		amb:   0.2,
-		objs:  []Obj{{sp, ShadeDiffuse()}, {sl, WithShadow(ShadeFlat(0.3))}},
+		objs:  []Obj{{sp, ShadeDiffuse()}, {sl, ShadeReflect()}},
 	}
 
 	img := MakeImage(*width, *height)
@@ -74,6 +75,7 @@ func refine(sc *Scene, img [][]float64, sub int, first bool) {
 			r := Ray{start, start.Sub(Focal).Normalized()}
 
 			v := PixelShade(sc, r)
+			v = clip(v, 0, 1)
 
 			for I := i; I < i+sub && I < H; I++ {
 				for J := j; J < j+sub && J < W; J++ {
@@ -121,6 +123,24 @@ func WithShadow(sf ShaderFunc) ShaderFunc {
 		}
 		return scene.amb // occluded: ambient light
 	}
+}
+
+func ShadeReflect() ShaderFunc {
+	return func(p, n Vec, r Ray) float64 {
+		p = p.MAdd(0.01, n) // make sure we're outside
+		dir2 := reflect(r.Dir, n)
+		secondary := Ray{p, dir2}
+
+		if rand.Float64() < 0.9999999 {
+			return 0.5*PixelShade(scene, secondary) + scene.amb
+		} else {
+			return 0
+		}
+	}
+}
+
+func reflect(v, n Vec) Vec {
+	return v.MAdd(-2*v.Dot(n), n)
 }
 
 func Nearest(s []Obj, r Ray) (int, float64) {
