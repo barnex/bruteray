@@ -4,15 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"math"
-	"math/rand"
 	"time"
 )
 
 var (
-	width       = flag.Int("w", 1024, "canvas width")
-	height      = flag.Int("h", 768, "canvas height")
-	focalLen    = flag.Float64("f", 1, "focal length")
-	progressive = flag.Int("p", 16, "progressively increase resolution")
+	width        = flag.Int("w", 1024, "canvas width")
+	height       = flag.Int("h", 768, "canvas height")
+	focalLen     = flag.Float64("f", 1, "focal length")
+	progressive  = flag.Int("p", 16, "progressively increase resolution")
+	maxRecursion = flag.Int("r", 10, "maximum number of recursive rays")
 )
 
 const (
@@ -27,6 +27,17 @@ var (
 	Focal = Vec{0, 0, -1}
 	scene *Scene
 )
+
+type Scene struct {
+	light Vec
+	amb   float64
+	objs  []Obj
+}
+
+type Obj struct {
+	Shape
+	Shader ShaderFunc
+}
 
 func main() {
 	Init()
@@ -47,7 +58,10 @@ func main() {
 	fmt.Println("done,", time.Since(start))
 }
 
+var nShade int
+
 func Render(s *Scene, img [][]float64) {
+	nShade = 0
 	for sub := *progressive; sub > 0; sub /= 2 {
 		refine(s, img, sub, sub == *progressive)
 		Encode(img, "out.jpg")
@@ -57,7 +71,6 @@ func Render(s *Scene, img [][]float64) {
 func refine(sc *Scene, img [][]float64, sub int, first bool) {
 	W := *width
 	H := *height
-	nShade := 0
 	for i := 0; i < H; i += sub {
 		fmt.Printf("%.1f%%\n\u001B[F", float64(100*nShade)/float64((W+1)*(H+1)))
 		for j := 0; j < W; j += sub {
@@ -70,7 +83,7 @@ func refine(sc *Scene, img [][]float64, sub int, first bool) {
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
 
-			v := PixelShade(sc, r)
+			v := PixelShade(sc, r, *maxRecursion)
 			v = clip(v, 0, 1)
 
 			for I := i; I < i+sub && I < H; I++ {
@@ -82,61 +95,27 @@ func refine(sc *Scene, img [][]float64, sub int, first bool) {
 	}
 }
 
-type Scene struct {
-	light Vec
-	amb   float64
-	objs  []Obj
-}
-
-type Obj struct {
-	Shape
-	Shader ShaderFunc
-}
-
-type ShaderFunc func(p, normal Vec, r Ray) float64
-
-func ShadeFlat(v float64) ShaderFunc {
-	return func(p, n Vec, r Ray) float64 {
-		return v
+func PixelShade(sc *Scene, r Ray, N int) float64 {
+	if N == 0 {
+		return scene.amb
 	}
-}
 
-func ShadeDiffuse() ShaderFunc {
-	return func(p, n Vec, r Ray) float64 {
-		d := scene.light.Sub(p).Normalized()
-		return 0.8*n.Dot(d) + scene.amb
+	i, _ := Nearest(sc.objs, r)
+	if i == -1 {
+		return 0
 	}
-}
+	obj := sc.objs[i]
+	shape := obj.Shape
 
-func WithShadow(sf ShaderFunc) ShaderFunc {
-	return func(p, n Vec, r Ray) float64 {
-
-		d := scene.light.Sub(p).Normalized()
-
-		secondary := Ray{p.MAdd(0.01, d), d}
-		if !intersAny(secondary, scene.objs) {
-			return sf(p, n, r) // not occluded, original shader
-		}
-		return scene.amb // occluded: ambient light
+	pos, norm, ok := Normal(r, shape)
+	if !ok {
+		return 0
 	}
-}
 
-func ShadeReflect() ShaderFunc {
-	return func(p, n Vec, r Ray) float64 {
-		p = p.MAdd(0.01, n) // make sure we're outside
-		dir2 := reflect(r.Dir, n)
-		secondary := Ray{p, dir2}
+	v := obj.Shader(pos, norm, r, N)
 
-		if rand.Float64() < 0.9999999 {
-			return 0.5*PixelShade(scene, secondary) + scene.amb
-		} else {
-			return 0
-		}
-	}
-}
-
-func reflect(v, n Vec) Vec {
-	return v.MAdd(-2*v.Dot(n), n)
+	//v = clip(v, 0, 1)
+	return v
 }
 
 func Nearest(s []Obj, r Ray) (int, float64) {
@@ -150,27 +129,7 @@ func Nearest(s []Obj, r Ray) (int, float64) {
 			nearest = i
 		}
 	}
-
 	return nearest, nearestZ
-}
-
-func PixelShade(sc *Scene, r Ray) float64 {
-	i, _ := Nearest(sc.objs, r)
-	if i == -1 {
-		return 0
-	}
-	obj := sc.objs[i]
-	shape := obj.Shape
-
-	c, n, ok := Normal(r, shape)
-	if !ok {
-		return 0
-	}
-
-	v := obj.Shader(c, n, r)
-
-	//v = clip(v, 0, 1)
-	return v
 }
 
 func inters(r Ray, s Shape) bool {
@@ -197,7 +156,6 @@ func Inters(r Ray, s Shape) (float64, bool) {
 }
 
 func Bisect(r Ray, s Shape) (Vec, bool) {
-
 	in, ok := Inters(r, s)
 	if !ok {
 		return Vec{}, false
