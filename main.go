@@ -35,7 +35,7 @@ type Scene struct {
 }
 
 type Obj struct {
-	Shape
+	BruteShape
 	Shader ShaderFunc
 }
 
@@ -105,9 +105,9 @@ func PixelShade(sc *Scene, r Ray, N int) float64 {
 		return 0
 	}
 	obj := sc.objs[i]
-	shape := obj.Shape
+	shape := obj.BruteShape
 
-	pos, norm, ok := Normal(r, shape)
+	pos, norm, ok := shape.Normal(r)
 	if !ok {
 		return 0
 	}
@@ -123,7 +123,7 @@ func Nearest(s []Obj, r Ray) (int, float64) {
 	nearestZ := math.Inf(1)
 
 	for i, s := range s {
-		z, ok := Inters(r, s.Shape)
+		z, ok := s.BruteShape.Inters(r)
 		if ok && z < nearestZ {
 			nearestZ = z
 			nearest = i
@@ -132,76 +132,18 @@ func Nearest(s []Obj, r Ray) (int, float64) {
 	return nearest, nearestZ
 }
 
-func inters(r Ray, s Shape) bool {
-	_, ok := Inters(r, s)
+func inters(r Ray, s BruteShape) bool {
+	_, ok := s.Inters(r)
 	return ok
 }
 
 func intersAny(r Ray, s []Obj) bool {
 	for _, s := range s {
-		if inters(r, s.Shape) {
+		if inters(r, s.BruteShape) {
 			return true
 		}
 	}
 	return false
-}
-
-func Inters(r Ray, s Shape) (float64, bool) {
-	for t := 0.0; t < Horiz; t += fine {
-		if s(r.At(t)) {
-			return t, true
-		}
-	}
-	return 0, false
-}
-
-func Bisect(r Ray, s Shape) (Vec, bool) {
-	in, ok := Inters(r, s)
-	if !ok {
-		return Vec{}, false
-	}
-
-	out := in - fine
-
-	if s(r.At(out)) || !s(r.At(in)) {
-		return Vec{}, false
-	}
-
-	for math.Abs(in-out)/(in+out) > tol {
-		mid := (in + out) / 2
-		if s(r.At(mid)) {
-			in = mid
-		} else {
-			out = mid
-		}
-	}
-	return r.At(in), true
-}
-
-func Normal(r Ray, s Shape) (Vec, Vec, bool) {
-	c, ok := Bisect(r, s)
-	if !ok {
-		return Vec{}, Vec{}, false
-	}
-
-	ra := r
-	ra.Dir = ra.Dir.Add(Vec{1e-5, 0, 0})
-	a, okA := Bisect(ra, s)
-
-	rb := r
-	rb.Dir = rb.Dir.Add(Vec{0, 1e-5, 0})
-	b, okB := Bisect(rb, s)
-
-	if !okA || !okB {
-		return Vec{}, Vec{}, false
-	}
-
-	a = a.Sub(c)
-	b = b.Sub(c)
-
-	n := b.Cross(a).Normalized()
-	return c, n, true
-
 }
 
 func MakeImage(W, H int) [][]float64 {

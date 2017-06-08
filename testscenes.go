@@ -4,7 +4,7 @@ import "math"
 
 // some shapes for testing
 
-func coolSphere() Shape {
+func coolSphere() BruteShape {
 	const (
 		R = 2
 		H = 2
@@ -18,7 +18,7 @@ func coolSphere() Shape {
 	return s
 }
 
-func cubeFrame() Shape {
+func cubeFrame() BruteShape {
 	const (
 		X = 1
 		Y = 0.5
@@ -29,8 +29,8 @@ func cubeFrame() Shape {
 	return frame.RotY(-0.5).Transl(0, -0.2, 2)
 }
 
-func sinc() Shape {
-	sinc := Shape(func(r Vec) bool {
+func sinc() BruteShape {
+	sinc := BruteShape(func(r Vec) bool {
 		R := math.Sqrt(r.X*r.X+r.Z*r.Z) * 5
 		return r.Y < 2*math.Sin(R)/R
 	})
