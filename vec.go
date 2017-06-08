@@ -34,6 +34,10 @@ func (v Vec) Len() float64 {
 	return math.Sqrt(v.Dot(v))
 }
 
+func (v Vec) Len2() float64 {
+	return v.Dot(v)
+}
+
 func (v Vec) Normalized() Vec {
 	l := v.Len()
 	if l == 0 {

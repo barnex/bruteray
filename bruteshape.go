@@ -11,6 +11,34 @@ const (
 	tol  = 1e-9
 )
 
+func (s BruteShape) Normal(r Ray) (float64, Vec, bool) {
+	t, ok := s.bisect(r)
+	c := r.At(t)
+	if !ok {
+		return 0, Vec{}, false
+	}
+
+	ra := r
+	ra.Dir = ra.Dir.Add(Vec{1e-5, 0, 0})
+	ta, okA := s.bisect(ra)
+	a := ra.At(ta)
+
+	rb := r
+	rb.Dir = rb.Dir.Add(Vec{0, 1e-5, 0})
+	tb, okB := s.bisect(rb)
+	b := rb.At(tb)
+
+	if !okA || !okB {
+		return 0, Vec{}, false
+	}
+
+	a = a.Sub(c)
+	b = b.Sub(c)
+
+	n := b.Cross(a).Normalized()
+	return t, n, true
+}
+
 func (s BruteShape) inters(r Ray) (float64, bool) {
 	for t := 0.0; t < Horiz; t += fine {
 		if s(r.At(t)) {
@@ -41,35 +69,6 @@ func (s BruteShape) bisect(r Ray) (float64, bool) {
 		}
 	}
 	return out, true
-}
-
-func (s BruteShape) Normal(r Ray) (float64, Vec, bool) {
-	t, ok := s.bisect(r)
-	c := r.At(t)
-	if !ok {
-		return 0, Vec{}, false
-	}
-
-	ra := r
-	ra.Dir = ra.Dir.Add(Vec{1e-5, 0, 0})
-	ta, okA := s.bisect(ra)
-	a := ra.At(ta)
-
-	rb := r
-	rb.Dir = rb.Dir.Add(Vec{0, 1e-5, 0})
-	tb, okB := s.bisect(rb)
-	b := rb.At(tb)
-
-	if !okA || !okB {
-		return 0, Vec{}, false
-	}
-
-	a = a.Sub(c)
-	b = b.Sub(c)
-
-	n := b.Cross(a).Normalized()
-	return t, n, true
-
 }
 
 func Sphere(r float64) BruteShape {

@@ -41,13 +41,11 @@ func main() {
 	Init()
 	start := time.Now()
 
-	const H = 2
-	sp := coolSphere().RotX(-30*deg).Transl(0, 0, 6)
-	sl := Slab(8, 0.1, 8).Transl(0, -H, 0).RotX(-30*deg).Transl(0, 0, 6)
+	sp := ASphere(Vec{0, 0, 5}, 1)
 	scene = &Scene{
 		light: Vec{9, 3, -5},
 		amb:   0.2,
-		objs:  []Obj{{sp, ShadeDiffuse()}, {sl, ShadeReflect()}},
+		objs:  []Obj{{sp, ShadeDiffuse()}},
 	}
 
 	img := MakeImage(*width, *height)
