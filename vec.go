@@ -30,6 +30,10 @@ func (v Vec) Div(a float64) Vec {
 	return v.Mul(1 / a)
 }
 
+func (v Vec) Div3(a Vec) Vec {
+	return Vec{v.X / a.X, v.Y / a.Y, v.Z / a.Z}
+}
+
 func (v Vec) Len() float64 {
 	return math.Sqrt(v.Dot(v))
 }

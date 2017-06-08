@@ -41,7 +41,7 @@ func main() {
 	Init()
 	start := time.Now()
 
-	sp := ASphere(Vec{0, 0, 5}, 1)
+	sp := ABox(Vec{1, 1, 4}, Vec{2, 2, 6})
 	scene = &Scene{
 		light: Vec{9, 3, -5},
 		amb:   0.2,
