@@ -1,36 +1,39 @@
 package main
 
-type ShaderFunc func(pos, normal Vec, r Ray, rec int) float64
+type ShaderFunc func(t float64, normal Vec, r Ray, rec int) float64
 
 func ShadeFlat(v float64) ShaderFunc {
-	return func(p, n Vec, r Ray, rec int) float64 {
+	return func(t float64, n Vec, r Ray, rec int) float64 {
 		return v
 	}
 }
 
 func ShadeDiffuse() ShaderFunc {
-	return func(p, n Vec, r Ray, rec int) float64 {
+	return func(t float64, n Vec, r Ray, rec int) float64 {
+		p := r.At(t)
 		d := scene.light.Sub(p).Normalized()
 		return 0.8*n.Dot(d) + scene.amb
 	}
 }
 
 func WithShadow(sf ShaderFunc) ShaderFunc {
-	return func(p, n Vec, r Ray, rec int) float64 {
+	return func(t float64, n Vec, r Ray, rec int) float64 {
 
+		p := r.At(t)
 		d := scene.light.Sub(p).Normalized()
 
-		secondary := Ray{p.MAdd(0.01, d), d}
+		secondary := Ray{p, d} // todo: rm
 		if !intersAny(secondary, scene.objs) {
-			return sf(p, n, r, rec-1) // not occluded, original shader
+			return sf(t, n, r, rec-1) // not occluded, original shader
 		}
 		return scene.amb // occluded: ambient light
 	}
 }
 
 func ShadeReflect() ShaderFunc {
-	return func(p, n Vec, r Ray, rec int) float64 {
-		p = p.MAdd(0.01, n) // make sure we're outside
+	return func(t float64, n Vec, r Ray, rec int) float64 {
+		p := r.At(t)
+		//p = p.MAdd(0.01, n) // make sure we're outside
 		dir2 := reflect(r.Dir, n)
 		secondary := Ray{p, dir2}
 		return 0.5*PixelShade(scene, secondary, rec-1) + scene.amb

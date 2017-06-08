@@ -17,8 +17,6 @@ var (
 
 const (
 	Horiz = 20.0
-	fine  = 0.02
-	tol   = 1e-9
 )
 
 const deg = math.Pi / 180
@@ -35,7 +33,7 @@ type Scene struct {
 }
 
 type Obj struct {
-	BruteShape
+	Shape
 	Shader ShaderFunc
 }
 
@@ -105,14 +103,14 @@ func PixelShade(sc *Scene, r Ray, N int) float64 {
 		return 0
 	}
 	obj := sc.objs[i]
-	shape := obj.BruteShape
+	shape := obj.Shape
 
-	pos, norm, ok := shape.Normal(r)
+	t, norm, ok := shape.Normal(r)
 	if !ok {
 		return 0
 	}
 
-	v := obj.Shader(pos, norm, r, N)
+	v := obj.Shader(t, norm, r, N)
 
 	//v = clip(v, 0, 1)
 	return v
@@ -123,7 +121,7 @@ func Nearest(s []Obj, r Ray) (int, float64) {
 	nearestZ := math.Inf(1)
 
 	for i, s := range s {
-		z, ok := s.BruteShape.Inters(r)
+		z, _, ok := s.Normal(r)
 		if ok && z < nearestZ {
 			nearestZ = z
 			nearest = i
@@ -132,14 +130,14 @@ func Nearest(s []Obj, r Ray) (int, float64) {
 	return nearest, nearestZ
 }
 
-func inters(r Ray, s BruteShape) bool {
-	_, ok := s.Inters(r)
+func inters(r Ray, s Shape) bool {
+	_, _, ok := s.Normal(r)
 	return ok
 }
 
 func intersAny(r Ray, s []Obj) bool {
 	for _, s := range s {
-		if inters(r, s.BruteShape) {
+		if inters(r, s.Shape) {
 			return true
 		}
 	}

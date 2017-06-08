@@ -2,9 +2,16 @@ package main
 
 import "math"
 
+// A Shape implemented as a function that returns true when a point lies inside.
+// Intersection is calculated by brute force.
 type BruteShape func(Vec) bool
 
-func (s BruteShape) Inters(r Ray) (float64, bool) {
+const (
+	fine = 0.02
+	tol  = 1e-9
+)
+
+func (s BruteShape) inters(r Ray) (float64, bool) {
 	for t := 0.0; t < Horiz; t += fine {
 		if s(r.At(t)) {
 			return t, true
@@ -13,16 +20,16 @@ func (s BruteShape) Inters(r Ray) (float64, bool) {
 	return 0, false
 }
 
-func (s BruteShape) Bisect(r Ray) (Vec, bool) {
-	in, ok := s.Inters(r)
+func (s BruteShape) bisect(r Ray) (float64, bool) {
+	in, ok := s.inters(r)
 	if !ok {
-		return Vec{}, false
+		return 0, false
 	}
 
 	out := in - fine
 
 	if s(r.At(out)) || !s(r.At(in)) {
-		return Vec{}, false
+		return 0, false
 	}
 
 	for math.Abs(in-out)/(in+out) > tol {
@@ -33,32 +40,35 @@ func (s BruteShape) Bisect(r Ray) (Vec, bool) {
 			out = mid
 		}
 	}
-	return r.At(in), true
+	return out, true
 }
 
-func (s BruteShape) Normal(r Ray) (Vec, Vec, bool) {
-	c, ok := s.Bisect(r)
+func (s BruteShape) Normal(r Ray) (float64, Vec, bool) {
+	t, ok := s.bisect(r)
+	c := r.At(t)
 	if !ok {
-		return Vec{}, Vec{}, false
+		return 0, Vec{}, false
 	}
 
 	ra := r
 	ra.Dir = ra.Dir.Add(Vec{1e-5, 0, 0})
-	a, okA := s.Bisect(ra)
+	ta, okA := s.bisect(ra)
+	a := ra.At(ta)
 
 	rb := r
 	rb.Dir = rb.Dir.Add(Vec{0, 1e-5, 0})
-	b, okB := s.Bisect(rb)
+	tb, okB := s.bisect(rb)
+	b := rb.At(tb)
 
 	if !okA || !okB {
-		return Vec{}, Vec{}, false
+		return 0, Vec{}, false
 	}
 
 	a = a.Sub(c)
 	b = b.Sub(c)
 
 	n := b.Cross(a).Normalized()
-	return c, n, true
+	return t, n, true
 
 }
 
