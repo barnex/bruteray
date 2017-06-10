@@ -18,9 +18,10 @@ func Diffuse1(reflect float64) Shader {
 
 		acc := 0.
 		for _, light := range sources {
-			d := light.Pos.Sub(p)
+			lightPos, flux := light.Sample()
+			d := lightPos.Sub(p)
 			if !intersectsAny(Ray{p, d.Normalized()}) {
-				acc += reflect * light.Flux * n.Dot(d) / (d.Len2())
+				acc += reflect * flux * n.Dot(d) / (d.Len2())
 			}
 		}
 		return acc

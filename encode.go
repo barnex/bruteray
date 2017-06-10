@@ -13,13 +13,24 @@ var (
 	quality = flag.Int("q", 80, "JPEG quality")
 )
 
-func Encode(img [][]float64, fname string) error {
+func Encode(img [][]float64, fname string, div float64) error {
+	img2 := MakeImage(*width, *height)
+	fac := 1 / div
+	for i := range img {
+		for j := range img[i] {
+			v := img[i][j] * fac
+			if !*overExp {
+				v = clip(v, 0, 1)
+			}
+			img2[i][j] = v
+		}
+	}
 	f, err := os.Create(fname)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	return jpeg.Encode(f, Gray(img), &jpeg.Options{Quality: *quality})
+	return jpeg.Encode(f, Gray(img2), &jpeg.Options{Quality: *quality})
 }
 
 type Gray [][]float64

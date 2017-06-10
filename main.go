@@ -18,7 +18,7 @@ var (
 // Scene:
 var (
 	objects []*Obj
-	sources []*PointSource
+	sources []Source
 )
 
 const off = 1e-6 // anti-bleeding offset, intersection points moved this much away from surface
@@ -31,9 +31,10 @@ func main() {
 
 	InitScene()
 
-	Render(img)
-
-	Encode(img, "out.jpg")
+	for N := 0; N < 100; N++ {
+		Render(img)
+		Encode(img, "out.jpg", float64(N+1))
+	}
 
 	fmt.Println("done,", time.Since(start))
 }
@@ -57,15 +58,8 @@ func InitScene() {
 		{Sphere(Vec{0, -1, 8}, 1), Reflective(0.9)},
 		{Sphere(Vec{2, -1, 6}, 1), Diffuse1(0.8)},
 	}
-	sources = []*PointSource{
-		{Pos: Vec{3.0, 8, 4.0}, Flux: 3},
-		{Pos: Vec{3.0, 8, 4.5}, Flux: 3},
-		{Pos: Vec{3.0, 8.0, 4}, Flux: 3},
-		{Pos: Vec{3.0, 8.5, 4}, Flux: 3},
-		{Pos: Vec{3.0, 7.0, 5}, Flux: 3},
-		{Pos: Vec{3.3, 8.5, 6}, Flux: 3},
-		{Pos: Vec{2.5, 9.0, 4}, Flux: 3},
-		{Pos: Vec{3, 1, 0}, Flux: 2},
+	sources = []Source{
+		&BulbSource{Pos: Vec{3.0, 8, 4.0}, Flux: 30, R: 2},
 	}
 }
 
@@ -86,11 +80,7 @@ func Render(img [][]float64) {
 
 			v := Intensity(r, 0)
 
-			if !*overExp {
-				v = clip(v, 0, 1)
-			}
-
-			img[i][j] = v
+			img[i][j] += v
 		}
 	}
 }
