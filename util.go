@@ -1,6 +1,11 @@
 package main
 
-import "math/rand"
+import (
+	"math"
+	"math/rand"
+)
+
+const deg = math.Pi / 180
 
 func sqr(x float64) float64 {
 	return x * x
@@ -28,4 +33,10 @@ func randVec(n Vec) Vec {
 		v = v.Mul(-1)
 	}
 	return v
+}
+
+func assert(t bool) {
+	if !t {
+		panic("assertion failed")
+	}
 }
