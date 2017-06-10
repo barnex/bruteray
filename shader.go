@@ -21,7 +21,7 @@ func Diffuse1(reflect float64) Shader {
 
 func diffuse1(reflect float64, r Ray, t float64, n Vec, N int) float64 {
 	p := r.At(t).MAdd(off, n)
-	acc := 0.
+	acc := amb
 	for _, light := range sources {
 		lightPos, flux := light.Sample()
 		d := lightPos.Sub(p)
@@ -70,6 +70,14 @@ func Reflective(reflect float64) Shader {
 	return func(r Ray, t float64, n Vec, N int) float64 {
 		p := r.At(t).MAdd(off, n)
 		dir2 := reflectVec(r.Dir, n)
+		return reflect * Intensity(Ray{p, dir2}, N+1)
+	}
+}
+
+func ReflectiveMate(reflect float64, jitter float64) Shader {
+	return func(r Ray, t float64, n Vec, N int) float64 {
+		p := r.At(t).MAdd(off, n)
+		dir2 := reflectVec(r.Dir, n).MAdd(jitter, randVec(n))
 		return reflect * Intensity(Ray{p, dir2}, N+1)
 	}
 }

@@ -15,12 +15,14 @@ var (
 	overExp  = flag.Bool("over", false, "highlight over/under exposed pixels")
 	quality  = flag.Int("q", 80, "JPEG quality")
 	useSRGB  = flag.Bool("srgb", true, "use sRGB color space")
+	iters    = flag.Int("N", 100, "number of iterations")
 )
 
 // Scene:
 var (
 	objects []*Obj
 	sources []Source
+	amb     = 0.02
 )
 
 const off = 1e-6 // anti-bleeding offset, intersection points moved this much away from surface
@@ -33,7 +35,7 @@ func main() {
 
 	InitScene()
 
-	for N := 0; N < 100; N++ {
+	for N := 0; N < *iters; N++ {
 		Render(img)
 		Encode(img, "out.jpg", float64(N+1))
 	}
@@ -58,10 +60,10 @@ func InitScene() {
 	lr := 10.
 	objects = []*Obj{
 		{HalfspaceY(-2), Diffuse2(0.7)},
-		{Sphere(Vec{-2, -1, 6}, 1), Reflective(0.8)},
-		{Sphere(Vec{0, -1, 8}, 1), Reflective(0.8)},
-		{Sphere(Vec{2, -1, 6}, 1), Diffuse2(0.9)},
-		{Sphere(lp, lr/2), Flat(1)},
+		{Sphere(Vec{-3, -0.5, 6}, 1.5), Reflective(0.6)},
+		{Sphere(Vec{0, -0.5, 8}, 1.5), Reflective(0.6)},
+		{Sphere(Vec{3, -0.5, 6}, 1.5), Diffuse2(0.9)},
+		{Sphere(lp, lr/2), Flat(1)}, // makes the light visible. TODO: double-counted
 	}
 	sources = []Source{
 		//&BulbSource{Pos: Vec{3, 8, 4}, Flux: 30, R: 2},
@@ -104,7 +106,7 @@ func Intensity(r Ray, N int) float64 {
 	if obj != nil {
 		return obj.Shader.Intensity(r, t, n, N)
 	}
-	return 0
+	return amb
 }
 
 func FirstIntersect(r Ray) (float64, Vec, *Obj) {
