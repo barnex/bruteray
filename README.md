@@ -1,5 +1,11 @@
 # Brute force ray tracing
 
+## 5: Monte Carlo integration
+
+Shooting many secondary rays in random directions and averaging out.
+
+![fig](shots/010.jpg)
+
 ## 4: Reflection
 
 When a ray hits a reflective surface, a reflected ray is cast. Recursion does the rest.

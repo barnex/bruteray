@@ -11,8 +11,8 @@ var (
 	width        = flag.Int("w", 1024, "canvas width")
 	height       = flag.Int("h", 768, "canvas height")
 	focalLen     = flag.Float64("f", 1, "focal length")
-	progressive  = flag.Int("p", 1, "progressively increase resolution")
-	maxRecursion = flag.Int("r", 10, "maximum number of recursive rays")
+	progressive  = flag.Int("p", 8, "progressively increase resolution")
+	maxRecursion = flag.Int("r", 2, "maximum number of recursive rays")
 )
 
 const (
@@ -45,8 +45,12 @@ func main() {
 		light: Vec{5, 8, 1},
 		amb:   0.2,
 		objs: []Obj{
-			{AHalfspaceY(-2), WithShadow(ShadeDiffuse())},
-			{ASphere(Vec{0, -1, 6}, 1), ShadeDiffuse()},
+			{AHalfspaceY(-2), ShadeGlobal()},
+			{ASphere(Vec{0, -1, 6}, 1), ShadeGlobal()},
+			{ASphere(Vec{4, 3, 5}, 3), ShadeFlat(10)},
+			//{AHalfspaceY(-2), WithShadow(ShadeDiffuse())},
+			//{ASphere(Vec{0, -1, 6}, 1), ShadeDiffuse()},
+			//{ASphere(Vec{3, 2, 7}, 1), ShadeFlat(1)},
 		},
 	}
 
@@ -81,7 +85,7 @@ func refine(sc *Scene, img [][]float64, sub int, first bool) {
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(Focal).Normalized()}
 
-			v := PixelShade(sc, r, *maxRecursion)
+			v, _, _ := PixelShade(sc, r, *maxRecursion)
 			v = clip(v, 0, 1)
 
 			for I := i; I < i+sub && I < H; I++ {
@@ -93,27 +97,27 @@ func refine(sc *Scene, img [][]float64, sub int, first bool) {
 	}
 }
 
-func PixelShade(sc *Scene, r Ray, N int) float64 {
+func PixelShade(sc *Scene, r Ray, N int) (float64, Vec, bool) {
 	if N == 0 {
-		return scene.amb
+		return scene.amb, Vec{}, false
 	}
 
 	i, _ := Nearest(sc.objs, r)
 	if i == -1 {
-		return 0
+		return 0, Vec{}, false
 	}
 	obj := sc.objs[i]
 	shape := obj.Shape
 
 	t, norm, ok := shape.Normal(r)
 	if !ok {
-		return 0
+		return 0, Vec{}, false
 	}
 
 	v := obj.Shader(t, norm, r, N)
 
 	//v = clip(v, 0, 1)
-	return v
+	return v, r.At(t), true
 }
 
 func Nearest(s []Obj, r Ray) (int, float64) {

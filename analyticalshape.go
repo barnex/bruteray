@@ -17,6 +17,9 @@ func ASphere(c Vec, r float64) Shape {
 			return 0, Vec{}, false
 		}
 		t := (-v.Dot(d) - math.Sqrt(D)) / d.Len2()
+		if t < 0 {
+			return 0, Vec{}, false
+		}
 		n := ray.At(t).Sub(c).Normalized()
 
 		return t, n, true

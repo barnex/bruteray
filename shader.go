@@ -1,5 +1,9 @@
 package main
 
+import (
+	"math/rand"
+)
+
 type ShaderFunc func(t float64, normal Vec, r Ray, rec int) float64
 
 func ShadeFlat(v float64) ShaderFunc {
@@ -16,13 +20,14 @@ func ShadeDiffuse() ShaderFunc {
 	}
 }
 
+const off = 1e-3 // tiny offset to avoid bleeding
+
 func WithShadow(sf ShaderFunc) ShaderFunc {
 	return func(t float64, n Vec, r Ray, rec int) float64 {
 
 		p := r.At(t)
 		d := scene.light.Sub(p).Normalized()
 
-		off := 1e-3                         // tiny offset to avoid bleeding
 		secondary := Ray{p.MAdd(off, d), d} // todo: rm
 		if !intersAny(secondary, scene.objs) {
 			return sf(t, n, r, rec-1) // not occluded, original shader
@@ -37,8 +42,47 @@ func ShadeReflect() ShaderFunc {
 		//p = p.MAdd(0.01, n) // make sure we're outside
 		dir2 := reflect(r.Dir, n)
 		secondary := Ray{p, dir2}
-		return 0.5*PixelShade(scene, secondary, rec-1) + scene.amb
+		v, p, ok := PixelShade(scene, secondary, rec-1)
+		if !ok {
+			return scene.amb
+		}
+		return v
+
+		//d := scene.light.Sub(p).Normalized()
+		//return v * n.Dot(d)
 	}
+}
+
+func ShadeGlobal() ShaderFunc {
+	return func(t float64, n Vec, r Ray, rec int) float64 {
+		p := r.At(t).MAdd(off, n)
+
+		a := 0.0
+		const N = 300
+
+		for i := 0; i < N; i++ {
+			secondary := Ray{p, randVec(n)}
+			v2, p2, ok := PixelShade(scene, secondary, rec-1)
+			if !ok {
+				continue
+			}
+			d := p2.Sub(p).Normalized()
+			v := v2 * n.Dot(d)
+			a += v
+		}
+		//assert(v >= 0)
+		return a / N
+	}
+}
+
+var rng = rand.New(rand.NewSource(1))
+
+func randVec(n Vec) Vec {
+	v := Vec{rng.NormFloat64(), rng.NormFloat64(), rng.NormFloat64()}.Normalized()
+	if v.Dot(n) < 0 {
+		v = v.Mul(-1)
+	}
+	return v
 }
 
 // reflects v of the surface with normal n.
