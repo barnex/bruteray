@@ -23,6 +23,17 @@ func ASphere(c Vec, r float64) Shape {
 	})
 }
 
+func AHalfspaceY(y float64) Shape {
+	return ShapeFunc(func(r Ray) (float64, Vec, bool) {
+		t := (y - r.Start.Y) / r.Dir.Y
+		if t < 0 {
+			return 0, Vec{}, false
+		}
+		n := Vec{0, 1, 0}
+		return t, n, true
+	})
+}
+
 func ABox(min, max Vec) Shape {
 	return ShapeFunc(func(r Ray) (float64, Vec, bool) {
 		tmin := min.Sub(r.Start).Div3(r.Dir)

@@ -11,8 +11,8 @@ func ShadeFlat(v float64) ShaderFunc {
 func ShadeDiffuse() ShaderFunc {
 	return func(t float64, n Vec, r Ray, rec int) float64 {
 		p := r.At(t)
-		d := scene.light.Sub(p).Normalized()
-		return 0.8*n.Dot(d) + scene.amb
+		d := scene.light.Sub(p)
+		return 100*0.8*n.Dot(d.Normalized())/(d.Len2()) + scene.amb
 	}
 }
 
@@ -22,7 +22,8 @@ func WithShadow(sf ShaderFunc) ShaderFunc {
 		p := r.At(t)
 		d := scene.light.Sub(p).Normalized()
 
-		secondary := Ray{p, d} // todo: rm
+		off := 1e-3                         // tiny offset to avoid bleeding
+		secondary := Ray{p.MAdd(off, d), d} // todo: rm
 		if !intersAny(secondary, scene.objs) {
 			return sf(t, n, r, rec-1) // not occluded, original shader
 		}

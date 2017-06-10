@@ -11,7 +11,7 @@ var (
 	width        = flag.Int("w", 1024, "canvas width")
 	height       = flag.Int("h", 768, "canvas height")
 	focalLen     = flag.Float64("f", 1, "focal length")
-	progressive  = flag.Int("p", 16, "progressively increase resolution")
+	progressive  = flag.Int("p", 1, "progressively increase resolution")
 	maxRecursion = flag.Int("r", 10, "maximum number of recursive rays")
 )
 
@@ -41,11 +41,13 @@ func main() {
 	Init()
 	start := time.Now()
 
-	sp := ABox(Vec{1, 1, 4}, Vec{2, 2, 6})
 	scene = &Scene{
-		light: Vec{9, 3, -5},
+		light: Vec{5, 8, 1},
 		amb:   0.2,
-		objs:  []Obj{{sp, ShadeDiffuse()}},
+		objs: []Obj{
+			{AHalfspaceY(-2), WithShadow(ShadeDiffuse())},
+			{ASphere(Vec{0, -1, 6}, 1), ShadeDiffuse()},
+		},
 	}
 
 	img := MakeImage(*width, *height)
