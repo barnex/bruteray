@@ -52,10 +52,20 @@ func MakeImage(W, H int) [][]float64 {
 
 func InitScene() {
 	objects = []*Obj{
-		{HalfspaceY(-2), Flat(0.3)},
-		{Sphere(Vec{-1, -1, 6}, 1), Flat(0.9)},
-		{Sphere(Vec{2, -1, 7}, 1), Reflective(0.9)},
-		{Sphere(Vec{0, -1, 6}, 1), Diffuse(0.8)},
+		{HalfspaceY(-2), Diffuse1(0.3)},
+		{Sphere(Vec{-2, -1, 6}, 1), Reflective(0.5)},
+		{Sphere(Vec{0, -1, 8}, 1), Reflective(0.9)},
+		{Sphere(Vec{2, -1, 6}, 1), Diffuse1(0.8)},
+	}
+	sources = []*PointSource{
+		{Pos: Vec{3.0, 8, 4.0}, Flux: 3},
+		{Pos: Vec{3.0, 8, 4.5}, Flux: 3},
+		{Pos: Vec{3.0, 8.0, 4}, Flux: 3},
+		{Pos: Vec{3.0, 8.5, 4}, Flux: 3},
+		{Pos: Vec{3.0, 7.0, 5}, Flux: 3},
+		{Pos: Vec{3.3, 8.5, 6}, Flux: 3},
+		{Pos: Vec{2.5, 9.0, 4}, Flux: 3},
+		{Pos: Vec{3, 1, 0}, Flux: 2},
 	}
 }
 

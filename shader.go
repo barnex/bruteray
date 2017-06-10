@@ -12,17 +12,24 @@ func Flat(v float64) Shader {
 	}
 }
 
-func Diffuse(reflect float64) Shader {
+func Diffuse1(reflect float64) Shader {
 	return func(r Ray, t float64, n Vec, N int) float64 {
 		p := r.At(t).MAdd(off, n)
 
 		acc := 0.
 		for _, light := range sources {
 			d := light.Pos.Sub(p)
-			acc += reflect * light.Flux * n.Dot(d.Normalized()) / (d.Len2())
+			if !intersectsAny(Ray{p, d.Normalized()}) {
+				acc += reflect * light.Flux * n.Dot(d) / (d.Len2())
+			}
 		}
 		return acc
 	}
+}
+
+func intersectsAny(r Ray) bool {
+	_, _, obj := FirstIntersect(r)
+	return obj != nil
 }
 
 func Reflective(reflect float64) Shader {
