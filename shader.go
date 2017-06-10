@@ -12,20 +12,53 @@ func Flat(v float64) Shader {
 	}
 }
 
+// Diffuse shading with shadows, but no interreflection
 func Diffuse1(reflect float64) Shader {
 	return func(r Ray, t float64, n Vec, N int) float64 {
-		p := r.At(t).MAdd(off, n)
+		return diffuse1(reflect, r, t, n, N)
+	}
+}
 
-		acc := 0.
-		for _, light := range sources {
-			lightPos, flux := light.Sample()
-			d := lightPos.Sub(p)
-			if !intersectsAny(Ray{p, d.Normalized()}) {
-				acc += reflect * flux * n.Dot(d) / (d.Len2())
-			}
+func diffuse1(reflect float64, r Ray, t float64, n Vec, N int) float64 {
+	p := r.At(t).MAdd(off, n)
+	acc := 0.
+	for _, light := range sources {
+		lightPos, flux := light.Sample()
+		d := lightPos.Sub(p)
+		if !intersectsAny(Ray{p, d.Normalized()}) {
+			acc += reflect * flux * n.Dot(d) / (d.Len2())
 		}
+	}
+	return acc
+}
+
+// Diffuse shading with shadows and interreflection
+func Diffuse2(reflect float64) Shader {
+	return func(r Ray, t float64, n Vec, N int) float64 {
+		acc := diffuse1(reflect, r, t, n, N)
+		p := r.At(t).MAdd(off, n)
+		d := randVec(n)
+		sec := Ray{p, d}
+		acc += reflect * Intensity(sec, N+1) * n.Dot(d.Normalized())
 		return acc
 	}
+	//	return func(r Ray, t float64, n Vec, N int) float64 {
+	//		p := r.At(t).MAdd(off, n)
+	//
+	//		acc := 0.
+	//		for _, light := range sources {
+	//			lightPos, flux := light.Sample()
+	//			d := lightPos.Sub(p)
+	//			_, n, obj := FirstIntersect(Ray{p, d.Normalized()}) // TODO: we intersect twice
+	//			if obj == nil {
+	//				acc += reflect * flux * n.Dot(d) / (d.Len2())
+	//			} else {
+	//				//	sec := Ray{p, d.Normalized()}
+	//				//	acc += reflect * Intensity(sec, N+1) * n.Dot(d.Normalized())
+	//			}
+	//		}
+	//		return acc
+	//	}
 }
 
 func intersectsAny(r Ray) bool {

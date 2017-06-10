@@ -1,16 +1,11 @@
 package main
 
 import (
-	"flag"
 	"image"
 	"image/color"
 	"image/jpeg"
 	"math"
 	"os"
-)
-
-var (
-	quality = flag.Int("q", 80, "JPEG quality")
 )
 
 func Encode(img [][]float64, fname string, div float64) error {
@@ -43,7 +38,9 @@ func (g Gray) At(i, j int) color.Color {
 	if c > 1 {
 		return color.NRGBA{R: 255, G: 0, B: 0, A: 255}
 	}
-	//c = srgb(c)
+	if *useSRGB {
+		c = srgb(c)
+	}
 	v := uint8(c * ((1 << 8) - 1))
 	return color.RGBA{v, v, v, 255}
 }

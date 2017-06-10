@@ -1,5 +1,9 @@
 # Brute force ray tracing
 
+## 6: Diffuse interreflection
+
+![fig](shots/012.jpg)
+
 ## 5: Monte Carlo integration
 
 Shooting many secondary rays in random directions and averaging out.

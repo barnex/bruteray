@@ -2,7 +2,7 @@ package main
 
 import (
 	"math"
-	"math/rand"
+	random "math/rand"
 )
 
 const deg = math.Pi / 180
@@ -21,7 +21,11 @@ func clip(v, min, max float64) float64 {
 	return v
 }
 
-var rng = rand.New(rand.NewSource(1))
+var rng = random.New(random.NewSource(1))
+
+func rand() float64 {
+	return rng.Float64()
+}
 
 func randNorm() float64 {
 	return rng.NormFloat64()

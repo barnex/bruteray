@@ -13,6 +13,8 @@ var (
 	focalLen = flag.Float64("f", 1, "focal length")
 	maxRec   = flag.Int("rec", 2, "maximum number of recursive rays")
 	overExp  = flag.Bool("over", false, "highlight over/under exposed pixels")
+	quality  = flag.Int("q", 80, "JPEG quality")
+	useSRGB  = flag.Bool("srgb", true, "use sRGB color space")
 )
 
 // Scene:
@@ -52,14 +54,18 @@ func MakeImage(W, H int) [][]float64 {
 }
 
 func InitScene() {
+	lp := Vec{20, 60, -5}
+	lr := 10.
 	objects = []*Obj{
-		{HalfspaceY(-2), Diffuse1(0.3)},
-		{Sphere(Vec{-2, -1, 6}, 1), Reflective(0.5)},
-		{Sphere(Vec{0, -1, 8}, 1), Reflective(0.9)},
-		{Sphere(Vec{2, -1, 6}, 1), Diffuse1(0.8)},
+		{HalfspaceY(-2), Diffuse2(0.7)},
+		{Sphere(Vec{-2, -1, 6}, 1), Reflective(0.8)},
+		{Sphere(Vec{0, -1, 8}, 1), Reflective(0.8)},
+		{Sphere(Vec{2, -1, 6}, 1), Diffuse2(0.9)},
+		{Sphere(lp, lr/2), Flat(1)},
 	}
 	sources = []Source{
-		&BulbSource{Pos: Vec{3.0, 8, 4.0}, Flux: 30, R: 2},
+		//&BulbSource{Pos: Vec{3, 8, 4}, Flux: 30, R: 2},
+		&BulbSource{Pos: lp, Flux: 80, R: lr},
 	}
 }
 
@@ -72,8 +78,8 @@ func Render(img [][]float64) {
 		fmt.Printf("%.1f%%\n\u001B[F", float64(100*nPix)/float64((W+1)*(H+1)))
 		for j := 0; j < W; j++ {
 			nPix++
-			y0 := (-float64(i) + float64(H)/2 + 0.5) / float64(H)
-			x0 := (float64(j) - float64(W)/2 + 0.5) / float64(H)
+			y0 := (-float64(i) + aa() + float64(H)/2) / float64(H)
+			x0 := (float64(j) + aa() - float64(W)/2) / float64(H)
 
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(focal).Normalized()}
@@ -83,6 +89,11 @@ func Render(img [][]float64) {
 			img[i][j] += v
 		}
 	}
+}
+
+// Anti-aliasing jitter
+func aa() float64 {
+	return rand()
 }
 
 func Intensity(r Ray, N int) float64 {
