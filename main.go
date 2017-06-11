@@ -3,7 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"math"
+	"net/http"
+	_ "net/http/pprof"
 	"time"
 )
 
@@ -16,13 +19,14 @@ var (
 	quality  = flag.Int("q", 80, "JPEG quality")
 	useSRGB  = flag.Bool("srgb", true, "use sRGB color space")
 	iters    = flag.Int("N", 100, "number of iterations")
+	pprof    = flag.String("pprof", ":6060", "pprof port")
 )
 
 // Scene:
 var (
 	objects []*Obj // TODO: object sources, intersect([]obj), nearest([]obj)
 	sources []Source
-	ambient = 1.1
+	ambient float64 = 1.3
 )
 
 const off = 1e-6 // anti-bleeding offset, intersection points moved this much away from surface
@@ -46,6 +50,11 @@ func main() {
 
 func Init() {
 	flag.Parse()
+	if *pprof != "" {
+		go func() {
+			log.Fatal(http.ListenAndServe(*pprof, nil))
+		}()
+	}
 }
 
 func MakeImage(W, H int) [][]float64 {
@@ -58,16 +67,16 @@ func MakeImage(W, H int) [][]float64 {
 
 func InitScene() {
 	lp := Vec{30, 50, -20}
-	lr := 6.
+	lr := 12.
 	objects = []*Obj{
 		{Shape: SheetY(-2), Shader: Diffuse2(0.5)},
 		{Shape: Sphere(Vec{-3, -0.5, 6}, 1.5), Shader: ShaderAdd(ReflectiveMate(0.09, 0.0005), Diffuse2(0.2))},
 		{Shape: Sphere(Vec{0, -0.5, 8}, 1.5), Shader: Reflective(0.5)},
 		{Shape: Sphere(Vec{3, -0.5, 5.0}, 1.5), Shader: Diffuse2(1)},
-		{Shape: Sphere(lp, lr), Shader: Flat(2), IsSource: true},
+		{Shape: Sphere(lp, lr), Shader: Flat(5), IsSource: true},
 	}
 	sources = []Source{
-		&BulbSource{Pos: lp, Flux: 20, R: lr},
+	//&BulbSource{Pos: lp, Flux: 100, R: lr},
 	}
 }
 
