@@ -26,7 +26,9 @@ var (
 var (
 	objects []*Obj // TODO: object sources, intersect([]obj), nearest([]obj)
 	sources []Source
-	ambient float64 = 1.3
+	ambient = func(v Vec) float64 {
+		return 0.3 + 0.7*math.Abs((v.Normalized().Y))
+	}
 )
 
 const off = 1e-6 // anti-bleeding offset, intersection points moved this much away from surface
@@ -70,13 +72,13 @@ func InitScene() {
 	lr := 12.
 	objects = []*Obj{
 		{Shape: SheetY(-2), Shader: Diffuse2(0.5)},
-		{Shape: Sphere(Vec{-3, -0.5, 6}, 1.5), Shader: ShaderAdd(ReflectiveMate(0.09, 0.0005), Diffuse2(0.2))},
+		{Shape: Sphere(Vec{-3, -0.5, 6}, 1.5), Shader: ShaderAdd(ReflectiveMate(0.05, 0.02), Diffuse2(0.01))},
 		{Shape: Sphere(Vec{0, -0.5, 8}, 1.5), Shader: Reflective(0.5)},
 		{Shape: Sphere(Vec{3, -0.5, 5.0}, 1.5), Shader: Diffuse2(1)},
 		{Shape: Sphere(lp, lr), Shader: Flat(5), IsSource: true},
 	}
 	sources = []Source{
-	//&BulbSource{Pos: lp, Flux: 100, R: lr},
+		&BulbSource{Pos: lp, Flux: 60, R: lr},
 	}
 }
 
@@ -115,7 +117,7 @@ func Intensity(r Ray, N int, includeSources bool) float64 {
 	if obj != nil {
 		return obj.Shader.Intensity(r, t, n, N)
 	} else {
-		return ambient
+		return ambient(r.Dir)
 	}
 }
 
