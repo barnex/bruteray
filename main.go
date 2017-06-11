@@ -11,7 +11,7 @@ var (
 	width    = flag.Int("w", 1024, "canvas width")
 	height   = flag.Int("h", 768, "canvas height")
 	focalLen = flag.Float64("f", 1, "focal length")
-	maxRec   = flag.Int("rec", 2, "maximum number of recursive rays")
+	maxRec   = flag.Int("rec", 3, "maximum number of recursive rays")
 	overExp  = flag.Bool("over", false, "highlight over/under exposed pixels")
 	quality  = flag.Int("q", 80, "JPEG quality")
 	useSRGB  = flag.Bool("srgb", true, "use sRGB color space")
@@ -36,6 +36,7 @@ func main() {
 	InitScene()
 
 	for N := 0; N < *iters; N++ {
+		fmt.Printf("%v/%v\n\u001B[F", N, *iters)
 		Render(img)
 		Encode(img, "out.jpg", float64(N+1))
 	}
@@ -56,18 +57,18 @@ func MakeImage(W, H int) [][]float64 {
 }
 
 func InitScene() {
-	lp := Vec{20, 60, -5}
-	lr := 10.
+	lp := Vec{5, 3, -2}
+	lr := 1.
 	objects = []*Obj{
 		{HalfspaceY(-2), Diffuse2(0.7)},
-		{Sphere(Vec{-3, -0.5, 6}, 1.5), Reflective(0.6)},
-		{Sphere(Vec{0, -0.5, 8}, 1.5), Reflective(0.6)},
+		{Sphere(Vec{-3, -0.5, 6}, 1.5), Reflective(0.5)},
+		{Sphere(Vec{0, -0.5, 8}, 1.5), Reflective(0.5)},
 		{Sphere(Vec{3, -0.5, 6}, 1.5), Diffuse2(0.9)},
-		{Sphere(lp, lr/2), Flat(1)}, // makes the light visible. TODO: double-counted
+		{Sphere(lp, lr), Flat(1)}, // makes the light visible. TODO: double-counted
 	}
 	sources = []Source{
 		//&BulbSource{Pos: Vec{3, 8, 4}, Flux: 30, R: 2},
-		&BulbSource{Pos: lp, Flux: 80, R: lr},
+		&BulbSource{Pos: lp, Flux: 20, R: lr},
 	}
 }
 
@@ -77,7 +78,7 @@ func Render(img [][]float64) {
 	H := *height
 	nPix := 0
 	for i := 0; i < H; i++ {
-		fmt.Printf("%.1f%%\n\u001B[F", float64(100*nPix)/float64((W+1)*(H+1)))
+		//fmt.Printf("%.1f%%\n\u001B[F", float64(100*nPix)/float64((W+1)*(H+1)))
 		for j := 0; j < W; j++ {
 			nPix++
 			y0 := (-float64(i) + aa() + float64(H)/2) / float64(H)
