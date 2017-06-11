@@ -1,5 +1,9 @@
 # Brute force ray tracing
 
+## 8: Textured ambient
+
+![fig](shots/015.jpg)
+
 ## 7: Ambient occlusion
 
 ![fig](shots/014.jpg)
