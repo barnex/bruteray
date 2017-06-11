@@ -30,7 +30,7 @@ func Sphere(c Vec, r float64) Shape {
 	})
 }
 
-func HalfspaceY(y float64) Shape {
+func SheetY(y float64) Shape {
 	return ShapeFunc(func(r Ray) (float64, Vec, bool) {
 		t := (y - r.Start.Y) / r.Dir.Y
 		if t < 0 {

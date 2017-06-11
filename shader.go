@@ -42,23 +42,6 @@ func Diffuse2(reflect float64) Shader {
 		acc += reflect * Intensity(sec, N+1) * n.Dot(d.Normalized())
 		return acc
 	}
-	//	return func(r Ray, t float64, n Vec, N int) float64 {
-	//		p := r.At(t).MAdd(off, n)
-	//
-	//		acc := 0.
-	//		for _, light := range sources {
-	//			lightPos, flux := light.Sample()
-	//			d := lightPos.Sub(p)
-	//			_, n, obj := FirstIntersect(Ray{p, d.Normalized()}) // TODO: we intersect twice
-	//			if obj == nil {
-	//				acc += reflect * flux * n.Dot(d) / (d.Len2())
-	//			} else {
-	//				//	sec := Ray{p, d.Normalized()}
-	//				//	acc += reflect * Intensity(sec, N+1) * n.Dot(d.Normalized())
-	//			}
-	//		}
-	//		return acc
-	//	}
 }
 
 func intersectsAny(r Ray) bool {
@@ -79,6 +62,12 @@ func ReflectiveMate(reflect float64, jitter float64) Shader {
 		p := r.At(t).MAdd(off, n)
 		dir2 := reflectVec(r.Dir, n).MAdd(jitter, randVec(n))
 		return reflect * Intensity(Ray{p, dir2}, N+1)
+	}
+}
+
+func ShaderAdd(a, b Shader) Shader {
+	return func(r Ray, t float64, n Vec, N int) float64 {
+		return a.Intensity(r, t, n, N) + b.Intensity(r, t, n, N)
 	}
 }
 

@@ -57,18 +57,18 @@ func MakeImage(W, H int) [][]float64 {
 }
 
 func InitScene() {
-	lp := Vec{5, 3, -2}
-	lr := 1.
+	lp := Vec{30, 50, -20}
+	lr := 6.
 	objects = []*Obj{
-		{HalfspaceY(-2), Diffuse2(0.7)},
-		{Sphere(Vec{-3, -0.5, 6}, 1.5), Reflective(0.5)},
+		{SheetY(-2), Diffuse2(0.7)},
+		{Sphere(Vec{-3, -0.5, 6}, 1.5), ShaderAdd(ReflectiveMate(0.09, 0.0005), Diffuse2(0.2))},
 		{Sphere(Vec{0, -0.5, 8}, 1.5), Reflective(0.5)},
-		{Sphere(Vec{3, -0.5, 6}, 1.5), Diffuse2(0.9)},
+		{Sphere(Vec{3, -0.5, 5.0}, 1.5), Diffuse2(0.9)},
 		{Sphere(lp, lr), Flat(1)}, // makes the light visible. TODO: double-counted
 	}
 	sources = []Source{
 		//&BulbSource{Pos: Vec{3, 8, 4}, Flux: 30, R: 2},
-		&BulbSource{Pos: lp, Flux: 20, R: lr},
+		&BulbSource{Pos: lp, Flux: 140, R: lr},
 	}
 }
 
