@@ -20,7 +20,7 @@ var (
 
 // Scene:
 var (
-	objects []*Obj
+	objects []*Obj // TODO: object sources, intersect([]obj), nearest([]obj)
 	sources []Source
 	amb     = 0.02
 )
@@ -60,15 +60,15 @@ func InitScene() {
 	lp := Vec{30, 50, -20}
 	lr := 6.
 	objects = []*Obj{
-		{SheetY(-2), Diffuse2(0.7)},
-		{Sphere(Vec{-3, -0.5, 6}, 1.5), ShaderAdd(ReflectiveMate(0.09, 0.0005), Diffuse2(0.2))},
-		{Sphere(Vec{0, -0.5, 8}, 1.5), Reflective(0.5)},
-		{Sphere(Vec{3, -0.5, 5.0}, 1.5), Diffuse2(0.9)},
-		{Sphere(lp, lr), Flat(1)}, // makes the light visible. TODO: double-counted
+		{Shape: SheetY(-2), Shader: Diffuse2(0.7)},
+		{Shape: Sphere(Vec{-3, -0.5, 6}, 1.5), Shader: ShaderAdd(ReflectiveMate(0.09, 0.0005), Diffuse2(0.2))},
+		{Shape: Sphere(Vec{0, -0.5, 8}, 1.5), Shader: Reflective(0.5)},
+		{Shape: Sphere(Vec{3, -0.5, 5.0}, 1.5), Shader: Diffuse2(0.9)},
+		{Shape: Sphere(lp, lr), Shader: Flat(1), IsSource: true},
 	}
 	sources = []Source{
 		//&BulbSource{Pos: Vec{3, 8, 4}, Flux: 30, R: 2},
-		&BulbSource{Pos: lp, Flux: 140, R: lr},
+		&BulbSource{Pos: lp, Flux: 80, R: lr},
 	}
 }
 
@@ -87,7 +87,7 @@ func Render(img [][]float64) {
 			start := Vec{x0, y0, 0}
 			r := Ray{start, start.Sub(focal).Normalized()}
 
-			v := Intensity(r, 0)
+			v := Intensity(r, 0, true)
 
 			img[i][j] += v
 		}
@@ -99,18 +99,18 @@ func aa() float64 {
 	return rand()
 }
 
-func Intensity(r Ray, N int) float64 {
+func Intensity(r Ray, N int, includeSources bool) float64 {
 	if N == *maxRec {
 		return 0
 	}
-	t, n, obj := FirstIntersect(r)
+	t, n, obj := FirstIntersect(r, includeSources)
 	if obj != nil {
 		return obj.Shader.Intensity(r, t, n, N)
 	}
 	return amb
 }
 
-func FirstIntersect(r Ray) (float64, Vec, *Obj) {
+func FirstIntersect(r Ray, includeSources bool) (float64, Vec, *Obj) {
 	var (
 		nearestT        = math.Inf(1)
 		nearestN        = Vec{}
@@ -118,6 +118,9 @@ func FirstIntersect(r Ray) (float64, Vec, *Obj) {
 	)
 
 	for _, o := range objects {
+		if o.IsSource && !includeSources {
+			continue
+		}
 		t, n, ok := o.Normal(r)
 		if ok && t < nearestT {
 			nearestT = t
