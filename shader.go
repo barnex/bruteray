@@ -21,7 +21,7 @@ func Diffuse1(reflect float64) Shader {
 
 func diffuse1(reflect float64, r Ray, t float64, n Vec, N int) float64 {
 	p := r.At(t).MAdd(off, n)
-	acc := amb
+	acc := 0.
 	for _, light := range sources {
 		lightPos, flux := light.Sample()
 		d := lightPos.Sub(p)

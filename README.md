@@ -1,5 +1,9 @@
 # Brute force ray tracing
 
+## 7: Ambient occlusion
+
+![fig](shots/014.jpg)
+
 ## 6: Diffuse interreflection
 
 ![fig](shots/012.jpg)
