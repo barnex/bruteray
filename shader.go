@@ -26,7 +26,7 @@ func diffuse1(reflect float64, r Ray, t float64, n Vec, N int) float64 {
 		lightPos, flux := light.Sample()
 		d := lightPos.Sub(p)
 		if !intersectsAny(Ray{p, d.Normalized()}) {
-			acc += reflect * flux * n.Dot(d) / (d.Len2())
+			acc += reflect * flux * n.Dot(d.Normalized()) / (d.Len2())
 		}
 	}
 	return acc

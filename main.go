@@ -18,7 +18,7 @@ var (
 	overExp  = flag.Bool("over", false, "highlight over/under exposed pixels")
 	quality  = flag.Int("q", 80, "JPEG quality")
 	useSRGB  = flag.Bool("srgb", true, "use sRGB color space")
-	iters    = flag.Int("N", 100, "number of iterations")
+	iters    = flag.Int("N", 1000, "number of iterations")
 	pprof    = flag.String("pprof", ":6060", "pprof port")
 )
 
@@ -27,7 +27,7 @@ var (
 	objects []*Obj // TODO: object sources, intersect([]obj), nearest([]obj)
 	sources []Source
 	ambient = func(v Vec) float64 {
-		return 0.3 + 0.7*math.Abs((v.Normalized().Y))
+		return 0.1 * math.Abs((v.Normalized().Y))
 	}
 )
 
@@ -68,17 +68,18 @@ func MakeImage(W, H int) [][]float64 {
 }
 
 func InitScene() {
-	lp := Vec{30, 50, -20}
-	lr := 12.
+	lp := Vec{7.5, 12.5, -5}
+	lr := 3.
 	objects = []*Obj{
 		{Shape: SheetY(-2), Shader: Diffuse2(0.5)},
 		{Shape: Sphere(Vec{-3, -0.5, 6}, 1.5), Shader: ShaderAdd(ReflectiveMate(0.05, 0.02), Diffuse2(0.01))},
 		{Shape: Sphere(Vec{0, -0.5, 8}, 1.5), Shader: Reflective(0.5)},
+		//{Shape: And(SheetY(-1), Sphere(Vec{3, -0.5, 5.0}, 1.5)), Shader: Diffuse2(1)},
 		{Shape: Sphere(Vec{3, -0.5, 5.0}, 1.5), Shader: Diffuse2(1)},
-		{Shape: Sphere(lp, lr), Shader: Flat(5), IsSource: true},
+		{Shape: Sphere(lp, lr), Shader: Flat(2), IsSource: true},
 	}
 	sources = []Source{
-		&BulbSource{Pos: lp, Flux: 60, R: lr},
+		&BulbSource{Pos: lp, Flux: 200, R: lr},
 	}
 }
 
