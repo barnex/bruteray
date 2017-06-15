@@ -3,36 +3,10 @@ package main
 import "math"
 
 type Shape interface {
-	//Inters(r Ray) (float64, float64)
-	Normal(r Ray) (float64, Vec, bool)
+	Inters(r Ray) Inter
 }
 
-//type ShapeFunc func(r Ray) (t float64, normal Vec, intersect bool)
-//
-//func (f ShapeFunc) Normal(r Ray) (t float64, normal Vec, intersect bool) {
-//	return f(r)
-//}
-
-//func And(a, b Shape) Shape {
-//	return ShapeFunc(func(r Ray) (float64, Vec, bool) {
-//		ta, na, oka := a.Normal(r)
-//		if !oka || ta < 0 {
-//			return 0, Vec{}, false
-//		}
-//		tb, nb, okb := b.Normal(r)
-//		if !okb || tb < 0 {
-//			return 0, Vec{}, false
-//		}
-//
-//		if ta < tb {
-//			return ta, na, oka
-//		} else {
-//			return tb, nb, okb
-//		}
-//	})
-//}
-
-func Sphere(c Vec, r float64) Shape {
+func Sphere(c Vec, r float64) sphere {
 	return sphere{c, r}
 }
 
@@ -41,72 +15,35 @@ type sphere struct {
 	r float64
 }
 
-func (s sphere) Normal(ray Ray) (float64, Vec, bool) {
+func (s sphere) Inters(ray Ray) Inter {
 	v := ray.Start.Sub(s.c)
 	d := ray.Dir
-	D := sqr(v.Dot(d)) - (v.Dot(v) - s.r*s.r)
+	r := s.r
+	D := sqr(v.Dot(d)) - (v.Len2() - sqr(r))
 	if D < 0 {
-		return 0, Vec{}, false
+		return empty
 	}
-	t := (-v.Dot(d) - math.Sqrt(D)) / d.Len2()
-	if t < 0 {
-		return 0, Vec{}, false
-	}
-	n := ray.At(t).Sub(s.c).Normalized()
+	t1 := (-v.Dot(d) - math.Sqrt(D))
+	t2 := (-v.Dot(d) + math.Sqrt(D))
+	assert(t1 <= t2)
 
-	return t, n, true
+	return Inter{t1, t2}
 }
 
-type sheetY struct {
-	y float64
+func (s sphere) Transl(dx, dy, dz float64) sphere {
+	return sphere{s.c.Add(Vec{dx, dy, dz}), s.r}
 }
 
-func SheetY(y float64) Shape {
-	return sheetY{y}
+func And(a, b Shape) Shape {
+	return and{a, b}
 }
 
-func (s sheetY) Normal(r Ray) (float64, Vec, bool) {
-	t := (s.y - r.Start.Y) / r.Dir.Y
-	if t < 0 {
-		return 0, Vec{}, false
-	}
-	n := Vec{0, 1, 0}
-	return t, n, true
+type and struct {
+	a, b Shape
 }
 
-//func ABox(min, max Vec) Shape {
-//	return ShapeFunc(func(r Ray) (float64, Vec, bool) {
-//		tmin := min.Sub(r.Start).Div3(r.Dir)
-//		tmax := max.Sub(r.Start).Div3(r.Dir)
-//
-//		txen := Min(tmin.X, tmax.X)
-//		txex := Max(tmin.X, tmax.X)
-//
-//		tyen := Min(tmin.Y, tmax.Y)
-//		tyex := Max(tmin.Y, tmax.Y)
-//
-//		tzen := Min(tmin.Z, tmax.Z)
-//		tzex := Max(tmin.Z, tmax.Z)
-//
-//		ten := Max3(txen, tyen, tzen)
-//		tex := Min3(txex, tyex, tzex)
-//
-//		return ten, Vec{}, ten < tex
-//	})
-//}
-
-func Min(x, y float64) float64 {
-	return math.Min(x, y)
-}
-
-func Min3(x, y, z float64) float64 {
-	return Min(Min(x, y), z)
-}
-
-func Max(x, y float64) float64 {
-	return math.Max(x, y)
-}
-
-func Max3(x, y, z float64) float64 {
-	return Max(Max(x, y), z)
+func (s and) Inters(r Ray) Inter {
+	a := s.a.Inters(r)
+	b := s.b.Inters(r)
+	return a.And(b)
 }

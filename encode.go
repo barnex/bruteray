@@ -53,6 +53,16 @@ func (g Gray) ColorModel() color.Model {
 	return nil
 }
 
+func clip(v, min, max float64) float64 {
+	if v < 0 {
+		v = 0
+	}
+	if v > 1 {
+		v = 1
+	}
+	return v
+}
+
 // linear to sRGB gamma curve
 // https://en.wikipedia.org/wiki/SRGB
 func srgb(c float64) float64 {
