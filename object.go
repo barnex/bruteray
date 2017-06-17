@@ -1,6 +1,6 @@
 package main
 
-type Obj struct {
-	Shape
-	//Shader
+type Obj interface {
+	Inters(Ray) Inter
+	Intensity(Ray, float64) float64
 }

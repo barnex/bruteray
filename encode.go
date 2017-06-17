@@ -8,14 +8,13 @@ import (
 	"os"
 )
 
-func Encode(img [][]float64, fname string, div float64) error {
+func Encode(img [][]float64, fname string, overExp bool) error {
 	img2 := MakeImage(*width, *height)
-	fac := 1 / div
 	for i := range img {
 		for j := range img[i] {
-			v := img[i][j] * fac
-			if !*overExp {
-				v = clip(v, 0, 1)
+			v := img[i][j]
+			if !overExp {
+				v = clip(v)
 			}
 			img2[i][j] = v
 		}
@@ -53,7 +52,8 @@ func (g Gray) ColorModel() color.Model {
 	return nil
 }
 
-func clip(v, min, max float64) float64 {
+// clip color value between 0 and 1
+func clip(v float64) float64 {
 	if v < 0 {
 		v = 0
 	}

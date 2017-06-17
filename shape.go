@@ -3,22 +3,24 @@ package main
 import "math"
 
 type Shape interface {
-	Inters(r Ray) Inter
+	Inters(Ray, float64) (Inter, Shape)
+	//Normal(r Ray, t float64) Vec
 }
 
-func Sphere(c Vec, r float64) sphere {
-	return sphere{c, r}
+type Sphere struct {
+	C   Vec
+	R   float64
+	Col float64
 }
 
-type sphere struct {
-	c Vec
-	r float64
+func (s *Sphere) Intensity(ray Ray, t float64) float64 {
+	return s.Col
 }
 
-func (s sphere) Inters(ray Ray) Inter {
-	v := ray.Start.Sub(s.c)
+func (s *Sphere) Inters(ray Ray) Inter {
+	v := ray.Start.Sub(s.C)
+	r := s.R
 	d := ray.Dir
-	r := s.r
 	D := sqr(v.Dot(d)) - (v.Len2() - sqr(r))
 	if D < 0 {
 		return empty
@@ -30,20 +32,31 @@ func (s sphere) Inters(ray Ray) Inter {
 	return Inter{t1, t2}
 }
 
-func (s sphere) Transl(dx, dy, dz float64) sphere {
-	return sphere{s.c.Add(Vec{dx, dy, dz}), s.r}
+func (s *Sphere) Transl(dx, dy, dz float64) Sphere {
+	return Sphere{s.C.Add(Vec{dx, dy, dz}), s.R, s.Col}
 }
 
-func And(a, b Shape) Shape {
-	return and{a, b}
-}
-
-type and struct {
-	a, b Shape
-}
-
-func (s and) Inters(r Ray) Inter {
-	a := s.a.Inters(r)
-	b := s.b.Inters(r)
-	return a.And(b)
-}
+//func And(a, b Shape) Shape {
+//	return and{a, b}
+//}
+//
+//type and struct {
+//	a, b Shape
+//}
+//
+//func (s and) Inters(r Ray) (Inter, Shape) {
+//	a, A := s.a.Inters(r)
+//	b, B := s.b.Inters(r)
+//	ival := a.And(b)
+//
+//	if ival.Empty() {
+//		return ival, nil
+//	}
+//	if ival.Min == a.Min || ival.Min == a.Max {
+//		return ival, A
+//	}
+//	if ival.Min == b.Min || ival.Min == b.Max {
+//		return ival, B
+//	}
+//	panic("bug")
+//}

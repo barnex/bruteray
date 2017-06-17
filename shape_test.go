@@ -10,10 +10,10 @@ var (
 
 func TestSphere(t *testing.T) {
 
-	sp := Sphere(Vec{0, 0, 0}, 1)
+	sp := Sphere{R: 1}
 
 	cases := []struct {
-		s      Shape
+		s      Sphere
 		r      Ray
 		w1, w2 Vec
 		ok     bool

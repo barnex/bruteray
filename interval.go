@@ -15,6 +15,11 @@ func (a Inter) And(b Inter) Inter {
 
 	return empty
 }
+
 func (a Inter) OK() bool {
 	return a.Min < a.Max
+}
+
+func (a Inter) Empty() bool {
+	return a.Min >= a.Max
 }
