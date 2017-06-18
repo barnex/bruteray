@@ -36,9 +36,10 @@ func main() {
 	Init()
 	start := time.Now()
 
-	test(Scene1())
-	test(Scene2())
-	test(Scene3())
+	scenes := []func() *Scene{Scene1, Scene2, Scene3, Scene4, Scene5}
+	for _, s := range scenes {
+		test(s())
+	}
 
 	fmt.Println("done,", time.Since(start))
 }
