@@ -36,7 +36,7 @@ func main() {
 	Init()
 	start := time.Now()
 
-	scenes := []func() *Scene{Scene1, Scene2, Scene3, Scene4, Scene5}
+	scenes := []func() *Scene{Scene1, Scene2, Scene3, Scene4, Scene5, Scene6}
 	for _, s := range scenes {
 		test(s())
 	}

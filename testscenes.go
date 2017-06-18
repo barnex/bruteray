@@ -65,3 +65,17 @@ func Scene5() *Scene {
 		},
 	}
 }
+
+// Intersection of normal.z-shaded spheres
+func Scene6() *Scene {
+	const r = 0.25
+	s1 := ShadeNormal(Sphere(Vec{-r / 2, 0, 3}, r))
+	s2 := ShadeNormal(Sphere(Vec{r / 2, 0, 3}, r))
+
+	return &Scene{
+		objs: []Obj{
+			s1,
+			s2,
+		},
+	}
+}

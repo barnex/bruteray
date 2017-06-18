@@ -19,8 +19,23 @@ func (s *flat) Intensity(ray Ray, t float64) Color {
 	return s.c
 }
 
-func (s *flat) Intersect(ray Ray) (Inter, Shader) {
-	return s.s.Intersect(ray), s
+func (s *flat) Intersect(r Ray) (Inter, Shader) {
+	return s.s.Intersect(r), s
+}
+
+type shadeNormal struct{ s Shape }
+
+func ShadeNormal(s Shape) Obj {
+	return shadeNormal{s}
+}
+
+func (s shadeNormal) Intersect(r Ray) (Inter, Shader) {
+	return s.s.Intersect(r), s
+}
+
+func (s shadeNormal) Intensity(r Ray, t float64) Color {
+	n := Normal(s.s, r, t)
+	return Color(n.Z/2 + 0.5)
 }
 
 //// Diffuse shading with shadows, but no interreflection
