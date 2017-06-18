@@ -2,10 +2,10 @@ package main
 
 import "math"
 
-type Shape interface {
-	Inters(Ray, float64) (Inter, Shape)
-	//Normal(r Ray, t float64) Vec
-}
+//type Shape interface {
+//	Inters(Ray, float64) (Inter, Shape)
+//	//Normal(r Ray, t float64) Vec
+//}
 
 type Sphere struct {
 	C Vec
@@ -36,27 +36,46 @@ func (s *Sphere) Transl(dx, dy, dz float64) Sphere {
 	return Sphere{s.C.Add(Vec{dx, dy, dz}), s.R, s.Color}
 }
 
-//func And(a, b Shape) Shape {
-//	return and{a, b}
-//}
-//
-//type and struct {
-//	a, b Shape
-//}
-//
-//func (s and) Inters(r Ray) (Inter, Shape) {
-//	a, A := s.a.Inters(r)
-//	b, B := s.b.Inters(r)
-//	ival := a.And(b)
-//
-//	if ival.Empty() {
-//		return ival, nil
-//	}
-//	if ival.Min == a.Min || ival.Min == a.Max {
-//		return ival, A
-//	}
-//	if ival.Min == b.Min || ival.Min == b.Max {
-//		return ival, B
-//	}
-//	panic("bug")
-//}
+type And struct {
+	a, b Obj
+}
+
+func (s And) Inters(r Ray) Inter {
+	a := s.a.Inters(r)
+	if !a.OK() {
+		return a
+	}
+	b := s.b.Inters(r)
+
+	return a.And(b)
+
+	//if ival.Empty() {
+	//	return ival, nil
+	//}
+	//if ival.Min == a.Min || ival.Min == a.Max {
+	//	return ival
+	//}
+	//if ival.Min == b.Min || ival.Min == b.Max {
+	//	return ival
+	//}
+	//panic("bug")
+}
+
+func (s *And) Intensity(r Ray, t float64) Color {
+
+	a := s.a.Inters(r)
+	b := s.b.Inters(r)
+
+	ival := a.And(b)
+
+	if ival.Empty() {
+		panic("bug")
+	}
+	if ival.Min == a.Min || ival.Min == a.Max {
+		return s.a.Intensity(r, t)
+	}
+	if ival.Min == b.Min || ival.Min == b.Max {
+		return s.b.Intensity(r, t)
+	}
+	panic("bug")
+}

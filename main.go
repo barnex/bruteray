@@ -38,6 +38,7 @@ func main() {
 
 	test(Scene1())
 	test(Scene2())
+	test(Scene3())
 
 	fmt.Println("done,", time.Since(start))
 }

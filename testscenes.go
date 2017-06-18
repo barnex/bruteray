@@ -25,19 +25,15 @@ func Scene2() *Scene {
 	}
 }
 
-//func Scene3() {
-//	const r = 0.25
-//	sp := Sphere(Vec{0, 0, 3}, r)
-//	objects = []*Obj{
-//		{Shape: sp.Transl(r/2, 0, 0)},
-//		{Shape: sp.Transl(-r/2, 0, 0)},
-//	}
-//}
-//
-//func Scene4() {
-//	const r = 0.25
-//	sp := Sphere(Vec{0, 0, 3}, r)
-//	objects = []*Obj{
-//		{Shape: And(sp.Transl(r/2, 0, 0), sp.Transl(-r/2, 0, 0))},
-//	}
-//}
+// Intersection of flat-shaded spheres
+func Scene3() *Scene {
+	const r = 0.25
+	s1 := &Sphere{C: Vec{-r / 2, 0, 3}, R: r, Color: 1}
+	s2 := &Sphere{C: Vec{r / 2, 0, 3}, R: r, Color: 0.5}
+
+	return &Scene{
+		objs: []Obj{
+			&And{s1, s2},
+		},
+	}
+}
