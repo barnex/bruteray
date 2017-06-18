@@ -1,6 +1,6 @@
 package main
 
 type Obj interface {
-	Inters(Ray) Inter
-	Intensity(Ray, float64) Color
+	Inters(Ray) (Inter, Obj)      // TODO: -> Intersect
+	Intensity(Ray, float64) Color // TODO: -> Color
 }
