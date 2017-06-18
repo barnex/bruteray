@@ -5,9 +5,9 @@ type Scene struct {
 }
 
 func (s *Scene) Intensity(r Ray) (float64, Color) {
-	ival, obj := s.Intersect(r)
-	if obj != nil {
-		return ival.Min, obj.Intensity(r, ival.Min)
+	ival, shader := s.Intersect(r)
+	if shader != nil {
+		return ival.Min, shader.Intensity(r, ival.Min)
 	} else {
 		return inf, 0 //ambient(r.Dir)
 	}
@@ -22,18 +22,18 @@ func (s *Scene) Intensity(r Ray) (float64, Color) {
 //	}
 //}
 
-func (s *Scene) Intersect(r Ray) (Inter, Obj) {
+func (s *Scene) Intersect(r Ray) (Inter, Shader) {
 	var (
-		minT     = Inter{inf, inf}
-		obj  Obj = nil
+		minT          = Inter{inf, inf}
+		shader Shader = nil
 	)
 
 	for _, o := range s.objs {
-		ival, sub := o.Inters(r)
+		ival, s := o.Intersect(r)
 		if ival.Min < minT.Min && ival.Max > 0 {
 			minT = ival
-			obj = sub
+			shader = s
 		}
 	}
-	return minT, obj
+	return minT, shader
 }

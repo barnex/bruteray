@@ -1,17 +1,28 @@
 package main
 
-//type Shader func(r Ray, t float64, normal Vec, N int) float64
-//
-//func (s Shader) Intensity(r Ray, t float64, n Vec, N int) float64 {
-//	return s(r, t, n, N)
-//}
-//
-//func Flat(v float64) Shader {
-//	return func(r Ray, t float64, normal Vec, N int) float64 {
-//		return v
-//	}
-//}
-//
+// Shader provides a lazily evaluated color.
+// It may be expensive and is only evaluated if really needed.
+type Shader interface {
+	Intensity(Ray, float64) Color
+}
+
+type flat struct {
+	s Shape
+	c Color
+}
+
+func Flat(s Shape, c Color) Obj {
+	return &flat{s, c}
+}
+
+func (s *flat) Intensity(ray Ray, t float64) Color {
+	return s.c
+}
+
+func (s *flat) Intersect(ray Ray) (Inter, Shader) {
+	return s.s.Intersect(ray), s
+}
+
 //// Diffuse shading with shadows, but no interreflection
 //func Diffuse1(reflect float64) Shader {
 //	return func(r Ray, t float64, n Vec, N int) float64 {

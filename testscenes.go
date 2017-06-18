@@ -4,8 +4,8 @@ package main
 func Scene1() *Scene {
 	const r = 0.25
 	objects = []Obj{
-		&Shaded{&Sphere{C: Vec{-r / 2, 0, 3}, R: r}, 1},
-		&Shaded{&Sphere{C: Vec{r / 2, 0, 3}, R: r}, 0.5},
+		Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1),
+		Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5),
 	}
 
 	return &Scene{
@@ -17,7 +17,7 @@ func Scene1() *Scene {
 func Scene2() *Scene {
 	const r = 0.25
 	objects = []Obj{
-		&Shaded{&Sphere{C: Vec{0, 0, -3}, R: r}, 1},
+		Flat(Sphere(Vec{0, 0, -3}, r), 1),
 	}
 
 	return &Scene{
@@ -28,8 +28,8 @@ func Scene2() *Scene {
 // Intersection of flat-shaded spheres
 func Scene3() *Scene {
 	const r = 0.25
-	s1 := &Shaded{&Sphere{C: Vec{-r / 2, 0, 3}, R: r}, 1}
-	s2 := &Shaded{&Sphere{C: Vec{r / 2, 0, 3}, R: r}, 0.5}
+	s1 := Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1)
+	s2 := Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5)
 
 	return &Scene{
 		objs: []Obj{
@@ -41,13 +41,13 @@ func Scene3() *Scene {
 // Intersection of spheres, as shapes (not objects)
 func Scene4() *Scene {
 	const r = 0.25
-	s1 := &Sphere{C: Vec{-r / 2, 0, 3}, R: r}
-	s2 := &Sphere{C: Vec{r / 2, 0, 3}, R: r}
+	s1 := Sphere(Vec{-r / 2, 0, 3}, r)
+	s2 := Sphere(Vec{r / 2, 0, 3}, r)
 	s := ShapeAnd{s1, s2}
 
 	return &Scene{
 		objs: []Obj{
-			&Shaded{s, 1},
+			Flat(s, 1),
 		},
 	}
 }
@@ -55,13 +55,13 @@ func Scene4() *Scene {
 // Minus of spheres, as shapes (not objects)
 func Scene5() *Scene {
 	const r = 0.5
-	s1 := &Sphere{C: Vec{0, 0, 3}, R: r}
-	s2 := &Sphere{C: Vec{0, 0, 2 + r/2}, R: r}
+	s1 := Sphere(Vec{0, 0, 3}, r)
+	s2 := Sphere(Vec{0, 0, 2 + r/2}, r)
 	s := ShapeMinus{s1, s2}
 
 	return &Scene{
 		objs: []Obj{
-			&Shaded{s, 1},
+			Flat(s, 1),
 		},
 	}
 }

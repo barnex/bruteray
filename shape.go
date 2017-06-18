@@ -1,45 +1,38 @@
 package main
 
-import "math"
-
 type Shape interface {
-	Inters(Ray) Inter // TODO: -> Intersect
+	Intersect(Ray) Inter // TODO: -> Intersect
 }
 
-type Sphere struct {
-	C Vec
-	R float64
-}
+func Normal(s Shape, r Ray) Vec {
+	i0 := s.Intersect(r)
+	c := r.At(i0.Min)
 
-func (s *Sphere) Inters(ray Ray) Inter {
-	v := ray.Start.Sub(s.C)
-	r := s.R
-	d := ray.Dir
-	D := sqr(v.Dot(d)) - (v.Len2() - sqr(r))
-	if D < 0 {
-		return empty
-	}
-	t1 := (-v.Dot(d) - math.Sqrt(D))
-	t2 := (-v.Dot(d) + math.Sqrt(D))
-	assert(t1 <= t2)
+	ra := r
+	ra.Dir = ra.Dir.MAdd(1e-4, RandVec(r.Dir)).Normalized()
+	i1 := s.Intersect(ra)
+	a := ra.At(i1.Min)
 
-	return Inter{t1, t2}
-}
+	rb := r
+	rb.Dir = rb.Dir.MAdd(1e-4, RandVec(r.Dir)).Normalized()
+	i2 := s.Intersect(rb)
+	b := rb.At(i2.Min)
 
-func (s *Sphere) Transl(dx, dy, dz float64) Sphere {
-	return Sphere{s.C.Add(Vec{dx, dy, dz}), s.R}
+	a = a.Sub(c)
+	b = b.Sub(c)
+	return b.Cross(a).Normalized()
 }
 
 type ShapeAnd struct {
 	a, b Shape
 }
 
-func (s ShapeAnd) Inters(r Ray) Inter {
-	a := s.a.Inters(r)
+func (s ShapeAnd) Intersect(r Ray) Inter {
+	a := s.a.Intersect(r)
 	if !a.OK() {
 		return a
 	}
-	b := s.b.Inters(r)
+	b := s.b.Intersect(r)
 
 	return a.And(b)
 }
@@ -48,12 +41,12 @@ type ShapeMinus struct {
 	a, b Shape
 }
 
-func (s ShapeMinus) Inters(r Ray) Inter {
-	a := s.a.Inters(r)
+func (s ShapeMinus) Intersect(r Ray) Inter {
+	a := s.a.Intersect(r)
 	if !a.OK() {
 		return a
 	}
-	b := s.b.Inters(r)
+	b := s.b.Intersect(r)
 
 	return a.Minus(b)
 }

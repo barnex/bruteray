@@ -10,10 +10,10 @@ var (
 
 func TestSphere(t *testing.T) {
 
-	sp := Sphere{R: 1}
+	sp := Sphere(Vec{}, 1)
 
 	cases := []struct {
-		s      Sphere
+		s      *sphere
 		r      Ray
 		w1, w2 Vec
 		ok     bool
@@ -31,7 +31,7 @@ func TestSphere(t *testing.T) {
 		s := c.s
 		r := c.r
 		ok := c.ok
-		have := c.s.Inters(c.r)
+		have := c.s.Intersect(c.r)
 		hok := have.OK()
 		if hok != ok {
 			t.Errorf("intersect %v %v: have %v, want %v", s, r, hok, ok)

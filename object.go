@@ -1,23 +1,9 @@
 package main
 
-// An object has a shape (provided by Inters) and color (provided by Intensity).
 type Obj interface {
-	Inters(Ray) (Inter, Obj)      // TODO: -> Intersect
-	Intensity(Ray, float64) Color // TODO: -> Color
-}
-
-// An object composed of shape and color
-type Shaded struct {
-	s Shape
-	c Color
-}
-
-func (s *Shaded) Intensity(ray Ray, t float64) Color {
-	return s.c
-}
-
-func (s *Shaded) Inters(ray Ray) (Inter, Obj) {
-	return s.s.Inters(ray), s
+	// Returns the object-ray intersection interval (possibly empty)
+	// and a shader that will provide color.
+	Intersect(Ray) (Inter, Shader)
 }
 
 // An object composed of the intersection ("and") of two objects.
@@ -25,12 +11,12 @@ type ObjAnd struct {
 	a, b Obj
 }
 
-func (s ObjAnd) Inters(r Ray) (Inter, Obj) {
-	a, A := s.a.Inters(r)
+func (s ObjAnd) Intersect(r Ray) (Inter, Shader) {
+	a, A := s.a.Intersect(r)
 	if !a.OK() {
 		return a, A
 	}
-	b, B := s.b.Inters(r)
+	b, B := s.b.Intersect(r)
 
 	ival := a.And(b)
 
