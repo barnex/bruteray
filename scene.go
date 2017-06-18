@@ -4,12 +4,12 @@ type Scene struct {
 	objs []Obj
 }
 
-func (s *Scene) Intensity(r Ray) float64 {
+func (s *Scene) Intensity(r Ray) (float64, Color) {
 	t, obj := s.FirstIntersect(r)
 	if obj != nil {
-		return obj.Intensity(r, t)
+		return t, obj.Intensity(r, t)
 	} else {
-		return 0 //ambient(r.Dir)
+		return -inf, 0 //ambient(r.Dir)
 	}
 }
 

@@ -36,50 +36,21 @@ func main() {
 	Init()
 	start := time.Now()
 
-	cam := Camera{W: *width, H: *height, FocalLen: 0}
-
-	scene := Scene1()
-	img := cam.Render(scene)
-	Encode(img, "001.jpg", *overExp)
-
-	//Reset()
-	//Scene2()
-	//RenderScene(*width, *height, *iters, "002.jpg")
-
-	//Reset()
-	//Scene3()
-	//RenderScene(*width, *height, *iters, "003.jpg")
-
-	//Reset()
-	//Scene4()
-	//RenderScene(*width, *height, *iters, "004.jpg")
+	test(Scene1())
+	test(Scene2())
 
 	fmt.Println("done,", time.Since(start))
 }
 
-//func Scene2() {
-//	sp := Sphere(Vec{0, 0, -3}, 0.25)
-//	objects = []Obj{
-//		{Shape: sp},
-//	}
-//}
-//
-//func Scene3() {
-//	const r = 0.25
-//	sp := Sphere(Vec{0, 0, 3}, r)
-//	objects = []*Obj{
-//		{Shape: sp.Transl(r/2, 0, 0)},
-//		{Shape: sp.Transl(-r/2, 0, 0)},
-//	}
-//}
-//
-//func Scene4() {
-//	const r = 0.25
-//	sp := Sphere(Vec{0, 0, 3}, r)
-//	objects = []*Obj{
-//		{Shape: And(sp.Transl(r/2, 0, 0), sp.Transl(-r/2, 0, 0))},
-//	}
-//}
+var cnt = 0
+
+func test(s *Scene) {
+	cam := Camera(*width, *height, 0)
+	cnt++
+	name := fmt.Sprintf("%03d", cnt)
+	Encode(cam.Render(s), name+".jpg", *overExp)
+	Encode(Stretch(cam.ZMap), name+"-z.jpg", true)
+}
 
 func Init() {
 	flag.Parse()

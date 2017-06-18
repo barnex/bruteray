@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-func Encode(img [][]float64, fname string, overExp bool) error {
-	img2 := MakeImage(*width, *height)
+func Encode(img [][]Color, fname string, overExp bool) error {
+	img2 := MakeImage(len(img[0]), len(img))
 	for i := range img {
 		for j := range img[i] {
 			v := img[i][j]
@@ -27,7 +27,35 @@ func Encode(img [][]float64, fname string, overExp bool) error {
 	return jpeg.Encode(f, Gray(img2), &jpeg.Options{Quality: *quality})
 }
 
-type Gray [][]float64
+func Stretch(img [][]Color) [][]Color {
+	min, max := Color(inf), Color(-inf)
+	for i := range img {
+		for j := range img[i] {
+			c := img[i][j]
+			if math.IsInf(float64(c), 0) {
+				continue
+			}
+			if c < min {
+				min = c
+			}
+			if c > max {
+				max = c
+			}
+		}
+	}
+
+	img2 := MakeImage(len(img[0]), len(img))
+	for i := range img {
+		for j := range img[i] {
+			c := img[i][j]
+			c = (c - min) / (max - min)
+			img2[i][j] = c
+		}
+	}
+	return img2
+}
+
+type Gray [][]Color
 
 func (g Gray) At(i, j int) color.Color {
 	c := g[j][i]
@@ -53,7 +81,7 @@ func (g Gray) ColorModel() color.Model {
 }
 
 // clip color value between 0 and 1
-func clip(v float64) float64 {
+func clip(v Color) Color {
 	if v < 0 {
 		v = 0
 	}
@@ -65,11 +93,11 @@ func clip(v float64) float64 {
 
 // linear to sRGB gamma curve
 // https://en.wikipedia.org/wiki/SRGB
-func srgb(c float64) float64 {
+func srgb(c Color) Color {
 	if c <= 0.0031308 {
 		return 12.92 * c
 	}
-	c = 1.055*math.Pow(c, 1./2.4) - 0.05
+	c = Color(1.055*math.Pow(float64(c), 1./2.4) - 0.05)
 	if c > 1 {
 		return 1
 	}

@@ -8,13 +8,13 @@ type Shape interface {
 }
 
 type Sphere struct {
-	C   Vec
-	R   float64
-	Col float64
+	C Vec
+	R float64
+	Color
 }
 
-func (s *Sphere) Intensity(ray Ray, t float64) float64 {
-	return s.Col
+func (s *Sphere) Intensity(ray Ray, t float64) Color {
+	return s.Color
 }
 
 func (s *Sphere) Inters(ray Ray) Inter {
@@ -33,7 +33,7 @@ func (s *Sphere) Inters(ray Ray) Inter {
 }
 
 func (s *Sphere) Transl(dx, dy, dz float64) Sphere {
-	return Sphere{s.C.Add(Vec{dx, dy, dz}), s.R, s.Col}
+	return Sphere{s.C.Add(Vec{dx, dy, dz}), s.R, s.Color}
 }
 
 //func And(a, b Shape) Shape {

@@ -1,21 +1,32 @@
 package main
 
 // Camera renders a scene into a raw intensity image.
-type Camera struct {
-	W, H     int     // film size in pixels
-	FocalLen float64 // focal length
+type Cam struct {
+	Img      [][]Color
+	ZMap     [][]Color
+	FocalLen float64
 }
 
-func (c *Camera) Render(s *Scene) [][]float64 {
-	img := MakeImage(c.W, c.H)
-	c.iterate(s, img)
-	return img
+func Camera(w, h int, focalLen float64) *Cam {
+	return &Cam{
+		Img:      MakeImage(w, h),
+		ZMap:     MakeImage(w, h),
+		FocalLen: focalLen,
+	}
 }
 
-func (c *Camera) iterate(s *Scene, img [][]float64) {
+func (c *Cam) Size() (int, int) {
+	return len(c.Img[0]), len(c.Img)
+}
+
+func (c *Cam) Render(s *Scene) [][]Color {
+	c.iterate(s)
+	return c.Img
+}
+
+func (c *Cam) iterate(s *Scene) {
 	focalPoint := Vec{0, 0, -c.FocalLen}
-	W := c.W
-	H := c.H
+	W, H := c.Size()
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
 			// ray start point
@@ -31,16 +42,17 @@ func (c *Camera) iterate(s *Scene, img [][]float64) {
 
 			// accumulate ray intensity
 			r := Ray{start, dir}
-			v := s.Intensity(r)
-			img[i][j] += v
+			t, v := s.Intensity(r)
+			c.Img[i][j] += v
+			c.ZMap[i][j] = Color(-t)
 		}
 	}
 }
 
-func MakeImage(W, H int) [][]float64 {
-	img := make([][]float64, H)
+func MakeImage(W, H int) [][]Color {
+	img := make([][]Color, H)
 	for i := range img {
-		img[i] = make([]float64, W)
+		img[i] = make([]Color, W)
 	}
 	return img
 }
