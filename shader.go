@@ -3,7 +3,7 @@ package main
 // Shader provides a lazily evaluated color.
 // It may be expensive and is only evaluated if really needed.
 type Shader interface {
-	Intensity(Ray, float64) Color
+	Intensity(Ray, float64, int) Color
 }
 
 type flat struct {
@@ -15,7 +15,7 @@ func Flat(s Shape, c Color) Obj {
 	return &flat{s, c}
 }
 
-func (s *flat) Intensity(ray Ray, t float64) Color {
+func (s *flat) Intensity(ray Ray, t float64, N int) Color {
 	return s.c
 }
 
@@ -33,7 +33,7 @@ func (s shadeNormal) Intersect(r Ray) (Inter, Shader) {
 	return s.s.Intersect(r), s
 }
 
-func (s shadeNormal) Intensity(r Ray, t float64) Color {
+func (s shadeNormal) Intensity(r Ray, t float64, N int) Color {
 	n := Normal(s.s, r, t)
 	return Color(-n.Z)
 }
@@ -55,35 +55,52 @@ func (s *diffuse1) Intersect(r Ray) (Inter, Shader) {
 	return s.shape.Intersect(r), s
 }
 
-func (s *diffuse1) Intensity(r Ray, t float64) Color {
-
+func (s *diffuse1) Intensity(r Ray, t float64, N int) Color {
 	n := Normal(s.shape, r, t)
+	return Color(s.refl) * directDiffuse(s.scene, r, t, n)
+}
 
+func directDiffuse(scene *Scene, r Ray, t float64, n Vec) Color {
 	p := r.At(t) //.MAdd(off, n)
 	acc := 0.
-	for _, light := range s.scene.sources {
+	for _, light := range scene.sources {
 		lightPos, flux := light.Sample()
 		d := lightPos.Sub(p)
-		if !s.scene.IntersectsAny(Ray{p.MAdd(1e-6, d.Normalized()), d.Normalized()}) {
-			acc += s.refl * flux * Max(n.Dot(d.Normalized())/(d.Len2()), 0)
+		if !scene.IntersectsAny(Ray{p.MAdd(1e-6, n), d.Normalized()}) {
+			acc += flux * Max(n.Dot(d.Normalized())/(d.Len2()), 0)
 		}
 	}
 	return Color(acc)
 }
 
-//// Diffuse shading with shadows and interreflection
-//func Diffuse2(reflect float64) Shader {
-//	return func(r Ray, t float64, n Vec, N int) float64 {
-//		acc := diffuse1(reflect, r, t, n, N)
-//		p := r.At(t).MAdd(off, n)
-//		d := RandVec(n)
-//		sec := Ray{p, d}
-//		acc += reflect * Intensity(sec, N+1, false) * n.Dot(d.Normalized())
-//		return acc
-//	}
-//}
-//
-//
+type diffuse2 struct {
+	scene *Scene
+	shape Shape
+	refl  float64
+}
+
+// Diffuse shading with shadows, but no interreflection
+func Diffuse2(sc *Scene, sh Shape, refl float64) Obj {
+	return &diffuse2{sc, sh, refl}
+}
+
+func (s *diffuse2) Intersect(r Ray) (Inter, Shader) {
+	return s.shape.Intersect(r), s
+}
+
+// Diffuse shading with shadows and interreflection
+func (s *diffuse2) Intensity(r Ray, t float64, N int) Color {
+	n := Normal(s.shape, r, t)
+	acc := Color(s.refl) * directDiffuse(s.scene, r, t, n)
+	p := r.At(t).MAdd(off, n)
+	d := RandVecDir(n)
+	sec := Ray{p, d}
+	_, I := s.scene.Intensity(sec, N-1)
+	acc += I * Color(s.refl*Max(n.Dot(d.Normalized()), 0))
+	return acc
+
+}
+
 //func Reflective(reflect float64) Shader {
 //	return func(r Ray, t float64, n Vec, N int) float64 {
 //		p := r.At(t).MAdd(off, n)

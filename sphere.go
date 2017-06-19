@@ -1,6 +1,9 @@
 package main
 
-import "math"
+import (
+	"log"
+	"math"
+)
 
 type sphere struct {
 	C Vec
@@ -21,7 +24,9 @@ func (s *sphere) Intersect(ray Ray) Inter {
 	}
 	t1 := (-v.Dot(d) - math.Sqrt(D))
 	t2 := (-v.Dot(d) + math.Sqrt(D))
-	assert(t1 <= t2)
+	if t1 > t2 {
+		log.Println("ERROR: sphere intersect t1=%v, t2=%v", t1, t2)
+	}
 
 	return Inter{t1, t2}
 }

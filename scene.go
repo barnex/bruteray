@@ -3,14 +3,25 @@ package main
 type Scene struct {
 	objs    []Obj
 	sources []Source
+	amb     func(Vec) Color
 }
 
-func (s *Scene) Intensity(r Ray) (float64, Color) {
+func (s *Scene) Ambient(r Ray) Color {
+	if s.amb == nil {
+		return 0
+	}
+	return s.amb(r.Dir)
+}
+
+func (s *Scene) Intensity(r Ray, N int) (float64, Color) {
+	if N == 0 {
+		return inf, s.Ambient(r)
+	}
 	ival, shader := s.Intersect(r)
 	if shader != nil {
-		return ival.Min, shader.Intensity(r, ival.Min)
+		return ival.Min, shader.Intensity(r, ival.Min, N)
 	} else {
-		return inf, 0 //ambient(r.Dir)
+		return inf, s.Ambient(r)
 	}
 }
 

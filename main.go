@@ -18,7 +18,7 @@ var (
 	quality  = flag.Int("q", 85, "JPEG quality")
 	useSRGB  = flag.Bool("srgb", true, "use sRGB color space")
 	iters    = flag.Int("N", 10000, "number of iterations")
-	pprof    = flag.String("pprof", "", "pprof port")
+	pprof    = flag.String("pprof", ":9093", "pprof port")
 )
 
 //const off = 1e-6 // anti-bleeding offset, intersection points moved this much away from surface
@@ -31,15 +31,17 @@ func main() {
 
 	s := &Scene{}
 
-	ground := Diffuse1(s, Slab(-h, -h-100), 0.95)
-	sph := Diffuse1(s, Sphere(Vec{-1, -0.8, 4}, 1.2), 0.5)
+	ground := Diffuse2(s, Slab(-h, -h-100), 0.95)
+	//sph := shadeNormal{Sphere(Vec{-1, -0.8, 4}, 1.2)}
+	sph := Diffuse2(s, Sphere(Vec{-1, -0.8, 4}, 1.2), 0.95)
 	s.objs = []Obj{
 		ground,
 		sph,
 	}
-	s.sources = []Source{
-		&BulbSource{Vec{3, 5, 1}, 100, 1},
-	}
+	//s.sources = []Source{
+	//	&BulbSource{Vec{3, 5, 1}, 100, 1},
+	//}
+	s.amb = func(Vec) Color { return 1 }
 
 	cam := Camera(*width, *height, *focalLen)
 

@@ -50,7 +50,7 @@ func (c *Cam) iterate(s *Scene) {
 
 			// accumulate ray intensity
 			r := Ray{start, dir}
-			t, v := s.Intensity(r)
+			t, v := s.Intensity(r, *maxRec)
 			c.Img[i][j] += v
 			c.ZMap[i][j] = Color(-t)
 		}
