@@ -11,11 +11,11 @@ import (
 	"path"
 )
 
-func Encode(img [][]Color, fname string, overExp bool) error {
+func Encode(img [][]Color, fname string, scale float64, overExp bool) error {
 	img2 := MakeImage(len(img[0]), len(img))
 	for i := range img {
 		for j := range img[i] {
-			v := img[i][j]
+			v := img[i][j] * Color(scale)
 			if !overExp {
 				v = clip(v)
 			}

@@ -5,6 +5,7 @@ type Cam struct {
 	Img      [][]Color
 	ZMap     [][]Color
 	FocalLen float64
+	N        int
 }
 
 func Camera(w, h int, focalLen float64) *Cam {
@@ -21,6 +22,13 @@ func (c *Cam) Size() (int, int) {
 
 func (c *Cam) Render(s *Scene) [][]Color {
 	c.iterate(s)
+	return c.Img
+}
+
+func (c *Cam) Iterate(s *Scene, N int) [][]Color {
+	for i := 0; i < N; i++ {
+		c.iterate(s)
+	}
 	return c.Img
 }
 
@@ -47,6 +55,7 @@ func (c *Cam) iterate(s *Scene) {
 			c.ZMap[i][j] = Color(-t)
 		}
 	}
+	c.N++
 }
 
 func MakeImage(W, H int) [][]Color {

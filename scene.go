@@ -1,7 +1,8 @@
 package main
 
 type Scene struct {
-	objs []Obj
+	objs    []Obj
+	sources []Source
 }
 
 func (s *Scene) Intensity(r Ray) (float64, Color) {
@@ -12,15 +13,6 @@ func (s *Scene) Intensity(r Ray) (float64, Color) {
 		return inf, 0 //ambient(r.Dir)
 	}
 }
-
-//func (s *Scene) ZMap(r Ray) float64 {
-//	t, obj := s.Intersect(r)
-//	if obj != nil {
-//		return t
-//	} else {
-//		return inf
-//	}
-//}
 
 func (s *Scene) Intersect(r Ray) (Inter, Shader) {
 	var (
@@ -36,4 +28,9 @@ func (s *Scene) Intersect(r Ray) (Inter, Shader) {
 		}
 	}
 	return minT, shader
+}
+
+func (s *Scene) IntersectsAny(r Ray) bool {
+	_, shader := s.Intersect(r)
+	return shader != nil
 }

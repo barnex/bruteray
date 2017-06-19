@@ -31,7 +31,7 @@ func TestBehindCam(tst *testing.T) {
 	t := Helper(tst)
 
 	const r = 0.25
-	objects = []Obj{
+	objects := []Obj{
 		Flat(Sphere(Vec{0, 0, -3}, r), 1),
 	}
 	s := &Scene{
@@ -123,7 +123,7 @@ func (t helper) Compare(s *Scene, name string) {
 	//t.Helper()
 	cam := Camera(testW, testH, 0)
 	out := name + ".png"
-	Encode(cam.Render(s), out, true)
+	Encode(cam.Render(s), out, 1/(float64(cam.N)), true)
 	ref := "testdata/" + out
 	deviation, err := imgComp(out, ref)
 

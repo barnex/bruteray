@@ -4,17 +4,20 @@ type Shape interface {
 	Intersect(Ray) Inter // TODO: -> Intersect
 }
 
+// TODO: choose delta vectors perpendicular to ray
 func Normal(s Shape, r Ray, t float64) Vec {
 	i0 := s.Intersect(r)
 	c := r.At(i0.Min)
 
+	const diff = 1. / (1024 * 1024)
+	//const diff = 1e-6
 	ra := r
-	ra.Dir = ra.Dir.MAdd(1e-5, Vec{1, 0, 0}).Normalized()
+	ra.Dir = ra.Dir.MAdd(diff, Vec{1, 0, 0}).Normalized()
 	i1 := s.Intersect(ra)
 	a := ra.At(i1.Min)
 
 	rb := r
-	rb.Dir = rb.Dir.MAdd(1e-5, Vec{0, 1, 0}).Normalized()
+	rb.Dir = rb.Dir.MAdd(diff, Vec{0, 1, 0}).Normalized()
 	i2 := s.Intersect(rb)
 	b := rb.At(i2.Min)
 
