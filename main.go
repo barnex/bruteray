@@ -32,15 +32,17 @@ func main() {
 	s := &Scene{}
 
 	ground := Diffuse2(s, Slab(-h, -h-100), 0.95)
-	//sph := shadeNormal{Sphere(Vec{-1, -0.8, 4}, 1.2)}
-	sph := Diffuse2(s, Sphere(Vec{-1, -0.8, 4}, 1.2), 0.95)
+	sp := Sphere(Vec{-0.5, -1, 5}, 2)
+	die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
+	dice := Diffuse2(s, die, 0.95)
+	//dice := Flat(die, 0.95)
 	s.objs = []Obj{
 		ground,
-		sph,
+		dice,
 	}
-	//s.sources = []Source{
-	//	&BulbSource{Vec{3, 5, 1}, 100, 1},
-	//}
+	s.sources = []Source{
+		&BulbSource{Vec{6, 10, 2}, 80, 4},
+	}
 	s.amb = func(Vec) Color { return 1 }
 
 	cam := Camera(*width, *height, *focalLen)

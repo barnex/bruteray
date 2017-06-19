@@ -9,15 +9,17 @@ func Normal(s Shape, r Ray, t float64) Vec {
 	i0 := s.Intersect(r)
 	c := r.At(i0.Min)
 
+	perp1 := Vec{-r.Dir.Z, 0, r.Dir.X}.Normalized()
+	perp2 := Vec{0, -r.Dir.Z, r.Dir.Y}.Normalized()
+
 	const diff = 1. / (1024 * 1024)
-	//const diff = 1e-6
 	ra := r
-	ra.Dir = ra.Dir.MAdd(diff, Vec{1, 0, 0}).Normalized()
+	ra.Dir = r.Dir.MAdd(t*diff, perp1).Normalized()
 	i1 := s.Intersect(ra)
 	a := ra.At(i1.Min)
 
 	rb := r
-	rb.Dir = rb.Dir.MAdd(diff, Vec{0, 1, 0}).Normalized()
+	rb.Dir = r.Dir.MAdd(t*diff, perp2).Normalized()
 	i2 := s.Intersect(rb)
 	b := rb.At(i2.Min)
 

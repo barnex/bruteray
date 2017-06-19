@@ -1,5 +1,10 @@
 package main
 
+import (
+	"log"
+	"math"
+)
+
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
 	Img      [][]Color
@@ -51,6 +56,10 @@ func (c *Cam) iterate(s *Scene) {
 			// accumulate ray intensity
 			r := Ray{start, dir}
 			t, v := s.Intensity(r, *maxRec)
+			if math.IsNaN(float64(v)) {
+				log.Println("ERROR: got NaN")
+				continue
+			}
 			c.Img[i][j] += v
 			c.ZMap[i][j] = Color(-t)
 		}

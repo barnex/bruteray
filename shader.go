@@ -92,13 +92,12 @@ func (s *diffuse2) Intersect(r Ray) (Inter, Shader) {
 func (s *diffuse2) Intensity(r Ray, t float64, N int) Color {
 	n := Normal(s.shape, r, t)
 	acc := Color(s.refl) * directDiffuse(s.scene, r, t, n)
-	p := r.At(t).MAdd(off, n)
+	p := r.At(t).MAdd(1e-6, n)
 	d := RandVecDir(n)
 	sec := Ray{p, d}
 	_, I := s.scene.Intensity(sec, N-1)
 	acc += I * Color(s.refl*Max(n.Dot(d.Normalized()), 0))
 	return acc
-
 }
 
 //func Reflective(reflect float64) Shader {
