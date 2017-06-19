@@ -21,8 +21,6 @@ var (
 	pprof    = flag.String("pprof", ":9093", "pprof port")
 )
 
-//const off = 1e-6 // anti-bleeding offset, intersection points moved this much away from surface
-
 func main() {
 	Init()
 	start := time.Now()
@@ -31,14 +29,15 @@ func main() {
 
 	s := &Scene{}
 
-	ground := Diffuse2(s, Slab(-h, -h-100), 0.95)
-	sp := Sphere(Vec{-0.5, -1, 5}, 2)
+	ground := Diffuse2(s, Slab(-h, -h-100), 0.5)
+	sp := Sphere(Vec{-0.5, -1, 8}, 2)
 	die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
 	dice := Diffuse2(s, die, 0.95)
 	//dice := Flat(die, 0.95)
 	s.objs = []Obj{
 		ground,
 		dice,
+		Reflective(s, Sphere(Vec{3, -1, 10}, 1), 0.9),
 	}
 	s.sources = []Source{
 		&BulbSource{Vec{6, 10, 2}, 80, 4},

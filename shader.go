@@ -100,6 +100,35 @@ func (s *diffuse2) Intensity(r Ray, t float64, N int) Color {
 	return acc
 }
 
+type reflective struct {
+	scene *Scene
+	shape Shape
+	refl  float64
+}
+
+// Diffuse shading with shadows, but no interreflection
+func Reflective(sc *Scene, sh Shape, refl float64) Obj {
+	return &reflective{sc, sh, refl}
+}
+
+func (s *reflective) Intersect(r Ray) (Inter, Shader) {
+	return s.shape.Intersect(r), s
+}
+
+// Diffuse shading with shadows and interreflection
+func (s *reflective) Intensity(r Ray, t float64, N int) Color {
+	n := Normal(s.shape, r, t)
+	p := r.At(t).MAdd(1e-6, n)
+	dir2 := reflectVec(r.Dir, n)
+	_, I := s.scene.Intensity(Ray{p, dir2}, N-1)
+	return Color(s.refl) * I
+}
+
+// reflects v of the surface with normal n.
+func reflectVec(v, n Vec) Vec {
+	return v.MAdd(-2*v.Dot(n), n)
+}
+
 //func Reflective(reflect float64) Shader {
 //	return func(r Ray, t float64, n Vec, N int) float64 {
 //		p := r.At(t).MAdd(off, n)
@@ -122,7 +151,3 @@ func (s *diffuse2) Intensity(r Ray, t float64, N int) Color {
 //	}
 //}
 //
-//// reflects v of the surface with normal n.
-//func reflectVec(v, n Vec) Vec {
-//	return v.MAdd(-2*v.Dot(n), n)
-//}
