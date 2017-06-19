@@ -79,3 +79,15 @@ func Scene6() *Scene {
 		},
 	}
 }
+
+func Scene7() *Scene {
+	const r = 0.5
+	sp := ShadeNormal(Sphere(Vec{0, 0, 3}, r))
+	sl := ShadeNormal(Slab(-0.25, 0.25))
+
+	return &Scene{
+		objs: []Obj{
+			ObjAnd{sp, sl},
+		},
+	}
+}

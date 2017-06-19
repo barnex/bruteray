@@ -18,7 +18,7 @@ var (
 	quality  = flag.Int("q", 85, "JPEG quality")
 	useSRGB  = flag.Bool("srgb", true, "use sRGB color space")
 	iters    = flag.Int("N", 1, "number of iterations")
-	pprof    = flag.String("pprof", ":6060", "pprof port")
+	pprof    = flag.String("pprof", "", "pprof port")
 )
 
 // Scene:
@@ -36,7 +36,7 @@ func main() {
 	Init()
 	start := time.Now()
 
-	scenes := []func() *Scene{Scene1, Scene2, Scene3, Scene4, Scene5, Scene6}
+	scenes := []func() *Scene{Scene1, Scene2, Scene3, Scene4, Scene5, Scene6, Scene7}
 	for _, s := range scenes {
 		test(s())
 	}

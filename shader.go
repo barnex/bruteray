@@ -35,7 +35,7 @@ func (s shadeNormal) Intersect(r Ray) (Inter, Shader) {
 
 func (s shadeNormal) Intensity(r Ray, t float64) Color {
 	n := Normal(s.s, r, t)
-	return Color(n.Z/2 + 0.5)
+	return Color(-n.Z)
 }
 
 //// Diffuse shading with shadows, but no interreflection

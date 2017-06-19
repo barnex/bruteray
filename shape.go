@@ -22,9 +22,9 @@ func Normal(s Shape, r Ray, t float64) Vec {
 	b = b.Sub(c)
 	n := b.Cross(a).Normalized()
 
-	if n.Dot(r.Dir) > 0 {
-		n = n.Mul(-1)
-	}
+	//if n.Dot(r.Dir) > 0 {
+	//	n = n.Mul(-1)
+	//}
 	return n
 }
 

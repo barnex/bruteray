@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/jpeg"
+	"image/png"
 	"math"
 	"os"
+	"path"
 )
 
 func Encode(img [][]Color, fname string, overExp bool) error {
@@ -24,7 +27,14 @@ func Encode(img [][]Color, fname string, overExp bool) error {
 		return err
 	}
 	defer f.Close()
-	return jpeg.Encode(f, Gray(img2), &jpeg.Options{Quality: *quality})
+	switch path.Ext(fname) {
+	default:
+		return fmt.Errorf("unknown format: %q", fname)
+	case ".jpg", ".jpeg":
+		return jpeg.Encode(f, Gray(img2), &jpeg.Options{Quality: *quality})
+	case ".png":
+		return png.Encode(f, Gray(img2))
+	}
 }
 
 func Stretch(img [][]Color) [][]Color {
