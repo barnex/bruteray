@@ -36,22 +36,12 @@ func main() {
 	Init()
 	start := time.Now()
 
-	scenes := []func() *Scene{Scene1, Scene2, Scene3, Scene4, Scene5, Scene6, Scene7}
-	for _, s := range scenes {
-		test(s())
-	}
+	s := &Scene{}
+	cam := Camera(*width, *height, 0)
+	Encode(cam.Render(s), "out.jpg", *overExp)
+	Encode(Stretch(cam.ZMap), "z.jpg", true)
 
 	fmt.Println("done,", time.Since(start))
-}
-
-var cnt = 0
-
-func test(s *Scene) {
-	cam := Camera(*width, *height, 0)
-	cnt++
-	name := fmt.Sprintf("%03d", cnt)
-	Encode(cam.Render(s), name+".jpg", *overExp)
-	Encode(Stretch(cam.ZMap), name+"-z.jpg", true)
 }
 
 func Init() {

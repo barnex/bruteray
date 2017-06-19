@@ -24,7 +24,90 @@ func TestOverlap(tst *testing.T) {
 	}
 
 	t.Compare(s, "001-overlap")
+}
 
+// A sphere behind the camera, should not be visible
+func TestBehindCam(tst *testing.T) {
+	t := Helper(tst)
+
+	const r = 0.25
+	objects = []Obj{
+		Flat(Sphere(Vec{0, 0, -3}, r), 1),
+	}
+	s := &Scene{
+		objs: objects,
+	}
+
+	t.Compare(s, "002-behindcam")
+}
+
+// Intersection of flat-shaded spheres
+func TestIntersect(tst *testing.T) {
+	t := Helper(tst)
+
+	const r = 0.25
+	s1 := Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1)
+	s2 := Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5)
+	s := &Scene{
+		objs: []Obj{
+			&ObjAnd{s1, s2},
+		},
+	}
+
+	t.Compare(s, "003-intersect")
+}
+
+// Intersection of spheres, as shapes (not objects)
+func TestIntersectShape(tst *testing.T) {
+	t := Helper(tst)
+
+	const r = 0.25
+	s1 := Sphere(Vec{-r / 2, 0, 3}, r)
+	s2 := Sphere(Vec{r / 2, 0, 3}, r)
+	sh := ShapeAnd{s1, s2}
+
+	s := &Scene{
+		objs: []Obj{
+			Flat(sh, 1),
+		},
+	}
+
+	t.Compare(s, "004-intersectshape")
+}
+
+// Minus of spheres, as shapes (not objects)
+func TestMinusShape(tst *testing.T) {
+	t := Helper(tst)
+
+	const r = 0.5
+	s1 := Sphere(Vec{-r / 2, 0, 3}, r)
+	s2 := Sphere(Vec{r / 2, 0, 3}, r)
+	sh := ShapeMinus{s1, s2}
+	s := &Scene{
+		objs: []Obj{
+			Flat(sh, 1),
+		},
+	}
+
+	t.Compare(s, "005-minusshape")
+}
+
+// Intersection of normal.z-shaded spheres
+func TestSphereNormals(tst *testing.T) {
+	t := Helper(tst)
+
+	const r = 0.25
+	s3 := ShadeNormal(Sphere(Vec{0, -0.5, 3}, 2*r))
+	s1 := ShadeNormal(Sphere(Vec{-r / 2, 0, 3}, r))
+	s2 := ShadeNormal(Sphere(Vec{r / 2, 0, 3}, r))
+	s := &Scene{
+		objs: []Obj{
+			ObjAnd{s3, s1},
+			ObjAnd{s3, s2},
+		},
+	}
+
+	t.Compare(s, "006-spherenormals")
 }
 
 type helper struct {
