@@ -20,5 +20,5 @@ type BulbSource struct {
 }
 
 func (s *BulbSource) Sample() (Vec, float64) {
-	return RandVec().Mul(s.R).Add(s.Pos), s.Flux
+	return Vec{RandNorm(), RandNorm(), RandNorm()}.Mul(s.R).Add(s.Pos), s.Flux
 }
