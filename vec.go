@@ -56,3 +56,11 @@ func (a Vec) Cross(b Vec) Vec {
 	z := a.X*b.Y - a.Y*b.X
 	return Vec{x, y, z}
 }
+
+func (r Vec) RotX(θ float64) Vec {
+	cos := math.Cos(θ)
+	sin := math.Sin(θ)
+	y_ := r.Y*cos + r.Z*sin
+	z_ := -r.Y*sin + r.Z*cos
+	return Vec{r.X, y_, z_}
+}

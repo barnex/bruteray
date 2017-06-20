@@ -14,7 +14,7 @@ var (
 	height   = flag.Int("h", 600, "canvas height")
 	focalLen = flag.Float64("f", 1, "focal length")
 	maxRec   = flag.Int("rec", 3, "maximum number of recursive rays")
-	overExp  = flag.Bool("over", true, "highlight over/under exposed pixels")
+	overExp  = flag.Bool("over", false, "highlight over/under exposed pixels")
 	quality  = flag.Int("q", 85, "JPEG quality")
 	useSRGB  = flag.Bool("srgb", true, "use sRGB color space")
 	iters    = flag.Int("N", 10000, "number of iterations")
@@ -40,11 +40,12 @@ func main() {
 		Reflective(s, Sphere(Vec{3, -1, 10}, 1), 0.9),
 	}
 	s.sources = []Source{
-		&BulbSource{Vec{6, 10, 2}, 80, 4},
+		&BulbSource{Vec{6, 10, 2}, 180, 4},
 	}
 	s.amb = func(Vec) Color { return 1 }
 
 	cam := Camera(*width, *height, *focalLen)
+	cam.Pitch = -10 * deg
 
 	Encode(Stretch(cam.ZMap), "z.jpg", 1, true)
 	every := 1
