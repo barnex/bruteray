@@ -28,27 +28,56 @@ func main() {
 	const h = 2
 
 	s := &Scene{}
+	const (
+		G     = -2
+		RoomW = 6
+		RoomD = 10
+		WallW = 0.1
+		WallH = 5
+		WallT = 0.02
+	)
 
-	ground := Diffuse2(s, Slab(-h, -h-100), 0.5)
-	//ground := Diffuse2(s, ABox(Vec{-100, -h, 0}, Vec{100, -2 * h, 100}), 0.5)
-	sp := Sphere(Vec{-0.5, -1, 8}, 2)
-	die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
-	dice := Diffuse2(s, die, 0.95)
-	//dice := Flat(die, 0.95)
+	ground := Slab(G, -100)
+
+	die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})
+	marble := Sphere(Vec{1, G + 1, 5}, 1)
+	walll := ABox(Vec{-RoomW / 2, G, 0}, Vec{-RoomW - WallT/2, G + WallH, 100})
+	wallr_ := ABox(Vec{RoomW / 2, G, 0}, Vec{RoomW + WallT/2, G + WallH, 100})
+	//win := ABox(Vec{RoomW/2 - 1, G + 2, 1}, Vec{RoomW/2 + 1, G + 3, 2})
+	//win := ABox(Vec{2, G, 4}, Vec{4, G + 1, 5})
+	//wallr := &ShapeMinus{wallr_, win}
+	wallr := wallr_
+	wallb := ABox(Vec{-RoomW / 2, G, RoomD}, Vec{RoomW, G + WallH, RoomD + WallT})
+
 	s.objs = []Obj{
-		ground,
-		dice,
-		Reflective(s, Sphere(Vec{3, -1, 10}, 1), 0.9),
+		Diffuse2(s, ground, 0.5),
+		Reflective(s, marble, 0.9),
+		Diffuse2(s, die, 1),
+		Diffuse2(s, walll, 1),
+		Diffuse2(s, wallr, 1),
+		Diffuse2(s, wallb, 1),
+		Flat(Sphere(Vec{2, 8, -2}, 1), 10),
 	}
 	s.sources = []Source{
-		&BulbSource{Vec{6, 10, 2}, 180, 4},
+		&BulbSource{Vec{2, 8, -2}, 150, 2},
+		//&PointSource{Vec{2, 8, -2}, 100},
 	}
-	s.amb = func(Vec) Color { return 1 }
+	s.amb = func(v Vec) Color { return Color(0.1 * v.Y) }
+
+	//ground := Diffuse2(s, ABox(Vec{-100, -h, 0}, Vec{100, -2 * h, 100}), 0.5)
+	//sp := Sphere(Vec{-0.5, -1, 8}, 2)
+	//die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
+	//dice := Diffuse2(s, die, 0.95)
+	////dice := Flat(die, 0.95)
+	//s.objs = []Obj{
+	//	ground,
+	//	dice,
+	//	Reflective(s, Sphere(Vec{3, -1, 10}, 1), 0.9),
+	//}
 
 	cam := Camera(*width, *height, *focalLen)
-	cam.Pitch = -10 * deg
+	cam.Pitch = -5 * deg
 
-	Encode(Stretch(cam.ZMap), "z.jpg", 1, true)
 	every := 1
 	for i := 0; i < *iters; i++ {
 		cam.iterate(s)

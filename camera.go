@@ -79,6 +79,6 @@ func MakeImage(W, H int) [][]Color {
 
 // Anti-aliasing jitter
 func aa() float64 {
-	return 0.5
-	//return Rand()
+	//	return 0.5
+	return Rand()
 }
