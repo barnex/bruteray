@@ -30,6 +30,7 @@ func main() {
 	s := &Scene{}
 
 	ground := Diffuse2(s, Slab(-h, -h-100), 0.5)
+	//ground := Diffuse2(s, ABox(Vec{-100, -h, 0}, Vec{100, -2 * h, 100}), 0.5)
 	sp := Sphere(Vec{-0.5, -1, 8}, 2)
 	die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
 	dice := Diffuse2(s, die, 0.95)

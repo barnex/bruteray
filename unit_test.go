@@ -131,6 +131,32 @@ func TestBox(tst *testing.T) {
 	t.CompareCam(s, "007-box", Camera(testW, testH, 0.7))
 }
 
+func TestReflection(tst *testing.T) {
+	t := Helper(tst)
+
+	s := &Scene{}
+
+	const h = 2
+	ground := Diffuse1(s, Slab(-h, -h-100), 0.5)
+	sp := Sphere(Vec{-0.5, -1, 8}, 2)
+	die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
+	dice := Diffuse1(s, die, 0.95)
+	s.objs = []Obj{
+		ground,
+		dice,
+		Reflective(s, Sphere(Vec{3, -1, 10}, 1), 0.9),
+	}
+	s.sources = []Source{
+		&PointSource{Vec{6, 10, 2}, 180},
+	}
+	s.amb = func(Vec) Color { return 1 }
+
+	cam := Camera(testW, testH, 1)
+	cam.Pitch = -10 * deg
+
+	t.CompareCam(s, "008-reflections", cam)
+}
+
 type helper struct {
 	*testing.T
 }
