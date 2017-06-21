@@ -110,6 +110,27 @@ func TestSphereNormals(tst *testing.T) {
 	t.Compare(s, "006-spherenormals")
 }
 
+func TestBox(tst *testing.T) {
+	t := Helper(tst)
+
+	b1 := ABox(Vec{-2, -2, 4}, Vec{-1, -1, 3})
+	b2 := ABox(Vec{2, -2, 4}, Vec{1, -1, 3})
+	b3 := ABox(Vec{-2, 2, 4}, Vec{-1, 1, 3})
+	b4 := ABox(Vec{2, 2, 4}, Vec{1, 1, 3})
+	s := &Scene{}
+	s.objs = []Obj{
+		Diffuse1(s, b1, 1),
+		Diffuse1(s, b2, 1),
+		Diffuse1(s, b3, 1),
+		Diffuse1(s, b4, 1),
+	}
+	s.sources = []Source{
+		&PointSource{Vec{0.5, 0.3, -5}, 60},
+	}
+
+	t.CompareCam(s, "007-box", Camera(testW, testH, 0.7))
+}
+
 type helper struct {
 	*testing.T
 }
@@ -122,6 +143,11 @@ func Helper(tst *testing.T) helper {
 func (t helper) Compare(s *Scene, name string) {
 	//t.Helper()
 	cam := Camera(testW, testH, 0)
+	t.CompareCam(s, name, cam)
+}
+
+func (t helper) CompareCam(s *Scene, name string, cam *Cam) {
+	//t.Helper()
 	out := name + ".png"
 	Encode(cam.Render(s), out, 1/(float64(cam.N)), true)
 	ref := "testdata/" + out

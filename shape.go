@@ -4,6 +4,12 @@ type Shape interface {
 	Intersect(Ray) Inter // TODO: -> Intersect
 }
 
+type ShapeFunc func(Ray) Inter
+
+func (f ShapeFunc) Intersect(r Ray) Inter {
+	return f(r)
+}
+
 // TODO: choose delta vectors perpendicular to ray
 func Normal(s Shape, r Ray, t float64) Vec {
 	i0 := s.Intersect(r)
