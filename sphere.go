@@ -14,6 +14,10 @@ func Sphere(center Vec, radius float64) *sphere {
 	return &sphere{center, radius}
 }
 
+func (s *sphere) Normal(r Ray, t float64) Vec {
+	return Normal(s, r, t)
+}
+
 func (s *sphere) Intersect(ray Ray) Inter {
 	v := ray.Start.Sub(s.C)
 	r := s.R
