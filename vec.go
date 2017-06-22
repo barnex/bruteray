@@ -43,11 +43,8 @@ func (v Vec) Len2() float64 {
 }
 
 func (v Vec) Normalized() Vec {
-	l := v.Len()
-	if l == 0 {
-		l = 1
-	}
-	return v.Div(l)
+	l := 1 / math.Sqrt(v.X*v.X+v.Y*v.Y+v.Z*v.Z)
+	return Vec{v.X * l, v.Y * l, v.Z * l}
 }
 
 func (a Vec) Cross(b Vec) Vec {
