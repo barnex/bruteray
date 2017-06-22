@@ -17,17 +17,37 @@ func assert(t bool) {
 }
 
 func Min(x, y float64) float64 {
-	return math.Min(x, y)
+	if x < y {
+		return x
+	}
+	return y
 }
 
 func Min3(x, y, z float64) float64 {
-	return Min(Min(x, y), z)
+	min := x
+	if y < min {
+		min = y
+	}
+	if z < min {
+		min = z
+	}
+	return min
 }
 
 func Max(x, y float64) float64 {
-	return math.Max(x, y)
+	if x > y {
+		return x
+	}
+	return y
 }
 
 func Max3(x, y, z float64) float64 {
-	return Max(Max(x, y), z)
+	max := x
+	if y > max {
+		max = y
+	}
+	if z > max {
+		max = z
+	}
+	return max
 }

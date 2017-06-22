@@ -152,7 +152,7 @@ func TestReflection(tst *testing.T) {
 	s.amb = func(Vec) Color { return 1 }
 
 	cam := Camera(testW, testH, 1)
-	cam.Pitch = -10 * deg
+	cam.Transf = RotX(-10 * deg)
 
 	t.CompareCam(s, "008-reflections", cam)
 }
@@ -162,7 +162,6 @@ type helper struct {
 }
 
 func Helper(tst *testing.T) helper {
-	tst.Parallel()
 	return helper{tst}
 }
 

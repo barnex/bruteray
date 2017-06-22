@@ -76,7 +76,7 @@ func main() {
 	//}
 
 	cam := Camera(*width, *height, *focalLen)
-	cam.Pitch = -5 * deg
+	cam.Transf = RotX(-5 * deg)
 
 	every := 1
 	for i := 0; i < *iters; i++ {
