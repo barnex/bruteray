@@ -37,8 +37,11 @@ func main() {
 	scene := &Env{}
 	scene.amb = func(v Vec) Color { return Color(0.1 * v.Y) }
 
-	scene.Add(Sheet(-1, Ey), Flat(0.5))
-	scene.Add(Sphere(Vec{0, 0, 4}, 1), Flat(0.9))
+	scene.Add(Sheet(-1, Ey), Diffuse1(0.5))
+	scene.Add(Sphere(Vec{1, 0, 4}, 1), Diffuse1(0.9))
+	scene.Add(Sphere(Vec{-1, 0, 5}, 1), Reflective(0.9))
+	//scene.AddLight(PointLight(Vec{2, 8, 0}, 100))
+	scene.AddLight(SmoothLight(Vec{2, 8, 0}, 100, 2))
 
 	//ground := Slab(G, -100)
 	//die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})
@@ -69,10 +72,13 @@ func main() {
 }
 
 func Render(s *Env, cam *Cam, fname string) {
-	start := time.Now()
 	every := 1
+	W, H := cam.Size()
 	for i := 0; i < *iters; i++ {
+		start := time.Now()
 		cam.iterate(s)
+		speed := float64((W+1)*(H+1)) / time.Since(start).Seconds()
+		fmt.Printf("%.2f Mpixel/s\n", speed/1e6)
 		if i%every == 0 {
 			Encode(cam.Img, fname, 1/(float64(cam.N)), *overExp)
 		}
@@ -82,7 +88,6 @@ func Render(s *Env, cam *Cam, fname string) {
 		}
 	}
 
-	fmt.Println("done,", time.Since(start))
 }
 
 func Init() {

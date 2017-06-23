@@ -1,24 +1,36 @@
 package main
 
-//type Shape interface {
-//	Hit(Ray) float64
-//	Intersect(Ray) Inter // TODO: -> Intersect
-//	Normal(Ray, float64) Vec
-//}
-//
-//type ShapeFunc func(Ray) Inter
-//
-//func (f ShapeFunc) Intersect(r Ray) Inter {
-//	return f(r)
-//}
-//
-//func (f ShapeFunc) Normal(r Ray, t float64) Vec {
-//	return Normal(f, r, t)
-//}
-//
-//func (f ShapeFunc) Hit(r Ray) float64 {
-//	return f.Intersect(r).Min
-//}
+type Shape interface {
+	Hit(r *Ray) float64
+	Normal(r *Ray, t float64) Vec
+}
+
+type shape struct {
+	hit    func(r *Ray) float64
+	normal func(r *Ray, t float64) Vec
+}
+
+func (s *shape) Hit(r *Ray) float64 {
+	return s.hit(r)
+}
+
+func (s *shape) Normal(r *Ray, t float64) Vec {
+	return s.normal(r, t)
+}
+
+func Sheet(pos float64, dir Vec) Shape {
+	return &shape{
+		hit: func(r *Ray) float64 {
+			rs := r.Start.Dot(dir)
+			rd := r.Dir.Dot(dir)
+			t := (pos - rs) / rd
+			return Max(t, 0)
+		},
+		normal: func(r *Ray, t float64) Vec {
+			return dir
+		},
+	}
+}
 
 // Numerical approximation of normal vector
 func NumNormal(s Shape, r *Ray, t float64) Vec {
