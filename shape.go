@@ -27,7 +27,7 @@ func Sheet(pos float64, dir Vec) Shape {
 			return Max(t, 0)
 		},
 		normal: func(r *Ray, t float64) Vec {
-			return dir
+			return dir.Towards(r.Dir)
 		},
 	}
 }

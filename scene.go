@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 )
 
@@ -47,12 +48,15 @@ func (e *Env) Hit(r *Ray) (float64, Obj) {
 			shader = o
 		}
 	}
+	if math.IsInf(minT, 0) {
+		minT = 0
+	}
 	return minT, shader
 }
 
 func (e *Env) HitAny(r *Ray) bool {
-	_, obj := e.Hit(r)
-	return obj != nil
+	t, _ := e.Hit(r)
+	return t > 0 //obj != nil
 }
 
 func (s *Env) Ambient(dir Vec) Color {
@@ -77,7 +81,7 @@ func (o *object) Shade(e *Env, r *Ray, t float64, N int) Color {
 		return e.Ambient(r.Dir)
 	}
 	n := o.Shape.Normal(r, t)
-	return o.shader.Shade(e, r, t, n)
+	return o.shader.Shade(e, r, t, n, N)
 }
 
 //type Shader interface{

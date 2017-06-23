@@ -1,23 +1,23 @@
 package main
 
 type Shader interface {
-	Shade(e *Env, r *Ray, t float64, n Vec) Color
+	Shade(e *Env, r *Ray, t float64, n Vec, N int) Color
 }
 
-type shadeFn func(e *Env, r *Ray, t float64, n Vec) Color
+type shadeFn func(e *Env, r *Ray, t float64, n Vec, N int) Color
 
-func (f shadeFn) Shade(e *Env, r *Ray, t float64, n Vec) Color {
-	return f(e, r, t, n)
+func (f shadeFn) Shade(e *Env, r *Ray, t float64, n Vec, N int) Color {
+	return f(e, r, t, n, N)
 }
 
 func Flat(v Color) Shader {
-	return shadeFn(func(*Env, *Ray, float64, Vec) Color {
+	return shadeFn(func(*Env, *Ray, float64, Vec, int) Color {
 		return v
 	})
 }
 
 func Diffuse1(refl float64) Shader {
-	return shadeFn(func(e *Env, r *Ray, t float64, n Vec) Color {
+	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
 		return Color(refl) * directDiffuse(e, r, t, n)
 	})
 }
@@ -40,11 +40,11 @@ func directDiffuse(e *Env, r *Ray, t float64, n Vec) Color {
 }
 
 func Reflective(refl float64) Shader {
-	return shadeFn(func(e *Env, r *Ray, t float64, n Vec) Color {
+	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
 		p := r.At(t)
 		dir2 := reflectVec(r.Dir, n)
 		sec := &Ray{p.MAdd(off, n), dir2}
-		I := e.Shade(sec, 1) // TODO: pass N
+		I := e.Shade(sec, N-1) // TODO: pass N
 		return Color(refl) * I
 	})
 }
@@ -55,26 +55,23 @@ func reflectVec(v, n Vec) Vec {
 }
 
 func ShadeNormal() Shader {
-	return shadeFn(func(e *Env, r *Ray, t float64, n Vec) Color {
+	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
 		return Color(-n.Z)
 	})
 }
 
-//type diffuse2 struct {
-//	scene *Env
-//	shape Shape
-//	refl  float64
-//}
-//
-//// Diffuse shading with shadows, but no interreflection
-//func Diffuse2(sc *Env, sh Shape, refl float64) Obj {
-//	return &diffuse2{sc, sh, refl}
-//}
-//
-//func (s *diffuse2) Intersect(r Ray) (Inter, Shader) {
-//	return s.shape.Intersect(r), s
-//}
-//
+func Diffuse2(refl float64) Shader {
+	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
+		acc := Color(refl) * directDiffuse(e, r, t, n)
+		p := r.At(t).MAdd(off, n)
+		d := RandVecDir(n)
+		sec := &Ray{p, d}
+		I := e.Shade(sec, N-1)
+		acc += I * Color(refl*Max(n.Dot(d.Normalized()), 0))
+		return acc
+	})
+}
+
 //// Diffuse shading with shadows and interreflection
 //func (s *diffuse2) Intensity(r Ray, t float64, N int) Color {
 //	n := Normal(s.shape, r, t)
