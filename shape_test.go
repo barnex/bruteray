@@ -31,19 +31,15 @@ func TestSphere(t *testing.T) {
 		s := c.s
 		r := c.r
 		ok := c.ok
-		have := c.s.Intersect(c.r)
-		hok := have.OK()
+		have := c.s.Hit(&c.r)
+		hok := have > 0
 		if hok != ok {
 			t.Errorf("intersect %v %v: have %v, want %v", s, r, hok, ok)
 		}
 
-		h1 := r.At(have.Min)
-		h2 := r.At(have.Max)
+		h1 := r.At(have)
 		if h1.Sub(c.w1).Len() > tol {
 			t.Errorf("intersect %v %v: point 1: have %v, want %v", s, r, h1, c.w1)
-		}
-		if h1.Sub(c.w1).Len() > tol {
-			t.Errorf("intersect %v %v: point 2: have %v, want %v", s, r, h2, c.w2)
 		}
 	}
 }

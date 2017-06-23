@@ -2,6 +2,12 @@ package main
 
 import "math"
 
+var (
+	Ex = Vec{1, 0, 0}
+	Ey = Vec{0, 1, 0}
+	Ez = Vec{0, 0, 1}
+)
+
 type Vec struct {
 	X, Y, Z float64
 }

@@ -37,7 +37,8 @@ func main() {
 	scene := &Env{}
 	scene.amb = func(v Vec) Color { return Color(0.1 * v.Y) }
 
-	scene.Add(Sheet(0, Ey), Flat(0.5))
+	scene.Add(Sheet(-1, Ey), Flat(0.5))
+	scene.Add(Sphere(Vec{0, 0, 4}, 1), Flat(0.9))
 
 	//ground := Slab(G, -100)
 	//die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})

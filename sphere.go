@@ -1,44 +1,38 @@
 package main
 
-import (
-	"log"
-	"math"
-)
+import "math"
 
 type sphere struct {
-	C Vec
-	R float64
+	c  Vec
+	r2 float64
 }
 
 func Sphere(center Vec, radius float64) *sphere {
-	return &sphere{center, radius}
+	return &sphere{center, sqr(radius)}
 }
 
-func (s *sphere) Normal(r Ray, t float64) Vec {
-	return Normal(s, r, t)
+func (s *sphere) Normal(r *Ray, t float64) Vec {
+	return NumNormal(s, r, t)
 }
 
-func (s *sphere) Hit(r Ray) float64 {
-	return s.Intersect(r).Min
-}
-
-func (s *sphere) Intersect(ray Ray) Inter {
-	v := ray.Start.Sub(s.C)
-	r := s.R
-	d := ray.Dir
-	D := sqr(v.Dot(d)) - (v.Len2() - sqr(r))
+func (s *sphere) Hit(r *Ray) float64 {
+	v := r.Start.Sub(s.c)
+	d := r.Dir
+	vd := v.Dot(d)
+	D := sqr(vd) - (v.Len2() - s.r2)
 	if D < 0 {
-		return empty
+		return 0
 	}
-	t1 := (-v.Dot(d) - math.Sqrt(D))
-	t2 := (-v.Dot(d) + math.Sqrt(D))
-	if t1 > t2 {
-		log.Println("ERROR: sphere intersect t1=%v, t2=%v", t1, t2)
+	if t1 := (-vd - math.Sqrt(D)); t1 > 0 {
+		return t1
+	}
+	if t2 := (-vd + math.Sqrt(D)); t2 > 0 {
+		return t2
 	}
 
-	return Inter{t1, t2}
+	return 0
 }
 
 func (s *sphere) Transl(dx, dy, dz float64) *sphere {
-	return &sphere{s.C.Add(Vec{dx, dy, dz}), s.R}
+	return &sphere{s.c.Add(Vec{dx, dy, dz}), s.r2}
 }
