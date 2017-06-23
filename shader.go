@@ -39,13 +39,13 @@ func (s shadeNormal) Intensity(r Ray, t float64, N int) Color {
 }
 
 type diffuse1 struct {
-	scene *Scene
+	scene *Env
 	shape Shape
 	refl  float64
 }
 
 // Diffuse shading with shadows, but no interreflection
-func Diffuse1(sc *Scene, sh Shape, refl float64) Obj {
+func Diffuse1(sc *Env, sh Shape, refl float64) Obj {
 	return &diffuse1{sc, sh, refl}
 }
 
@@ -60,7 +60,7 @@ func (s *diffuse1) Intensity(r Ray, t float64, N int) Color {
 	return Color(s.refl) * directDiffuse(s.scene, r, t, n)
 }
 
-func directDiffuse(scene *Scene, r Ray, t float64, n Vec) Color {
+func directDiffuse(scene *Env, r Ray, t float64, n Vec) Color {
 	p := r.At(t) //.MAdd(off, n)
 	acc := 0.
 	for _, light := range scene.sources {
@@ -74,13 +74,13 @@ func directDiffuse(scene *Scene, r Ray, t float64, n Vec) Color {
 }
 
 type diffuse2 struct {
-	scene *Scene
+	scene *Env
 	shape Shape
 	refl  float64
 }
 
 // Diffuse shading with shadows, but no interreflection
-func Diffuse2(sc *Scene, sh Shape, refl float64) Obj {
+func Diffuse2(sc *Env, sh Shape, refl float64) Obj {
 	return &diffuse2{sc, sh, refl}
 }
 
@@ -101,13 +101,13 @@ func (s *diffuse2) Intensity(r Ray, t float64, N int) Color {
 }
 
 type reflective struct {
-	scene *Scene
+	scene *Env
 	shape Shape
 	refl  float64
 }
 
 // Diffuse shading with shadows, but no interreflection
-func Reflective(sc *Scene, sh Shape, refl float64) Obj {
+func Reflective(sc *Env, sh Shape, refl float64) Obj {
 	return &reflective{sc, sh, refl}
 }
 

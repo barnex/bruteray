@@ -25,7 +25,7 @@ func main() {
 	Init()
 
 	const h = 2
-	s := &Scene{}
+	s := &Env{}
 	const (
 		G     = -2
 		RoomW = 6
@@ -64,7 +64,7 @@ func main() {
 	Render(s, cam, "out.jpg")
 }
 
-func Render(s *Scene, cam *Cam, fname string) {
+func Render(s *Env, cam *Cam, fname string) {
 	start := time.Now()
 	every := 1
 	for i := 0; i < *iters; i++ {

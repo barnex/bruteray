@@ -4,7 +4,7 @@ import "testing"
 
 func Benchmark1(b *testing.B) {
 
-	s := &Scene{}
+	s := &Env{}
 	const h = 2
 	ground := Diffuse1(s, Slab(-h, -h-100), 0.5)
 	sp := Sphere(Vec{-0.5, -1, 8}, 2)

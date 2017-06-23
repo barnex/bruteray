@@ -16,7 +16,7 @@ func TestOverlap(tst *testing.T) {
 	t := Helper(tst)
 
 	const r = 0.25
-	s := &Scene{
+	s := &Env{
 		objs: []Obj{
 			Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1.0),
 			Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5),
@@ -34,7 +34,7 @@ func TestBehindCam(tst *testing.T) {
 	objects := []Obj{
 		Flat(Sphere(Vec{0, 0, -3}, r), 1),
 	}
-	s := &Scene{
+	s := &Env{
 		objs: objects,
 	}
 
@@ -48,7 +48,7 @@ func TestIntersect(tst *testing.T) {
 	const r = 0.25
 	s1 := Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1)
 	s2 := Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5)
-	s := &Scene{
+	s := &Env{
 		objs: []Obj{
 			&ObjAnd{s1, s2},
 		},
@@ -66,7 +66,7 @@ func TestIntersectShape(tst *testing.T) {
 	s2 := Sphere(Vec{r / 2, 0, 3}, r)
 	sh := ShapeAnd{s1, s2}
 
-	s := &Scene{
+	s := &Env{
 		objs: []Obj{
 			Flat(sh, 1),
 		},
@@ -83,7 +83,7 @@ func TestMinusShape(tst *testing.T) {
 	s1 := Sphere(Vec{-r / 2, 0, 3}, r)
 	s2 := Sphere(Vec{r / 2, 0, 3}, r)
 	sh := ShapeMinus{s1, s2}
-	s := &Scene{
+	s := &Env{
 		objs: []Obj{
 			Flat(sh, 1),
 		},
@@ -100,7 +100,7 @@ func TestSphereNormals(tst *testing.T) {
 	s3 := ShadeNormal(Sphere(Vec{0, -0.5, 3}, 2*r))
 	s1 := ShadeNormal(Sphere(Vec{-r / 2, 0, 3}, r))
 	s2 := ShadeNormal(Sphere(Vec{r / 2, 0, 3}, r))
-	s := &Scene{
+	s := &Env{
 		objs: []Obj{
 			ObjAnd{s3, s1},
 			ObjAnd{s3, s2},
@@ -117,7 +117,7 @@ func TestBox(tst *testing.T) {
 	b2 := ABox(Vec{2, -2, 4}, Vec{1, -1, 3})
 	b3 := ABox(Vec{-2, 2, 4}, Vec{-1, 1, 3})
 	b4 := ABox(Vec{2, 2, 4}, Vec{1, 1, 3})
-	s := &Scene{}
+	s := &Env{}
 	s.objs = []Obj{
 		Diffuse1(s, b1, 1),
 		Diffuse1(s, b2, 1),
@@ -134,7 +134,7 @@ func TestBox(tst *testing.T) {
 func TestReflection(tst *testing.T) {
 	t := Helper(tst)
 
-	s := &Scene{}
+	s := &Env{}
 
 	const h = 2
 	ground := Diffuse1(s, Slab(-h, -h-100), 0.5)
@@ -165,13 +165,13 @@ func Helper(tst *testing.T) helper {
 	return helper{tst}
 }
 
-func (t helper) Compare(s *Scene, name string) {
+func (t helper) Compare(s *Env, name string) {
 	//t.Helper()
 	cam := Camera(testW, testH, 0)
 	t.CompareCam(s, name, cam)
 }
 
-func (t helper) CompareCam(s *Scene, name string, cam *Cam) {
+func (t helper) CompareCam(s *Env, name string, cam *Cam) {
 	//t.Helper()
 	out := name + ".png"
 	Encode(cam.Render(s), out, 1/(float64(cam.N)), true)

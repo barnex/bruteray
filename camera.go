@@ -27,19 +27,19 @@ func (c *Cam) Size() (int, int) {
 	return len(c.Img[0]), len(c.Img)
 }
 
-func (c *Cam) Render(s *Scene) [][]Color {
+func (c *Cam) Render(s *Env) [][]Color {
 	c.iterate(s)
 	return c.Img
 }
 
-func (c *Cam) Iterate(s *Scene, N int) [][]Color {
+func (c *Cam) Iterate(s *Env, N int) [][]Color {
 	for i := 0; i < N; i++ {
 		c.iterate(s)
 	}
 	return c.Img
 }
 
-func (c *Cam) iterate(s *Scene) {
+func (c *Cam) iterate(s *Env) {
 	focalPoint := Vec{0, 0, -c.FocalLen}
 	W, H := c.Size()
 	for i := 0; i < H; i++ {
@@ -58,13 +58,13 @@ func (c *Cam) iterate(s *Scene) {
 
 			// accumulate ray intensity
 			r := Ray{start, dir}
-			t, v := s.Intensity(r, *maxRec)
+			v := s.Shade(r, 0, *maxRec)
 			if math.IsNaN(float64(v)) {
 				log.Println("ERROR: got NaN")
 				continue
 			}
 			c.Img[i][j] += v
-			c.ZMap[i][j] = Color(-t)
+			//c.ZMap[i][j] = Color(-t)
 		}
 	}
 	c.N++
