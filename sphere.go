@@ -12,7 +12,7 @@ func Sphere(center Vec, radius float64) *sphere {
 }
 
 func (s *sphere) Normal(r *Ray, t float64) Vec {
-	return NumNormal(s, r, t)
+	return r.At(t).Sub(s.c).Normalized()
 }
 
 func (s *sphere) Hit(r *Ray) float64 {
