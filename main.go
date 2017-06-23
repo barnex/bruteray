@@ -42,25 +42,27 @@ func main() {
 	die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})
 	marble := Sphere(Vec{1, G + 1, 5}, 1)
 	walll := ABox(Vec{-RoomW / 2, G, 0}, Vec{-RoomW - WallT/2, G + WallH, 100})
-	wallr_ := ABox(Vec{RoomW / 2, G, 0}, Vec{RoomW + WallT/2, G + WallH, 100})
+	//wallr_ := ABox(Vec{RoomW / 2, G, 0}, Vec{RoomW + WallT/2, G + WallH, 100})
+	wallr_ := SlabD(RoomW/2, RoomW+WallT/2, Vec{1, 0, 0})
 	//win := ABox(Vec{RoomW/2 - 1, G + 2, 1}, Vec{RoomW/2 + 1, G + 3, 2})
 	//win := ABox(Vec{2, G, 4}, Vec{4, G + 1, 5})
 	//wallr := &ShapeMinus{wallr_, win}
 	wallr := wallr_
-	wallb := ABox(Vec{-RoomW / 2, G, RoomD}, Vec{RoomW, G + WallH, RoomD + WallT})
-
+	//wallb := ABox(Vec{-RoomW / 2, G, RoomD}, Vec{RoomW, G + WallH, RoomD + WallT})
+	wallb := SlabD(RoomD, RoomD+WallT, Vec{0, 0, 1})
+	lightPos := Vec{0, 1, 4}
 	s.objs = []Obj{
-		Diffuse2(s, ground, 0.5),
-		Reflective(s, marble, 0.9),
+		Diffuse2(s, ground, 0.8),
+		Reflective(s, marble, 0.5),
 		Diffuse2(s, die, 1),
-		Diffuse2(s, walll, 1),
-		Diffuse2(s, wallr, 1),
-		Diffuse2(s, wallb, 1),
-		Flat(Sphere(Vec{2, 8, -2}, 1), 10),
+		Diffuse2(s, walll, 0.8),
+		Diffuse2(s, wallr, 0.8),
+		Diffuse2(s, wallb, 0.8),
+		Flat(Sphere(lightPos, 1), 10),
 	}
 	s.sources = []Source{
-		&BulbSource{Vec{2, 8, -2}, 150, 2},
-		//&PointSource{Vec{2, 8, -2}, 100},
+		&BulbSource{lightPos, 150, 2},
+		//&PointSource{lightPos, 100},
 	}
 	s.amb = func(v Vec) Color { return Color(0.1 * v.Y) }
 

@@ -2,22 +2,28 @@ package main
 
 type slab struct {
 	min, max float64
+	dir      Vec
 }
 
 // A slab along Y (XZ plane, aka horizontal)
 func Slab(min, max float64) *slab {
-	return &slab{min, max}
+	return &slab{min, max, Vec{0, 1, 0}}
+}
+func SlabD(min, max float64, dir Vec) *slab {
+	return &slab{min, max, dir}
 }
 
 func (s *slab) Intersect(r Ray) Inter {
-	t0 := (s.min - r.Start.Y) / r.Dir.Y
-	t1 := (s.max - r.Start.Y) / r.Dir.Y
+	rs := r.Start.Dot(s.dir)
+	rd := r.Dir.Dot(s.dir)
+	t0 := (s.min - rs) / rd
+	t1 := (s.max - rs) / rd
 	t0, t1 = sort(t0, t1)
 	return Inter{t0, t1}
 }
 
 func (s *slab) Normal(r Ray, t float64) Vec {
-	return Vec{0, 1, 0}.Towards(r.Dir)
+	return s.dir.Towards(r.Dir)
 }
 
 func (s *slab) Hit(r Ray) float64 {
