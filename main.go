@@ -23,10 +23,8 @@ var (
 
 func main() {
 	Init()
-	start := time.Now()
 
 	const h = 2
-
 	s := &Scene{}
 	const (
 		G     = -2
@@ -38,17 +36,11 @@ func main() {
 	)
 
 	ground := Slab(G, -100)
-
 	die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})
 	marble := Sphere(Vec{1, G + 1, 5}, 1)
 	walll := ABox(Vec{-RoomW / 2, G, 0}, Vec{-RoomW - WallT/2, G + WallH, 100})
-	//wallr_ := ABox(Vec{RoomW / 2, G, 0}, Vec{RoomW + WallT/2, G + WallH, 100})
 	wallr_ := SlabD(RoomW/2, RoomW+WallT/2, Vec{1, 0, 0})
-	//win := ABox(Vec{RoomW/2 - 1, G + 2, 1}, Vec{RoomW/2 + 1, G + 3, 2})
-	//win := ABox(Vec{2, G, 4}, Vec{4, G + 1, 5})
-	//wallr := &ShapeMinus{wallr_, win}
 	wallr := wallr_
-	//wallb := ABox(Vec{-RoomW / 2, G, RoomD}, Vec{RoomW, G + WallH, RoomD + WallT})
 	wallb := SlabD(RoomD, RoomD+WallT, Vec{0, 0, 1})
 	lightPos := Vec{0, 1, 4}
 	s.objs = []Obj{
@@ -66,25 +58,19 @@ func main() {
 	}
 	s.amb = func(v Vec) Color { return Color(0.1 * v.Y) }
 
-	//ground := Diffuse2(s, ABox(Vec{-100, -h, 0}, Vec{100, -2 * h, 100}), 0.5)
-	//sp := Sphere(Vec{-0.5, -1, 8}, 2)
-	//die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
-	//dice := Diffuse2(s, die, 0.95)
-	////dice := Flat(die, 0.95)
-	//s.objs = []Obj{
-	//	ground,
-	//	dice,
-	//	Reflective(s, Sphere(Vec{3, -1, 10}, 1), 0.9),
-	//}
-
 	cam := Camera(*width, *height, *focalLen)
 	cam.Transf = RotX(-5 * deg)
 
+	Render(s, cam, "out.jpg")
+}
+
+func Render(s *Scene, cam *Cam, fname string) {
+	start := time.Now()
 	every := 1
 	for i := 0; i < *iters; i++ {
 		cam.iterate(s)
 		if i%every == 0 {
-			Encode(cam.Img, "out.jpg", 1/(float64(cam.N)), *overExp)
+			Encode(cam.Img, fname, 1/(float64(cam.N)), *overExp)
 		}
 		every++
 		if every > 20 {
