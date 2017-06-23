@@ -18,6 +18,10 @@ func (s *sphere) Normal(r Ray, t float64) Vec {
 	return Normal(s, r, t)
 }
 
+func (s *sphere) Hit(r Ray) float64 {
+	return s.Intersect(r).Min
+}
+
 func (s *sphere) Intersect(ray Ray) Inter {
 	v := ray.Start.Sub(s.C)
 	r := s.R

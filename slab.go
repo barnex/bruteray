@@ -20,6 +20,10 @@ func (s *slab) Normal(r Ray, t float64) Vec {
 	return Vec{0, 1, 0}.Towards(r.Dir)
 }
 
+func (s *slab) Hit(r Ray) float64 {
+	return s.Intersect(r).Min
+}
+
 func sort(t0, t1 float64) (float64, float64) {
 	if t0 < t1 {
 		return t0, t1

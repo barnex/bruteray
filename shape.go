@@ -1,6 +1,7 @@
 package main
 
 type Shape interface {
+	Hit(Ray) float64
 	Intersect(Ray) Inter // TODO: -> Intersect
 	Normal(Ray, float64) Vec
 }
@@ -13,6 +14,10 @@ func (f ShapeFunc) Intersect(r Ray) Inter {
 
 func (f ShapeFunc) Normal(r Ray, t float64) Vec {
 	return Normal(f, r, t)
+}
+
+func (f ShapeFunc) Hit(r Ray) float64 {
+	return f.Intersect(r).Min
 }
 
 // TODO: choose delta vectors perpendicular to ray
@@ -66,6 +71,10 @@ func (s ShapeAnd) Normal(r Ray, t float64) Vec {
 	return Normal(s, r, t)
 }
 
+func (s ShapeAnd) Hit(r Ray) float64 {
+	return s.Intersect(r).Min
+}
+
 type ShapeMinus struct {
 	a, b Shape
 }
@@ -82,4 +91,8 @@ func (s ShapeMinus) Intersect(r Ray) Inter {
 
 func (s ShapeMinus) Normal(r Ray, t float64) Vec {
 	return Normal(s, r, t)
+}
+
+func (s ShapeMinus) Hit(r Ray) float64 {
+	return s.Intersect(r).Min
 }

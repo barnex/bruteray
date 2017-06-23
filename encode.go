@@ -37,7 +37,9 @@ func Encode(img [][]Color, fname string, scale float64, overExp bool) error {
 	}
 }
 
-func Stretch(img [][]Color) [][]Color {
+// Normalizes colors into the [0,1] interval,
+// for maximum, non-overexposed contrast.
+func MaxContrast(img [][]Color) [][]Color {
 	min, max := Color(inf), Color(-inf)
 	for i := range img {
 		for j := range img[i] {
