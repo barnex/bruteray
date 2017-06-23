@@ -12,150 +12,150 @@ const (
 )
 
 // Two flat-shaded spheres, partially overlapping.
-func TestOverlap(tst *testing.T) {
-	t := Helper(tst)
-
-	const r = 0.25
-	s := &Env{
-		objs: []Obj{
-			Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1.0),
-			Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5),
-		},
-	}
-
-	t.Compare(s, "001-overlap")
-}
-
-// A sphere behind the camera, should not be visible
-func TestBehindCam(tst *testing.T) {
-	t := Helper(tst)
-
-	const r = 0.25
-	objects := []Obj{
-		Flat(Sphere(Vec{0, 0, -3}, r), 1),
-	}
-	s := &Env{
-		objs: objects,
-	}
-
-	t.Compare(s, "002-behindcam")
-}
-
-// Intersection of flat-shaded spheres
-func TestIntersect(tst *testing.T) {
-	t := Helper(tst)
-
-	const r = 0.25
-	s1 := Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1)
-	s2 := Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5)
-	s := &Env{
-		objs: []Obj{
-			&ObjAnd{s1, s2},
-		},
-	}
-
-	t.Compare(s, "003-intersect")
-}
-
-// Intersection of spheres, as shapes (not objects)
-func TestIntersectShape(tst *testing.T) {
-	t := Helper(tst)
-
-	const r = 0.25
-	s1 := Sphere(Vec{-r / 2, 0, 3}, r)
-	s2 := Sphere(Vec{r / 2, 0, 3}, r)
-	sh := ShapeAnd{s1, s2}
-
-	s := &Env{
-		objs: []Obj{
-			Flat(sh, 1),
-		},
-	}
-
-	t.Compare(s, "004-intersectshape")
-}
-
-// Minus of spheres, as shapes (not objects)
-func TestMinusShape(tst *testing.T) {
-	t := Helper(tst)
-
-	const r = 0.5
-	s1 := Sphere(Vec{-r / 2, 0, 3}, r)
-	s2 := Sphere(Vec{r / 2, 0, 3}, r)
-	sh := ShapeMinus{s1, s2}
-	s := &Env{
-		objs: []Obj{
-			Flat(sh, 1),
-		},
-	}
-
-	t.Compare(s, "005-minusshape")
-}
-
-// Intersection of normal.z-shaded spheres
-func TestSphereNormals(tst *testing.T) {
-	t := Helper(tst)
-
-	const r = 0.25
-	s3 := ShadeNormal(Sphere(Vec{0, -0.5, 3}, 2*r))
-	s1 := ShadeNormal(Sphere(Vec{-r / 2, 0, 3}, r))
-	s2 := ShadeNormal(Sphere(Vec{r / 2, 0, 3}, r))
-	s := &Env{
-		objs: []Obj{
-			ObjAnd{s3, s1},
-			ObjAnd{s3, s2},
-		},
-	}
-
-	t.Compare(s, "006-spherenormals")
-}
-
-func TestBox(tst *testing.T) {
-	t := Helper(tst)
-
-	b1 := ABox(Vec{-2, -2, 4}, Vec{-1, -1, 3})
-	b2 := ABox(Vec{2, -2, 4}, Vec{1, -1, 3})
-	b3 := ABox(Vec{-2, 2, 4}, Vec{-1, 1, 3})
-	b4 := ABox(Vec{2, 2, 4}, Vec{1, 1, 3})
-	s := &Env{}
-	s.objs = []Obj{
-		Diffuse1(s, b1, 1),
-		Diffuse1(s, b2, 1),
-		Diffuse1(s, b3, 1),
-		Diffuse1(s, b4, 1),
-	}
-	s.sources = []Source{
-		&PointSource{Vec{0.5, 0.3, -5}, 60},
-	}
-
-	t.CompareCam(s, "007-box", Camera(testW, testH, 0.7))
-}
-
-func TestReflection(tst *testing.T) {
-	t := Helper(tst)
-
-	s := &Env{}
-
-	const h = 2
-	ground := Diffuse1(s, Slab(-h, -h-100), 0.5)
-	sp := Sphere(Vec{-0.5, -1, 8}, 2)
-	die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
-	dice := Diffuse1(s, die, 0.95)
-	s.objs = []Obj{
-		ground,
-		dice,
-		Reflective(s, Sphere(Vec{3, -1, 10}, 1), 0.9),
-	}
-	s.sources = []Source{
-		&PointSource{Vec{6, 10, 2}, 180},
-	}
-	s.amb = func(Vec) Color { return 1 }
-
-	cam := Camera(testW, testH, 1)
-	cam.Transf = RotX(-10 * deg)
-
-	t.CompareCam(s, "008-reflections", cam)
-}
+//func TestOverlap(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	const r = 0.25
+//	s := &Env{
+//		objs: []Obj{
+//			Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1.0),
+//			Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5),
+//		},
+//	}
+//
+//	t.Compare(s, "001-overlap")
+//}
+//
+//// A sphere behind the camera, should not be visible
+//func TestBehindCam(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	const r = 0.25
+//	objects := []Obj{
+//		Flat(Sphere(Vec{0, 0, -3}, r), 1),
+//	}
+//	s := &Env{
+//		objs: objects,
+//	}
+//
+//	t.Compare(s, "002-behindcam")
+//}
+//
+//// Intersection of flat-shaded spheres
+//func TestIntersect(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	const r = 0.25
+//	s1 := Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1)
+//	s2 := Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5)
+//	s := &Env{
+//		objs: []Obj{
+//			&ObjAnd{s1, s2},
+//		},
+//	}
+//
+//	t.Compare(s, "003-intersect")
+//}
+//
+//// Intersection of spheres, as shapes (not objects)
+//func TestIntersectShape(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	const r = 0.25
+//	s1 := Sphere(Vec{-r / 2, 0, 3}, r)
+//	s2 := Sphere(Vec{r / 2, 0, 3}, r)
+//	sh := ShapeAnd{s1, s2}
+//
+//	s := &Env{
+//		objs: []Obj{
+//			Flat(sh, 1),
+//		},
+//	}
+//
+//	t.Compare(s, "004-intersectshape")
+//}
+//
+//// Minus of spheres, as shapes (not objects)
+//func TestMinusShape(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	const r = 0.5
+//	s1 := Sphere(Vec{-r / 2, 0, 3}, r)
+//	s2 := Sphere(Vec{r / 2, 0, 3}, r)
+//	sh := ShapeMinus{s1, s2}
+//	s := &Env{
+//		objs: []Obj{
+//			Flat(sh, 1),
+//		},
+//	}
+//
+//	t.Compare(s, "005-minusshape")
+//}
+//
+//// Intersection of normal.z-shaded spheres
+//func TestSphereNormals(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	const r = 0.25
+//	s3 := ShadeNormal(Sphere(Vec{0, -0.5, 3}, 2*r))
+//	s1 := ShadeNormal(Sphere(Vec{-r / 2, 0, 3}, r))
+//	s2 := ShadeNormal(Sphere(Vec{r / 2, 0, 3}, r))
+//	s := &Env{
+//		objs: []Obj{
+//			ObjAnd{s3, s1},
+//			ObjAnd{s3, s2},
+//		},
+//	}
+//
+//	t.Compare(s, "006-spherenormals")
+//}
+//
+//func TestBox(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	b1 := ABox(Vec{-2, -2, 4}, Vec{-1, -1, 3})
+//	b2 := ABox(Vec{2, -2, 4}, Vec{1, -1, 3})
+//	b3 := ABox(Vec{-2, 2, 4}, Vec{-1, 1, 3})
+//	b4 := ABox(Vec{2, 2, 4}, Vec{1, 1, 3})
+//	s := &Env{}
+//	s.objs = []Obj{
+//		Diffuse1(s, b1, 1),
+//		Diffuse1(s, b2, 1),
+//		Diffuse1(s, b3, 1),
+//		Diffuse1(s, b4, 1),
+//	}
+//	s.sources = []Source{
+//		&PointSource{Vec{0.5, 0.3, -5}, 60},
+//	}
+//
+//	t.CompareCam(s, "007-box", Camera(testW, testH, 0.7))
+//}
+//
+//func TestReflection(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	s := &Env{}
+//
+//	const h = 2
+//	ground := Diffuse1(s, Slab(-h, -h-100), 0.5)
+//	sp := Sphere(Vec{-0.5, -1, 8}, 2)
+//	die := &ShapeAnd{sp, Slab(-h+.2, -.2)}
+//	dice := Diffuse1(s, die, 0.95)
+//	s.objs = []Obj{
+//		ground,
+//		dice,
+//		Reflective(s, Sphere(Vec{3, -1, 10}, 1), 0.9),
+//	}
+//	s.sources = []Source{
+//		&PointSource{Vec{6, 10, 2}, 180},
+//	}
+//	s.amb = func(Vec) Color { return 1 }
+//
+//	cam := Camera(testW, testH, 1)
+//	cam.Transf = RotX(-10 * deg)
+//
+//	t.CompareCam(s, "008-reflections", cam)
+//}
 
 type helper struct {
 	*testing.T

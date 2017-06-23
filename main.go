@@ -25,7 +25,6 @@ func main() {
 	Init()
 
 	const h = 2
-	s := &Env{}
 	const (
 		G     = -2
 		RoomW = 6
@@ -35,33 +34,37 @@ func main() {
 		WallT = 0.02
 	)
 
-	ground := Slab(G, -100)
-	die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})
-	marble := Sphere(Vec{1, G + 1, 5}, 1)
-	walll := ABox(Vec{-RoomW / 2, G, 0}, Vec{-RoomW - WallT/2, G + WallH, 100})
-	wallr_ := SlabD(RoomW/2, RoomW+WallT/2, Vec{1, 0, 0})
-	wallr := wallr_
-	wallb := SlabD(RoomD, RoomD+WallT, Vec{0, 0, 1})
-	lightPos := Vec{0, 1, 4}
-	s.objs = []Obj{
-		Diffuse2(s, ground, 0.8),
-		Reflective(s, marble, 0.5),
-		Diffuse2(s, die, 1),
-		Diffuse2(s, walll, 0.8),
-		Diffuse2(s, wallr, 0.8),
-		Diffuse2(s, wallb, 0.8),
-		Flat(Sphere(lightPos, 1), 10),
-	}
-	s.sources = []Source{
-		&BulbSource{lightPos, 150, 2},
-		//&PointSource{lightPos, 100},
-	}
-	s.amb = func(v Vec) Color { return Color(0.1 * v.Y) }
+	scene := &Env{}
+	scene.amb = func(v Vec) Color { return Color(0.1 * v.Y) }
+
+	scene.Add(Sheet(0, Ey), Flat(0.5))
+
+	//ground := Slab(G, -100)
+	//die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})
+	//marble := Sphere(Vec{1, G + 1, 5}, 1)
+	//walll := ABox(Vec{-RoomW / 2, G, 0}, Vec{-RoomW - WallT/2, G + WallH, 100})
+	//wallr_ := SlabD(RoomW/2, RoomW+WallT/2, Vec{1, 0, 0})
+	//wallr := wallr_
+	//wallb := SlabD(RoomD, RoomD+WallT, Vec{0, 0, 1})
+	//lightPos := Vec{0, 1, 4}
+	//s.objs = []Obj{
+	//	Diffuse2(s, ground, 0.8),
+	//	Reflective(s, marble, 0.5),
+	//	Diffuse2(s, die, 1),
+	//	Diffuse2(s, walll, 0.8),
+	//	Diffuse2(s, wallr, 0.8),
+	//	Diffuse2(s, wallb, 0.8),
+	//	Flat(Sphere(lightPos, 1), 10),
+	//}
+	//s.sources = []Source{
+	//	&BulbSource{lightPos, 150, 2},
+	//	//&PointSource{lightPos, 100},
+	//}
 
 	cam := Camera(*width, *height, *focalLen)
-	cam.Transf = RotX(-5 * deg)
+	//cam.Transf = RotX(-5 * deg)
 
-	Render(s, cam, "out.jpg")
+	Render(scene, cam, "out.jpg")
 }
 
 func Render(s *Env, cam *Cam, fname string) {

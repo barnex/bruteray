@@ -42,6 +42,7 @@ func (c *Cam) Iterate(s *Env, N int) [][]Color {
 func (c *Cam) iterate(s *Env) {
 	focalPoint := Vec{0, 0, -c.FocalLen}
 	W, H := c.Size()
+	r := &Ray{}
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
 			// ray start point
@@ -57,8 +58,9 @@ func (c *Cam) iterate(s *Env) {
 			dir = dir.Transf(&c.Transf)
 
 			// accumulate ray intensity
-			r := Ray{start, dir}
-			v := s.Shade(r, 0, *maxRec)
+			r.Start = start
+			r.Dir = dir
+			v := s.Shade(r, *maxRec)
 			if math.IsNaN(float64(v)) {
 				log.Println("ERROR: got NaN")
 				continue
