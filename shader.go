@@ -16,6 +16,18 @@ func Flat(v Color) Shader {
 	})
 }
 
+func Diffuse0(refl float64) Shader {
+	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
+		acc := 0.0
+		for _, light := range e.sources {
+			lightPos, flux := light.Sample()
+			d := lightPos.Sub(r.At(t))
+			acc += flux * Max(n.Dot(d.Normalized())/(d.Len2()), 0)
+		}
+		return Color(refl * acc)
+	})
+}
+
 func Diffuse1(refl float64) Shader {
 	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
 		return Color(refl) * directDiffuse(e, r, t, n)
