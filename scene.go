@@ -54,10 +54,10 @@ func (e *Env) Hit(r *Ray) (float64, Obj) {
 	return minT, shader
 }
 
-func (e *Env) HitAny(r *Ray) bool {
-	t, _ := e.Hit(r)
-	return t > 0 //obj != nil
-}
+//func (e *Env) HitAny(r *Ray) bool {
+//	t, _ := e.Hit(r)
+//	return t > 0 //obj != nil
+//}
 
 func (s *Env) Ambient(dir Vec) Color {
 	if s.amb == nil {

@@ -37,14 +37,15 @@ func main() {
 	scene := &Env{}
 	scene.amb = func(v Vec) Color { return Color(0.2*v.Y + 0.2) }
 
-	scene.Add(Sheet(-3, Ey), Diffuse1(0.8))
-	scene.Add(Sphere(Vec{1, 0, 4}, 1), Diffuse1(0.9))
-	scene.Add(Sphere(Vec{-1, 0, 5}, 1), Reflective(0.5))
-	scene.Add(Sheet(20, Ez), Diffuse1(0.8))
-	//scene.Add(Sheet(10, Ex), Diffuse1(0.8))
-	//scene.Add(Sheet(-10, Ex), Diffuse2(0.8))
-	scene.AddLight(PointLight(Vec{0, 8, 0}, 100))
-	//scene.AddLight(SmoothLight(Vec{0, 5, 0}, 100, 2))
+	scene.Add(Sheet(-3, Ey), Diffuse2(0.8))
+	//scene.Add(Sphere(Vec{1, 0, 4}, 1), Diffuse1(0.9))
+	scene.Add(Sphere(Vec{0, 0, 5}, 1), Reflective(0.5))
+	scene.Add(Sheet(20, Ez), Diffuse2(0.8))
+	scene.Add(Sheet(10, Ex), Diffuse2(0.8))
+	scene.Add(Sheet(-10, Ex), Diffuse2(0.8))
+
+	//scene.AddLight(PointLight(Vec{0, 8, 0}, 100))
+	scene.AddLight(SmoothLight(Vec{0, 5, 0}, 100, 2))
 
 	//ground := Slab(G, -100)
 	//die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})

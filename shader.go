@@ -44,7 +44,10 @@ func directDiffuse(e *Env, r *Ray, t float64, n Vec) Color {
 		d := lightPos.Sub(p)
 		p2 := p.MAdd(off, n) // anti-bleeding offset
 		sec := Ray{p2, d.Normalized()}
-		if !e.HitAny(&sec) { // TODO: could hit any except this
+		t, _ := e.Hit(&sec) // TODO: could hit any except this
+		own := d.Len()
+		//own := inf
+		if !(t > 0 && t < own) {
 			acc += flux * Max(n.Dot(d.Normalized())/(d.Len2()), 0)
 		}
 	}
