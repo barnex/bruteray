@@ -2,7 +2,10 @@ package main
 
 import "math"
 
-const deg = math.Pi / 180
+const (
+	pi  = math.Pi
+	deg = pi / 180
+)
 
 var inf = math.Inf(1)
 

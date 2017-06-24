@@ -29,9 +29,9 @@ type bulbSource struct {
 
 func (s *bulbSource) Sample() (Vec, float64) {
 	p := Vec{RandNorm(), RandNorm(), RandNorm()}
-	//	if p.Len2() > 9 {
-	//		p = Vec{}
-	//	}
+	for p.Len2() > 9 {
+		p = Vec{RandNorm(), RandNorm(), RandNorm()}
+	}
 	p = p.Mul(s.R).Add(s.Pos)
 	return p, s.Flux
 }

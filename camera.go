@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math"
 )
@@ -11,6 +12,7 @@ type Cam struct {
 	ZMap     [][]Color
 	FocalLen float64
 	N        int
+	Pos      Vec
 	Transf   Matrix
 }
 
@@ -40,7 +42,7 @@ func (c *Cam) Iterate(s *Env, N int) [][]Color {
 }
 
 func (c *Cam) iterate(s *Env) {
-	focalPoint := Vec{0, 0, -c.FocalLen}
+	focalPoint := Vec{0, 0, -c.FocalLen}.Add(c.Pos)
 	W, H := c.Size()
 	r := &Ray{}
 	for i := 0; i < H; i++ {
@@ -48,7 +50,7 @@ func (c *Cam) iterate(s *Env) {
 			// ray start point
 			y0 := (-float64(i) + aa() + float64(H)/2) / float64(H)
 			x0 := (float64(j) + aa() - float64(W)/2) / float64(H)
-			start := Vec{x0, y0, 0}.Transf(&c.Transf) // RotX(c.Pitch)
+			start := Vec{x0, y0, 0}.Transf(&c.Transf).Add(c.Pos)
 
 			// ray direction
 			dir := Vec{0, 0, 1}
@@ -64,6 +66,10 @@ func (c *Cam) iterate(s *Env) {
 			if math.IsNaN(float64(v)) {
 				log.Println("ERROR: got NaN")
 				continue
+			}
+			if v > 100 {
+				fmt.Println("too big", v)
+				v = 100
 			}
 			c.Img[i][j] += v
 			//c.ZMap[i][j] = Color(-t)

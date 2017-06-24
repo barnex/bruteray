@@ -24,55 +24,28 @@ var (
 func main() {
 	Init()
 
-	const h = 2
-	const (
-		G     = -2
-		RoomW = 6
-		RoomD = 10
-		WallW = 0.1
-		WallH = 5
-		WallT = 0.02
-	)
-
-	scene := &Env{}
-	scene.amb = func(v Vec) Color { return Color(0.2*v.Y + 0.2) }
-
-	scene.Add(Sheet(-3, Ey), Diffuse2(0.8))
-	//scene.Add(Sphere(Vec{1, 0, 4}, 1), Diffuse1(0.9))
-	scene.Add(Sphere(Vec{0, 0, 5}, 1), Reflective(0.5))
-	scene.Add(Sheet(20, Ez), Diffuse2(0.8))
-	scene.Add(Sheet(10, Ex), Diffuse2(0.8))
-	scene.Add(Sheet(-10, Ex), Diffuse2(0.8))
-
-	//scene.AddLight(PointLight(Vec{0, 8, 0}, 100))
-	scene.AddLight(SmoothLight(Vec{0, 5, 0}, 100, 2))
-
-	//ground := Slab(G, -100)
-	//die := ABox(Vec{-2, G, 4}, Vec{-1, G + 1, 5})
-	//marble := Sphere(Vec{1, G + 1, 5}, 1)
-	//walll := ABox(Vec{-RoomW / 2, G, 0}, Vec{-RoomW - WallT/2, G + WallH, 100})
-	//wallr_ := SlabD(RoomW/2, RoomW+WallT/2, Vec{1, 0, 0})
-	//wallr := wallr_
-	//wallb := SlabD(RoomD, RoomD+WallT, Vec{0, 0, 1})
-	//lightPos := Vec{0, 1, 4}
-	//s.objs = []Obj{
-	//	Diffuse2(s, ground, 0.8),
-	//	Reflective(s, marble, 0.5),
-	//	Diffuse2(s, die, 1),
-	//	Diffuse2(s, walll, 0.8),
-	//	Diffuse2(s, wallr, 0.8),
-	//	Diffuse2(s, wallb, 0.8),
-	//	Flat(Sphere(lightPos, 1), 10),
-	//}
-	//s.sources = []Source{
-	//	&BulbSource{lightPos, 150, 2},
-	//	//&PointSource{lightPos, 100},
-	//}
+	scene := chessboard()
+	//scene := spheresInARoom()
 
 	cam := Camera(*width, *height, *focalLen)
-	//cam.Transf = RotX(-5 * deg)
+	cam.Pos = Vec{0, 4, -5}
+	cam.Transf = RotX(-10 * deg)
 
 	Render(scene, cam, "out.jpg")
+}
+
+func chessboard() *Env {
+	s := &Env{}
+	s.amb = func(dir Vec) Color { return 0 }
+
+	s.Add(Sheet(0, Ey), Diffuse1(1))                          // floor
+	s.Add(Box(Vec{0, 0, 8}, 5, 0.4, 5), Diffuse2(0.1))        // base
+	s.Add(Rect(Vec{0, 0.5, 8}, Ey, 4, inf, 4), Diffuse2(0.9)) // base
+	//s.Add(Sphere(Vec{0, 0, 8}, 1), Diffuse2(0.3))
+
+	s.AddLight(SmoothLight(Vec{2, 8, 6}, 100, 2))
+
+	return s
 }
 
 func Render(s *Env, cam *Cam, fname string) {
