@@ -36,14 +36,21 @@ func main() {
 
 func chessboard() *Env {
 	s := &Env{}
-	s.amb = func(dir Vec) Color { return 0 }
+	s.amb = func(dir Vec) Color { return Color(0.2 + 0.5*dir.Y) }
 
-	s.Add(Sheet(0, Ey), Diffuse1(1))                          // floor
-	s.Add(Box(Vec{0, 0, 8}, 5, 0.4, 5), Diffuse2(0.1))        // base
-	s.Add(Rect(Vec{0, 0.5, 8}, Ey, 4, inf, 4), Diffuse2(0.9)) // base
-	//s.Add(Sphere(Vec{0, 0, 8}, 1), Diffuse2(0.3))
+	s.Add(Sheet(0, Ey), Diffuse2(0.8))                                                  // floor
+	s.Add(Box(Vec{0, 0, 8}, 5, 0.4, 5), Diffuse2(0.1))                                  // base
+	s.Add(Rect(Vec{0, 0.5, 8}, Ey, 4, inf, 4), CheckBoard(Diffuse2(1), Diffuse2(0.02))) // checkboard
 
-	s.AddLight(SmoothLight(Vec{2, 8, 6}, 100, 2))
+	// walls
+	s.Add(Sheet(40, Ez), Diffuse2(0.8)) // back
+	//scene.Add(Sheet(-5, Ez), Diffuse2(0.8))  // front
+	s.Add(Sheet(20, Ex), Diffuse2(0.8))  // left
+	s.Add(Sheet(-20, Ex), Diffuse2(0.8)) // right
+
+	s.Add(Sphere(Vec{5, 2, 15}, 2), Reflective(0.3))
+
+	s.AddLight(SmoothLight(Vec{3, 12, 6}, 150, 3))
 
 	return s
 }

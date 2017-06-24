@@ -86,6 +86,27 @@ func reflectVec(v, n Vec) Vec {
 	return v.MAdd(-2*v.Dot(n), n)
 }
 
+func CheckBoard(a, b Shader) Shader {
+	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
+		p := r.At(t)
+		x := int(p.X + (1 << 10))
+		z := int(p.Z + (1 << 10))
+		if mod(x+z, 2) == 0 {
+			return a.Shade(e, r, t, n, N)
+		} else {
+			return b.Shade(e, r, t, n, N)
+		}
+	})
+}
+
+func mod(x, y int) int {
+	m := x % y
+	if x < 0 {
+		m = (m + y) % y
+	}
+	return m
+}
+
 // Shade with Z component of normal vector (for debugging)
 func ShadeNormal() Shader {
 	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
