@@ -30,9 +30,3 @@ package main
 //	return s.Intersect(r).Min
 //}
 //
-//func sort(t0, t1 float64) (float64, float64) {
-//	if t0 < t1 {
-//		return t0, t1
-//	}
-//	return t1, t0
-//}

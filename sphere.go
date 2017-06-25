@@ -33,6 +33,20 @@ func (s *sphere) Hit(r *Ray) float64 {
 	return 0
 }
 
+func (s *sphere) Inters(r *Ray) Inter {
+	v := r.Start.Sub(s.c)
+	d := r.Dir
+	vd := v.Dot(d)
+	D := sqr(vd) - (v.Len2() - s.r2)
+	if D < 0 {
+		return empty
+	}
+	t1 := (-vd - math.Sqrt(D))
+	t2 := (-vd + math.Sqrt(D))
+	t1, t2 = Sort(t1, t2)
+	return Inter{t1, t2}
+}
+
 func (s *sphere) Transl(dx, dy, dz float64) *sphere {
 	return &sphere{s.c.Add(Vec{dx, dy, dz}), s.r2}
 }

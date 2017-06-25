@@ -120,28 +120,35 @@ func (n Vec) Towards(d Vec) Vec {
 	return n
 }
 
-//type ShapeAnd struct {
-//	a, b Shape
-//}
-//
-//func (s ShapeAnd) Intersect(r Ray) Inter {
-//	a := s.a.Intersect(r)
-//	if !a.OK() {
-//		return a
-//	}
-//	b := s.b.Intersect(r)
-//
-//	return a.And(b)
-//}
-//
-//func (s ShapeAnd) Normal(r Ray, t float64) Vec {
-//	return Normal(s, r, t)
-//}
-//
-//func (s ShapeAnd) Hit(r Ray) float64 {
-//	return s.Intersect(r).Min
-//}
-//
+func ShapeAnd(a, b Convex) Shape {
+	return &shapeAnd{a, b}
+}
+
+type shapeAnd struct {
+	a, b Convex
+}
+
+type Convex interface {
+	Inters(r *Ray) Inter
+}
+
+func (s *shapeAnd) Hit(r *Ray) float64 {
+	a := s.a.Inters(r)
+	if !a.OK() {
+		return 0
+	}
+	b := s.b.Inters(r)
+	if !b.OK() {
+		return 0
+	}
+	t := a.And(b).Min
+	return Max(0, t)
+}
+
+func (s *shapeAnd) Normal(r *Ray, t float64) Vec {
+	return NumNormal(s, r, t)
+}
+
 //type ShapeMinus struct {
 //	a, b Shape
 //}

@@ -54,3 +54,10 @@ func Max3(x, y, z float64) float64 {
 	}
 	return max
 }
+
+func Sort(t0, t1 float64) (float64, float64) {
+	if t0 < t1 {
+		return t0, t1
+	}
+	return t1, t0
+}
