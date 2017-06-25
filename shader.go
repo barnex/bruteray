@@ -50,7 +50,7 @@ func Diffuse2(refl float64) Shader {
 	})
 }
 
-const off = 1e-6
+const off = 1e-3
 
 func directDiffuse(e *Env, r *Ray, t float64, n Vec) Color {
 	p := r.At(t)
@@ -75,7 +75,7 @@ func Reflective(refl float64) Shader {
 	return shadeFn(func(e *Env, r *Ray, t float64, n Vec, N int) Color {
 		p := r.At(t)
 		dir2 := reflectVec(r.Dir, n)
-		sec := &Ray{p.MAdd(off, n), dir2}
+		sec := &Ray{p.MAdd(1e-3, n), dir2}
 		I := e.Shade(sec, N-1) // TODO: pass N
 		return Color(refl) * I
 	})

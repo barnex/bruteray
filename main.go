@@ -48,9 +48,10 @@ func chessboard() *Env {
 	s.Add(Sheet(20, Ex), Diffuse2(0.8))  // left
 	s.Add(Sheet(-20, Ex), Diffuse2(0.8)) // right
 
-	s.Add(Sphere(Vec{5, 2, 15}, 2), Reflective(0.3))
+	s.Add(Cylinder(Vec{0, 0, 10}, 2), Reflective(0.3))
 
 	s.AddLight(SmoothLight(Vec{3, 12, 6}, 150, 3))
+	//s.AddLight(PointLight(Vec{3, 12, 6}, 150))
 
 	return s
 }
