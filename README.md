@@ -1,5 +1,9 @@
 # Brute force ray tracing
 
+## 9: Constructive solid geometry
+
+![fig](shots/020.jpg)
+
 ## 8: Textured ambient
 
 ![fig](shots/015.jpg)
