@@ -20,10 +20,10 @@ func Box(center Vec, rx, ry, rz float64) Shape {
 			ten := Max3(txen, tyen, tzen)
 			tex := Min3(txex, tyex, tzex)
 
-			if ten < tex && ten > 0 {
-				return Inter{ten, tex}
-			}
-			return empty
+			//if ten < tex && ten > 0 {
+			return Inter{ten, tex}
+			//}
+			//return empty
 		}}
 
 	s.normal = func(r *Ray, t float64) Vec {

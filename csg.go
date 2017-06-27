@@ -21,7 +21,7 @@ func (s *shapeAnd) Inters(r *Ray) Inter {
 	if !b.OK() {
 		return empty
 	}
-	return a.And(b).Normalize()
+	return a.And(b) //.Normalize()
 }
 
 func (s *shapeAnd) Normal(r *Ray, t float64) Vec {
