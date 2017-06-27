@@ -58,35 +58,9 @@ func (e *Env) Hit(r *Ray) (float64, Obj) {
 	return minT, shader
 }
 
-//func (e *Env) HitAny(r *Ray) bool {
-//	t, _ := e.Hit(r)
-//	return t > 0 //obj != nil
-//}
-
 func (s *Env) Ambient(dir Vec) Color {
 	if s.amb == nil {
 		return 0
 	}
 	return s.amb(dir)
 }
-
-type Obj interface {
-	Shape
-	Shade(e *Env, r *Ray, t float64, N int) Color
-}
-
-type object struct {
-	Shape
-	shader Shader
-}
-
-func (o *object) Shade(e *Env, r *Ray, t float64, N int) Color {
-	if N == 0 {
-		return e.Ambient(r.Dir)
-	}
-	n := o.Shape.Normal(r, t)
-	return o.shader.Shade(e, r, t, n, N)
-}
-
-//type Shader interface{
-//}
