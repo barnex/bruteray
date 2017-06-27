@@ -78,8 +78,8 @@ func Render(s *Env, cam *Cam, fname string) {
 		fmt.Printf("%.2f Mpixel/s\n", speed/1e6)
 		if i%every == 0 {
 			Encode(cam.Img, fname, 1/(float64(cam.N)), *overExp)
+			every++
 		}
-		every++
 		if every > 20 {
 			every = 20
 		}

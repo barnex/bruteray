@@ -1,17 +1,17 @@
 package main
 
 type Shape interface {
-	Hit(r *Ray) float64
+	Inters(r *Ray) Inter
 	Normal(r *Ray, t float64) Vec
 }
 
 type shape struct {
-	hit    func(r *Ray) float64
+	inters func(r *Ray) Inter
 	normal func(r *Ray, t float64) Vec
 }
 
-func (s *shape) Hit(r *Ray) float64 {
-	return s.hit(r)
+func (s *shape) Inters(r *Ray) Inter {
+	return s.inters(r)
 }
 
 func (s *shape) Normal(r *Ray, t float64) Vec {
@@ -20,7 +20,10 @@ func (s *shape) Normal(r *Ray, t float64) Vec {
 
 // Numerical approximation of normal vector
 func NumNormal(s Shape, r *Ray, t float64) Vec {
-	t0 := s.Hit(r)
+	t0 := s.Inters(r).Min
+	if t0 < 0 {
+		return Vec{}
+	}
 	c := r.At(t0)
 
 	perp1 := Vec{-r.Dir.Z, 0, r.Dir.X}.Normalized()
@@ -29,12 +32,18 @@ func NumNormal(s Shape, r *Ray, t float64) Vec {
 	const diff = 1. / (1024 * 1024)
 	ra := r
 	ra.Dir = r.Dir.MAdd(t*diff, perp1).Normalized()
-	t1 := s.Hit(ra)
+	t1 := s.Inters(ra).Min
+	if t1 < 0 {
+		return Vec{}
+	}
 	a := ra.At(t1)
 
 	rb := r
 	rb.Dir = r.Dir.MAdd(t*diff, perp2).Normalized()
-	t2 := s.Hit(rb)
+	t2 := s.Inters(rb).Min
+	if t2 < 0 {
+		return Vec{}
+	}
 	b := rb.At(t2)
 
 	a = a.Sub(c)
@@ -63,17 +72,16 @@ type Convex interface {
 	Inters(r *Ray) Inter
 }
 
-func (s *shapeAnd) Hit(r *Ray) float64 {
+func (s *shapeAnd) Inters(r *Ray) Inter {
 	a := s.a.Inters(r)
 	if !a.OK() {
-		return 0
+		return empty
 	}
 	b := s.b.Inters(r)
 	if !b.OK() {
-		return 0
+		return empty
 	}
-	t := a.And(b).Min
-	return Max(0, t)
+	return a.And(b).Normalize()
 }
 
 func (s *shapeAnd) Normal(r *Ray, t float64) Vec {

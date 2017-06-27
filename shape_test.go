@@ -68,8 +68,9 @@ func TestSheet(t *testing.T) {
 		s := c.s
 		r := c.r
 		ok := c.ok
-		have := c.s.Hit(&c.r)
-		hok := have > 0
+		ival := c.s.Inters(&c.r)
+		have := ival.Min
+		hok := ival.OK()
 		if hok != ok {
 			t.Errorf("intersect %v %v: have %v, want %v", s, r, hok, ok)
 		}

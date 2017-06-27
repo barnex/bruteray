@@ -39,7 +39,11 @@ func (e *Env) Hit(r *Ray) (float64, Obj) {
 	)
 
 	for i, o := range e.objs {
-		t := o.Hit(r)
+		ival := o.Inters(r)
+		if !ival.OK() || ival.Min < 0 {
+			continue
+		}
+		t := ival.Min
 		if t < 0 {
 			panic(fmt.Sprintf("object %v: %#v: t=%v", i, o, t))
 		}

@@ -4,7 +4,7 @@ func Box(center Vec, rx, ry, rz float64) Shape {
 	min := center.Sub(Vec{rx, ry, rz})
 	max := center.Add(Vec{rx, ry, rz})
 	s := &shape{
-		hit: func(r *Ray) float64 {
+		inters: func(r *Ray) Inter {
 			tmin := min.Sub(r.Start).Div3(r.Dir)
 			tmax := max.Sub(r.Start).Div3(r.Dir)
 
@@ -20,10 +20,10 @@ func Box(center Vec, rx, ry, rz float64) Shape {
 			ten := Max3(txen, tyen, tzen)
 			tex := Min3(txex, tyex, tzex)
 
-			if ten < tex {
-				return Max(0, ten)
+			if ten < tex && ten > 0 {
+				return Inter{ten, tex}
 			}
-			return 0
+			return empty
 		}}
 
 	s.normal = func(r *Ray, t float64) Vec {

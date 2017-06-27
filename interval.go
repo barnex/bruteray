@@ -4,7 +4,7 @@ type Inter struct {
 	Min, Max float64
 }
 
-var empty = Inter{-inf, -inf}
+var empty = Inter{inf, -inf}
 
 func (a Inter) And(b Inter) Inter {
 	if a.Max < b.Min || b.Max < a.Min {
@@ -28,15 +28,15 @@ func (a Inter) Minus(b Inter) Inter {
 }
 
 func (a Inter) OK() bool {
-	return a.Min < a.Max
+	return a.Min <= a.Max && a.Min > 0
 }
 
-func (a Inter) Empty() bool {
-	return a.Min >= a.Max
-}
+//func (a Inter) Empty() bool {
+//	return a.Min > a.Max
+//}
 
 func (a Inter) Normalize() Inter {
-	if a.Empty() {
+	if !a.OK() {
 		return empty
 	}
 	return a
