@@ -29,8 +29,7 @@ func TestIntervalMinus(t *testing.T) {
 		a, b, want Inter
 	}{
 		{empty, empty, empty},
-		{Inter{}, Inter{}, empty},
-		//{Inter{1, 2}, Inter{1, 2}, empty},
+		{Inter{0, 0}, Inter{0, 0}, Inter{0, 0}},
 		{Inter{1, 2}, Inter{3, 4}, Inter{1, 2}},
 		{Inter{1, 3}, Inter{2, 4}, Inter{1, 2}},
 		{Inter{2, 4}, Inter{1, 3}, Inter{3, 4}},

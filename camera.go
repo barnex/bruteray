@@ -14,6 +14,7 @@ type Cam struct {
 	N        int
 	Pos      Vec
 	Transf   Matrix
+	AA       bool
 }
 
 func Camera(w, h int, focalLen float64) *Cam {
@@ -48,8 +49,8 @@ func (c *Cam) iterate(s *Env) {
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
 			// ray start point
-			y0 := (-float64(i) + aa() + float64(H)/2) / float64(H)
-			x0 := (float64(j) + aa() - float64(W)/2) / float64(H)
+			y0 := (-float64(i) + c.aa() + float64(H)/2) / float64(H)
+			x0 := (float64(j) + c.aa() - float64(W)/2) / float64(H)
 			start := Vec{x0, y0, 0}.Transf(&c.Transf).Add(c.Pos)
 
 			// ray direction
@@ -87,7 +88,10 @@ func MakeImage(W, H int) [][]Color {
 }
 
 // Anti-aliasing jitter
-func aa() float64 {
-	//	return 0.5
-	return Rand()
+func (c *Cam) aa() float64 {
+	if c.AA {
+		return Rand()
+	} else {
+		return 0.5
+	}
 }

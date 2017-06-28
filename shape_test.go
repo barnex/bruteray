@@ -70,7 +70,7 @@ func TestSheet(t *testing.T) {
 		ok := c.ok
 		ival := c.s.Inters(&c.r)
 		have := ival.Min
-		hok := ival.OK()
+		hok := ival.Min > 0
 		if hok != ok {
 			t.Errorf("intersect %v %v: have %v, want %v", s, r, hok, ok)
 		}

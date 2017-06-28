@@ -10,3 +10,5 @@ This directory contains reference images for unit tests.
 ![fig](006-spherenormals.png)
 ![fig](007-box.png)
 ![fig](008-reflections.png)
+![fig](009-spheres.png)
+![fig](010-checkers.png)
