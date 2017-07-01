@@ -125,7 +125,7 @@ func TestDice1(tst *testing.T) {
 //
 //	t.Compare(s, "002-behindcam")
 //}
-//
+
 // Intersection of flat-shaded spheres
 func TestIntersect(tst *testing.T) {
 	t := Helper(tst)
@@ -263,7 +263,8 @@ func (t helper) CompareCam(s *Env, name string, cam *Cam) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if deviation > 0 {
+	const tolerance = 10
+	if deviation > tolerance {
 		t.Errorf("%v: differs from reference by %v", name, deviation)
 	}
 }

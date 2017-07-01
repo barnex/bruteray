@@ -27,7 +27,7 @@ func NumNormal(s Shape, r *Ray, t float64) Vec {
 	c := r.At(t0)
 
 	perp1 := Vec{-r.Dir.Z, 0, r.Dir.X}.Normalized()
-	perp2 := Vec{0, -r.Dir.Z, r.Dir.Y}.Normalized()
+	perp2 := r.Dir.Cross(perp1) // Thanks trijnewijn.
 
 	const diff = 1. / (1024 * 1024)
 	ra := r
