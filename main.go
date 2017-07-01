@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	_ "net/http/pprof"
 	"time"
@@ -29,6 +30,7 @@ func main() {
 	cam := Camera(*width, *height, *focalLen)
 	cam.Pos = Vec{0, 4, -6}
 	cam.Transf = RotX(-15 * deg)
+	cam.AA = true
 
 	Render(scene, cam, "out.jpg")
 }
@@ -40,22 +42,22 @@ func dies() *Env {
 
 	die := cube
 	const r = 0.15
-	die = ShapeMinus(die, Sphere(Vec{0, 0, -1}, r))
-	die = ShapeMinus(die, Sphere(Vec{0.5, 0.5, -1}, r))
-	die = ShapeMinus(die, Sphere(Vec{-0.5, 0.5, -1}, r))
-	die = ShapeMinus(die, Sphere(Vec{0.5, -0.5, -1}, r))
-	die = ShapeMinus(die, Sphere(Vec{-0.5, -0.5, -1}, r))
+	die = ShapeMinus(die, Sphere(Vec{0, 0, -0.9}, r))
+	die = ShapeMinus(die, Sphere(Vec{0.5, 0.5, -0.9}, r))
+	die = ShapeMinus(die, Sphere(Vec{-0.5, 0.5, -0.9}, r))
+	die = ShapeMinus(die, Sphere(Vec{0.5, -0.5, -0.9}, r))
+	die = ShapeMinus(die, Sphere(Vec{-0.5, -0.5, -0.9}, r))
 
-	die = ShapeMinus(die, Sphere(Vec{0.4, 1, -0.4}, r))
-	die = ShapeMinus(die, Sphere(Vec{-0.4, 1, 0.4}, r))
+	die = ShapeMinus(die, Sphere(Vec{0.4, 1.1, -0.4}, r))
+	die = ShapeMinus(die, Sphere(Vec{-0.4, 1.1, 0.4}, r))
 
-	die = ShapeAnd(die, Sphere(Vec{}, 1.55))
+	die = ShapeAnd(die, Sphere(Vec{}, 0.98*math.Sqrt(2.)))
 
-	s.Add(die, Diffuse2(0.8))
+	s.Add(die, Diffuse2(0.9))
 
-	s.Add(Sheet(-1, Ey), Diffuse2(0.8))
+	s.Add(Sheet(-1, Ey), Diffuse2(0.5))
 
-	s.AddLight(SmoothLight(Vec{1, 3, -3}, 15, 0.5))
+	s.AddLight(SmoothLight(Vec{2, 3, -3}, 15, 0.2))
 	//s.AddLight(PointLight(Vec{1, 3, -3}, 15))
 
 	return s
