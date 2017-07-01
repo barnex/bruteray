@@ -3,6 +3,7 @@ package main
 import (
 	"image"
 	"image/png"
+	"math"
 	"os"
 	"testing"
 )
@@ -60,6 +61,41 @@ func TestCheckers(tst *testing.T) {
 	t.CompareCam(s, "010-checkers", cam)
 }
 
+func TestDice1(tst *testing.T) {
+	t := Helper(tst)
+
+	s := &Env{}
+	s.amb = func(Vec) Color { return 0.1 }
+	cube := Box(Vec{0, 0, 0}, -1, -1, -1)
+
+	die := cube
+	const r = 0.15
+	die = ShapeMinus(die, Sphere(Vec{0, 0, -0.9}, r))
+	die = ShapeMinus(die, Sphere(Vec{0.5, 0.5, -0.9}, r))
+	die = ShapeMinus(die, Sphere(Vec{-0.5, 0.5, -0.9}, r))
+	die = ShapeMinus(die, Sphere(Vec{0.5, -0.5, -0.9}, r))
+	die = ShapeMinus(die, Sphere(Vec{-0.5, -0.5, -0.9}, r))
+
+	die = ShapeMinus(die, Sphere(Vec{0.4, 1.1, -0.4}, r))
+	die = ShapeMinus(die, Sphere(Vec{-0.4, 1.1, 0.4}, r))
+
+	die = ShapeAnd(die, Sphere(Vec{}, 0.98*math.Sqrt(2.)))
+
+	s.Add(die, Diffuse1(0.9))
+
+	s.Add(Sheet(-1, Ey), Diffuse1(0.5))
+
+	//s.AddLight(SmoothLight(Vec{2, 3, -3}, 15, 0.2))
+	s.AddLight(PointLight(Vec{2, 3, -3}, 15))
+
+	cam := Camera(testW, testH, 1)
+	cam.Pos = Vec{0, 4, -6}
+	cam.Transf = RotX(-15 * deg)
+
+	t.CompareCam(s, "011-dice", cam)
+
+}
+
 // Two flat-shaded spheres, partially overlapping.
 //func TestOverlap(tst *testing.T) {
 //	t := Helper(tst)
@@ -90,22 +126,19 @@ func TestCheckers(tst *testing.T) {
 //	t.Compare(s, "002-behindcam")
 //}
 //
-//// Intersection of flat-shaded spheres
-//func TestIntersect(tst *testing.T) {
-//	t := Helper(tst)
-//
-//	const r = 0.25
-//	s1 := Flat(Sphere(Vec{-r / 2, 0, 3}, r), 1)
-//	s2 := Flat(Sphere(Vec{r / 2, 0, 3}, r), 0.5)
-//	s := &Env{
-//		objs: []Obj{
-//			&ObjAnd{s1, s2},
-//		},
-//	}
-//
-//	t.Compare(s, "003-intersect")
-//}
-//
+// Intersection of flat-shaded spheres
+func TestIntersect(tst *testing.T) {
+	t := Helper(tst)
+
+	const r = 0.25
+	s1 := &object{Sphere(Vec{-r / 2, 0, 3}, r), Flat(1)}
+	s2 := &object{Sphere(Vec{r / 2, 0, 3}, r), Flat(0.5)}
+	s := &Env{}
+	s.objs = append(s.objs, &objAnd{s1, s2})
+
+	t.Compare(s, "003-intersect")
+}
+
 //// Intersection of spheres, as shapes (not objects)
 //func TestIntersectShape(tst *testing.T) {
 //	t := Helper(tst)

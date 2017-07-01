@@ -23,16 +23,24 @@ var (
 )
 
 func main() {
-	Init()
+	//Init()
 
-	scene := dice()
+	//scene := &Env
 
-	cam := Camera(*width, *height, *focalLen)
-	cam.Pos = Vec{0, 4, -6}
-	cam.Transf = RotX(-15 * deg)
-	cam.AA = true
+	//cube := &object{Box(Vec{0, 0, 0}, -1, -1, -1), Diffuse1(0.9)}
+	//pip = &object{Sphere(Vec{0, 0, -0.9}, r), Reflective(0.05)}
+	//dice :=
 
-	Render(scene, cam, "out.jpg")
+	//die := cube
+	//const r = 0.15
+	//die = ShapeMinus(die, Sphere(Vec{0, 0, -0.9}, r))
+
+	//cam := Camera(*width, *height, *focalLen)
+	//cam.Pos = Vec{0, 4, -6}
+	//cam.Transf = RotX(-15 * deg)
+	//cam.AA = true
+
+	//Render(scene, cam, "out.jpg")
 }
 
 func dice() *Env {
