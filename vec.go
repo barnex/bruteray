@@ -8,6 +8,7 @@ var (
 	Ez = Vec{0, 0, 1}
 )
 
+// 3-component vector.
 type Vec struct {
 	X, Y, Z float64
 }

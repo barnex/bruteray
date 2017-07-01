@@ -10,6 +10,8 @@ func Slab(min, max float64) *slab {
 	return &slab{min, max, Vec{0, 1, 0}}
 }
 
+// A slab along a certain (normal) direction,
+// e.g. Ey. for horizontal.
 func SlabD(min, max float64, dir Vec) *slab {
 	return &slab{min, max, dir}
 }
@@ -23,10 +25,6 @@ func (s *slab) Inters(r *Ray) Inter {
 	return Inter{t0, t1}
 }
 
-func (s *slab) Normal(r Ray, t float64) Vec {
+func (s *slab) Normal(r *Ray, t float64) Vec {
 	return s.dir.Towards(r.Dir)
-}
-
-func (s *slab) Hit(r *Ray) float64 {
-	return s.Inters(r).Min
 }

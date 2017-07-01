@@ -25,7 +25,7 @@ var (
 func main() {
 	Init()
 
-	scene := dies()
+	scene := dice()
 
 	cam := Camera(*width, *height, *focalLen)
 	cam.Pos = Vec{0, 4, -6}
@@ -35,10 +35,10 @@ func main() {
 	Render(scene, cam, "out.jpg")
 }
 
-func dies() *Env {
+func dice() *Env {
 	s := &Env{}
 	s.amb = func(Vec) Color { return 0.1 }
-	cube := Box(Vec{0, 0, 0}, 1, 1, 1)
+	cube := Box(Vec{0, 0, 0}, -1, -1, -1)
 
 	die := cube
 	const r = 0.15

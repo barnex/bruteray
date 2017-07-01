@@ -36,15 +36,8 @@ func (s *cylinder) Inters(r *Ray) Inter {
 		return empty
 	}
 	t0 := (-math.Sqrt(D) - d0*s0 - d1*s1) / (d02 + d12)
-	//if t0 > 0 {
-	//	return t0
-	//}
-
 	t1 := (math.Sqrt(D) - d0*s0 - d1*s1) / (d02 + d12)
-	//if t1 > 0 {
-	//	return t1
-	//}
-	t0, t1 = Sort(t0, t1) // TODO, not needed, assert
+	assert(t0 <= t1)
 
 	return Inter{t0, t1}
 }

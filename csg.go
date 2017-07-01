@@ -1,15 +1,11 @@
 package main
 
-func ShapeAnd(a, b Convex) Shape {
+func ShapeAnd(a, b Shape) Shape {
 	return &shapeAnd{a, b}
 }
 
 type shapeAnd struct {
-	a, b Convex
-}
-
-type Convex interface {
-	Inters(r *Ray) Inter
+	a, b Shape
 }
 
 func (s *shapeAnd) Inters(r *Ray) Inter {
@@ -28,12 +24,12 @@ func (s *shapeAnd) Normal(r *Ray, t float64) Vec {
 	return NumNormal(s, r, t)
 }
 
-func ShapeMinus(a, b Convex) Shape {
+func ShapeMinus(a, b Shape) Shape {
 	return &shapeMinus{a, b}
 }
 
 type shapeMinus struct {
-	a, b Convex
+	a, b Shape
 }
 
 func (s *shapeMinus) Inters(r *Ray) Inter {

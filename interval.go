@@ -28,12 +28,8 @@ func (a Inter) Minus(b Inter) Inter {
 }
 
 func (a Inter) OK() bool {
-	return a.Min <= a.Max // && a.Min > 0
+	return a.Min <= a.Max
 }
-
-//func (a Inter) Empty() bool {
-//	return a.Min > a.Max
-//}
 
 func (a Inter) Normalize() Inter {
 	if !a.OK() {
