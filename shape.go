@@ -5,19 +5,6 @@ type Shape interface {
 	Normal(r *Ray, t float64) Vec
 }
 
-//type shape struct {
-//	inters func(r *Ray) Inter
-//	normal func(r *Ray, t float64) Vec
-//}
-//
-//func (s *shape) Inters(r *Ray) Inter {
-//	return s.inters(r)
-//}
-//
-//func (s *shape) Normal(r *Ray, t float64) Vec {
-//	return s.normal(r, t)
-//}
-
 // Numerical approximation of normal vector
 func NumNormal(s Shape, r *Ray, t float64) Vec {
 	t0 := s.Inters(r).Min

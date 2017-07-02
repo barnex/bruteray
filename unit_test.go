@@ -85,7 +85,6 @@ func TestDice1(tst *testing.T) {
 
 	s.Add(Sheet(-1, Ey), Diffuse1(0.5))
 
-	//s.AddLight(SmoothLight(Vec{2, 3, -3}, 15, 0.2))
 	s.AddLight(PointLight(Vec{2, 3, -3}, 15))
 
 	cam := Camera(testW, testH, 1)

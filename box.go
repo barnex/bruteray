@@ -5,6 +5,14 @@ type box struct {
 	min, max Vec
 }
 
+func Box(center Vec, rx, ry, rz float64) Shape {
+	return &box{
+		c:   center,
+		min: center.Sub(Vec{rx, ry, rz}),
+		max: center.Add(Vec{rx, ry, rz}),
+	}
+}
+
 func (s *box) Inters(r *Ray) Inter {
 	min := s.min
 	max := s.max
@@ -29,12 +37,4 @@ func (s *box) Inters(r *Ray) Inter {
 
 func (s *box) Normal(r *Ray, t float64) Vec {
 	return NumNormal(s, r, t)
-}
-
-func Box(center Vec, rx, ry, rz float64) Shape {
-	return &box{
-		c:   center,
-		min: center.Sub(Vec{rx, ry, rz}),
-		max: center.Add(Vec{rx, ry, rz}),
-	}
 }
