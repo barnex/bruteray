@@ -23,24 +23,43 @@ var (
 )
 
 func main() {
-	//Init()
+	Init()
 
-	//scene := &Env
+	scene := &Env{}
+	scene.amb = func(dir Vec) Color { return Color(0.4 * dir.Y) }
+	scene.Add(Sheet(-1, Ey), Diffuse2(0.5))
 
-	//cube := &object{Box(Vec{0, 0, 0}, -1, -1, -1), Diffuse1(0.9)}
-	//pip = &object{Sphere(Vec{0, 0, -0.9}, r), Reflective(0.05)}
-	//dice :=
+	diec := Diffuse2(0.9)
+	cube := &object{Box(Vec{0, 0, 0}, -1, -1, -1), diec}
+	var die Obj = cube
 
-	//die := cube
-	//const r = 0.15
-	//die = ShapeMinus(die, Sphere(Vec{0, 0, -0.9}, r))
+	const r = 0.175
+	pipc := Reflective(0.2)
+	die = &objMinus{die, &object{Sphere(Vec{0, 0, -0.9}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{0.5, 0.5, -0.9}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{-0.5, 0.5, -0.9}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{0.5, -0.5, -0.9}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{-0.5, -0.5, -0.9}, r), pipc}}
 
-	//cam := Camera(*width, *height, *focalLen)
-	//cam.Pos = Vec{0, 4, -6}
-	//cam.Transf = RotX(-15 * deg)
-	//cam.AA = true
+	die = &objMinus{die, &object{Sphere(Vec{0.4, 1.1, -0.4}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{-0.4, 1.1, 0.4}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{0, 1.1, 0}, r), pipc}}
 
-	//Render(scene, cam, "out.jpg")
+	die = &objAnd{die, &object{Sphere(Vec{}, 0.98*math.Sqrt(2.)), diec}}
+
+	scene.objs = append(scene.objs, die)
+
+	lp := Vec{2, 3, -4}
+	scene.AddLight(SmoothLight(lp, 12, 0.2))
+	hilight := &object{Sphere(lp.Mul(2), 2), Flat(4)}
+	scene.objs = append(scene.objs, hilight)
+
+	cam := Camera(*width, *height, *focalLen)
+	cam.Pos = Vec{0, 4, -6}
+	cam.Transf = RotX(-15 * deg)
+	cam.AA = true
+
+	Render(scene, cam, "out.jpg")
 }
 
 func dice() *Env {

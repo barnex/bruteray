@@ -1,5 +1,9 @@
 # Brute force ray tracing
 
+## 10: Textured CSG
+
+![fig](shots/023.jpg)
+
 ## 9: Constructive solid geometry
 
 ![fig](shots/020.jpg)
