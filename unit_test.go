@@ -27,7 +27,7 @@ func TestSpheres(tst *testing.T) {
 	scene.Add(Sphere(Vec{-1, -2, 6}, 1), Diffuse1(0.95))
 	scene.AddLight(PointLight(Vec{0, 7, 1}, 100))
 
-	cam := Camera(testW, testH, 1)
+	cam := Camera(1)
 	cam.Transf = RotX(-5 * deg)
 	t.CompareCam(scene, "009-spheres", cam)
 }
@@ -55,7 +55,7 @@ func TestCheckers(tst *testing.T) {
 	}
 	s.AddLight(PointLight(Vec{3, 12, 6}, 130))
 
-	cam := Camera(testW, testH, 1)
+	cam := Camera(1)
 	cam.Pos = Vec{0, 4, 0}
 	cam.Transf = RotX(-15 * deg)
 	t.CompareCam(s, "010-checkers", cam)
@@ -87,7 +87,7 @@ func TestDice1(tst *testing.T) {
 
 	s.AddLight(PointLight(Vec{2, 3, -3}, 15))
 
-	cam := Camera(testW, testH, 1)
+	cam := Camera(1)
 	cam.Pos = Vec{0, 4, -6}
 	cam.Transf = RotX(-15 * deg)
 
@@ -248,14 +248,16 @@ func Helper(tst *testing.T) helper {
 
 func (t helper) Compare(s *Env, name string) {
 	t.Helper()
-	cam := Camera(testW, testH, 0)
+	cam := Camera(0)
 	t.CompareCam(s, name, cam)
 }
 
 func (t helper) CompareCam(s *Env, name string, cam *Cam) {
 	t.Helper()
 	out := name + ".png"
-	Encode(cam.Render(s), out, 1/(float64(cam.N)), false)
+	img := MakeImage(testW, testH)
+	cam.Render(s, img)
+	Encode(img, out, 1/(float64(cam.N)), false)
 	ref := "testdata/" + out
 	deviation, err := imgComp(out, ref)
 

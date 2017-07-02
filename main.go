@@ -54,7 +54,7 @@ func main() {
 	hilight := &object{Sphere(lp.Mul(2), 2), Flat(4)}
 	scene.objs = append(scene.objs, hilight)
 
-	cam := Camera(*width, *height, *focalLen)
+	cam := Camera(*focalLen)
 	cam.Pos = Vec{0, 4, -6}
 	cam.Transf = RotX(-15 * deg)
 	cam.AA = true
@@ -91,22 +91,22 @@ func dice() *Env {
 }
 
 func Render(s *Env, cam *Cam, fname string) {
+	img := MakeImage(*width, *height)
 	every := 1
-	W, H := cam.Size()
+	W, H := img.Size()
 	for i := 0; i < *iters; i++ {
 		start := time.Now()
-		cam.iterate(s)
+		cam.Render(s, img)
 		speed := float64((W+1)*(H+1)) / time.Since(start).Seconds()
 		fmt.Printf("%.2f Mpixel/s\n", speed/1e6)
 		if i%every == 0 {
-			Encode(cam.Img, fname, 1/(float64(cam.N)), *overExp)
+			Encode(img, fname, 1/(float64(cam.N)), *overExp)
 			every++
 		}
 		if every > 20 {
 			every = 20
 		}
 	}
-
 }
 
 func Init() {
