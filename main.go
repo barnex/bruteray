@@ -25,7 +25,7 @@ var (
 func main() {
 	Init()
 
-	scene := &Env{}
+	scene := NewEnv()
 	scene.amb = func(dir Vec) Color { return Color(0.4 * dir.Y) }
 	scene.Add(Sheet(-1, Ey), Diffuse2(0.5))
 
@@ -63,7 +63,7 @@ func main() {
 }
 
 func dice() *Env {
-	s := &Env{}
+	s := NewEnv()
 	s.amb = func(Vec) Color { return 0.1 }
 	cube := Box(Vec{0, 0, 0}, -1, -1, -1)
 

@@ -15,7 +15,7 @@ const (
 func TestSpheres(tst *testing.T) {
 	t := Helper(tst)
 
-	scene := &Env{}
+	scene := NewEnv()
 	scene.amb = func(v Vec) Color { return Color(0.2*v.Y + 0.2) }
 	scene.Add(Sheet(-3, Ey), Diffuse1(0.5))  // floor
 	scene.Add(Sheet(8, Ey), Diffuse1(0.5))   // ceiling
@@ -35,7 +35,7 @@ func TestSpheres(tst *testing.T) {
 func TestCheckers(tst *testing.T) {
 	t := Helper(tst)
 
-	s := &Env{}
+	s := NewEnv()
 	s.amb = func(dir Vec) Color { return 0.5 }
 
 	s.Add(Sheet(0, Ey), Diffuse1(0.7))                                                      // floor
@@ -64,7 +64,7 @@ func TestCheckers(tst *testing.T) {
 func TestDice1(tst *testing.T) {
 	t := Helper(tst)
 
-	s := &Env{}
+	s := NewEnv()
 	s.amb = func(Vec) Color { return 0.1 }
 	cube := Box(Vec{0, 0, 0}, -1, -1, -1)
 
@@ -132,7 +132,7 @@ func TestIntersect(tst *testing.T) {
 	const r = 0.25
 	s1 := &object{Sphere(Vec{-r / 2, 0, 3}, r), Flat(1)}
 	s2 := &object{Sphere(Vec{r / 2, 0, 3}, r), Flat(0.5)}
-	s := &Env{}
+	s := NewEnv()
 	s.objs = append(s.objs, &objAnd{s1, s2})
 
 	t.Compare(s, "003-intersect")
