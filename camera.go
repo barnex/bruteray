@@ -13,7 +13,7 @@ type Cam struct {
 	FocalLen float64
 	N        int
 	pos      Vec
-	Transf   Matrix
+	transf   Matrix
 	AA       bool
 }
 
@@ -22,7 +22,7 @@ func Camera(w, h int, focalLen float64) *Cam {
 		Img:      MakeImage(w, h),
 		ZMap:     MakeImage(w, h),
 		FocalLen: focalLen,
-		Transf:   UnitMatrix(),
+		transf:   UnitMatrix(),
 	}
 }
 
@@ -32,6 +32,10 @@ func (c *Cam) Size() (int, int) {
 
 func (c *Cam) Transl(r Vec) {
 	c.pos = c.pos.Add(r)
+}
+
+func (c *Cam) Transf(t Matrix) {
+	c.transf = *t.Mul(&c.transf)
 }
 
 func (c *Cam) Render(s *Env) [][]Color {
@@ -55,14 +59,14 @@ func (c *Cam) iterate(s *Env) {
 			// ray start point
 			y0 := (-float64(i) + c.aa() + float64(H)/2) / float64(H)
 			x0 := (float64(j) + c.aa() - float64(W)/2) / float64(H)
-			start := Vec{x0, y0, 0}.Transf(&c.Transf).Add(c.pos)
+			start := Vec{x0, y0, 0}.Transf(&c.transf).Add(c.pos)
 
 			// ray direction
 			dir := Vec{0, 0, 1}
 			if c.FocalLen != 0 {
-				dir = start.Sub(focalPoint).Normalized().Transf(&c.Transf)
+				dir = start.Sub(focalPoint).Normalized().Transf(&c.transf)
 			}
-			dir = dir.Transf(&c.Transf)
+			dir = dir.Transf(&c.transf)
 
 			// accumulate ray intensity
 			r.Start = start

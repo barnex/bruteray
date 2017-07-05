@@ -59,7 +59,7 @@ func main() {
 
 	cam := Camera(*width, *height, *focalLen)
 	cam.Transl(Vec{0, 4, -6})
-	cam.Transf = RotX(-15 * deg)
+	cam.Transf(RotX(-15 * deg))
 	cam.AA = true
 
 	Render(scene, cam, "out.jpg")

@@ -28,7 +28,7 @@ func TestSpheres(tst *testing.T) {
 	scene.AddLight(PointLight(Vec{0, 7, 1}, 100))
 
 	cam := Camera(testW, testH, 1)
-	cam.Transf = RotX(-5 * deg)
+	cam.Transf(RotX(-5 * deg))
 	t.CompareCam(scene, "009-spheres", cam)
 }
 
@@ -57,7 +57,7 @@ func TestCheckers(tst *testing.T) {
 
 	cam := Camera(testW, testH, 1)
 	cam.Transl(Vec{0, 4, 0})
-	cam.Transf = RotX(-15 * deg)
+	cam.Transf(RotX(-15 * deg))
 	t.CompareCam(s, "010-checkers", cam)
 }
 
@@ -90,7 +90,7 @@ func TestDice1(tst *testing.T) {
 
 	cam := Camera(testW, testH, 1)
 	cam.Transl(Vec{0, 4, -6})
-	cam.Transf = RotX(-15 * deg)
+	cam.Transf(RotX(-15 * deg))
 
 	t.CompareCam(s, "011-dice", cam)
 

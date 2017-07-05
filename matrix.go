@@ -1,6 +1,10 @@
 package main
 
-import "math"
+import (
+	"bytes"
+	"fmt"
+	"math"
+)
 
 type Matrix [3]Vec
 
@@ -10,9 +14,9 @@ func (r Vec) Transf(T *Matrix) Vec {
 
 func (a *Matrix) Mul(b *Matrix) *Matrix {
 	return &Matrix{
-		{a[0].Dot(b[0]), a[0].Dot(b[1]), a[0].Dot(b[2])},
-		{a[1].Dot(b[0]), a[1].Dot(b[1]), a[1].Dot(b[2])},
-		{a[2].Dot(b[0]), a[2].Dot(b[1]), a[2].Dot(b[2])},
+		{a[0].Dot(b[0]), a[1].Dot(b[0]), a[2].Dot(b[0])},
+		{a[0].Dot(b[1]), a[1].Dot(b[1]), a[2].Dot(b[1])},
+		{a[0].Dot(b[2]), a[1].Dot(b[2]), a[2].Dot(b[2])},
 	}
 }
 
@@ -21,8 +25,8 @@ func RotX(θ float64) Matrix {
 	s := math.Sin(θ)
 	return Matrix{
 		{1, 0, 0},
-		{0, c, s},
-		{0, -s, c},
+		{0, c, -s},
+		{0, s, c},
 	}
 }
 
@@ -32,6 +36,14 @@ func UnitMatrix() Matrix {
 		{0, 1, 0},
 		{0, 0, 1},
 	}
+}
+
+func (a *Matrix) String() string {
+	var b bytes.Buffer
+	for _, v := range a {
+		fmt.Fprintln(&b, v)
+	}
+	return b.String()
 }
 
 type Matrix4 [4]Vec4
@@ -69,8 +81,17 @@ func RotX4(θ float64) Matrix4 {
 	s := math.Sin(θ)
 	return Matrix4{
 		{1, 0, 0, 0},
-		{0, c, s, 0},
-		{0, -s, c, 0},
+		{0, c, -s, 0},
+		{0, s, c, 0},
+		{0, 0, 0, 1},
+	}
+}
+
+func Transl4(d Vec) Matrix4 {
+	return Matrix4{
+		{1, 0, 0, d.X},
+		{0, 1, 0, d.Y},
+		{0, 0, 1, d.Z},
 		{0, 0, 0, 1},
 	}
 }
