@@ -26,8 +26,11 @@ func main() {
 	Init()
 
 	scene := &Env{}
-	scene.amb = func(dir Vec) Color { return Color(0.4 * dir.Y) }
+	scene.amb = func(dir Vec) Color { return Color(0.2 * dir.Y) }
+
 	scene.Add(Sheet(-1, Ey), Diffuse2(0.5))
+	//scene.Add(Sheet(25, Ex), Diffuse2(0.7))  // right wall
+	scene.Add(Rect(Vec{-25, 0, 0}, Ex, 0, 10, 10), Diffuse2(0.7)) // left wall
 
 	diec := Diffuse2(0.9)
 	cube := &object{Box(Vec{0, 0, 0}, -1, -1, -1), diec}
@@ -49,9 +52,9 @@ func main() {
 
 	scene.objs = append(scene.objs, die)
 
-	lp := Vec{2, 3, -4}
-	scene.AddLight(SmoothLight(lp, 12, 0.2))
-	hilight := &object{Sphere(lp.Mul(2), 2), Flat(4)}
+	lp := Vec{4, 8, -6}
+	scene.AddLight(SmoothLight(lp, 50, 1))
+	hilight := &object{Sphere(lp.Mul(2), 4), Flat(2)}
 	scene.objs = append(scene.objs, hilight)
 
 	cam := Camera(*width, *height, *focalLen)

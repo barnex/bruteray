@@ -60,3 +60,11 @@ func (a Vec) Cross(b Vec) Vec {
 	z := a.X*b.Y - a.Y*b.X
 	return Vec{x, y, z}
 }
+
+type Vec4 struct {
+	X, Y, Z, W float64
+}
+
+func (a Vec4) Dot(b Vec4) float64 {
+	return a.X*b.X + a.Y*b.Y + a.Z*b.Z + a.W*b.W
+}
