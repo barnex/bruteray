@@ -25,9 +25,8 @@ var (
 func main() {
 	Init()
 
-	scene := &Env{}
-	scene.amb = func(dir Vec) Color { return Color(0.2 * dir.Y) }
-
+	scene := NewEnv()
+	scene.amb = func(dir Vec) Color { return Color(0.4 * dir.Y) }
 	scene.Add(Sheet(-1, Ey), Diffuse2(0.5))
 	//scene.Add(Sheet(25, Ex), Diffuse2(0.7))  // right wall
 	scene.Add(Rect(Vec{-25, 0, 0}, Ex, 0, 10, 10), Diffuse2(0.7)) // left wall
@@ -57,7 +56,7 @@ func main() {
 	hilight := &object{Sphere(lp.Mul(2), 4), Flat(2)}
 	scene.objs = append(scene.objs, hilight)
 
-	cam := Camera(*width, *height, *focalLen)
+	cam := Camera(*focalLen)
 	cam.Transl(Vec{0, 4, -6})
 	cam.Transf(RotX(-15 * deg))
 	cam.AA = true
@@ -66,7 +65,7 @@ func main() {
 }
 
 func dice() *Env {
-	s := &Env{}
+	s := NewEnv()
 	s.amb = func(Vec) Color { return 0.1 }
 	cube := Box(Vec{0, 0, 0}, -1, -1, -1)
 
@@ -94,22 +93,22 @@ func dice() *Env {
 }
 
 func Render(s *Env, cam *Cam, fname string) {
+	img := MakeImage(*width, *height)
 	every := 1
-	W, H := cam.Size()
+	W, H := img.Size()
 	for i := 0; i < *iters; i++ {
 		start := time.Now()
-		cam.iterate(s)
+		cam.Render(s, img)
 		speed := float64((W+1)*(H+1)) / time.Since(start).Seconds()
 		fmt.Printf("%.2f Mpixel/s\n", speed/1e6)
 		if i%every == 0 {
-			Encode(cam.Img, fname, 1/(float64(cam.N)), *overExp)
+			Encode(img, fname, 1/(float64(cam.N)), *overExp)
 			every++
 		}
 		if every > 20 {
 			every = 20
 		}
 	}
-
 }
 
 func Init() {

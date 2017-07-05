@@ -11,6 +11,15 @@ type Env struct {
 	sources []Source
 	amb     func(Vec) Color
 	rand.Rand
+	seed int64
+}
+
+func NewEnv() *Env {
+	return &Env{
+		amb:  func(Vec) Color { return 0 },
+		seed: 1,
+		Rand: *rand.New(rand.NewSource(1)),
+	}
 }
 
 func (e *Env) Add(s Shape, sh Shader) {
@@ -59,8 +68,5 @@ func (e *Env) Hit(r *Ray) (float64, Obj) {
 }
 
 func (s *Env) Ambient(dir Vec) Color {
-	if s.amb == nil {
-		return 0
-	}
 	return s.amb(dir)
 }

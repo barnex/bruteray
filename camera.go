@@ -8,8 +8,6 @@ import (
 
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
-	Img      [][]Color
-	ZMap     [][]Color
 	FocalLen float64
 	N        int
 	pos      Vec
@@ -17,17 +15,11 @@ type Cam struct {
 	AA       bool
 }
 
-func Camera(w, h int, focalLen float64) *Cam {
+func Camera(focalLen float64) *Cam {
 	return &Cam{
-		Img:      MakeImage(w, h),
-		ZMap:     MakeImage(w, h),
 		FocalLen: focalLen,
 		transf:   UnitMatrix(),
 	}
-}
-
-func (c *Cam) Size() (int, int) {
-	return len(c.Img[0]), len(c.Img)
 }
 
 func (c *Cam) Transl(r Vec) {
@@ -38,21 +30,9 @@ func (c *Cam) Transf(t Matrix) {
 	c.transf = *t.Mul(&c.transf)
 }
 
-func (c *Cam) Render(s *Env) [][]Color {
-	c.iterate(s)
-	return c.Img
-}
-
-func (c *Cam) Iterate(s *Env, N int) [][]Color {
-	for i := 0; i < N; i++ {
-		c.iterate(s)
-	}
-	return c.Img
-}
-
-func (c *Cam) iterate(s *Env) {
+func (c *Cam) Render(s *Env, img Image) {
 	focalPoint := Vec{0, 0, -c.FocalLen}.Add(c.pos)
-	W, H := c.Size()
+	W, H := img.Size()
 	r := &Ray{}
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
@@ -80,19 +60,11 @@ func (c *Cam) iterate(s *Env) {
 				fmt.Println("too big", v)
 				v = 100
 			}
-			c.Img[i][j] += v
+			img[i][j] += v
 			//c.ZMap[i][j] = Color(-t)
 		}
 	}
 	c.N++
-}
-
-func MakeImage(W, H int) [][]Color {
-	img := make([][]Color, H)
-	for i := range img {
-		img[i] = make([]Color, W)
-	}
-	return img
 }
 
 // Anti-aliasing jitter

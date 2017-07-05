@@ -1,7 +1,7 @@
 package main
 
 func spheresInARoom() *Env {
-	scene := &Env{}
+	scene := NewEnv()
 	scene.amb = func(v Vec) Color { return Color(0.2*v.Y + 0.2) }
 	scene.Add(Sheet(-3, Ey), Diffuse2(0.5))  // floor
 	scene.Add(Sheet(8, Ey), Diffuse2(0.5))   // ceiling
@@ -16,7 +16,7 @@ func spheresInARoom() *Env {
 }
 
 func checkboard() *Env {
-	s := &Env{}
+	s := NewEnv()
 	s.amb = func(dir Vec) Color { return 0.5 }
 
 	s.Add(Sheet(0, Ey), Diffuse2(0.7))                                                      // floor

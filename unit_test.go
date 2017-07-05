@@ -15,7 +15,7 @@ const (
 func TestSpheres(tst *testing.T) {
 	t := Helper(tst)
 
-	scene := &Env{}
+	scene := NewEnv()
 	scene.amb = func(v Vec) Color { return Color(0.2*v.Y + 0.2) }
 	scene.Add(Sheet(-3, Ey), Diffuse1(0.5))  // floor
 	scene.Add(Sheet(8, Ey), Diffuse1(0.5))   // ceiling
@@ -27,7 +27,7 @@ func TestSpheres(tst *testing.T) {
 	scene.Add(Sphere(Vec{-1, -2, 6}, 1), Diffuse1(0.95))
 	scene.AddLight(PointLight(Vec{0, 7, 1}, 100))
 
-	cam := Camera(testW, testH, 1)
+	cam := Camera(1)
 	cam.Transf(RotX(-5 * deg))
 	t.CompareCam(scene, "009-spheres", cam)
 }
@@ -35,7 +35,7 @@ func TestSpheres(tst *testing.T) {
 func TestCheckers(tst *testing.T) {
 	t := Helper(tst)
 
-	s := &Env{}
+	s := NewEnv()
 	s.amb = func(dir Vec) Color { return 0.5 }
 
 	s.Add(Sheet(0, Ey), Diffuse1(0.7))                                                      // floor
@@ -55,7 +55,7 @@ func TestCheckers(tst *testing.T) {
 	}
 	s.AddLight(PointLight(Vec{3, 12, 6}, 130))
 
-	cam := Camera(testW, testH, 1)
+	cam := Camera(1)
 	cam.Transl(Vec{0, 4, 0})
 	cam.Transf(RotX(-15 * deg))
 	t.CompareCam(s, "010-checkers", cam)
@@ -64,7 +64,7 @@ func TestCheckers(tst *testing.T) {
 func TestDice1(tst *testing.T) {
 	t := Helper(tst)
 
-	s := &Env{}
+	s := NewEnv()
 	s.amb = func(Vec) Color { return 0.1 }
 	cube := Box(Vec{0, 0, 0}, -1, -1, -1)
 
@@ -85,15 +85,12 @@ func TestDice1(tst *testing.T) {
 
 	s.Add(Sheet(-1, Ey), Diffuse1(0.5))
 
-	//s.AddLight(SmoothLight(Vec{2, 3, -3}, 15, 0.2))
 	s.AddLight(PointLight(Vec{2, 3, -3}, 15))
 
-	cam := Camera(testW, testH, 1)
+	cam := Camera(1)
 	cam.Transl(Vec{0, 4, -6})
 	cam.Transf(RotX(-15 * deg))
-
 	t.CompareCam(s, "011-dice", cam)
-
 }
 
 // Two flat-shaded spheres, partially overlapping.
@@ -133,7 +130,7 @@ func TestIntersect(tst *testing.T) {
 	const r = 0.25
 	s1 := &object{Sphere(Vec{-r / 2, 0, 3}, r), Flat(1)}
 	s2 := &object{Sphere(Vec{r / 2, 0, 3}, r), Flat(0.5)}
-	s := &Env{}
+	s := NewEnv()
 	s.objs = append(s.objs, &objAnd{s1, s2})
 
 	t.Compare(s, "003-intersect")
@@ -249,14 +246,16 @@ func Helper(tst *testing.T) helper {
 
 func (t helper) Compare(s *Env, name string) {
 	t.Helper()
-	cam := Camera(testW, testH, 0)
+	cam := Camera(0)
 	t.CompareCam(s, name, cam)
 }
 
 func (t helper) CompareCam(s *Env, name string, cam *Cam) {
 	t.Helper()
 	out := name + ".png"
-	Encode(cam.Render(s), out, 1/(float64(cam.N)), false)
+	img := MakeImage(testW, testH)
+	cam.Render(s, img)
+	Encode(img, out, 1/(float64(cam.N)), false)
 	ref := "testdata/" + out
 	deviation, err := imgComp(out, ref)
 
