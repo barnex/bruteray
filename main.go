@@ -58,7 +58,7 @@ func main() {
 	scene.objs = append(scene.objs, hilight)
 
 	cam := Camera(*width, *height, *focalLen)
-	cam.Pos = Vec{0, 4, -6}
+	cam.Transl(Vec{0, 4, -6})
 	cam.Transf = RotX(-15 * deg)
 	cam.AA = true
 

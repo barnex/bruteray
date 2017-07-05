@@ -56,7 +56,7 @@ func TestCheckers(tst *testing.T) {
 	s.AddLight(PointLight(Vec{3, 12, 6}, 130))
 
 	cam := Camera(testW, testH, 1)
-	cam.Pos = Vec{0, 4, 0}
+	cam.Transl(Vec{0, 4, 0})
 	cam.Transf = RotX(-15 * deg)
 	t.CompareCam(s, "010-checkers", cam)
 }
@@ -89,7 +89,7 @@ func TestDice1(tst *testing.T) {
 	s.AddLight(PointLight(Vec{2, 3, -3}, 15))
 
 	cam := Camera(testW, testH, 1)
-	cam.Pos = Vec{0, 4, -6}
+	cam.Transl(Vec{0, 4, -6})
 	cam.Transf = RotX(-15 * deg)
 
 	t.CompareCam(s, "011-dice", cam)
