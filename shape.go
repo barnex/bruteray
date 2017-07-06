@@ -46,3 +46,25 @@ func (n Vec) Towards(d Vec) Vec {
 	}
 	return n
 }
+
+type transShape struct {
+	orig   Shape
+	transf Matrix4
+}
+
+var _ Shape = &transShape{}
+
+func (s *transShape) Inters(r *Ray) Inter {
+
+}
+
+func (s *transShape) Normal(r *Ray, t float64) Vec {
+
+}
+
+func transRay(r *Ray, T *Matrix4) Ray {
+	return Ray{
+		Start: T.TransfPoint(r.Start),
+		Dir:   T.TransfDir(r.Dir),
+	}
+}
