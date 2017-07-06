@@ -76,10 +76,10 @@ func UnitMatrix4() Matrix4 {
 	}
 }
 
-func RotX4(θ float64) Matrix4 {
+func RotX4(θ float64) *Matrix4 {
 	c := math.Cos(θ)
 	s := math.Sin(θ)
-	return Matrix4{
+	return &Matrix4{
 		{1, 0, 0, 0},
 		{0, c, -s, 0},
 		{0, s, c, 0},
@@ -87,8 +87,19 @@ func RotX4(θ float64) Matrix4 {
 	}
 }
 
-func Transl4(d Vec) Matrix4 {
-	return Matrix4{
+func RotY4(θ float64) *Matrix4 {
+	c := math.Cos(θ)
+	s := math.Sin(θ)
+	return &Matrix4{
+		{c, 0, -s, 0},
+		{0, 1, 0, 0},
+		{s, 0, c, 0},
+		{0, 0, 0, 1},
+	}
+}
+
+func Transl4(d Vec) *Matrix4 {
+	return &Matrix4{
 		{1, 0, 0, d.X},
 		{0, 1, 0, d.Y},
 		{0, 0, 1, d.Z},

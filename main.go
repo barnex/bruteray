@@ -27,34 +27,18 @@ func main() {
 
 	scene := NewEnv()
 	scene.amb = func(dir Vec) Color { return Color(0.4 * dir.Y) }
-	scene.Add(Sheet(-1, Ey), Diffuse2(0.5))
-	//scene.Add(Sheet(25, Ex), Diffuse2(0.7))  // right wall
-	scene.Add(Rect(Vec{-25, 0, 0}, Ex, 0, 10, 10), Diffuse2(0.7)) // left wall
+	scene.Add(Sheet(-1, Ey), Diffuse1(0.5))
 
-	diec := Diffuse2(0.9)
-	cube := &object{Box(Vec{0, 0, 0}, -1, -1, -1), diec}
+	box1 := Box(Vec{0, 0, 0}, -1, -1, -1)
+	box1 = Transf(box1, RotY4(pi/5).Mul(RotX4(pi/7)))
+
+	cube := &object{box1, Diffuse1(0.8)}
 	var die Obj = cube
 
-	const r = 0.175
-	pipc := Reflective(0.2)
-	die = &objMinus{die, &object{Sphere(Vec{0, 0, -0.9}, r), pipc}}
-	die = &objMinus{die, &object{Sphere(Vec{0.5, 0.5, -0.9}, r), pipc}}
-	die = &objMinus{die, &object{Sphere(Vec{-0.5, 0.5, -0.9}, r), pipc}}
-	die = &objMinus{die, &object{Sphere(Vec{0.5, -0.5, -0.9}, r), pipc}}
-	die = &objMinus{die, &object{Sphere(Vec{-0.5, -0.5, -0.9}, r), pipc}}
-
-	die = &objMinus{die, &object{Sphere(Vec{0.4, 1.1, -0.4}, r), pipc}}
-	die = &objMinus{die, &object{Sphere(Vec{-0.4, 1.1, 0.4}, r), pipc}}
-	die = &objMinus{die, &object{Sphere(Vec{0, 1.1, 0}, r), pipc}}
-
-	die = &objAnd{die, &object{Sphere(Vec{}, 0.98*math.Sqrt(2.)), diec}}
-
-	scene.objs = append(scene.objs, die)
+	scene.AddObj(die)
 
 	lp := Vec{4, 8, -6}
-	scene.AddLight(SmoothLight(lp, 50, 1))
-	hilight := &object{Sphere(lp.Mul(2), 4), Flat(2)}
-	scene.objs = append(scene.objs, hilight)
+	scene.AddLight(PointLight(lp, 50))
 
 	cam := Camera(*focalLen)
 	cam.Transl(Vec{0, 4, -6})

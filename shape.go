@@ -47,6 +47,10 @@ func (n Vec) Towards(d Vec) Vec {
 	return n
 }
 
+func Transf(s Shape, T *Matrix4) Shape {
+	return &transShape{s, *T}
+}
+
 type transShape struct {
 	orig   Shape
 	transf Matrix4
@@ -55,11 +59,12 @@ type transShape struct {
 var _ Shape = &transShape{}
 
 func (s *transShape) Inters(r *Ray) Inter {
-
+	r2 := transRay(r, &s.transf)
+	return s.orig.Inters(&r2)
 }
 
 func (s *transShape) Normal(r *Ray, t float64) Vec {
-
+	return NumNormal(s, r, t)
 }
 
 func transRay(r *Ray, T *Matrix4) Ray {

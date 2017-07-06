@@ -37,33 +37,33 @@ func TestMatrix(tst *testing.T) {
 
 func TestMatrix4(tst *testing.T) {
 
-	T := Transl4(Vec{1, 2, 3})
+	//T := Transl4(Vec{1, 2, 3})
 
-	a := Vec{-2, 3, -1}
+	//a := Vec{-2, 3, -1}
 
-	fmt.Println(T.TransfPoint(a))
-	fmt.Println(T.TransfDir(a))
-
-	T = RotX4(pi / 2)
-
-	fmt.Println(T.TransfPoint(a))
-	fmt.Println(T.TransfDir(a))
-
-	a = Vec{1, 2, 3}
-	tr := Transl4(Vec{10, 10, 10})
-	rot := RotX4(pi / 2)
-
-	_ = tr
-	_ = rot
-
-	T = *(tr.Mul(&rot))
-	//T = *(rot.Mul(&tr))
-	//T = tr
-	//T = rot
-
-	fmt.Println(&T)
-
-	fmt.Println()
-	fmt.Println(T.TransfPoint(a))
+	//fmt.Println(T.TransfPoint(a))
 	//fmt.Println(T.TransfDir(a))
+
+	//T = RotX4(pi / 2)
+
+	//fmt.Println(T.TransfPoint(a))
+	//fmt.Println(T.TransfDir(a))
+
+	//a = Vec{1, 2, 3}
+	//tr := Transl4(Vec{10, 10, 10})
+	//rot := RotX4(pi / 2)
+
+	//_ = tr
+	//_ = rot
+
+	//T = *(tr.Mul(&rot))
+	////T = *(rot.Mul(&tr))
+	////T = tr
+	////T = rot
+
+	//fmt.Println(&T)
+
+	//fmt.Println()
+	//fmt.Println(T.TransfPoint(a))
+	////fmt.Println(T.TransfDir(a))
 }

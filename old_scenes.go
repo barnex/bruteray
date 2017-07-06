@@ -1,5 +1,7 @@
 package main
 
+import "math"
+
 func spheresInARoom() *Env {
 	scene := NewEnv()
 	scene.amb = func(v Vec) Color { return Color(0.2*v.Y + 0.2) }
@@ -42,4 +44,44 @@ func checkboard() *Env {
 	s.AddLight(SmoothLight(Vec{3, 12, 6}, 130, 2))
 
 	return s
+}
+
+func onedice() *Env {
+
+	scene := NewEnv()
+	scene.amb = func(dir Vec) Color { return Color(0.4 * dir.Y) }
+	scene.Add(Sheet(-1, Ey), Diffuse2(0.5))
+	//scene.Add(Sheet(25, Ex), Diffuse2(0.7))  // right wall
+	scene.Add(Rect(Vec{-25, 0, 0}, Ex, 0, 10, 10), Diffuse2(0.7)) // left wall
+
+	diec := Diffuse2(0.9)
+	cube := &object{Box(Vec{0, 0, 0}, -1, -1, -1), diec}
+	var die Obj = cube
+
+	const r = 0.175
+	pipc := Reflective(0.2)
+	die = &objMinus{die, &object{Sphere(Vec{0, 0, -0.9}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{0.5, 0.5, -0.9}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{-0.5, 0.5, -0.9}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{0.5, -0.5, -0.9}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{-0.5, -0.5, -0.9}, r), pipc}}
+
+	die = &objMinus{die, &object{Sphere(Vec{0.4, 1.1, -0.4}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{-0.4, 1.1, 0.4}, r), pipc}}
+	die = &objMinus{die, &object{Sphere(Vec{0, 1.1, 0}, r), pipc}}
+
+	die = &objAnd{die, &object{Sphere(Vec{}, 0.98*math.Sqrt(2.)), diec}}
+
+	scene.objs = append(scene.objs, die)
+
+	lp := Vec{4, 8, -6}
+	scene.AddLight(SmoothLight(lp, 50, 1))
+	hilight := &object{Sphere(lp.Mul(2), 4), Flat(2)}
+	scene.objs = append(scene.objs, hilight)
+
+	//cam := Camera(*focalLen)
+	//cam.Transl(Vec{0, 4, -6})
+	//cam.Transf(RotX(-15 * deg))
+	//cam.AA = true
+	return scene
 }

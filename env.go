@@ -22,8 +22,12 @@ func NewEnv() *Env {
 	}
 }
 
+func (e *Env) AddObj(o Obj) {
+	e.objs = append(e.objs, o)
+}
+
 func (e *Env) Add(s Shape, sh Shader) {
-	e.objs = append(e.objs, &object{s, sh})
+	e.AddObj(&object{s, sh})
 }
 func (e *Env) AddLight(s Source) {
 	e.sources = append(e.sources, s)
