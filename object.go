@@ -1,7 +1,7 @@
 package main
 
 type Obj interface {
-	Shape
+	Inters(r *Ray) Inter
 	Shade(e *Env, r *Ray, t float64, N int) Color
 }
 
@@ -88,4 +88,23 @@ func (s *objMinus) Shade(e *Env, r *Ray, t float64, N int) Color {
 		return s.b.Shade(e, r, t, N)
 	}
 	panic("bug")
+}
+
+func TransfObj(o Obj, T *Matrix4) Obj {
+	return &transObj{o, *T}
+}
+
+type transObj struct {
+	orig   Obj
+	transf Matrix4
+}
+
+func (s *transObj) Inters(r *Ray) Inter {
+	r2 := transRay(r, &s.transf)
+	return s.orig.Inters(&r2)
+}
+
+func (s *transObj) Shade(e *Env, r *Ray, t float64, N int) Color {
+	r2 := transRay(r, &s.transf)
+	return s.orig.Shade(e, &r2, t, N)
 }
