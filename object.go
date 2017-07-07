@@ -106,5 +106,5 @@ func (s *transObj) Inters(r *Ray) Inter {
 
 func (s *transObj) Shade(e *Env, r *Ray, t float64, N int) Color {
 	r2 := transRay(r, &s.transf)
-	return s.orig.Shade(e, &r2, t, N)
+	return s.orig.Shade(e, r2, t, N) // wrong, environment tranform?
 }
