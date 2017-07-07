@@ -8,7 +8,7 @@ type shapeAnd struct {
 	a, b Shape
 }
 
-func (s *shapeAnd) Inters(r *Ray) Inter {
+func (s *shapeAnd) Inters(r *Ray) Interval {
 	a := s.a.Inters(r)
 	if !a.OK() {
 		return empty
@@ -32,7 +32,7 @@ type shapeMinus struct {
 	a, b Shape
 }
 
-func (s *shapeMinus) Inters(r *Ray) Inter {
+func (s *shapeMinus) Inters(r *Ray) Interval {
 	a := s.a.Inters(r)
 	if !a.OK() {
 		return empty

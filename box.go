@@ -13,7 +13,7 @@ func Box(center Vec, rx, ry, rz float64) Shape {
 	}
 }
 
-func (s *box) Inters(r *Ray) Inter {
+func (s *box) Inters(r *Ray) Interval {
 	min := s.min
 	max := s.max
 
@@ -32,7 +32,7 @@ func (s *box) Inters(r *Ray) Inter {
 	ten := Max3(txen, tyen, tzen)
 	tex := Min3(txex, tyex, tzex)
 
-	return Inter{ten, tex}
+	return Interval{ten, tex}
 }
 
 func (s *box) Normal(r *Ray, t float64) Vec {

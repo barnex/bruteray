@@ -1,37 +1,37 @@
 package main
 
-type Inter struct {
+type Interval struct {
 	Min, Max float64
 }
 
-var empty = Inter{inf, -inf}
+var empty = Interval{inf, -inf}
 
-func (a Inter) And(b Inter) Inter {
+func (a Interval) And(b Interval) Interval {
 	if a.Max < b.Min || b.Max < a.Min {
 		return empty
 	}
 
-	return Inter{Max(a.Min, b.Min), Min(a.Max, b.Max)}
+	return Interval{Max(a.Min, b.Min), Min(a.Max, b.Max)}
 
 	return empty
 }
 
-func (a Inter) Minus(b Inter) Inter {
+func (a Interval) Minus(b Interval) Interval {
 	if a.Max < b.Min || b.Max < a.Min {
 		return a
 	}
 
 	if b.Min < a.Min {
-		return Inter{b.Max, a.Max}.Normalize()
+		return Interval{b.Max, a.Max}.Normalize()
 	}
-	return Inter{a.Min, b.Min}.Normalize()
+	return Interval{a.Min, b.Min}.Normalize()
 }
 
-func (a Inter) OK() bool {
+func (a Interval) OK() bool {
 	return a.Min <= a.Max
 }
 
-func (a Inter) Normalize() Inter {
+func (a Interval) Normalize() Interval {
 	if !a.OK() {
 		return empty
 	}

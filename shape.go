@@ -1,7 +1,7 @@
 package main
 
 type Shape interface {
-	Inters(r *Ray) Inter
+	Inters(r *Ray) Interval
 	Normal(r *Ray, t float64) Vec
 }
 
@@ -58,7 +58,7 @@ type transShape struct {
 
 var _ Shape = &transShape{}
 
-func (s *transShape) Inters(r *Ray) Inter {
+func (s *transShape) Inters(r *Ray) Interval {
 	r2 := transRay(r, &s.transf)
 	return s.orig.Inters(&r2)
 }

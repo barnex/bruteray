@@ -33,7 +33,7 @@ func (s *sphere) Hit(r *Ray) float64 {
 	return 0
 }
 
-func (s *sphere) Inters(r *Ray) Inter {
+func (s *sphere) Inters(r *Ray) Interval {
 	v := r.Start.Sub(s.c)
 	d := r.Dir
 	vd := v.Dot(d)
@@ -44,7 +44,7 @@ func (s *sphere) Inters(r *Ray) Inter {
 	t1 := (-vd - math.Sqrt(D))
 	t2 := (-vd + math.Sqrt(D))
 	t1, t2 = Sort(t1, t2)
-	return Inter{t1, t2}
+	return Interval{t1, t2}
 }
 
 func (s *sphere) Transl(dx, dy, dz float64) *sphere {

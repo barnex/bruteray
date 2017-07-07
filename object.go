@@ -1,7 +1,7 @@
 package main
 
 type Obj interface {
-	Inters(r *Ray) Inter
+	Inters(r *Ray) Interval
 	Shade(e *Env, r *Ray, t float64, N int) Color
 }
 
@@ -23,7 +23,7 @@ type objAnd struct {
 	a, b Obj
 }
 
-func (s *objAnd) Inters(r *Ray) Inter {
+func (s *objAnd) Inters(r *Ray) Interval {
 	a := s.a.Inters(r)
 	if !a.OK() {
 		return empty
@@ -59,7 +59,7 @@ type objMinus struct {
 	a, b Obj
 }
 
-func (s *objMinus) Inters(r *Ray) Inter {
+func (s *objMinus) Inters(r *Ray) Interval {
 	a := s.a.Inters(r)
 	if !a.OK() {
 		return empty
@@ -99,7 +99,7 @@ type transObj struct {
 	transf Matrix4
 }
 
-func (s *transObj) Inters(r *Ray) Inter {
+func (s *transObj) Inters(r *Ray) Interval {
 	r2 := transRay(r, &s.transf)
 	return s.orig.Inters(&r2)
 }

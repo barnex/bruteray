@@ -19,7 +19,7 @@ func (s *cylinder) Hit(r *Ray) float64 {
 	return s.Inters(r).Min
 }
 
-func (s *cylinder) Inters(r *Ray) Inter {
+func (s *cylinder) Inters(r *Ray) Interval {
 	s0 := r.Start.X - s.c.X
 	s1 := r.Start.Z - s.c.Z
 	d0 := r.Dir.X
@@ -39,5 +39,5 @@ func (s *cylinder) Inters(r *Ray) Inter {
 	t1 := (math.Sqrt(D) - d0*s0 - d1*s1) / (d02 + d12)
 	assert(t0 <= t1)
 
-	return Inter{t0, t1}
+	return Interval{t0, t1}
 }

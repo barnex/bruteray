@@ -12,11 +12,11 @@ func Sheet(pos float64, dir Vec) Shape {
 	return &sheet{pos, dir}
 }
 
-func (s *sheet) Inters(r *Ray) Inter {
+func (s *sheet) Inters(r *Ray) Interval {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	t := (s.pos - rs) / rd
-	return Inter{t, t}
+	return Interval{t, t}
 }
 
 func (s *sheet) Normal(r *Ray, t float64) Vec {
@@ -34,7 +34,7 @@ func Rect(pos, dir Vec, rx, ry, rz float64) Shape {
 	return &rect{pos, dir, rx, ry, rz}
 }
 
-func (s *rect) Inters(r *Ray) Inter {
+func (s *rect) Inters(r *Ray) Interval {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	t := (s.pos.Dot(s.dir) - rs) / rd
@@ -47,7 +47,7 @@ func (s *rect) Inters(r *Ray) Inter {
 		p.Z < -s.rz || p.Z > s.rz {
 		return empty
 	}
-	return Inter{t, t}
+	return Interval{t, t}
 }
 
 func (s *rect) Normal(r *Ray, t float64) Vec {
