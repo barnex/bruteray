@@ -15,9 +15,29 @@ const (
 func TestSphere(tst *testing.T) {
 	t := Helper(tst)
 
-	//e := NewEnv()
+	e, c := testSphere()
 
-	//t.CompareCam(e, "001-sphere", Camera(0))
+	t.Compare(e, c, "001-sphere")
+}
+
+func BenchmarkSphere(b *testing.B) {
+	e, c := testSphere()
+	benchmark(b, e, c)
+}
+
+func testSphere() (*Env, *Cam) {
+	e := NewEnv()
+	e.Add(Object(Sphere(Vec{}, 0.25), Flat(WHITE)))
+	return e, Camera(0)
+}
+
+func benchmark(b *testing.B, e *Env, c *Cam) {
+	b.SetBytes((testW + 1) * (testH + 1))
+	img := MakeImage(testW, testH)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		c.Render(e, testRec, img)
+	}
 }
 
 //func TestSpheres(tst *testing.T) {
@@ -244,20 +264,24 @@ func TestSphere(tst *testing.T) {
 //	t.CompareCam(s, "008-reflections", cam)
 //}
 
-func (t helper) Compare(s *Env, name string) {
-	t.Helper()
-	cam := Camera(0)
-	t.CompareCam(s, name, cam)
-}
+//func (t helper) Compare(s *Env, name string) {
+//	t.Helper()
+//	cam := Camera(0)
+//	t.CompareCam(s, name, cam)
+//}
 
-func (t helper) CompareCam(s *Env, name string, cam *Cam) {
+func (t helper) Compare(s *Env, cam *Cam, name string) {
 	t.Helper()
-	out := name + ".png"
+	os.Mkdir("out", 0777)
+
+	name = name + ".png"
+	have := "out/" + name
+	want := "testdata/" + name
+
 	img := MakeImage(testW, testH)
 	cam.Render(s, testRec, img)
-	Encode(img, out, 1/(float64(cam.N)), false)
-	ref := "testdata/" + out
-	deviation, err := imgComp(out, ref)
+	Encode(img, have, 1/(float64(cam.N)), false)
+	deviation, err := imgComp(have, want)
 
 	if err != nil {
 		t.Fatal(err)

@@ -10,7 +10,9 @@ type helper struct {
 	*testing.T
 }
 
-func Helper(tst *testing.T) helper { return helper{tst} }
+func Helper(tst *testing.T) helper {
+	return helper{tst}
+}
 
 func (t helper) Eq(a, b interface{}) {
 	t.Helper()

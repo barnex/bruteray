@@ -6,7 +6,9 @@ type Env struct {
 }
 
 func NewEnv() *Env {
-	return &Env{}
+	return &Env{
+		Ambient: Surf{T: inf, Material: Flat(BLACK)},
+	}
 }
 
 func (e *Env) Add(o Obj) {

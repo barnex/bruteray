@@ -11,6 +11,10 @@ func ObjShade(o Obj, e *Env, N int, r *Ray) Color {
 
 // -- Primitive Object
 
+func Object(s Shape, m Material) Obj {
+	return &prim{s, m}
+}
+
 type prim struct {
 	s Shape
 	m Material
