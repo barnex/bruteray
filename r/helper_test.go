@@ -11,6 +11,7 @@ type helper struct {
 }
 
 func Helper(tst *testing.T) helper {
+	tst.Parallel()
 	return helper{tst}
 }
 

@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	testW, testH = 300, 200
-	testRec      = 3
+	testW, testH = 300, 200 // test image size
+	testRec      = 3        // test recursion depth
 )
 
+// Test a flat sphere
 func TestSphere(tst *testing.T) {
 	t := Helper(tst)
 
@@ -27,8 +28,18 @@ func BenchmarkSphere(b *testing.B) {
 
 func testSphere() (*Env, *Cam) {
 	e := NewEnv()
-	e.Add(Object(Sphere(Vec{}, 0.25), Flat(WHITE)))
+	e.Add(Object(Sphere(Vec{0, 0, 1}, 0.25), Flat(WHITE)))
 	return e, Camera(0)
+}
+
+// Test a sphere behind the camera
+func TestBehindCam(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	e.Add(Object(Sphere(Vec{0, 0, -1}, 0.25), Flat(WHITE)))
+
+	t.Compare(e, Camera(0), "002-behindcam")
 }
 
 func benchmark(b *testing.B, e *Env, c *Cam) {

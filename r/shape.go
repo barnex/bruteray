@@ -4,6 +4,7 @@ import "math"
 
 type Shape interface {
 	Inters(r *Ray) Interval
+	Normal(pos Vec) Vec
 }
 
 type sphere struct {
@@ -15,9 +16,9 @@ func Sphere(center Vec, radius float64) *sphere {
 	return &sphere{center, Sqr(radius)}
 }
 
-//func (s *sphere) Normal(r *Ray, t float64) Vec {
-//        return r.At(t).Sub(s.c).Normalized()
-//}
+func (s *sphere) Normal(pos Vec) Vec {
+	return pos.Sub(s.c).Normalized()
+}
 
 func (s *sphere) Inters(r *Ray) Interval {
 	v := r.Start.Sub(s.c)
