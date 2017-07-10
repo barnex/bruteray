@@ -28,6 +28,7 @@ func (e *Env) Shade(r *Ray, N int) Color {
 		if !bi.OK() {
 			continue
 		}
+		assert(bi.S1.T <= bi.S2.T)
 		if t := bi.S1.T; t < surf.T && t > 0 {
 			surf = bi.S1
 		}

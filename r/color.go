@@ -11,3 +11,7 @@ var (
 type Color struct {
 	R, G, B float64
 }
+
+func (c Color) Mul(s float64) Color {
+	return Color{s * c.R, s * c.G, s * c.B}
+}

@@ -20,13 +20,14 @@ func (s *flat) Shade(e *Env, N int, pos, norm Vec) Color {
 
 // -- normal
 
-func ShadeNormal() Material {
-	return shadeNormal{}
+// debug shader
+func ShadeNormal(c Color) Material {
+	return shadeNormal{c}
 }
 
-type shadeNormal struct{}
+type shadeNormal struct{ c Color }
 
 func (s shadeNormal) Shade(e *Env, N int, pos, norm Vec) Color {
-	v := Max(0, norm[Z])
-	return Color{v, v, v}
+	v := Max(0, -norm[Z])
+	return s.c.Mul(v)
 }

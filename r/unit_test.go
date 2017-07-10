@@ -42,6 +42,16 @@ func TestBehindCam(tst *testing.T) {
 	t.Compare(e, Camera(0), "002-behindcam")
 }
 
+// Test normal vectors
+func TestNormal(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(RED)))
+
+	t.Compare(e, Camera(0), "003-normals")
+}
+
 func benchmark(b *testing.B, e *Env, c *Cam) {
 	b.SetBytes((testW + 1) * (testH + 1))
 	img := MakeImage(testW, testH)

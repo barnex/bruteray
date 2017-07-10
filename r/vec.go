@@ -57,6 +57,13 @@ func (v Vec) Normalized() Vec {
 	return Vec{v[X] * l, v[Y] * l, v[Z] * l}
 }
 
+func (n Vec) Towards(d Vec) Vec {
+	if n.Dot(d) > 0 {
+		return n.Mul(-1)
+	}
+	return n
+}
+
 func (a Vec) Cross(b Vec) Vec {
 	x := a[Y]*b[Z] - a[Z]*b[Y]
 	y := a[Z]*b[X] - a[X]*b[Z]

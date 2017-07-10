@@ -1,10 +1,18 @@
 package r
 
-import "math"
+import (
+	"math"
+)
 
 type Shape interface {
 	Inters(r *Ray) Interval
 	Normal(pos Vec) Vec
+}
+
+// -- sphere
+
+func Sphere(center Vec, radius float64) *sphere {
+	return &sphere{center, Sqr(radius)}
 }
 
 type sphere struct {
@@ -12,12 +20,9 @@ type sphere struct {
 	r2 float64
 }
 
-func Sphere(center Vec, radius float64) *sphere {
-	return &sphere{center, Sqr(radius)}
-}
-
 func (s *sphere) Normal(pos Vec) Vec {
-	return pos.Sub(s.c).Normalized()
+	n := pos.Sub(s.c).Normalized()
+	return n
 }
 
 func (s *sphere) Inters(r *Ray) Interval {
@@ -30,6 +35,27 @@ func (s *sphere) Inters(r *Ray) Interval {
 	}
 	t1 := (-vd - math.Sqrt(D))
 	t2 := (-vd + math.Sqrt(D))
-	//t1, t2 = Sort(t1, t2)
 	return Interv(t1, t2)
+}
+
+// -- half-space
+
+func Sheet(dir Vec, off float64) *sheet {
+	return &sheet{dir, off}
+}
+
+type sheet struct {
+	dir Vec
+	off float64
+}
+
+func (s *sheet) Normal(pos Vec) Vec {
+	return s.dir
+}
+
+func (s *sheet) Inters(r *Ray) Interval {
+	rs := r.Start.Dot(s.dir)
+	rd := r.Dir.Dot(s.dir)
+	t := (s.off - rs) / rd
+	return Interval{t, t}
 }

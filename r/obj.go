@@ -27,9 +27,12 @@ func (o *prim) Inters(r *Ray) BiSurf {
 	if !i.OK() {
 		return BiSurf{}
 	}
+	i.check()
+	n1 := o.s.Normal(r.At(i.Min))
+	n2 := o.s.Normal(r.At(i.Max))
 	return BiSurf{
-		S1: Surf{T: i.Min, Material: o.m},
-		S2: Surf{T: i.Max, Material: o.m},
+		S1: Surf{T: i.Min, Norm: n1, Material: o.m},
+		S2: Surf{T: i.Max, Norm: n2, Material: o.m},
 	}
 }
 
