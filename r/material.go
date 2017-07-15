@@ -21,14 +21,16 @@ func (s *flat) Shade(e *Env, N int, pos, norm Vec) Color {
 // -- normal
 
 // debug shader
-func ShadeNormal() Material {
-	return shadeNormal{}
+func ShadeNormal(dir Vec) Material {
+	return shadeNormal{dir}
 }
 
-type shadeNormal struct{}
+type shadeNormal struct {
+	dir Vec
+}
 
 func (s shadeNormal) Shade(e *Env, N int, pos, norm Vec) Color {
-	v := norm[Z]
+	v := norm.Dot(s.dir)
 	if v < 0 {
 		return RED.Mul(-v) // towards cam
 	} else {
