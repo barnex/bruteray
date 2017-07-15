@@ -38,7 +38,7 @@ func (s *sphere) Inters(r *Ray) Interval {
 	return Interv(t1, t2)
 }
 
-// -- half-space
+// -- sheet
 
 func Sheet(dir Vec, off float64) *sheet {
 	return &sheet{dir, off}

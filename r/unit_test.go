@@ -77,6 +77,7 @@ func TestCamRot(tst *testing.T) {
 	t.Compare(e, Camera(1).Transl(0, 4, -4).Transf(RotX4(pi/5)), "005-camrot")
 }
 
+// Test object transform
 func TestObjTransf(tst *testing.T) {
 	t := Helper(tst)
 
@@ -92,6 +93,32 @@ func TestObjTransf(tst *testing.T) {
 	e.Add(Transf(sz, rot))
 
 	t.Compare(e, Camera(0), "006-objtransf")
+}
+
+func TestObjAnd(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 0.5
+	s1 := Object(Sphere(Vec{-r / 2, 0, 2}, r), ShadeNormal(Ez))
+	s2 := Object(Sphere(Vec{r / 2, 0, 2}, r), ShadeNormal(Ey))
+	s := ObjAnd(s1, s2)
+	e.Add(s)
+
+	t.Compare(e, Camera(0), "007-objand")
+}
+
+func TestOverlap(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 0.5
+	s1 := Object(Sphere(Vec{-r / 2, 0, 2}, r), ShadeNormal(Ez))
+	s2 := Object(Sphere(Vec{r / 2, 0, 2}, r), ShadeNormal(Ey))
+	e.Add(s1)
+	e.Add(s2)
+
+	t.Compare(e, Camera(0), "008-overlap")
 }
 
 //func TestSpheres(tst *testing.T) {
