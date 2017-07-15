@@ -301,7 +301,7 @@ func (t helper) Compare(s *Env, cam *Cam, name string) {
 
 	img := MakeImage(testW, testH)
 	cam.Render(s, testRec, img)
-	Encode(img, have, 1/(float64(cam.N)), false)
+	Encode(img, have)
 	deviation, err := imgComp(have, want)
 
 	if err != nil {

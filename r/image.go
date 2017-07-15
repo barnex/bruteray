@@ -1,10 +1,17 @@
 package r
 
 import (
+	"fmt"
 	"image"
 	"image/color"
+	"image/jpeg"
+	"image/png"
+	"math"
+	"os"
+	"path"
 )
 
+// Image with float64 precission.
 type Image [][]Color
 
 func MakeImage(W, H int) Image {
@@ -15,8 +22,8 @@ func MakeImage(W, H int) Image {
 	return img
 }
 
-func (i Image) Size() (int, int) {
-	return len(i[0]), len(i)
+func (i Image) Bounds() image.Rectangle {
+	return image.Rect(0, 0, len(i[0]), len(i))
 }
 
 func (img Image) At(i, j int) color.Color {
@@ -33,10 +40,49 @@ func (img Image) At(i, j int) color.Color {
 	return color.RGBA{r, g, b, 255}
 }
 
-func (i Image) Bounds() image.Rectangle {
-	return image.Rect(0, 0, len(i[0]), len(i))
-}
-
 func (i Image) ColorModel() color.Model {
 	return nil
+}
+
+// linear to sRGB gamma curve
+// https://en.wikipedia.org/wiki/SRGB
+func srgb(c float64) float64 {
+	c = clip(c)
+	if c <= 0.0031308 {
+		return 12.92 * c
+	}
+	c = 1.055*math.Pow(float64(c), 1./2.4) - 0.05
+	if c > 1 {
+		return 1
+	}
+	return c
+}
+
+// clip color value between 0 and 1
+func clip(v float64) float64 {
+	if v < 0 {
+		v = 0
+	}
+	if v > 1 {
+		v = 1
+	}
+	return v
+}
+
+const jpegQual = 90
+
+func Encode(img Image, fname string) error {
+	f, err := os.Create(fname)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	switch path.Ext(fname) {
+	default:
+		return fmt.Errorf("unknown format: %q", fname)
+	case ".jpg", ".jpeg":
+		return jpeg.Encode(f, img, &jpeg.Options{Quality: jpegQual})
+	case ".png":
+		return png.Encode(f, img)
+	}
 }

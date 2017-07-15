@@ -8,6 +8,7 @@ var (
 	BLUE  = Color{0, 0, 1}
 )
 
+// Color or light intensity with float64 precision.
 type Color struct {
 	R, G, B float64
 }

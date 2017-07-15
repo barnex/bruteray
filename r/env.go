@@ -1,5 +1,7 @@
 package r
 
+// Env stores the entire environment
+// (all objects, light sources, ... in the scene)
 type Env struct {
 	objs    []Obj
 	Ambient Surf
@@ -15,6 +17,8 @@ func (e *Env) Add(o Obj) {
 	e.objs = append(e.objs, o)
 }
 
+// Calculate intensity seen by ray,
+// with maximum recursion depth N.
 func (e *Env) Shade(r *Ray, N int) Color {
 	if N == 0 {
 		return Color{}

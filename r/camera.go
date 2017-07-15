@@ -3,7 +3,6 @@ package r
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
 	FocalLen float64
-	N        int
 	pos      Vec
 	transf   Matrix
 	AA       bool
@@ -26,7 +25,7 @@ func (c *Cam) Transf(t Matrix) {
 
 func (c *Cam) Render(e *Env, maxRec int, img Image) {
 	focalPoint := Vec{0, 0, -c.FocalLen}.Add(c.pos)
-	W, H := img.Size()
+	W, H := img.Bounds().Dx(), img.Bounds().Dy()
 	r := &Ray{}
 	for i := 0; i < H; i++ {
 		for j := 0; j < W; j++ {
@@ -49,7 +48,6 @@ func (c *Cam) Render(e *Env, maxRec int, img Image) {
 			img[i][j] = v
 		}
 	}
-	c.N++
 }
 
 // Anti-aliasing jitter
