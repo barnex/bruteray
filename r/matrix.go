@@ -76,6 +76,17 @@ func RotY4(θ float64) *Matrix4 {
 	}
 }
 
+func RotZ4(θ float64) *Matrix4 {
+	c := cos(θ)
+	s := sin(θ)
+	return &Matrix4{
+		{c, -s, 0, 0},
+		{s, c, 0, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 1},
+	}
+}
+
 func Transl4(d Vec) *Matrix4 {
 	return &Matrix4{
 		{1, 0, 0, d[X]},

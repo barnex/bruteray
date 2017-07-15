@@ -16,20 +16,11 @@ const (
 func TestSphere(tst *testing.T) {
 	t := Helper(tst)
 
-	e, c := testSphere()
-
-	t.Compare(e, c, "001-sphere")
-}
-
-func BenchmarkSphere(b *testing.B) {
-	e, c := testSphere()
-	benchmark(b, e, c)
-}
-
-func testSphere() (*Env, *Cam) {
 	e := NewEnv()
 	e.Add(Object(Sphere(Vec{0, 0, 1}, 0.25), Flat(WHITE)))
-	return e, Camera(0)
+	c := Camera(0)
+
+	t.Compare(e, c, "001-sphere")
 }
 
 // Test a sphere behind the camera
@@ -54,6 +45,7 @@ func TestNormal(tst *testing.T) {
 	t.Compare(e, Camera(0), "003-normals")
 }
 
+// Test camera translation
 func TestCamTransl(tst *testing.T) {
 	t := Helper(tst)
 
@@ -63,6 +55,7 @@ func TestCamTransl(tst *testing.T) {
 	t.Compare(e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
 }
 
+// Test camera rotation
 func TestCamRot(tst *testing.T) {
 	t := Helper(tst)
 
@@ -84,34 +77,21 @@ func TestCamRot(tst *testing.T) {
 	t.Compare(e, Camera(1).Transl(0, 4, -4).Transf(RotX4(pi/5)), "005-camrot")
 }
 
-func Benchmark9Spheres(b *testing.B) {
+func TestObjTransf(tst *testing.T) {
+	t := Helper(tst)
+
 	e := NewEnv()
-	r := 0.5
+	r := 0.25
+	sx := Object(Sphere(Vec{-0.5, 0, 2}, r), ShadeNormal(Ex))
+	sy := Object(Sphere(Vec{0, 0, 2}, r), ShadeNormal(Ez))
+	sz := Object(Sphere(Vec{0.5, 0, 2}, r), ShadeNormal(Ey))
 
-	nz := ShadeNormal(Ez)
-	e.Add(Object(Sphere(Vec{0, 0, 0}, r), nz))
-	e.Add(Object(Sphere(Vec{0, 0, 2}, r), nz))
-	e.Add(Object(Sphere(Vec{0, 0, 4}, r), nz))
+	rot := RotZ4(pi / 4)
+	e.Add(Transf(sx, rot))
+	e.Add(Transf(sy, rot))
+	e.Add(Transf(sz, rot))
 
-	e.Add(Object(Sphere(Vec{2, 0, 0}, r), nz))
-	e.Add(Object(Sphere(Vec{2, 0, 2}, r), nz))
-	e.Add(Object(Sphere(Vec{2, 0, 4}, r), nz))
-
-	e.Add(Object(Sphere(Vec{-2, 0, 0}, r), nz))
-	e.Add(Object(Sphere(Vec{-2, 0, 2}, r), nz))
-	e.Add(Object(Sphere(Vec{-2, 0, 4}, r), nz))
-
-	c := Camera(1).Transl(0, 4, -4).Transf(RotX4(pi / 5))
-	benchmark(b, e, c)
-}
-
-func benchmark(b *testing.B, e *Env, c *Cam) {
-	b.SetBytes((testW + 1) * (testH + 1))
-	img := MakeImage(testW, testH)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		c.Render(e, testRec, img)
-	}
+	t.Compare(e, Camera(0), "006-objtransf")
 }
 
 //func TestSpheres(tst *testing.T) {

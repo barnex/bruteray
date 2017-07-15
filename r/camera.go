@@ -7,9 +7,8 @@ import (
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
 	FocalLen float64
-	//pos      Vec
-	transf Matrix4
-	AA     bool
+	transf   Matrix4
+	AA       bool
 }
 
 func Camera(focalLen float64) *Cam {
