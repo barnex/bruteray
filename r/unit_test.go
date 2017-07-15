@@ -47,7 +47,7 @@ func TestNormal(tst *testing.T) {
 	t := Helper(tst)
 
 	e := NewEnv()
-	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(RED)))
+	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal()))
 
 	t.Compare(e, Camera(0), "003-normals")
 }
@@ -56,9 +56,48 @@ func TestCamTransl(tst *testing.T) {
 	t := Helper(tst)
 
 	e := NewEnv()
-	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(RED)))
+	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal()))
 
 	t.Compare(e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
+}
+
+func TestCamRot(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 0.5
+	e.Add(Object(Sphere(Vec{0, 0, 0}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{0, 0, 2}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{0, 0, 4}, r), ShadeNormal()))
+
+	e.Add(Object(Sphere(Vec{2, 0, 0}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{2, 0, 2}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{2, 0, 4}, r), ShadeNormal()))
+
+	e.Add(Object(Sphere(Vec{-2, 0, 0}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{-2, 0, 2}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{-2, 0, 4}, r), ShadeNormal()))
+
+	t.Compare(e, Camera(1).Transl(0, 4, -4).Transf(RotX4(pi/5)), "005-camrot")
+}
+
+func Benchmark9Spheres(b *testing.B) {
+	e := NewEnv()
+	r := 0.5
+	e.Add(Object(Sphere(Vec{0, 0, 0}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{0, 0, 2}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{0, 0, 4}, r), ShadeNormal()))
+
+	e.Add(Object(Sphere(Vec{2, 0, 0}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{2, 0, 2}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{2, 0, 4}, r), ShadeNormal()))
+
+	e.Add(Object(Sphere(Vec{-2, 0, 0}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{-2, 0, 2}, r), ShadeNormal()))
+	e.Add(Object(Sphere(Vec{-2, 0, 4}, r), ShadeNormal()))
+
+	c := Camera(1).Transl(0, 4, -4).Transf(RotX4(pi / 5))
+	benchmark(b, e, c)
 }
 
 func benchmark(b *testing.B, e *Env, c *Cam) {

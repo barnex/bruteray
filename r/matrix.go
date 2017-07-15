@@ -6,55 +6,18 @@ import (
 	"math"
 )
 
-//type Matrix [3]Vec
-//
-//func (r Vec) Transf(T *Matrix) Vec {
-//	return Vec{r.Dot(T[0]), r.Dot(T[1]), r.Dot(T[2])}
-//}
-//
-//func (a *Matrix) Mul(b *Matrix) *Matrix {
-//	return &Matrix{
-//		{a[0].Dot(b[0]), a[1].Dot(b[0]), a[2].Dot(b[0])},
-//		{a[0].Dot(b[1]), a[1].Dot(b[1]), a[2].Dot(b[1])},
-//		{a[0].Dot(b[2]), a[1].Dot(b[2]), a[2].Dot(b[2])},
-//	}
-//}
-//
-//func RotX(θ float64) Matrix {
-//	c := math.Cos(θ)
-//	s := math.Sin(θ)
-//	return Matrix{
-//		{1, 0, 0},
-//		{0, c, -s},
-//		{0, s, c},
-//	}
-//}
-//
-//func UnitMatrix() Matrix {
-//	return Matrix{
-//		{1, 0, 0},
-//		{0, 1, 0},
-//		{0, 0, 1},
-//	}
-//}
-//
-//func (a *Matrix) String() string {
-//	var b bytes.Buffer
-//	for _, v := range a {
-//		fmt.Fprintln(&b, v)
-//	}
-//	return b.String()
-//}
-
 type Matrix4 [4]Vec4
 
 func (a *Matrix4) Mul(b *Matrix4) *Matrix4 {
-	return &Matrix4{
-		{a[0].Dot(b[0]), a[1].Dot(b[0]), a[2].Dot(b[0]), a[3].Dot(b[0])},
-		{a[0].Dot(b[1]), a[1].Dot(b[1]), a[2].Dot(b[1]), a[3].Dot(b[1])},
-		{a[0].Dot(b[2]), a[1].Dot(b[2]), a[2].Dot(b[2]), a[3].Dot(b[2])},
-		{a[0].Dot(b[3]), a[1].Dot(b[3]), a[2].Dot(b[3]), a[3].Dot(b[3])},
+	c := new(Matrix4)
+	for i := range c {
+		for j := range c[i] {
+			for k := range b {
+				c[i][j] += a[i][k] * b[k][j]
+			}
+		}
 	}
+	return c
 }
 
 func (T *Matrix4) TransfPoint(v Vec) Vec {

@@ -24,8 +24,8 @@ func (c *Cam) Transl(dx, dy, dz float64) *Cam {
 	return c
 }
 
-func (c *Cam) Transf(t *Matrix4) *Cam {
-	c.transf = *((&c.transf).Mul(t))
+func (c *Cam) Transf(T *Matrix4) *Cam {
+	c.transf = *((&c.transf).Mul(T))
 	return c
 }
 
