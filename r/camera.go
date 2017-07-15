@@ -1,5 +1,7 @@
 package r
 
+import "sync"
+
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
 	FocalLen float64
@@ -24,10 +26,24 @@ func (c *Cam) Transf(t Matrix) {
 }
 
 func (c *Cam) Render(e *Env, maxRec int, img Image) {
+	H := img.Bounds().Dy()
+	var wg sync.WaitGroup
+	const stride = 1
+	for i := 0; i < H; i += stride {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			c.renderLine(e, maxRec, img, i, i+stride)
+		}(i)
+	}
+	wg.Wait()
+}
+
+func (c *Cam) renderLine(e *Env, maxRec int, img Image, hMin, hMax int) {
 	focalPoint := Vec{0, 0, -c.FocalLen}.Add(c.pos)
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
 	r := &Ray{}
-	for i := 0; i < H; i++ {
+	for i := hMin; i < hMax; i++ {
 		for j := 0; j < W; j++ {
 			// ray start point
 			y0 := (-float64(i) + c.aa() + float64(H)/2) / float64(H)
