@@ -41,6 +41,26 @@ func (o *prim) Inters(r *Ray) BiSurf {
 // -- Transforms
 
 type transObj struct {
+	orig Obj
+	t    Matrix4
+	tinv Matrix4
+}
+
+func Transf(o Obj, T *Matrix4) Obj {
+	return &transObj{
+		o,
+		*T,
+		*(T.Inv()),
+	}
+}
+
+func (o *transObj) Inters(r *Ray) BiSurf {
+	r2 := *r
+	r2.Transf(&o.tinv)
+	bi := o.orig.Inters(&r2)
+	bi.S1.Norm = (&o.t).TransfDir(bi.S1.Norm)
+	bi.S2.Norm = (&o.t).TransfDir(bi.S2.Norm)
+	return bi
 }
 
 // -- CSG
