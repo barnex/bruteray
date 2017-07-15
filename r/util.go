@@ -21,6 +21,24 @@ func assert(t bool) {
 	}
 }
 
+func sin(x float64) float64 {
+	switch x {
+	default:
+		return math.Sin(x)
+	case pi, -pi:
+		return 0
+	}
+}
+
+func cos(x float64) float64 {
+	switch x {
+	default:
+		return math.Cos(x)
+	case pi / 2, -pi / 2:
+		return 0
+	}
+}
+
 func Min(x, y float64) float64 {
 	if x < y {
 		return x

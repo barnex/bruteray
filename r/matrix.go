@@ -3,7 +3,6 @@ package r
 import (
 	"bytes"
 	"fmt"
-	"math"
 )
 
 type Matrix4 [4]Vec4
@@ -30,6 +29,22 @@ func (T *Matrix4) TransfDir(v Vec) Vec {
 	return Vec{r.Dot(T[0]), r.Dot(T[1]), r.Dot(T[2])}
 }
 
+func (a *Matrix4) Inv() *Matrix4 {
+	assert(a[3] == Vec4{0, 0, 0, 1})
+	i := Matrix3{
+		{a[0][0], a[1][0], a[2][0]},
+		{a[0][1], a[1][1], a[2][1]},
+		{a[0][2], a[1][2], a[2][2]},
+	}
+	b := Vec{a[0][3], a[1][3], a[2][3]}
+	return &Matrix4{
+		{i[0][0], i[0][1], i[0][2], -b.Dot(i[0])},
+		{i[1][0], i[1][1], i[1][2], -b.Dot(i[1])},
+		{i[2][0], i[2][1], i[2][2], -b.Dot(i[2])},
+		{0, 0, 0, 1},
+	}
+}
+
 func UnitMatrix4() *Matrix4 {
 	return &Matrix4{
 		{1, 0, 0, 0},
@@ -40,8 +55,8 @@ func UnitMatrix4() *Matrix4 {
 }
 
 func RotX4(θ float64) *Matrix4 {
-	c := math.Cos(θ)
-	s := math.Sin(θ)
+	c := cos(θ)
+	s := sin(θ)
 	return &Matrix4{
 		{1, 0, 0, 0},
 		{0, c, -s, 0},
@@ -51,8 +66,8 @@ func RotX4(θ float64) *Matrix4 {
 }
 
 func RotY4(θ float64) *Matrix4 {
-	c := math.Cos(θ)
-	s := math.Sin(θ)
+	c := cos(θ)
+	s := sin(θ)
 	return &Matrix4{
 		{c, 0, -s, 0},
 		{0, 1, 0, 0},
@@ -77,3 +92,5 @@ func (a *Matrix4) String() string {
 	}
 	return b.String()
 }
+
+type Matrix3 [3]Vec
