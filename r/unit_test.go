@@ -52,6 +52,15 @@ func TestNormal(tst *testing.T) {
 	t.Compare(e, Camera(0), "003-normals")
 }
 
+func TestCamTransl(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(RED)))
+
+	t.Compare(e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
+}
+
 func benchmark(b *testing.B, e *Env, c *Cam) {
 	b.SetBytes((testW + 1) * (testH + 1))
 	img := MakeImage(testW, testH)
