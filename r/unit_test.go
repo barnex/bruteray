@@ -95,6 +95,7 @@ func TestObjTransf(tst *testing.T) {
 	t.Compare(e, Camera(0), "006-objtransf")
 }
 
+// Test intersection of two spheres
 func TestObjAnd(tst *testing.T) {
 	t := Helper(tst)
 
@@ -108,6 +109,7 @@ func TestObjAnd(tst *testing.T) {
 	t.Compare(e, Camera(0), "007-objand")
 }
 
+// Test two partially overlapping spheres
 func TestOverlap(tst *testing.T) {
 	t := Helper(tst)
 
@@ -119,6 +121,22 @@ func TestOverlap(tst *testing.T) {
 	e.Add(s2)
 
 	t.Compare(e, Camera(0), "008-overlap")
+}
+
+// Make a cube out of 3 intersecting slabs
+func TestSlabIntersect(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 1.
+	s1 := Object(Slab(Ex, -r, r), Flat(RED))
+	s2 := Object(Slab(Ey, -r, r), Flat(GREEN))
+	s3 := Object(Slab(Ez, -r, r), Flat(BLUE))
+	cube := ObjAnd(ObjAnd(s1, s2), s3)
+	cube = Transf(cube, RotY4(160*deg).Mul(RotX4(20*deg)))
+	e.Add(cube)
+
+	t.Compare(e, Camera(1).Transl(0, 0, -4), "009-slabintersect")
 }
 
 //func TestSpheres(tst *testing.T) {

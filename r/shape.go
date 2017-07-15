@@ -59,3 +59,27 @@ func (s *sheet) Inters(r *Ray) Interval {
 	t := (s.off - rs) / rd
 	return Interval{t, t}
 }
+
+// -- slab
+
+func Slab(dir Vec, off1, off2 float64) *slab {
+	return &slab{dir, off1, off2}
+}
+
+type slab struct {
+	dir        Vec
+	off1, off2 float64
+}
+
+func (s *slab) Normal(pos Vec) Vec {
+	return s.dir
+}
+
+func (s *slab) Inters(r *Ray) Interval {
+	rs := r.Start.Dot(s.dir)
+	rd := r.Dir.Dot(s.dir)
+	t1 := (s.off1 - rs) / rd
+	t2 := (s.off2 - rs) / rd
+	t1, t2 = Sort(t1, t2)
+	return Interval{t1, t2}
+}
