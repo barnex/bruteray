@@ -13,51 +13,46 @@ const (
 )
 
 // Test a flat sphere
-func TestSphere(tst *testing.T) {
-	t := Helper(tst)
+func TestSphere(t *testing.T) {
 
 	e := NewEnv()
 	e.Add(Object(Sphere(Vec{0, 0, 1}, 0.25), Flat(WHITE)))
 	c := Camera(0)
 
-	t.Compare(e, c, "001-sphere")
+	Compare(t, e, c, "001-sphere")
 }
 
 // Test a sphere behind the camera
-func TestBehindCam(tst *testing.T) {
-	t := Helper(tst)
+func TestBehindCam(t *testing.T) {
 
 	e := NewEnv()
 	e.Add(Object(Sphere(Vec{0, 0, -1}, 0.25), Flat(WHITE)))
 
-	t.Compare(e, Camera(0), "002-behindcam")
+	Compare(t, e, Camera(0), "002-behindcam")
 }
 
 // Test normal vectors
-func TestNormal(tst *testing.T) {
-	t := Helper(tst)
+func TestNormal(t *testing.T) {
 
 	e := NewEnv()
 	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)))
 	e.Add(Object(Sphere(Vec{-0.5, 0, 2}, 0.25), ShadeNormal(Ex)))
 	e.Add(Object(Sphere(Vec{0.5, 0, 2}, 0.25), ShadeNormal(Ey)))
 
-	t.Compare(e, Camera(0), "003-normals")
+	Compare(t, e, Camera(0), "003-normals")
 }
 
 // Test camera translation
-func TestCamTransl(tst *testing.T) {
-	t := Helper(tst)
+func TestCamTransl(t *testing.T) {
 
 	e := NewEnv()
 	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)))
 
-	t.Compare(e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
+	Compare(t, e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
 }
 
 // Test camera rotation
-func TestCamRot(tst *testing.T) {
-	t := Helper(tst)
+func TestCamRot(t *testing.T) {
 
 	e := NewEnv()
 	r := 0.5
@@ -74,12 +69,11 @@ func TestCamRot(tst *testing.T) {
 	e.Add(Object(Sphere(Vec{-2, 0, 2}, r), nz))
 	e.Add(Object(Sphere(Vec{-2, 0, 4}, r), nz))
 
-	t.Compare(e, Camera(1).Transl(0, 4, -4).Transf(RotX4(pi/5)), "005-camrot")
+	Compare(t, e, Camera(1).Transl(0, 4, -4).Transf(RotX4(pi/5)), "005-camrot")
 }
 
 // Test object transform
-func TestObjTransf(tst *testing.T) {
-	t := Helper(tst)
+func TestObjTransf(t *testing.T) {
 
 	e := NewEnv()
 	r := 0.25
@@ -92,12 +86,11 @@ func TestObjTransf(tst *testing.T) {
 	e.Add(Transf(sy, rot))
 	e.Add(Transf(sz, rot))
 
-	t.Compare(e, Camera(0), "006-objtransf")
+	Compare(t, e, Camera(0), "006-objtransf")
 }
 
 // Test intersection of two spheres
-func TestObjAnd(tst *testing.T) {
-	t := Helper(tst)
+func TestObjAnd(t *testing.T) {
 
 	e := NewEnv()
 	r := 0.5
@@ -106,12 +99,11 @@ func TestObjAnd(tst *testing.T) {
 	s := ObjAnd(s1, s2)
 	e.Add(s)
 
-	t.Compare(e, Camera(0), "007-objand")
+	Compare(t, e, Camera(0), "007-objand")
 }
 
 // Test two partially overlapping spheres
-func TestOverlap(tst *testing.T) {
-	t := Helper(tst)
+func TestOverlap(t *testing.T) {
 
 	e := NewEnv()
 	r := 0.5
@@ -120,12 +112,11 @@ func TestOverlap(tst *testing.T) {
 	e.Add(s1)
 	e.Add(s2)
 
-	t.Compare(e, Camera(0), "008-overlap")
+	Compare(t, e, Camera(0), "008-overlap")
 }
 
 // Make a cube out of 3 intersecting slabs
-func TestSlabIntersect(tst *testing.T) {
-	t := Helper(tst)
+func TestSlabIntersect(t *testing.T) {
 
 	e := NewEnv()
 	r := 1.
@@ -136,12 +127,11 @@ func TestSlabIntersect(tst *testing.T) {
 	cube = Transf(cube, RotY4(160*deg).Mul(RotX4(20*deg)))
 	e.Add(cube)
 
-	t.Compare(e, Camera(1).Transl(0, 0, -4), "009-slabintersect")
+	Compare(t, e, Camera(1).Transl(0, 0, -4), "009-slabintersect")
 }
 
 // Use sheets as green grass, blue sky and wall
-func TestSheet(tst *testing.T) {
-	t := Helper(tst)
+func TestSheet(t *testing.T) {
 
 	e := NewEnv()
 	s1 := Object(Sheet(Ey, -1), Flat(GREEN))
@@ -150,7 +140,25 @@ func TestSheet(tst *testing.T) {
 	s4 := Object(Sphere(Vec{1.5, 0, 3}, 1), ShadeNormal(Ez))
 	e.Add(s1, s2, s3, s4)
 
-	t.Compare(e, Camera(1), "010-sheet")
+	Compare(t, e, Camera(1), "010-sheet")
+}
+
+// Test rectangles
+func TestRect(t *testing.T) {
+
+	e := NewEnv()
+	const d = 0.5
+	const z = 10
+	nz := ShadeNormal(Ez)
+	r1 := Object(Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf), nz)
+	r2 := Transf(r1, RotZ4(-30*deg).Mul(Transl4(Vec{1, 0, 0})))
+	r3 := ObjAnd(
+		Object(Rect(Vec{0, 0, z}, Ez, 10, 10, 10), nz),
+		Object(Sphere(Vec{0, 0, z}, 0.25), nz),
+	)
+	e.Add(r1, r2, r3)
+
+	Compare(t, e, Camera(0), "011-rect")
 }
 
 //func TestSpheres(tst *testing.T) {
@@ -383,8 +391,9 @@ func TestSheet(tst *testing.T) {
 //	t.CompareCam(s, name, cam)
 //}
 
-func (t helper) Compare(s *Env, cam *Cam, name string) {
+func Compare(t *testing.T, s *Env, cam *Cam, name string) {
 	t.Helper()
+
 	os.Mkdir("out", 0777)
 
 	name = name + ".png"

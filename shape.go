@@ -5,7 +5,12 @@ import (
 )
 
 type Shape interface {
+	// Ray-shape intersection.
+	// t values may be < 0 (behind camera), but must be sorted (min <= max)
 	Inters(r *Ray) Interval
+
+	// Normal vector at position.
+	// Does not necessarily need to point outwards.
 	Normal(pos Vec) Vec
 }
 
@@ -38,7 +43,7 @@ func (s *sphere) Inters(r *Ray) Interval {
 	return Interv(t1, t2)
 }
 
-// -- sheet
+// -- sheet (infinite)
 
 func Sheet(dir Vec, off float64) *sheet {
 	return &sheet{dir, off}
@@ -58,6 +63,36 @@ func (s *sheet) Inters(r *Ray) Interval {
 	rd := r.Dir.Dot(s.dir)
 	t := (s.off - rs) / rd
 	return Interval{t, t}
+}
+
+// --rectangle (finite sheet)
+
+// A rectangle (i.e. finite sheet) at given position,
+// with normal vector dir and half-axes rx, ry, rz.
+func Rect(pos, dir Vec, rx, ry, rz float64) Shape {
+	return &rect{pos, dir, rx, ry, rz}
+}
+
+type rect struct {
+	pos, dir   Vec
+	rx, ry, rz float64
+}
+
+func (s *rect) Inters(r *Ray) Interval {
+	rs := r.Start.Dot(s.dir)
+	rd := r.Dir.Dot(s.dir)
+	t := (s.pos.Dot(s.dir) - rs) / rd
+	p := r.At(t).Sub(s.pos)
+	if p[X] < -s.rx || p[X] > s.rx ||
+		p[Y] < -s.ry || p[Y] > s.ry ||
+		p[Z] < -s.rz || p[Z] > s.rz {
+		return Interval{}
+	}
+	return Interval{t, t}
+}
+
+func (s *rect) Normal(p Vec) Vec {
+	return s.dir
 }
 
 // -- slab
