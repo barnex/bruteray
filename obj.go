@@ -1,13 +1,13 @@
-package r
+package bruteray
 
 type Obj interface {
 	Inters(r *Ray) BiSurf
 }
 
-func ObjShade(o Obj, e *Env, N int, r *Ray) Color {
-	bi := o.Inters(r)
-	return bi.S1.Shade(e, N, r)
-}
+//func ObjShade(o Obj, e *Env, N int, r *Ray) Color {
+//	bi := o.Inters(r)
+//	return bi.S1.Shade(e, N, r)
+//}
 
 // -- Primitive Object
 

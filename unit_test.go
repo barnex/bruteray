@@ -1,97 +1,236 @@
-package main
+package bruteray
 
 import (
 	"image"
 	"image/png"
-	"math"
 	"os"
 	"testing"
 )
 
 const (
-	testW, testH = 300, 200
+	testW, testH = 300, 200 // test image size
+	testRec      = 3        // test recursion depth
 )
 
-func TestSpheres(tst *testing.T) {
+// Test a flat sphere
+func TestSphere(tst *testing.T) {
 	t := Helper(tst)
 
-	scene := NewEnv()
-	scene.amb = func(v Vec) Color { return Color(0.2*v.Y + 0.2) }
-	scene.Add(Sheet(-3, Ey), Diffuse1(0.5))  // floor
-	scene.Add(Sheet(8, Ey), Diffuse1(0.5))   // ceiling
-	scene.Add(Sheet(20, Ez), Diffuse1(0.8))  // back
-	scene.Add(Sheet(-5, Ez), Diffuse1(0.8))  // front
-	scene.Add(Sheet(10, Ex), Diffuse1(0.8))  // left
-	scene.Add(Sheet(-10, Ex), Diffuse1(0.8)) // right
-	scene.Add(Sphere(Vec{1, -2, 8}, 1), Reflective(0.3))
-	scene.Add(Sphere(Vec{-1, -2, 6}, 1), Diffuse1(0.95))
-	scene.AddLight(PointLight(Vec{0, 7, 1}, 100))
+	e := NewEnv()
+	e.Add(Object(Sphere(Vec{0, 0, 1}, 0.25), Flat(WHITE)))
+	c := Camera(0)
 
-	cam := Camera(1)
-	cam.Transf(RotX(-5 * deg))
-	t.CompareCam(scene, "009-spheres", cam)
+	t.Compare(e, c, "001-sphere")
 }
 
-func TestCheckers(tst *testing.T) {
+// Test a sphere behind the camera
+func TestBehindCam(tst *testing.T) {
 	t := Helper(tst)
 
-	s := NewEnv()
-	s.amb = func(dir Vec) Color { return 0.5 }
+	e := NewEnv()
+	e.Add(Object(Sphere(Vec{0, 0, -1}, 0.25), Flat(WHITE)))
 
-	s.Add(Sheet(0, Ey), Diffuse1(0.7))                                                      // floor
-	s.Add(Box(Vec{0, 0, 8}, 5, 0.45, 5), Diffuse1(0.1))                                     // base
-	s.Add(Rect(Vec{0, 0.5, 8}, Ey, 4, inf, 4), CheckBoard(Reflective(0.05), Diffuse1(0.9))) // checkboard
-	s.Add(Sheet(20, Ez), Diffuse1(0.7))                                                     // back
-	s.Add(Sheet(20, Ey), Diffuse1(0.6))                                                     // ceiling
-	slab := Slab(0, 0.7)
-	for j := 0.; j < 2; j++ {
-		for i := j; i < 8; i += 2 {
-			cyl := Cylinder(Vec{j - 3.5, -1.5, i + 4.5}, 0.37)
-			s.Add(ShapeAnd(cyl, slab), Reflective(0.05))
-
-			cyl = Cylinder(Vec{j + 2.5, -1.5, i + 4.5}, 0.37)
-			s.Add(ShapeAnd(cyl, slab), Diffuse1(0.95))
-		}
-	}
-	s.AddLight(PointLight(Vec{3, 12, 6}, 130))
-
-	cam := Camera(1)
-	cam.Transl(Vec{0, 4, 0})
-	cam.Transf(RotX(-15 * deg))
-	t.CompareCam(s, "010-checkers", cam)
+	t.Compare(e, Camera(0), "002-behindcam")
 }
 
-func TestDice1(tst *testing.T) {
+// Test normal vectors
+func TestNormal(tst *testing.T) {
 	t := Helper(tst)
 
-	s := NewEnv()
-	s.amb = func(Vec) Color { return 0.1 }
-	cube := Box(Vec{0, 0, 0}, -1, -1, -1)
+	e := NewEnv()
+	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)))
+	e.Add(Object(Sphere(Vec{-0.5, 0, 2}, 0.25), ShadeNormal(Ex)))
+	e.Add(Object(Sphere(Vec{0.5, 0, 2}, 0.25), ShadeNormal(Ey)))
 
-	die := cube
-	const r = 0.15
-	die = ShapeMinus(die, Sphere(Vec{0, 0, -0.9}, r))
-	die = ShapeMinus(die, Sphere(Vec{0.5, 0.5, -0.9}, r))
-	die = ShapeMinus(die, Sphere(Vec{-0.5, 0.5, -0.9}, r))
-	die = ShapeMinus(die, Sphere(Vec{0.5, -0.5, -0.9}, r))
-	die = ShapeMinus(die, Sphere(Vec{-0.5, -0.5, -0.9}, r))
-
-	die = ShapeMinus(die, Sphere(Vec{0.4, 1.1, -0.4}, r))
-	die = ShapeMinus(die, Sphere(Vec{-0.4, 1.1, 0.4}, r))
-
-	die = ShapeAnd(die, Sphere(Vec{}, 0.98*math.Sqrt(2.)))
-
-	s.Add(die, Diffuse1(0.9))
-
-	s.Add(Sheet(-1, Ey), Diffuse1(0.5))
-
-	s.AddLight(PointLight(Vec{2, 3, -3}, 15))
-
-	cam := Camera(1)
-	cam.Transl(Vec{0, 4, -6})
-	cam.Transf(RotX(-15 * deg))
-	t.CompareCam(s, "011-dice", cam)
+	t.Compare(e, Camera(0), "003-normals")
 }
+
+// Test camera translation
+func TestCamTransl(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)))
+
+	t.Compare(e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
+}
+
+// Test camera rotation
+func TestCamRot(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 0.5
+	nz := ShadeNormal(Ez)
+	e.Add(Object(Sphere(Vec{0, 0, 0}, r), nz))
+	e.Add(Object(Sphere(Vec{0, 0, 2}, r), nz))
+	e.Add(Object(Sphere(Vec{0, 0, 4}, r), nz))
+
+	e.Add(Object(Sphere(Vec{2, 0, 0}, r), nz))
+	e.Add(Object(Sphere(Vec{2, 0, 2}, r), nz))
+	e.Add(Object(Sphere(Vec{2, 0, 4}, r), nz))
+
+	e.Add(Object(Sphere(Vec{-2, 0, 0}, r), nz))
+	e.Add(Object(Sphere(Vec{-2, 0, 2}, r), nz))
+	e.Add(Object(Sphere(Vec{-2, 0, 4}, r), nz))
+
+	t.Compare(e, Camera(1).Transl(0, 4, -4).Transf(RotX4(pi/5)), "005-camrot")
+}
+
+// Test object transform
+func TestObjTransf(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 0.25
+	sx := Object(Sphere(Vec{-0.5, 0, 2}, r), ShadeNormal(Ex))
+	sy := Object(Sphere(Vec{0, 0, 2}, r), ShadeNormal(Ez))
+	sz := Object(Sphere(Vec{0.5, 0, 2}, r), ShadeNormal(Ey))
+
+	rot := RotZ4(pi / 4)
+	e.Add(Transf(sx, rot))
+	e.Add(Transf(sy, rot))
+	e.Add(Transf(sz, rot))
+
+	t.Compare(e, Camera(0), "006-objtransf")
+}
+
+// Test intersection of two spheres
+func TestObjAnd(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 0.5
+	s1 := Object(Sphere(Vec{-r / 2, 0, 2}, r), ShadeNormal(Ez))
+	s2 := Object(Sphere(Vec{r / 2, 0, 2}, r), ShadeNormal(Ey))
+	s := ObjAnd(s1, s2)
+	e.Add(s)
+
+	t.Compare(e, Camera(0), "007-objand")
+}
+
+// Test two partially overlapping spheres
+func TestOverlap(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 0.5
+	s1 := Object(Sphere(Vec{-r / 2, 0, 2}, r), ShadeNormal(Ez))
+	s2 := Object(Sphere(Vec{r / 2, 0, 2}, r), ShadeNormal(Ey))
+	e.Add(s1)
+	e.Add(s2)
+
+	t.Compare(e, Camera(0), "008-overlap")
+}
+
+// Make a cube out of 3 intersecting slabs
+func TestSlabIntersect(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	r := 1.
+	s1 := Object(Slab(Ex, -r, r), Flat(RED))
+	s2 := Object(Slab(Ey, -r, r), Flat(GREEN))
+	s3 := Object(Slab(Ez, -r, r), Flat(BLUE))
+	cube := ObjAnd(ObjAnd(s1, s2), s3)
+	cube = Transf(cube, RotY4(160*deg).Mul(RotX4(20*deg)))
+	e.Add(cube)
+
+	t.Compare(e, Camera(1).Transl(0, 0, -4), "009-slabintersect")
+}
+
+// Make a cube out of 3 intersecting slabs
+//func TestSheet(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	e := NewEnv()
+//	s1 := Object(Sheet(Ey, -1), Flat(GREEN))
+//	s2 := Object(Sheet(Ey, 1), Flat(BLUE))
+//	e.Add(s1, s2)
+//
+//	t.Compare(e, Camera(1), "010-sheet")
+//}
+
+//func TestSpheres(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	scene := NewEnv()
+//	scene.amb = func(v Vec) Color { return Color(0.2*v.Y + 0.2) }
+//	scene.Add(Sheet(-3, Ey), Diffuse1(0.5))  // floor
+//	scene.Add(Sheet(8, Ey), Diffuse1(0.5))   // ceiling
+//	scene.Add(Sheet(20, Ez), Diffuse1(0.8))  // back
+//	scene.Add(Sheet(-5, Ez), Diffuse1(0.8))  // front
+//	scene.Add(Sheet(10, Ex), Diffuse1(0.8))  // left
+//	scene.Add(Sheet(-10, Ex), Diffuse1(0.8)) // right
+//	scene.Add(Sphere(Vec{1, -2, 8}, 1), Reflective(0.3))
+//	scene.Add(Sphere(Vec{-1, -2, 6}, 1), Diffuse1(0.95))
+//	scene.AddLight(PointLight(Vec{0, 7, 1}, 100))
+//
+//	cam := Camera(1)
+//	cam.Transf(RotX(-5 * deg))
+//	t.CompareCam(scene, "009-spheres", cam)
+//}
+//
+//func TestCheckers(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	s := NewEnv()
+//	s.amb = func(dir Vec) Color { return 0.5 }
+//
+//	s.Add(Sheet(0, Ey), Diffuse1(0.7))                                                      // floor
+//	s.Add(Box(Vec{0, 0, 8}, 5, 0.45, 5), Diffuse1(0.1))                                     // base
+//	s.Add(Rect(Vec{0, 0.5, 8}, Ey, 4, inf, 4), CheckBoard(Reflective(0.05), Diffuse1(0.9))) // checkboard
+//	s.Add(Sheet(20, Ez), Diffuse1(0.7))                                                     // back
+//	s.Add(Sheet(20, Ey), Diffuse1(0.6))                                                     // ceiling
+//	slab := Slab(0, 0.7)
+//	for j := 0.; j < 2; j++ {
+//		for i := j; i < 8; i += 2 {
+//			cyl := Cylinder(Vec{j - 3.5, -1.5, i + 4.5}, 0.37)
+//			s.Add(ShapeAnd(cyl, slab), Reflective(0.05))
+//
+//			cyl = Cylinder(Vec{j + 2.5, -1.5, i + 4.5}, 0.37)
+//			s.Add(ShapeAnd(cyl, slab), Diffuse1(0.95))
+//		}
+//	}
+//	s.AddLight(PointLight(Vec{3, 12, 6}, 130))
+//
+//	cam := Camera(1)
+//	cam.Transl(Vec{0, 4, 0})
+//	cam.Transf(RotX(-15 * deg))
+//	t.CompareCam(s, "010-checkers", cam)
+//}
+//
+//func TestDice1(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	s := NewEnv()
+//	s.amb = func(Vec) Color { return 0.1 }
+//	cube := Box(Vec{0, 0, 0}, -1, -1, -1)
+//
+//	die := cube
+//	const r = 0.15
+//	die = ShapeMinus(die, Sphere(Vec{0, 0, -0.9}, r))
+//	die = ShapeMinus(die, Sphere(Vec{0.5, 0.5, -0.9}, r))
+//	die = ShapeMinus(die, Sphere(Vec{-0.5, 0.5, -0.9}, r))
+//	die = ShapeMinus(die, Sphere(Vec{0.5, -0.5, -0.9}, r))
+//	die = ShapeMinus(die, Sphere(Vec{-0.5, -0.5, -0.9}, r))
+//
+//	die = ShapeMinus(die, Sphere(Vec{0.4, 1.1, -0.4}, r))
+//	die = ShapeMinus(die, Sphere(Vec{-0.4, 1.1, 0.4}, r))
+//
+//	die = ShapeAnd(die, Sphere(Vec{}, 0.98*math.Sqrt(2.)))
+//
+//	s.Add(die, Diffuse1(0.9))
+//
+//	s.Add(Sheet(-1, Ey), Diffuse1(0.5))
+//
+//	s.AddLight(PointLight(Vec{2, 3, -3}, 15))
+//
+//	cam := Camera(1)
+//	cam.Transl(Vec{0, 4, -6})
+//	cam.Transf(RotX(-15 * deg))
+//	t.CompareCam(s, "011-dice", cam)
+//}
 
 // Two flat-shaded spheres, partially overlapping.
 //func TestOverlap(tst *testing.T) {
@@ -124,17 +263,17 @@ func TestDice1(tst *testing.T) {
 //}
 
 // Intersection of flat-shaded spheres
-func TestIntersect(tst *testing.T) {
-	t := Helper(tst)
-
-	const r = 0.25
-	s1 := &object{Sphere(Vec{-r / 2, 0, 3}, r), Flat(1)}
-	s2 := &object{Sphere(Vec{r / 2, 0, 3}, r), Flat(0.5)}
-	s := NewEnv()
-	s.objs = append(s.objs, &objAnd{s1, s2})
-
-	t.Compare(s, "003-intersect")
-}
+//func TestIntersect(tst *testing.T) {
+//	t := Helper(tst)
+//
+//	const r = 0.25
+//	s1 := &object{Sphere(Vec{-r / 2, 0, 3}, r), Flat(1)}
+//	s2 := &object{Sphere(Vec{r / 2, 0, 3}, r), Flat(0.5)}
+//	s := NewEnv()
+//	s.objs = append(s.objs, &objAnd{s1, s2})
+//
+//	t.Compare(s, "003-intersect")
+//}
 
 //// Intersection of spheres, as shapes (not objects)
 //func TestIntersectShape(tst *testing.T) {
@@ -236,28 +375,24 @@ func TestIntersect(tst *testing.T) {
 //	t.CompareCam(s, "008-reflections", cam)
 //}
 
-type helper struct {
-	*testing.T
-}
+//func (t helper) Compare(s *Env, name string) {
+//	t.Helper()
+//	cam := Camera(0)
+//	t.CompareCam(s, name, cam)
+//}
 
-func Helper(tst *testing.T) helper {
-	return helper{tst}
-}
-
-func (t helper) Compare(s *Env, name string) {
+func (t helper) Compare(s *Env, cam *Cam, name string) {
 	t.Helper()
-	cam := Camera(0)
-	t.CompareCam(s, name, cam)
-}
+	os.Mkdir("out", 0777)
 
-func (t helper) CompareCam(s *Env, name string, cam *Cam) {
-	t.Helper()
-	out := name + ".png"
+	name = name + ".png"
+	have := "out/" + name
+	want := "testdata/" + name
+
 	img := MakeImage(testW, testH)
-	cam.Render(s, img)
-	Encode(img, out, 1/(float64(cam.N)), false)
-	ref := "testdata/" + out
-	deviation, err := imgComp(out, ref)
+	cam.Render(s, testRec, img)
+	Encode(img, have)
+	deviation, err := imgComp(have, want)
 
 	if err != nil {
 		t.Fatal(err)

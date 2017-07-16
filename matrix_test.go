@@ -1,69 +1,62 @@
-package main
+package bruteray
 
 import (
 	"fmt"
-	"testing"
 )
 
-func TestMatrix(tst *testing.T) {
-	//t := Helper(tst)
+func ExampleMatrix4_Mul() {
 
-	A := Matrix{
-		{1, 0, 0},
-		{0, 0, 1},
-		{0, -1, 0},
-	}
+	I := UnitMatrix4()
+	I = I.Mul(I)
+	fmt.Println(I)
 
-	b := Vec{2, 0, 0}
-	fmt.Println(b.Transf(&A))
+	T := Transl4(Vec{2, 3, 4})
+	fmt.Println(I.Mul(T))
+	fmt.Println(T.Mul(I))
 
-	b = Vec{0, 2, 0}
-	fmt.Println(b.Transf(&A))
-
-	b = Vec{0, 0, 2}
-	fmt.Println(b.Transf(&A))
-	fmt.Println()
-
-	B := Matrix{
-		{1, 2, 3},
-		{4, 5, 6},
-		{7, 8, 9},
-	}
-
-	fmt.Println(A.Mul(&B))
-	fmt.Println()
-	fmt.Println(B.Mul(&A))
+	// Output:
+	//[1 0 0 0]
+	//[0 1 0 0]
+	//[0 0 1 0]
+	//[0 0 0 1]
+	//
+	//[1 0 0 2]
+	//[0 1 0 3]
+	//[0 0 1 4]
+	//[0 0 0 1]
+	//
+	//[1 0 0 2]
+	//[0 1 0 3]
+	//[0 0 1 4]
+	//[0 0 0 1]
 }
 
-func TestMatrix4(tst *testing.T) {
+func ExampleMatrix4_Inv() {
+	T := Transl4(Vec{2, 3, 4}).Mul(RotX4(pi / 2).Mul(Transl4(Vec{1, 2, -3})).Mul(RotY4(pi / 2)))
+	//fmt.Println(T)
+	fmt.Println(T.Mul(T.Inv()))
+	fmt.Println(T.Inv().Mul(T))
+	// Output:
+	//[1 0 0 0]
+	//[0 1 0 0]
+	//[0 0 1 0]
+	//[0 0 0 1]
+	//
+	//[1 0 0 0]
+	//[0 1 0 0]
+	//[0 0 1 0]
+	//[0 0 0 1]
+}
 
-	//T := Transl4(Vec{1, 2, 3})
+func ExampleRay_Transf() {
+	T := Transl4(Vec{2, 3, -1})
+	r := Ray{Vec{4, 3, 2}, Vec{-1, -2, -3}}
+	r.Transf(T)
+	fmt.Println(r)
+	r.Transf(T.Inv())
+	fmt.Println(r)
 
-	//a := Vec{-2, 3, -1}
-
-	//fmt.Println(T.TransfPoint(a))
-	//fmt.Println(T.TransfDir(a))
-
-	//T = RotX4(pi / 2)
-
-	//fmt.Println(T.TransfPoint(a))
-	//fmt.Println(T.TransfDir(a))
-
-	//a = Vec{1, 2, 3}
-	//tr := Transl4(Vec{10, 10, 10})
-	//rot := RotX4(pi / 2)
-
-	//_ = tr
-	//_ = rot
-
-	//T = *(tr.Mul(&rot))
-	////T = *(rot.Mul(&tr))
-	////T = tr
-	////T = rot
-
-	//fmt.Println(&T)
-
-	//fmt.Println()
-	//fmt.Println(T.TransfPoint(a))
-	////fmt.Println(T.TransfDir(a))
+	// Output:
+	//{[6 6 1] [-1 -2 -3]}
+	//{[4 3 2] [-1 -2 -3]}
 }

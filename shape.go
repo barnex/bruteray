@@ -1,75 +1,85 @@
-package main
+package bruteray
+
+import (
+	"math"
+)
 
 type Shape interface {
 	Inters(r *Ray) Interval
-	Normal(r *Ray, t float64) Vec
+	Normal(pos Vec) Vec
 }
 
-// Numerical approximation of normal vector
-func NumNormal(s Shape, r *Ray, t float64) Vec {
-	t0 := s.Inters(r).Min
-	if t0 < 0 {
-		return Vec{}
-	}
-	c := r.At(t0)
+// -- sphere
 
-	perp1 := Vec{-r.Dir.Z, 0, r.Dir.X}.Normalized()
-	perp2 := r.Dir.Cross(perp1) // Thanks trijnewijn.
-
-	const diff = 1. / (1024 * 1024)
-	ra := r
-	ra.Dir = r.Dir.MAdd(t*diff, perp1).Normalized()
-	t1 := s.Inters(ra).Min
-	if t1 < 0 {
-		return Vec{}
-	}
-	a := ra.At(t1)
-
-	rb := r
-	rb.Dir = r.Dir.MAdd(t*diff, perp2).Normalized()
-	t2 := s.Inters(rb).Min
-	if t2 < 0 {
-		return Vec{}
-	}
-	b := rb.At(t2)
-
-	a = a.Sub(c)
-	b = b.Sub(c)
-	n := b.Cross(a).Normalized()
-
-	return n.Towards(r.Dir)
+func Sphere(center Vec, radius float64) *sphere {
+	return &sphere{center, Sqr(radius)}
 }
 
-func (n Vec) Towards(d Vec) Vec {
-	if n.Dot(d) > 0 {
-		return n.Mul(-1)
-	}
+type sphere struct {
+	c  Vec
+	r2 float64
+}
+
+func (s *sphere) Normal(pos Vec) Vec {
+	n := pos.Sub(s.c).Normalized()
 	return n
 }
 
-func Transf(s Shape, T *Matrix4) Shape {
-	return &transShape{s, *T}
-}
-
-type transShape struct {
-	orig   Shape
-	transf Matrix4
-}
-
-var _ Shape = &transShape{}
-
-func (s *transShape) Inters(r *Ray) Interval {
-	r2 := transRay(r, &s.transf)
-	return s.orig.Inters(&r2)
-}
-
-func (s *transShape) Normal(r *Ray, t float64) Vec {
-	return NumNormal(s, r, t)
-}
-
-func transRay(r *Ray, T *Matrix4) Ray {
-	return Ray{
-		Start: T.TransfPoint(r.Start),
-		Dir:   T.TransfDir(r.Dir),
+func (s *sphere) Inters(r *Ray) Interval {
+	v := r.Start.Sub(s.c)
+	d := r.Dir
+	vd := v.Dot(d)
+	D := Sqr(vd) - (v.Len2() - s.r2)
+	if D < 0 {
+		return Interval{}
 	}
+	t1 := (-vd - math.Sqrt(D))
+	t2 := (-vd + math.Sqrt(D))
+	return Interv(t1, t2)
+}
+
+// -- sheet
+
+func Sheet(dir Vec, off float64) *sheet {
+	return &sheet{dir, off}
+}
+
+type sheet struct {
+	dir Vec
+	off float64
+}
+
+func (s *sheet) Normal(pos Vec) Vec {
+	return s.dir
+}
+
+func (s *sheet) Inters(r *Ray) Interval {
+	rs := r.Start.Dot(s.dir)
+	rd := r.Dir.Dot(s.dir)
+	t := (s.off - rs) / rd
+	return Interval{t, t}
+}
+
+// -- slab
+
+func Slab(dir Vec, off1, off2 float64) *slab {
+	return &slab{dir, off1, off2}
+}
+
+type slab struct {
+	dir        Vec
+	off1, off2 float64
+}
+
+func (s *slab) Normal(pos Vec) Vec {
+	return s.dir
+}
+
+func (s *slab) Inters(r *Ray) Interval {
+	rs := r.Start.Dot(s.dir)
+	rd := r.Dir.Dot(s.dir)
+	t1 := (s.off1 - rs) / rd
+	t2 := (s.off2 - rs) / rd
+	t1, t2 = Sort(t1, t2)
+	return Interval{t1, t2}
 }

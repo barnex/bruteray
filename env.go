@@ -1,76 +1,42 @@
-package main
+package bruteray
 
-import (
-	"fmt"
-	"math"
-	"math/rand"
-)
-
+// Env stores the entire environment
+// (all objects, light sources, ... in the scene)
 type Env struct {
 	objs    []Obj
-	sources []Source
-	amb     func(Vec) Color
-	rand.Rand
-	seed int64
+	Ambient Surf
 }
 
 func NewEnv() *Env {
 	return &Env{
-		amb:  func(Vec) Color { return 0 },
-		seed: 1,
-		Rand: *rand.New(rand.NewSource(1)),
+		Ambient: Surf{T: inf, Material: Flat(BLACK)},
 	}
 }
 
-func (e *Env) AddObj(o Obj) {
-	e.objs = append(e.objs, o)
+func (e *Env) Add(o ...Obj) {
+	e.objs = append(e.objs, o...)
 }
 
-func (e *Env) Add(s Shape, sh Shader) {
-	e.AddObj(&object{s, sh})
-}
-func (e *Env) AddLight(s Source) {
-	e.sources = append(e.sources, s)
-}
-
+// Calculate intensity seen by ray,
+// with maximum recursion depth N.
 func (e *Env) Shade(r *Ray, N int) Color {
 	if N == 0 {
-		return e.Ambient(r.Dir)
+		return Color{}
 	}
-	t, obj := e.Hit(r)
-	if obj != nil {
-		return obj.Shade(e, r, t, N)
-	} else {
-		return e.Ambient(r.Dir)
-	}
-}
 
-func (e *Env) Hit(r *Ray) (float64, Obj) {
-	var (
-		minT   float64 = inf
-		shader Obj     = nil
-	)
+	surf := e.Ambient
+	surf.T = inf
 
-	for i, o := range e.objs {
-		ival := o.Inters(r)
-		if !ival.OK() || ival.Min < 0 {
+	for _, o := range e.objs {
+		bi := o.Inters(r)
+		if !bi.OK() {
 			continue
 		}
-		t := ival.Min
-		if t < 0 {
-			panic(fmt.Sprintf("object %v: %#v: t=%v", i, o, t))
-		}
-		if t < minT && t > 0 {
-			minT = t
-			shader = o
+		assert(bi.S1.T <= bi.S2.T)
+		if t := bi.S1.T; t < surf.T && t > 0 {
+			surf = bi.S1
 		}
 	}
-	if math.IsInf(minT, 0) {
-		minT = 0
-	}
-	return minT, shader
-}
 
-func (s *Env) Ambient(dir Vec) Color {
-	return s.amb(dir)
+	return surf.Shade(e, N-1, r)
 }

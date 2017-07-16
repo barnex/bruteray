@@ -1,4 +1,4 @@
-package r
+package bruteray
 
 type Material interface {
 	Shade(e *Env, N int, pos Vec, norm Vec) Color

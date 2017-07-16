@@ -1,4 +1,4 @@
-package r
+package main
 
 import "math"
 
@@ -7,35 +7,15 @@ const (
 	deg = pi / 180
 )
 
-var (
-	inf = math.Inf(1)
-)
+var inf = math.Inf(1)
 
-func Sqr(x float64) float64 {
+func sqr(x float64) float64 {
 	return x * x
 }
 
 func assert(t bool) {
 	if !t {
 		panic("assertion failed")
-	}
-}
-
-func sin(x float64) float64 {
-	switch x {
-	default:
-		return math.Sin(x)
-	case pi, -pi:
-		return 0
-	}
-}
-
-func cos(x float64) float64 {
-	switch x {
-	default:
-		return math.Cos(x)
-	case pi / 2, -pi / 2:
-		return 0
 	}
 }
 

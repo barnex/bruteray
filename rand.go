@@ -1,4 +1,4 @@
-package main
+package bruteray
 
 import "math/rand"
 

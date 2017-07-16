@@ -1,30 +1,35 @@
-package main
+package bruteray
 
 import (
 	"math"
+	"reflect"
 	"testing"
 )
 
-func testVec(t *testing.T, have, want Vec, tol float64) {
-	// go 1.9beta hack, TODO: remove
-	var ti interface{} = t
-	if h, ok := ti.(interface {
-		Helper()
-	}); ok {
-		h.Helper()
-	}
+type helper struct {
+	*testing.T
+}
 
-	fail :=
-		(math.Abs(have.X-want.X) > tol) ||
-			(math.Abs(have.Y-want.Y) > tol) ||
-			(math.Abs(have.Z-want.Z) > tol)
-	if fail {
-		t.Errorf("have %v, want %v", have, want)
+func Helper(tst *testing.T) helper {
+	tst.Parallel()
+	return helper{tst}
+}
+
+func (t helper) Eq(a, b interface{}) {
+	t.Helper()
+
+	if !reflect.DeepEqual(a, b) {
+		t.Errorf("have: %v, want: %v", a, b)
 	}
 }
 
-func testFloat(t *testing.T, have, want float64, tol float64) {
-	if math.Abs(have-want) > tol {
+func (t helper) EqVec(have, want Vec) {
+	const tol = 1e-6
+	fail :=
+		(math.Abs(have[X]-want[X]) > tol) ||
+			(math.Abs(have[Y]-want[Y]) > tol) ||
+			(math.Abs(have[Z]-want[Z]) > tol)
+	if fail {
 		t.Errorf("have %v, want %v", have, want)
 	}
 }

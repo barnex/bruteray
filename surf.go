@@ -1,4 +1,4 @@
-package r
+package bruteray
 
 type BiSurf struct {
 	S1, S2 Surf
