@@ -22,18 +22,33 @@ func (s *flat) Shade(e *Env, N int, pos, norm Vec) Color {
 
 // debug shader
 func ShadeNormal(dir Vec) Material {
-	return shadeNormal{dir}
+	return &shadeNormal{dir}
 }
 
 type shadeNormal struct {
 	dir Vec
 }
 
-func (s shadeNormal) Shade(e *Env, N int, pos, norm Vec) Color {
+func (s *shadeNormal) Shade(e *Env, N int, pos, norm Vec) Color {
 	v := norm.Dot(s.dir)
 	if v < 0 {
 		return RED.Mul(-v) // towards cam
 	} else {
 		return BLUE.Mul(v) // away from cam
 	}
+}
+
+// -- diffuse
+
+func Diffuse0(c Color) Material {
+	return &diffuse0{c}
+}
+
+type diffuse0 struct {
+	c Color
+}
+
+func (s *diffuse0) Shade(e *Env, N int, pos, norm Vec) Color {
+	// TODO
+	return s.c
 }
