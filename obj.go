@@ -60,13 +60,58 @@ func (o *transObj) Inters(r *Ray) BiSurf {
 
 // -- CSG
 
+// Intersection (boolean AND) of two objects.
 func ObjAnd(a, b Obj) Obj {
 	return &objAnd{a, b}
 }
 
-type objAnd struct{ a, b Obj }
+type objAnd struct {
+	a, b Obj
+}
 
 func (o *objAnd) Inters(r *Ray) BiSurf {
+	A := o.a.Inters(r)
+	if !A.OK() {
+		return A
+	}
+
+	B := o.b.Inters(r)
+	if !B.OK() {
+		return B
+	}
+
+	if A.Max() < B.Min() || B.Max() < A.Min() {
+		return BiSurf{}
+	}
+
+	var bi BiSurf
+
+	if A.Min() > B.Min() {
+		bi.S1 = A.S1
+	} else {
+		bi.S1 = B.S1
+	}
+
+	if A.Max() < B.Max() {
+		bi.S2 = A.S2
+	} else {
+		bi.S2 = B.S2
+	}
+
+	return bi
+}
+
+// Carve away object b from a.
+func ObjMinus(a, b Obj) Obj {
+	return &objMinus{a, b}
+}
+
+type objMinus struct {
+	a, b Obj
+}
+
+func (o *objMinus) Inters(r *Ray) BiSurf {
+	panic("todo")
 	A := o.a.Inters(r)
 	if !A.OK() {
 		return A

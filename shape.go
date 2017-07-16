@@ -43,6 +43,60 @@ func (s *sphere) Inters(r *Ray) Interval {
 	return Interv(t1, t2)
 }
 
+// -- box (axis aligned)
+
+type box struct {
+	//c        Vec
+	min, max Vec
+}
+
+func Box(center Vec, rx, ry, rz float64) Shape {
+	return &box{
+		//c:   center,
+		min: center.Sub(Vec{rx, ry, rz}),
+		max: center.Add(Vec{rx, ry, rz}),
+	}
+}
+
+func (s *box) Inters(r *Ray) Interval {
+	min := s.min
+	max := s.max
+
+	tmin := min.Sub(r.Start).Div3(r.Dir)
+	tmax := max.Sub(r.Start).Div3(r.Dir)
+
+	txen := Min(tmin[X], tmax[X])
+	txex := Max(tmin[X], tmax[X])
+
+	tyen := Min(tmin[Y], tmax[Y])
+	tyex := Max(tmin[Y], tmax[Y])
+
+	tzen := Min(tmin[Z], tmax[Z])
+	tzex := Max(tmin[Z], tmax[Z])
+
+	ten := Max3(txen, tyen, tzen)
+	tex := Min3(txex, tyex, tzex)
+
+	if ten > tex {
+		return Interval{}
+	}
+
+	return Interval{ten, tex}
+}
+
+func (s *box) Normal(p Vec) Vec {
+	for i := range p {
+		if approx(p[i], s.min[i]) || approx(p[i], s.max[i]) {
+			return Unit[i]
+		}
+	}
+	panic("box.normal")
+}
+
+func approx(a, b float64) bool {
+	return math.Abs(a-b) < 1e-6
+}
+
 // -- sheet (infinite)
 
 func Sheet(dir Vec, off float64) Shape {

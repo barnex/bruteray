@@ -4,10 +4,12 @@ import "math"
 
 type Vec [3]float64
 
+var Unit = Matrix3{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
+
 var (
-	Ex = Vec{1, 0, 0}
-	Ey = Vec{0, 1, 0}
-	Ez = Vec{0, 0, 1}
+	Ex = Unit[X]
+	Ey = Unit[Y]
+	Ez = Unit[Z]
 )
 
 const (

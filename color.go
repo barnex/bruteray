@@ -28,6 +28,11 @@ func (c Color) Mul(s float64) Color {
 	return Color{s * c.R, s * c.G, s * c.B}
 }
 
+// Exposure value, 2^exp.
+func EV(exp float64) float64 {
+	return math.Pow(2, exp)
+}
+
 // linear to sRGB gamma curve
 // https://en.wikipedia.org/wiki/SRGB
 func srgb(c float64) float64 {

@@ -14,8 +14,8 @@ const (
 
 // Test a flat sphere
 func TestSphere(t *testing.T) {
-
 	e := NewEnv()
+
 	e.Add(Object(Sphere(Vec{0, 0, 1}, 0.25), Flat(WHITE)))
 	c := Camera(0)
 
@@ -24,8 +24,8 @@ func TestSphere(t *testing.T) {
 
 // Test a sphere behind the camera
 func TestBehindCam(t *testing.T) {
-
 	e := NewEnv()
+
 	e.Add(Object(Sphere(Vec{0, 0, -1}, 0.25), Flat(WHITE)))
 
 	Compare(t, e, Camera(0), "002-behindcam")
@@ -33,8 +33,8 @@ func TestBehindCam(t *testing.T) {
 
 // Test normal vectors
 func TestNormal(t *testing.T) {
-
 	e := NewEnv()
+
 	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)))
 	e.Add(Object(Sphere(Vec{-0.5, 0, 2}, 0.25), ShadeNormal(Ex)))
 	e.Add(Object(Sphere(Vec{0.5, 0, 2}, 0.25), ShadeNormal(Ey)))
@@ -44,8 +44,8 @@ func TestNormal(t *testing.T) {
 
 // Test camera translation
 func TestCamTransl(t *testing.T) {
-
 	e := NewEnv()
+
 	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)))
 
 	Compare(t, e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
@@ -53,18 +53,16 @@ func TestCamTransl(t *testing.T) {
 
 // Test camera rotation
 func TestCamRot(t *testing.T) {
-
 	e := NewEnv()
+
 	r := 0.5
 	nz := ShadeNormal(Ez)
 	e.Add(Object(Sphere(Vec{0, 0, 0}, r), nz))
 	e.Add(Object(Sphere(Vec{0, 0, 2}, r), nz))
 	e.Add(Object(Sphere(Vec{0, 0, 4}, r), nz))
-
 	e.Add(Object(Sphere(Vec{2, 0, 0}, r), nz))
 	e.Add(Object(Sphere(Vec{2, 0, 2}, r), nz))
 	e.Add(Object(Sphere(Vec{2, 0, 4}, r), nz))
-
 	e.Add(Object(Sphere(Vec{-2, 0, 0}, r), nz))
 	e.Add(Object(Sphere(Vec{-2, 0, 2}, r), nz))
 	e.Add(Object(Sphere(Vec{-2, 0, 4}, r), nz))
@@ -74,8 +72,8 @@ func TestCamRot(t *testing.T) {
 
 // Test object transform
 func TestObjTransf(t *testing.T) {
-
 	e := NewEnv()
+
 	r := 0.25
 	sx := Object(Sphere(Vec{-0.5, 0, 2}, r), ShadeNormal(Ex))
 	sy := Object(Sphere(Vec{0, 0, 2}, r), ShadeNormal(Ez))
@@ -91,8 +89,8 @@ func TestObjTransf(t *testing.T) {
 
 // Test intersection of two spheres
 func TestObjAnd(t *testing.T) {
-
 	e := NewEnv()
+
 	r := 0.5
 	s1 := Object(Sphere(Vec{-r / 2, 0, 2}, r), ShadeNormal(Ez))
 	s2 := Object(Sphere(Vec{r / 2, 0, 2}, r), ShadeNormal(Ey))
@@ -104,8 +102,8 @@ func TestObjAnd(t *testing.T) {
 
 // Test two partially overlapping spheres
 func TestOverlap(t *testing.T) {
-
 	e := NewEnv()
+
 	r := 0.5
 	s1 := Object(Sphere(Vec{-r / 2, 0, 2}, r), ShadeNormal(Ez))
 	s2 := Object(Sphere(Vec{r / 2, 0, 2}, r), ShadeNormal(Ey))
@@ -117,8 +115,8 @@ func TestOverlap(t *testing.T) {
 
 // Make a cube out of 3 intersecting slabs
 func TestSlabIntersect(t *testing.T) {
-
 	e := NewEnv()
+
 	r := 1.
 	s1 := Object(Slab(Ex, -r, r), Flat(RED))
 	s2 := Object(Slab(Ey, -r, r), Flat(GREEN))
@@ -132,8 +130,8 @@ func TestSlabIntersect(t *testing.T) {
 
 // Use sheets as green grass, blue sky and wall
 func TestSheet(t *testing.T) {
-
 	e := NewEnv()
+
 	s1 := Object(Sheet(Ey, -1), Flat(GREEN))
 	s2 := Object(Sheet(Ey, 4), Flat(BLUE))
 	s3 := Object(Sheet(Ex, -10), Flat(WHITE))
@@ -145,8 +143,8 @@ func TestSheet(t *testing.T) {
 
 // Test rectangles
 func TestRect(t *testing.T) {
-
 	e := NewEnv()
+
 	const d = 0.5
 	const z = 10
 	nz := ShadeNormal(Ez)
@@ -159,6 +157,19 @@ func TestRect(t *testing.T) {
 	e.Add(r1, r2, r3)
 
 	Compare(t, e, Camera(0), "011-rect")
+}
+
+// Test Axis Aligned Box
+func TestBox(t *testing.T) {
+	e := NewEnv()
+
+	nz := ShadeNormal(Ez)
+	b := Object(Box(Vec{0, 0, 0}, 2, 1, 1), nz)
+	b = Transf(b, RotY4(150*deg))
+	g := Object(Sheet(Ey, -1), Flat(GREEN.Mul(EV(-4))))
+	e.Add(b, g)
+
+	Compare(t, e, Camera(1).Transl(0, 0, -4), "012-box")
 }
 
 //func TestSpheres(tst *testing.T) {
