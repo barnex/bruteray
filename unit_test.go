@@ -168,3 +168,16 @@ func TestBox(t *testing.T) {
 
 	Compare(t, e, Camera(1).Transl(0, 0, -4), "012-box")
 }
+
+//func TestDiffuse0(t *testing.T) {
+//	e := NewEnv()
+//
+//	g := Object(Sheet(Ey, -1), Diffuse0(WHITE.Mul(EV(-1))))
+//	s := Object(Sphere(Vec{}, 1), Diffuse0(WHITE))
+//	e.Add(g, s)
+//
+//	//l := PointLight(Vec{1, 1, -1}, WHITE.Mul(EV(8)))
+//	//e.AddLight(l)
+//
+//	Compare(t, e, Camera(1).Transl(0, 0, -4), "013-diffuse0")
+//}
