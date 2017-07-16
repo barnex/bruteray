@@ -15,6 +15,15 @@ type Color struct {
 	R, G, B float64
 }
 
+// Implements color.Color.
+func (c Color) RGBA() (r, g, b, a uint32) {
+	r = uint32(srgb(c.R) * 0xffff)
+	g = uint32(srgb(c.G) * 0xffff)
+	b = uint32(srgb(c.B) * 0xffff)
+
+	return r, g, b, 0xffff
+}
+
 func (c Color) Mul(s float64) Color {
 	return Color{s * c.R, s * c.G, s * c.B}
 }

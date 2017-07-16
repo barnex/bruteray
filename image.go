@@ -26,17 +26,7 @@ func (i Image) Bounds() image.Rectangle {
 }
 
 func (img Image) At(i, j int) color.Color {
-	c := img[j][i]
-
-	c.R = srgb(c.R)
-	c.G = srgb(c.G)
-	c.B = srgb(c.B)
-
-	r := uint8(c.R * ((1 << 8) - 1))
-	g := uint8(c.G * ((1 << 8) - 1))
-	b := uint8(c.B * ((1 << 8) - 1))
-
-	return color.RGBA{r, g, b, 255}
+	return img[j][i]
 }
 
 func (i Image) ColorModel() color.Model {
