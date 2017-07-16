@@ -139,17 +139,19 @@ func TestSlabIntersect(tst *testing.T) {
 	t.Compare(e, Camera(1).Transl(0, 0, -4), "009-slabintersect")
 }
 
-// Make a cube out of 3 intersecting slabs
-//func TestSheet(tst *testing.T) {
-//	t := Helper(tst)
-//
-//	e := NewEnv()
-//	s1 := Object(Sheet(Ey, -1), Flat(GREEN))
-//	s2 := Object(Sheet(Ey, 1), Flat(BLUE))
-//	e.Add(s1, s2)
-//
-//	t.Compare(e, Camera(1), "010-sheet")
-//}
+// Use sheets as green grass, blue sky and wall
+func TestSheet(tst *testing.T) {
+	t := Helper(tst)
+
+	e := NewEnv()
+	s1 := Object(Sheet(Ey, -1), Flat(GREEN))
+	s2 := Object(Sheet(Ey, 4), Flat(BLUE))
+	s3 := Object(Sheet(Ex, -10), Flat(WHITE))
+	s4 := Object(Sphere(Vec{1.5, 0, 3}, 1), ShadeNormal(Ez))
+	e.Add(s1, s2, s3, s4)
+
+	t.Compare(e, Camera(1), "010-sheet")
+}
 
 //func TestSpheres(tst *testing.T) {
 //	t := Helper(tst)
