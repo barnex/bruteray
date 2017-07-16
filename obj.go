@@ -4,12 +4,7 @@ type Obj interface {
 	Inters(r *Ray) BiSurf
 }
 
-//func ObjShade(o Obj, e *Env, N int, r *Ray) Color {
-//	bi := o.Inters(r)
-//	return bi.S1.Shade(e, N, r)
-//}
-
-// -- Primitive Object
+// -- Primitive Object (shape + material)
 
 func Object(s Shape, m Material) Obj {
 	return &prim{s, m}

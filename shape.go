@@ -16,7 +16,7 @@ type Shape interface {
 
 // -- sphere
 
-func Sphere(center Vec, radius float64) *sphere {
+func Sphere(center Vec, radius float64) Shape {
 	return &sphere{center, Sqr(radius)}
 }
 
@@ -45,7 +45,7 @@ func (s *sphere) Inters(r *Ray) Interval {
 
 // -- sheet (infinite)
 
-func Sheet(dir Vec, off float64) *sheet {
+func Sheet(dir Vec, off float64) Shape {
 	return &sheet{dir, off}
 }
 
@@ -97,7 +97,7 @@ func (s *rect) Normal(p Vec) Vec {
 
 // -- slab
 
-func Slab(dir Vec, off1, off2 float64) *slab {
+func Slab(dir Vec, off1, off2 float64) Shape {
 	return &slab{dir, off1, off2}
 }
 
