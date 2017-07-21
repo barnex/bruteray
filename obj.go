@@ -111,34 +111,32 @@ type objMinus struct {
 }
 
 func (o *objMinus) Inters(r *Ray) BiSurf {
-	panic("todo")
+	// not intersecting A = not intersecting anything
 	A := o.a.Inters(r)
 	if !A.OK() {
-		return A
-	}
-
-	B := o.b.Inters(r)
-	if !B.OK() {
-		return B
-	}
-
-	if A.Max() < B.Min() || B.Max() < A.Min() {
 		return BiSurf{}
 	}
 
-	var bi BiSurf
-
-	if A.Min() > B.Min() {
-		bi.S1 = A.S1
-	} else {
-		bi.S1 = B.S1
+	// not intersecting b = intersecting A fully
+	B := o.b.Inters(r)
+	if !B.OK() {
+		return A
 	}
 
-	if A.Max() < B.Max() {
+	// disjoint intervals =  intersecting A fully
+	if A.Max() < B.Min() || B.Max() < A.Min() {
+		return A
+	}
+
+	// non-trivial cases
+	var bi BiSurf
+	if B.Min() < A.Min() {
+		bi.S1 = B.S2
 		bi.S2 = A.S2
 	} else {
-		bi.S2 = B.S2
+		bi.S1 = B.S1
+		bi.S2 = A.S1
 	}
-
+	bi.Normalize()
 	return bi
 }

@@ -187,12 +187,18 @@ func TestDiffuse0(t *testing.T) {
 //
 //	g := Object(Sheet(Ey, 0), Diffuse0(WHITE.Mul(EV(-1))))
 //	r := 0.8
+//
 //	b := Object(Box(Vec{}, r, r, r), Diffuse0(WHITE.Mul(EV(-0))))
 //	s := Object(Sphere(Vec{}, 1), Diffuse0(WHITE))
-//	e.Add(g, s, b)
 //
-//	l := DirLight(Vec{2, 0.5, -4}, WHITE.Mul(EV(0)))
+//	dome := ObjMinus(b, s)
+//
+//	e.Add(g, dome)
+//
+//	l := DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
 //	e.AddLight(l)
 //
 //	Compare(t, e, Camera(1).Transl(0, 1, -2).Transf(RotX4(10*deg)), "014-objminus")
 //}
+
+//todo: unit test cube intersect, unit test objminus
