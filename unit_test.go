@@ -169,15 +169,30 @@ func TestBox(t *testing.T) {
 	Compare(t, e, Camera(1).Transl(0, 0, -4), "012-box")
 }
 
-//func TestDiffuse0(t *testing.T) {
+func TestDiffuse0(t *testing.T) {
+	e := NewEnv()
+
+	g := Object(Sheet(Ey, -1), Diffuse0(WHITE.Mul(EV(-1))))
+	s := Object(Sphere(Vec{}, 1), Diffuse0(WHITE))
+	e.Add(g, s)
+
+	l := DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
+	e.AddLight(l)
+
+	Compare(t, e, Camera(1).Transl(0, 0, -4), "013-diffuse0")
+}
+
+//func TestObjMinus(t *testing.T) {
 //	e := NewEnv()
 //
-//	g := Object(Sheet(Ey, -1), Diffuse0(WHITE.Mul(EV(-1))))
+//	g := Object(Sheet(Ey, 0), Diffuse0(WHITE.Mul(EV(-1))))
+//	r := 0.8
+//	b := Object(Box(Vec{}, r, r, r), Diffuse0(WHITE.Mul(EV(-0))))
 //	s := Object(Sphere(Vec{}, 1), Diffuse0(WHITE))
-//	e.Add(g, s)
+//	e.Add(g, s, b)
 //
-//	//l := PointLight(Vec{1, 1, -1}, WHITE.Mul(EV(8)))
-//	//e.AddLight(l)
+//	l := DirLight(Vec{2, 0.5, -4}, WHITE.Mul(EV(0)))
+//	e.AddLight(l)
 //
-//	Compare(t, e, Camera(1).Transl(0, 0, -4), "013-diffuse0")
+//	Compare(t, e, Camera(1).Transl(0, 1, -2).Transf(RotX4(10*deg)), "014-objminus")
 //}

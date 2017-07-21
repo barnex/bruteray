@@ -64,6 +64,14 @@ func Max(x, y float64) float64 {
 	return y
 }
 
+// Rectify: max(x, 0)
+func Re(x float64) float64 {
+	if x < 0 {
+		return 0
+	}
+	return x
+}
+
 func Max3(x, y, z float64) float64 {
 	max := x
 	if y > max {

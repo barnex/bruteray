@@ -6,6 +6,7 @@ type Material interface {
 
 // -- flat
 
+// Flat shader always returns the same color.
 func Flat(c Color) Material {
 	return &flat{c}
 }
@@ -18,9 +19,46 @@ func (s *flat) Shade(e *Env, N int, pos, norm Vec) Color {
 	return s.c
 }
 
+// -- diffuse
+
+//
+func Diffuse0(c Color) Material {
+	return &diffuse0{c}
+}
+
+type diffuse0 struct {
+	c Color
+}
+
+func (s *diffuse0) Shade(e *Env, N int, pos, norm Vec) Color {
+	var acc Color
+	for _, l := range e.lights {
+		acc = acc.Add(s.shade(e, pos, norm, l))
+	}
+	return acc
+}
+
+const off = 1e-6
+
+func (s *diffuse0) shade(e *Env, pos, norm Vec, l Light) Color {
+	lpos, intens := l.Sample(pos)
+
+	pos = pos.MAdd(off, norm)
+	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
+
+	t := e.IntersectAny(&secundary)
+
+	lightT := lpos.Sub(pos).Len()
+	if t > 0 && t < lightT { // intersection between start and light position
+		return Color{} // shadow
+	} else {
+		return s.c.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
+	}
+}
+
 // -- normal
 
-// debug shader
+// Debug shader: colors according to the normal vector projected on dir.
 func ShadeNormal(dir Vec) Material {
 	return &shadeNormal{dir}
 }
@@ -36,19 +74,4 @@ func (s *shadeNormal) Shade(e *Env, N int, pos, norm Vec) Color {
 	} else {
 		return BLUE.Mul(v) // away from cam
 	}
-}
-
-// -- diffuse
-
-func Diffuse0(c Color) Material {
-	return &diffuse0{c}
-}
-
-type diffuse0 struct {
-	c Color
-}
-
-func (s *diffuse0) Shade(e *Env, N int, pos, norm Vec) Color {
-	// TODO
-	return s.c
 }

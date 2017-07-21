@@ -4,6 +4,7 @@ package bruteray
 // (all objects, light sources, ... in the scene)
 type Env struct {
 	objs    []Obj
+	lights  []Light
 	Ambient Surf
 }
 
@@ -15,6 +16,10 @@ func NewEnv() *Env {
 
 func (e *Env) Add(o ...Obj) {
 	e.objs = append(e.objs, o...)
+}
+
+func (e *Env) AddLight(l ...Light) {
+	e.lights = append(e.lights, l...)
 }
 
 // Calculate intensity seen by ray,
@@ -39,4 +44,27 @@ func (e *Env) Shade(r *Ray, N int) Color {
 	}
 
 	return surf.Shade(e, N-1, r)
+}
+
+// Returns t > 0 if r intersects any object
+func (e *Env) IntersectAny(r *Ray) float64 {
+	t := inf
+	I := -1
+	for i, o := range e.objs {
+		bi := o.Inters(r)
+		if !bi.OK() {
+			continue
+		}
+		if bi.S1.T < 0 {
+			continue
+		}
+		if bi.S1.T < t {
+			t = bi.S1.T
+			I = i
+		}
+	}
+	if I == -1 {
+		t = 0
+	}
+	return t
 }

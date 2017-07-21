@@ -1,9 +1,5 @@
 package bruteray
 
-import (
-	"sync"
-)
-
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
 	FocalLen float64
@@ -30,16 +26,16 @@ func (c *Cam) Transf(T *Matrix4) *Cam {
 
 func (c *Cam) Render(e *Env, maxRec int, img Image) {
 	H := img.Bounds().Dy()
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
 	const stride = 1
 	for i := 0; i < H; i += stride {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			c.renderLine(e, maxRec, img, i, i+stride)
-		}(i)
+		//wg.Add(1)
+		//go func(i int) {
+		//	defer wg.Done()
+		c.renderLine(e, maxRec, img, i, i+stride)
+		//}(i)
 	}
-	wg.Wait()
+	//wg.Wait()
 }
 
 func (c *Cam) renderLine(e *Env, maxRec int, img Image, hMin, hMax int) {

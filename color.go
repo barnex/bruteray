@@ -28,6 +28,14 @@ func (c Color) Mul(s float64) Color {
 	return Color{s * c.R, s * c.G, s * c.B}
 }
 
+func (c Color) Mul3(b Color) Color {
+	return Color{c.R * b.R, c.G * b.G, c.B * b.G}
+}
+
+func (c Color) Add(b Color) Color {
+	return Color{c.R + b.R, c.G + b.G, c.B + b.G}
+}
+
 // Exposure value, 2^exp.
 func EV(exp float64) float64 {
 	return math.Pow(2, exp)
