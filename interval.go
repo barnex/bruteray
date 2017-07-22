@@ -2,14 +2,26 @@ package bruteray
 
 import "fmt"
 
+// An Interval along a ray.
+// 	Max >= Min
+// 	Max >= 0
+// The empty interval is {0, 0}.
 type Interval struct {
 	Min, Max float64
 }
 
-func Interv(min, max float64) Interval {
-	i := Interval{min, max}
-	i.check()
-	return i
+//func Interv(min, max float64) Interval {
+//	i := Interval{min, max}
+//	i.check()
+//	return i
+//}
+
+//
+func (i Interval) Fix() Interval {
+	if i.Max <= 0 {
+		return Interval{}
+	}
+	return i.check()
 }
 
 func (i Interval) OK() bool {
@@ -17,10 +29,11 @@ func (i Interval) OK() bool {
 	return (i != Interval{})
 }
 
-func (i Interval) check() {
-	if i.Min > i.Max {
+func (i Interval) check() Interval {
+	if i.Min > i.Max || i.Max < 0 {
 		panic(fmt.Sprintf("bad interval: %v", i))
 	}
+	return i
 }
 
 //const inf = 1e99

@@ -6,7 +6,11 @@ import (
 
 type Shape interface {
 	// Ray-shape intersection.
-	// t values may be < 0 (behind camera), but must be sorted (min <= max)
+	// Special cases:
+	// 	Shape lies entirely behind ray start point: return Interval{}
+	// 	Ray start point lies inside shape: Interval.Min < 0
+	// 	Shape does not intersect ray at all: return Interval{}
+	// 	Shape lies entirely in front of ray start: Min & Max > 0
 	Inters(r *Ray) Interval
 
 	// Normal vector at position.
@@ -40,7 +44,7 @@ func (s *sphere) Inters(r *Ray) Interval {
 	}
 	t1 := (-vd - math.Sqrt(D))
 	t2 := (-vd + math.Sqrt(D))
-	return Interv(t1, t2)
+	return Interval{t1, t2}.Fix().check()
 }
 
 // -- box (axis aligned)
@@ -79,7 +83,7 @@ func (s *box) Inters(r *Ray) Interval {
 		return Interval{}
 	}
 
-	return Interval{ten, tex}
+	return Interval{ten, tex}.Fix().check()
 }
 
 func (s *box) Normal(p Vec) Vec {
@@ -114,7 +118,7 @@ func (s *sheet) Inters(r *Ray) Interval {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	t := (s.off - rs) / rd
-	return Interval{t, t}
+	return Interval{t, t}.Fix().check()
 }
 
 // --rectangle (finite sheet)
@@ -140,7 +144,7 @@ func (s *rect) Inters(r *Ray) Interval {
 		p[Z] < -s.rz || p[Z] > s.rz {
 		return Interval{}
 	}
-	return Interval{t, t}
+	return Interval{t, t}.Fix().check()
 }
 
 func (s *rect) Normal(p Vec) Vec {
@@ -168,5 +172,5 @@ func (s *slab) Inters(r *Ray) Interval {
 	t1 := (s.off1 - rs) / rd
 	t2 := (s.off2 - rs) / rd
 	t1, t2 = Sort(t1, t2)
-	return Interval{t1, t2}
+	return Interval{t1, t2}.Fix().check()
 }
