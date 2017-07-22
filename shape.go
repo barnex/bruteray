@@ -20,8 +20,8 @@ type Shape interface {
 
 // -- sphere
 
-func Sphere(center Vec, radius float64) Shape {
-	return &sphere{center, Sqr(radius)}
+func Sphere(center Vec, radius float64, m Material) Obj {
+	return &prim{&sphere{center, Sqr(radius)}, m}
 }
 
 type sphere struct {
@@ -53,11 +53,11 @@ type box struct {
 	min, max Vec
 }
 
-func Box(center Vec, rx, ry, rz float64) Shape {
-	return &box{
+func Box(center Vec, rx, ry, rz float64, m Material) Obj {
+	return &prim{&box{
 		min: center.Sub(Vec{rx, ry, rz}),
 		max: center.Add(Vec{rx, ry, rz}),
-	}
+	}, m}
 }
 
 func (s *box) Inters(r *Ray) Interval {
@@ -101,8 +101,8 @@ func approx(a, b float64) bool {
 
 // -- sheet (infinite)
 
-func Sheet(dir Vec, off float64) Shape {
-	return &sheet{dir, off}
+func Sheet(dir Vec, off float64, m Material) Obj {
+	return &prim{&sheet{dir, off}, m}
 }
 
 type sheet struct {
@@ -125,8 +125,8 @@ func (s *sheet) Inters(r *Ray) Interval {
 
 // A rectangle (i.e. finite sheet) at given position,
 // with normal vector dir and half-axes rx, ry, rz.
-func Rect(pos, dir Vec, rx, ry, rz float64) Shape {
-	return &rect{pos, dir, rx, ry, rz}
+func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj {
+	return &prim{&rect{pos, dir, rx, ry, rz}, m}
 }
 
 type rect struct {
@@ -153,8 +153,8 @@ func (s *rect) Normal(p Vec) Vec {
 
 // -- slab
 
-func Slab(dir Vec, off1, off2 float64) Shape {
-	return &slab{dir, off1, off2}
+func Slab(dir Vec, off1, off2 float64, m Material) Obj {
+	return &prim{&slab{dir, off1, off2}, m}
 }
 
 type slab struct {

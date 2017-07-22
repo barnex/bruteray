@@ -13,7 +13,7 @@ const (
 func TestSphere(t *testing.T) {
 	e := NewEnv()
 
-	e.Add(Object(Sphere(Vec{0, 0, 1}, 0.25), Flat(WHITE)))
+	e.Add(Sphere(Vec{0, 0, 1}, 0.25, Flat(WHITE)))
 	c := Camera(0)
 
 	Compare(t, e, c, "001-sphere")
@@ -23,7 +23,7 @@ func TestSphere(t *testing.T) {
 func TestBehindCam(t *testing.T) {
 	e := NewEnv()
 
-	e.Add(Object(Sphere(Vec{0, 0, -1}, 0.25), Flat(WHITE)))
+	e.Add(Sphere(Vec{0, 0, -1}, 0.25, Flat(WHITE)))
 
 	Compare(t, e, Camera(0), "002-behindcam")
 }
@@ -32,9 +32,9 @@ func TestBehindCam(t *testing.T) {
 func TestNormal(t *testing.T) {
 	e := NewEnv()
 
-	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)))
-	e.Add(Object(Sphere(Vec{-0.5, 0, 2}, 0.25), ShadeNormal(Ex)))
-	e.Add(Object(Sphere(Vec{0.5, 0, 2}, 0.25), ShadeNormal(Ey)))
+	e.Add(Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)))
+	e.Add(Sphere(Vec{-0.5, 0, 2}, 0.25, ShadeNormal(Ex)))
+	e.Add(Sphere(Vec{0.5, 0, 2}, 0.25, ShadeNormal(Ey)))
 
 	Compare(t, e, Camera(0), "003-normals")
 }
@@ -43,7 +43,7 @@ func TestNormal(t *testing.T) {
 func TestCamTransl(t *testing.T) {
 	e := NewEnv()
 
-	e.Add(Object(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)))
+	e.Add(Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)))
 
 	Compare(t, e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
 }
@@ -54,15 +54,15 @@ func TestCamRot(t *testing.T) {
 
 	r := 0.5
 	nz := ShadeNormal(Ez)
-	e.Add(Object(Sphere(Vec{0, 0, 0}, r), nz))
-	e.Add(Object(Sphere(Vec{0, 0, 2}, r), nz))
-	e.Add(Object(Sphere(Vec{0, 0, 4}, r), nz))
-	e.Add(Object(Sphere(Vec{2, 0, 0}, r), nz))
-	e.Add(Object(Sphere(Vec{2, 0, 2}, r), nz))
-	e.Add(Object(Sphere(Vec{2, 0, 4}, r), nz))
-	e.Add(Object(Sphere(Vec{-2, 0, 0}, r), nz))
-	e.Add(Object(Sphere(Vec{-2, 0, 2}, r), nz))
-	e.Add(Object(Sphere(Vec{-2, 0, 4}, r), nz))
+	e.Add(Sphere(Vec{0, 0, 0}, r, nz))
+	e.Add(Sphere(Vec{0, 0, 2}, r, nz))
+	e.Add(Sphere(Vec{0, 0, 4}, r, nz))
+	e.Add(Sphere(Vec{2, 0, 0}, r, nz))
+	e.Add(Sphere(Vec{2, 0, 2}, r, nz))
+	e.Add(Sphere(Vec{2, 0, 4}, r, nz))
+	e.Add(Sphere(Vec{-2, 0, 0}, r, nz))
+	e.Add(Sphere(Vec{-2, 0, 2}, r, nz))
+	e.Add(Sphere(Vec{-2, 0, 4}, r, nz))
 
 	Compare(t, e, Camera(1).Transl(0, 4, -4).Transf(RotX4(pi/5)), "005-camrot")
 }
@@ -72,9 +72,9 @@ func TestObjTransf(t *testing.T) {
 	e := NewEnv()
 
 	r := 0.25
-	sx := Object(Sphere(Vec{-0.5, 0, 2}, r), ShadeNormal(Ex))
-	sy := Object(Sphere(Vec{0, 0, 2}, r), ShadeNormal(Ez))
-	sz := Object(Sphere(Vec{0.5, 0, 2}, r), ShadeNormal(Ey))
+	sx := Sphere(Vec{-0.5, 0, 2}, r, ShadeNormal(Ex))
+	sy := Sphere(Vec{0, 0, 2}, r, ShadeNormal(Ez))
+	sz := Sphere(Vec{0.5, 0, 2}, r, ShadeNormal(Ey))
 
 	rot := RotZ4(pi / 4)
 	e.Add(Transf(sx, rot))
@@ -89,8 +89,8 @@ func TestObjAnd(t *testing.T) {
 	e := NewEnv()
 
 	r := 0.5
-	s1 := Object(Sphere(Vec{-r / 2, 0, 2}, r), ShadeNormal(Ez))
-	s2 := Object(Sphere(Vec{r / 2, 0, 2}, r), ShadeNormal(Ey))
+	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
+	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
 	s := ObjAnd(s1, s2)
 	e.Add(s)
 
@@ -102,8 +102,8 @@ func TestOverlap(t *testing.T) {
 	e := NewEnv()
 
 	r := 0.5
-	s1 := Object(Sphere(Vec{-r / 2, 0, 2}, r), ShadeNormal(Ez))
-	s2 := Object(Sphere(Vec{r / 2, 0, 2}, r), ShadeNormal(Ey))
+	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
+	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
 	e.Add(s1)
 	e.Add(s2)
 
@@ -115,9 +115,9 @@ func TestSlabIntersect(t *testing.T) {
 	e := NewEnv()
 
 	r := 1.
-	s1 := Object(Slab(Ex, -r, r), Flat(RED))
-	s2 := Object(Slab(Ey, -r, r), Flat(GREEN))
-	s3 := Object(Slab(Ez, -r, r), Flat(BLUE))
+	s1 := Slab(Ex, -r, r, Flat(RED))
+	s2 := Slab(Ey, -r, r, Flat(GREEN))
+	s3 := Slab(Ez, -r, r, Flat(BLUE))
 	cube := ObjAnd(ObjAnd(s1, s2), s3)
 	cube = Transf(cube, RotY4(160*deg).Mul(RotX4(20*deg)))
 	e.Add(cube)
@@ -129,10 +129,10 @@ func TestSlabIntersect(t *testing.T) {
 func TestSheet(t *testing.T) {
 	e := NewEnv()
 
-	s1 := Object(Sheet(Ey, -1), Flat(GREEN))
-	s2 := Object(Sheet(Ey, 4), Flat(BLUE))
-	s3 := Object(Sheet(Ex, -10), Flat(WHITE))
-	s4 := Object(Sphere(Vec{1.5, 0, 3}, 1), ShadeNormal(Ez))
+	s1 := Sheet(Ey, -1, Flat(GREEN))
+	s2 := Sheet(Ey, 4, Flat(BLUE))
+	s3 := Sheet(Ex, -10, Flat(WHITE))
+	s4 := Sphere(Vec{1.5, 0, 3}, 1, ShadeNormal(Ez))
 	e.Add(s1, s2, s3, s4)
 
 	Compare(t, e, Camera(1), "010-sheet")
@@ -145,11 +145,11 @@ func TestRect(t *testing.T) {
 	const d = 0.5
 	const z = 10
 	nz := ShadeNormal(Ez)
-	r1 := Object(Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf), nz)
+	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf, nz)
 	r2 := Transf(r1, RotZ4(-30*deg).Mul(Transl4(Vec{1, 0, 0})))
 	r3 := ObjAnd(
-		Object(Rect(Vec{0, 0, z}, Ez, 10, 10, 10), nz),
-		Object(Sphere(Vec{0, 0, z}, 0.25), nz),
+		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
+		Sphere(Vec{0, 0, z}, 0.25, nz),
 	)
 	e.Add(r1, r2, r3)
 
@@ -161,9 +161,9 @@ func TestBox(t *testing.T) {
 	e := NewEnv()
 
 	nz := ShadeNormal(Ez)
-	b := Object(Box(Vec{0, 0, 0}, 2, 1, 1), nz)
+	b := Box(Vec{0, 0, 0}, 2, 1, 1, nz)
 	b = Transf(b, RotY4(150*deg))
-	g := Object(Sheet(Ey, -1), Flat(GREEN.Mul(EV(-4))))
+	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
 	e.Add(b, g)
 
 	Compare(t, e, Camera(1).Transl(0, 0, -4), "012-box")
@@ -172,8 +172,8 @@ func TestBox(t *testing.T) {
 func TestDiffuse0(t *testing.T) {
 	e := NewEnv()
 
-	g := Object(Sheet(Ey, -1), Diffuse0(WHITE.Mul(EV(-1))))
-	s := Object(Sphere(Vec{}, 1), Diffuse0(WHITE))
+	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
+	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
 	e.Add(g, s)
 
 	l := DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))

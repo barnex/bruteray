@@ -5,11 +5,6 @@ type Obj interface {
 }
 
 // -- Primitive Object (shape + material)
-
-func Object(s Shape, m Material) Obj {
-	return &prim{s, m}
-}
-
 type prim struct {
 	s Shape
 	m Material

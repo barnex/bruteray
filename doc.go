@@ -7,6 +7,5 @@ Bruteray is a brute-force ray tracer. More precisely it implements bi-directiona
 TODO
 
 	- Refactor: Object(SomeShape(...), material) -> SomeShape(..., material)
-	- Ray.At: panic on t < 0
 */
 package bruteray
