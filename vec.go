@@ -1,6 +1,9 @@
 package bruteray
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type Vec [3]float64
 
@@ -72,6 +75,15 @@ func (a Vec) Cross(b Vec) Vec {
 	y := a[Z]*b[X] - a[X]*b[Z]
 	z := a[X]*b[Y] - a[Y]*b[X]
 	return Vec{x, y, z}
+}
+
+func (v Vec) check() Vec {
+	for _, x := range v {
+		if math.IsNaN(x) {
+			panic(fmt.Sprintf("bad vector: %v", v))
+		}
+	}
+	return v
 }
 
 type Vec4 [4]float64

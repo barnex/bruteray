@@ -29,11 +29,11 @@ func (c Color) Mul(s float64) Color {
 }
 
 func (c Color) Mul3(b Color) Color {
-	return Color{c.R * b.R, c.G * b.G, c.B * b.G}
+	return Color{c.R * b.R, c.G * b.G, c.B * b.B}
 }
 
 func (c Color) Add(b Color) Color {
-	return Color{c.R + b.R, c.G + b.G, c.B + b.G}
+	return Color{c.R + b.R, c.G + b.G, c.B + b.B}
 }
 
 // Exposure value, 2^exp.

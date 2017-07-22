@@ -1,5 +1,7 @@
 package bruteray
 
+import "math"
+
 // A Ray is a half-line,
 // starting at the Start point (exclusive) and extending in direction Dir.
 type Ray struct {
@@ -10,6 +12,9 @@ type Ray struct {
 // Returns point Start + t*Dir.
 // t must be > 0 for the point to lie on the Ray.
 func (r *Ray) At(t float64) Vec {
+	if math.IsNaN(t) {
+		panic(t)
+	}
 	return r.Start.Add(r.Dir.Mul(t))
 }
 

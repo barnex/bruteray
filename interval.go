@@ -1,6 +1,9 @@
 package bruteray
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 // An Interval along a ray.
 // 	Max >= Min
@@ -30,7 +33,8 @@ func (i Interval) OK() bool {
 }
 
 func (i Interval) check() Interval {
-	if i.Min > i.Max || i.Max < 0 {
+	if math.IsNaN(i.Min) || math.IsNaN(i.Max) ||
+		i.Min > i.Max || i.Max < 0 {
 		panic(fmt.Sprintf("bad interval: %v", i))
 	}
 	return i

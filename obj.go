@@ -96,6 +96,44 @@ func (o *objAnd) Inters(r *Ray) BiSurf {
 	return bi
 }
 
+func ObjOr(a, b Obj) Obj {
+	return &objOr{a, b}
+}
+
+type objOr struct {
+	a, b Obj
+}
+
+func (o *objOr) Inters(r *Ray) BiSurf {
+
+	A := o.a.Inters(r)
+	B := o.b.Inters(r)
+
+	// ray only hits one
+	if !A.OK() {
+		return B
+	}
+	if !B.OK() {
+		return A
+	}
+
+	// sort A in front of B
+	if A.S1.T > B.S1.T {
+		A, B = B, A
+	}
+
+	var bi BiSurf
+	bi.S1 = A.S1 // enter A
+
+	if A.S2.T < B.S1.T {
+		bi.S2 = A.S2 // non-overlapping: exit from A
+	} else {
+		bi.S2 = B.S2 // overlapping: exit from B
+	}
+
+	return bi
+}
+
 // Carve away object b from a.
 func ObjMinus(a, b Obj) Obj {
 	return &objMinus{a, b}

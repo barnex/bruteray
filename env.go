@@ -34,6 +34,7 @@ func (e *Env) Shade(r *Ray, N int) Color {
 
 	for _, o := range e.objs {
 		bi := o.Inters(r)
+		Interval{bi.S1.T, bi.S2.T}.check()
 		if !bi.OK() {
 			continue
 		}

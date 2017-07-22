@@ -4,9 +4,17 @@ type BiSurf struct {
 	S1, S2 Surf
 }
 
-func (b *BiSurf) Min() float64 { return b.S1.T }
-func (b *BiSurf) Max() float64 { return b.S2.T }
-func (b *BiSurf) OK() bool     { return b.Min() != 0 && b.Max() != 0 }
+func (b *BiSurf) Min() float64 {
+	return b.S1.T
+}
+
+func (b *BiSurf) Max() float64 {
+	return b.S2.T
+}
+
+func (b *BiSurf) OK() bool {
+	return b.Min() != 0 && b.Max() != 0
+}
 
 // swap surfaces if not in sorted order
 func (b *BiSurf) Normalize() {

@@ -182,6 +182,41 @@ func TestDiffuse0(t *testing.T) {
 	Compare(t, e, Camera(1).Transl(0, 0, -4), "013-diffuse0")
 }
 
+func TestObjOr1(t *testing.T) {
+	e := NewEnv()
+
+	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
+	white := Diffuse0(WHITE)
+	box := Box(Vec{}, 1, 1, 1, white)
+	bar1 := Box(Vec{}, 1.5, 0.5, 0.5, Diffuse0(RED))
+	bar2 := Box(Vec{}, 0.5, 1.5, 0.5, Diffuse0(GREEN))
+	bar3 := Box(Vec{}, 0.5, 0.5, 1.5, Diffuse0(BLUE))
+	crux := ObjOr(ObjOr(box, bar1), ObjOr(bar2, bar3))
+	crux = Transf(crux, RotY4(15*deg))
+	e.Add(g, crux)
+
+	l := DirLight(Vec{4, 2, -6}, WHITE.Mul(EV(0)))
+	e.AddLight(l)
+
+	Compare(t, e, Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15*deg)), "014-objor1")
+}
+
+func TestObjOr2(t *testing.T) {
+	e := NewEnv()
+
+	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
+	b1 := Box(Vec{-2, 0, -.1}, 0.5, 1, 1, Diffuse0(RED))
+	b2 := Box(Vec{2, 0, -.1}, 0.5, 1, 1, Diffuse0(GREEN))
+	or := ObjOr(b1, b2)
+	or = Transf(or, RotY4(-15*deg))
+	e.Add(g, or)
+
+	l := DirLight(Vec{8, 2, 0}, WHITE.Mul(EV(0)))
+	e.AddLight(l)
+
+	Compare(t, e, Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15*deg)), "015-objor2")
+}
+
 //func TestObjMinus(t *testing.T) {
 //	e := NewEnv()
 //
