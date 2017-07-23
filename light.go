@@ -19,13 +19,16 @@ func (l *dirLight) Sample(target Vec) (Vec, Color) {
 	return l.pos, l.c
 }
 
-// Source with parallel rays,
-// like an infinitely far away point source.
-//func DirLight(dir Vec, intensity Color) Light {
-//	return &dirLight{dir, intensity}
-//}
-//
-//type dirLight struct {
-//	dir Vec
-//	c   Color
-//}
+// Point light source (with fall-off).
+func PointLight(pos Vec, intensity Color) Light {
+	return &pointLight{pos, intensity}
+}
+
+type pointLight struct {
+	pos Vec
+	c   Color
+}
+
+func (l *pointLight) Sample(target Vec) (Vec, Color) {
+	return l.pos, l.c.Mul(1 / target.Sub(l.pos).Len2())
+}
