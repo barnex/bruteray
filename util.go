@@ -15,6 +15,10 @@ func Sqr(x float64) float64 {
 	return x * x
 }
 
+func Sqrt(x float64) float64 {
+	return math.Sqrt(x)
+}
+
 func assert(t bool) {
 	if !t {
 		panic("assertion failed")

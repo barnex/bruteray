@@ -28,3 +28,13 @@ func RandVecDir(n Vec) Vec {
 	}
 	return v
 }
+
+// Random unit vector, sampled with probability cos(angle with dir).
+// Used for diffuse inter-reflection importance sampling.
+func RandVecCos(dir Vec) Vec {
+	v := RandVecDir(dir)
+	for v.Dot(dir) < Rand() {
+		v = RandVecDir(dir)
+	}
+	return v
+}

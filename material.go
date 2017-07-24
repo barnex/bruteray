@@ -21,7 +21,10 @@ func (s *flat) Shade(e *Env, N int, pos, norm Vec) Color {
 
 // -- diffuse
 
-//
+//    -- diffuse 0
+
+// Diffuse material with direct illumination only (no interreflection).
+// Intended for rapid previews.
 func Diffuse0(c Color) Material {
 	return &diffuse0{c}
 }
@@ -54,6 +57,27 @@ func (s *diffuse0) shade(e *Env, pos, norm Vec, l Light) Color {
 	} else {
 		return s.c.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
 	}
+}
+
+//    -- diffuse 1
+
+func Diffuse1(c Color) Material {
+	return &diffuse1{diffuse0{c}}
+}
+
+type diffuse1 struct {
+	diffuse0
+}
+
+func (s *diffuse1) Shade(e *Env, N int, pos, norm Vec) Color {
+	var acc Color
+	for _, l := range e.lights {
+		acc = acc.Add(s.shade(e, pos, norm, l))
+	}
+
+	// random ray
+
+	return acc
 }
 
 // -- normal
