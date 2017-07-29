@@ -1,17 +1,29 @@
 package bruteray
 
+import (
+	"math/rand"
+)
+
 // Env stores the entire environment
 // (all objects, light sources, ... in the scene)
 type Env struct {
 	objs    []Obj
 	lights  []Light
 	Ambient Surf
+	rng     rand.Rand
 }
 
 func NewEnv() *Env {
 	return &Env{
 		Ambient: Surf{T: inf, Material: Flat(BLACK)},
+		rng:     *(newRng()),
 	}
+}
+
+func (e *Env) Copy() *Env {
+	e2 := *e
+	e2.rng = *(newRng())
+	return &e2
 }
 
 func (e *Env) Add(o ...Obj) {
@@ -25,7 +37,7 @@ func (e *Env) AddLight(l ...Light) {
 // Calculate intensity seen by ray,
 // with maximum recursion depth N.
 func (e *Env) Shade(r *Ray, N int) Color {
-	if N == 0 {
+	if N <= 0 {
 		return Color{}
 	}
 

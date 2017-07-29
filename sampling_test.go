@@ -39,18 +39,20 @@ func TestImportanceSampling(t *testing.T) {
 }
 
 func uniformInt(f func(Vec) float64, N int, dir Vec) float64 {
+	e := NewEnv()
 	acc := 0.0
 	for i := 0; i < N; i++ {
-		V := RandVecDir(dir)
+		V := RandVecDir(e, dir)
 		acc += f(V) * dir.Dot(V) * 2 * pi
 	}
 	return acc / float64(N)
 }
 
 func importanceInt(f func(Vec) float64, N int, dir Vec) float64 {
+	e := NewEnv()
 	acc := 0.0
 	for i := 0; i < N; i++ {
-		V := RandVecCos(dir)
+		V := RandVecCos(e, dir)
 		acc += f(V) * pi
 	}
 	return acc / float64(N)

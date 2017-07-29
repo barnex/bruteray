@@ -1,7 +1,7 @@
 package bruteray
 
 type Light interface {
-	Sample(target Vec) (Vec, Color)
+	Sample(target Vec) (dir Vec, intens Color)
 }
 
 // Directed light source without fall-off.
@@ -30,5 +30,5 @@ type pointLight struct {
 }
 
 func (l *pointLight) Sample(target Vec) (Vec, Color) {
-	return l.pos, l.c.Mul(1 / target.Sub(l.pos).Len2())
+	return l.pos, l.c.Mul(1 / target.Sub(l.pos).Len2()) // TODO: 4 pi
 }

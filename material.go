@@ -77,7 +77,10 @@ func (s *diffuse1) Shade(e *Env, N int, pos, norm Vec) Color {
 
 	// random ray
 
-	return acc
+	sec := &Ray{pos.MAdd(off, norm), RandVecCos(e, norm)}
+	acc = acc.Add(e.Shade(sec, N-1))
+
+	return acc.Mul(1 / pi)
 }
 
 // -- normal

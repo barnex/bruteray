@@ -9,9 +9,8 @@ import (
 	"testing"
 )
 
-func Compare(t *testing.T, s *Env, cam *Cam, name string) {
+func CompareImg(t *testing.T, e *Env, img Image, name string) {
 	t.Helper()
-	t.Parallel()
 
 	os.Mkdir("out", 0777)
 
@@ -19,8 +18,6 @@ func Compare(t *testing.T, s *Env, cam *Cam, name string) {
 	have := "out/" + name
 	want := "testdata/" + name
 
-	img := MakeImage(testW, testH)
-	cam.Render(s, testRec, img)
 	Encode(img, have)
 	deviation, err := imgComp(have, want)
 
@@ -31,6 +28,14 @@ func Compare(t *testing.T, s *Env, cam *Cam, name string) {
 	if deviation > tolerance {
 		t.Errorf("%v: differs from reference by %v", name, deviation)
 	}
+}
+
+func Compare(t *testing.T, e *Env, cam *Cam, name string) {
+	t.Helper()
+
+	img := MakeImage(testW, testH)
+	cam.Render(e, testRec, img)
+	CompareImg(t, e, img, name)
 }
 
 func imgComp(a, b string) (float64, error) {

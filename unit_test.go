@@ -231,29 +231,39 @@ func TestPointLight(t *testing.T) {
 	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse0(WHITE))
 	e.Add(s)
 
-	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(EV(0))))
+	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE))
 
 	Compare(t, e, Camera(1).Transl(0, 1, -2), "016-pointlight")
 }
 
-//func TestDiffuse1(t *testing.T) {
-//	e := NewEnv()
-//
-//	g := Sheet(Ey, 0, Diffuse1(WHITE))
-//	l := Sheet(Ex, -1, Diffuse1(RED))
-//	r := Sheet(Ex, 1, Diffuse1(GREEN))
-//	c := Sheet(Ey, 2.2, Diffuse1(WHITE))
-//	b := Sheet(Ez, 1.1, Diffuse1(WHITE))
-//	e.Add(g, l, r, c, b)
-//
-//	R := 0.4
-//	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse1(WHITE))
-//	e.Add(s)
-//
-//	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(EV(0))))
-//
-//	Compare(t, e, Camera(1).Transl(0, 1, -2), "017-diffuse1")
-//}
+func TestDiffuse1(t *testing.T) {
+	e := NewEnv()
+
+	white := Diffuse1(WHITE.Mul(EV(-0.6)))
+	//red := Diffuse1(RED.Mul(EV(-0.3)))
+	//green := Diffuse1(GREEN.Mul(EV(-0.3)))
+
+	e.Add(
+		Sheet(Ey, 0, white),
+		//Sheet(Ex, -1, red),
+		//Sheet(Ex, 1, green),
+		//Sheet(Ey, 2.2, white),
+		Sheet(Ez, 1.1, white),
+	)
+
+	R := 0.4
+	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse1(WHITE))
+	e.Add(s)
+
+	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(6)))) // TODO: incorporate pi in diffusse0
+
+	c := Camera(1).Transl(0, 1, -2)
+
+	img := MakeImage(testW, testH)
+	c.MultiPass(e, testRec, img, 20)
+
+	CompareImg(t, e, img, "017-diffuse1")
+}
 
 //func TestObjMinus(t *testing.T) {
 //	e := NewEnv()
