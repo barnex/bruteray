@@ -1,6 +1,7 @@
 package bruteray
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -236,33 +237,62 @@ func TestPointLight(t *testing.T) {
 	Compare(t, e, Camera(1).Transl(0, 1, -2), "016-pointlight")
 }
 
+// Test convergence of diffuse interreflection:
+//
+// 1) We are inside a highly reflective white box containing a point light.
+// If the pre-factor for interreflection is slightly too high,
+// deeper recursion will diverge to an infinitely bright image instead of converge.
+//
+// 2) We are inside a 100% reflective white box containing a point light.
+// This is not a physical situation and the intensity should diverge to infinity.
+// If the pre-factor for interreflection is slightly too low, divergence will not happen.
 func TestDiffuse1(t *testing.T) {
+	for _, refl := range []float64{0.8, 1} {
+		refl := refl
+		e, c := whitebox(refl)
+		for _, rec := range []int{1, 16, 128} {
+			rec := rec
+			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, rec), func(t *testing.T) {
+				t.Parallel()
+				img := MakeImage(testW/4, testH/4)
+				nPass := 2
+				c.MultiPass(e, rec, img, nPass)
+				name := fmt.Sprintf("017-diffuse1-refl%v-rec%v", refl, rec)
+				CompareImg(t, e, img, name, 10)
+			})
+		}
+	}
+}
+
+func whitebox(refl float64) (*Env, *Cam) {
 	e := NewEnv()
-
-	white := Diffuse1(WHITE.Mul(EV(-0.6)))
-	//red := Diffuse1(RED.Mul(EV(-0.3)))
-	//green := Diffuse1(GREEN.Mul(EV(-0.3)))
-
+	white := Diffuse1(WHITE.Mul(refl))
 	e.Add(
-		Sheet(Ey, 0, white),
-		//Sheet(Ex, -1, red),
-		//Sheet(Ex, 1, green),
-		//Sheet(Ey, 2.2, white),
-		Sheet(Ez, 1.1, white),
+		Sheet(Ey, -1, white),
+		Sheet(Ey, 1, white),
+		Sheet(Ex, -1, white),
+		Sheet(Ex, 1, white),
+		Sheet(Ez, -1, white),
+		Sheet(Ez, 1, white),
 	)
+	e.AddLight(PointLight(Vec{}, WHITE.Mul(EV(-3))))
+	c := Camera(0.75).Transl(0, 0, -0.95)
+	c.AA = true
+	return e, c
+}
 
-	R := 0.4
-	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse1(WHITE))
-	e.Add(s)
-
-	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(6)))) // TODO: incorporate pi in diffusse0
-
+// There is a box buried underneath the floor,
+// it should not cast a shadow.
+func TestShadowBehind(t *testing.T) {
+	e := NewEnv()
+	const r = 0.8
+	e.Add(
+		Sheet(Ey, 0, Diffuse0(WHITE)),
+		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
+	)
+	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5))))
 	c := Camera(1).Transl(0, 1, -2)
-
-	img := MakeImage(testW, testH)
-	c.MultiPass(e, testRec, img, 20)
-
-	CompareImg(t, e, img, "017-diffuse1")
+	Compare(t, e, c, "019-shadowbehind")
 }
 
 //func TestObjMinus(t *testing.T) {

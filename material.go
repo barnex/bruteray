@@ -30,20 +30,20 @@ func Diffuse0(c Color) Material {
 }
 
 type diffuse0 struct {
-	c Color
+	refl Color
 }
 
 func (s *diffuse0) Shade(e *Env, N int, pos, norm Vec) Color {
 	var acc Color
 	for _, l := range e.lights {
-		acc = acc.Add(s.shade(e, pos, norm, l))
+		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
 	}
 	return acc
 }
 
 const off = 1e-6
 
-func (s *diffuse0) shade(e *Env, pos, norm Vec, l Light) Color {
+func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(pos)
 
 	pos = pos.MAdd(off, norm)
@@ -52,10 +52,10 @@ func (s *diffuse0) shade(e *Env, pos, norm Vec, l Light) Color {
 	t := e.IntersectAny(&secundary)
 
 	lightT := lpos.Sub(pos).Len()
-	if t > 0 && t < lightT { // intersection between start and light position
+	if (t > 0) && t < lightT { // intersection between start and light position
 		return Color{} // shadow
 	} else {
-		return s.c.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
+		return s.refl.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
 	}
 }
 
@@ -72,15 +72,15 @@ type diffuse1 struct {
 func (s *diffuse1) Shade(e *Env, N int, pos, norm Vec) Color {
 	var acc Color
 	for _, l := range e.lights {
-		acc = acc.Add(s.shade(e, pos, norm, l))
+		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
 	}
 
 	// random ray
 
 	sec := &Ray{pos.MAdd(off, norm), RandVecCos(e, norm)}
-	acc = acc.Add(e.Shade(sec, N-1))
+	acc = acc.Add(s.refl.Mul3(e.Shade(sec, N-1)))
 
-	return acc.Mul(1 / pi)
+	return acc
 }
 
 // -- normal

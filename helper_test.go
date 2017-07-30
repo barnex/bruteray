@@ -1,6 +1,7 @@
 package bruteray
 
 import (
+	"fmt"
 	"image"
 	"image/png"
 	"math"
@@ -9,7 +10,7 @@ import (
 	"testing"
 )
 
-func CompareImg(t *testing.T, e *Env, img Image, name string) {
+func CompareImg(t *testing.T, e *Env, img Image, name string, tol float64) {
 	t.Helper()
 
 	os.Mkdir("out", 0777)
@@ -24,8 +25,7 @@ func CompareImg(t *testing.T, e *Env, img Image, name string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	const tolerance = 10
-	if deviation > tolerance {
+	if deviation > tol {
 		t.Errorf("%v: differs from reference by %v", name, deviation)
 	}
 }
@@ -35,7 +35,8 @@ func Compare(t *testing.T, e *Env, cam *Cam, name string) {
 
 	img := MakeImage(testW, testH)
 	cam.Render(e, testRec, img)
-	CompareImg(t, e, img, name)
+	const defaultTolerance = 10
+	CompareImg(t, e, img, name, defaultTolerance)
 }
 
 func imgComp(a, b string) (float64, error) {
@@ -56,7 +57,10 @@ func imgComp(a, b string) (float64, error) {
 			delta += diff(r1, r2) + diff(g1, g2) + diff(b1, b2)
 		}
 	}
-	return float64(delta) / (3 * 255), nil
+	NPix := (A.Bounds().Dx() + 1) * (A.Bounds().Dx() + 1)
+	deviation := float64(delta) / (3 * 255 * float64(NPix))
+	fmt.Println(a, ": deviation=", deviation)
+	return deviation, nil
 }
 
 func diff(a, b uint32) int {

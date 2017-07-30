@@ -101,8 +101,8 @@ func (c *Cam) renderLine(e *Env, maxRec int, img Image, hMin, hMax int) {
 	for i := hMin; i < hMax; i++ {
 		for j := 0; j < W; j++ {
 			// ray start point
-			y0 := (-float64(i) + c.aa() + float64(H)/2) / float64(H)
-			x0 := (float64(j) + c.aa() - float64(W)/2) / float64(H)
+			y0 := (-float64(i) + c.aa(e) + float64(H)/2) / float64(H)
+			x0 := (float64(j) + c.aa(e) - float64(W)/2) / float64(H)
 			r.Start = Vec{x0, y0, 0}
 
 			// ray direction
@@ -122,10 +122,10 @@ func (c *Cam) renderLine(e *Env, maxRec int, img Image, hMin, hMax int) {
 }
 
 // Anti-aliasing jitter
-func (c *Cam) aa() float64 {
-	//if c.AA {
-	//	return Rand()
-	//} else {
-	return 0.5
-	//}
+func (c *Cam) aa(e *Env) float64 {
+	if c.AA {
+		return Rand(e)
+	} else {
+		return 0.5
+	}
 }

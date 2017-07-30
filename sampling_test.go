@@ -19,8 +19,8 @@ func TestImportanceSampling(t *testing.T) {
 	}
 
 	const (
-		N   = 1e5
-		tol = 3e-2 // a few times 1/sqrt(N)
+		N   = 1e4
+		tol = 5e-2 // a few times 1/sqrt(N)
 	)
 
 	for i, f := range testFn {

@@ -36,6 +36,10 @@ func (c Color) Add(b Color) Color {
 	return Color{c.R + b.R, c.G + b.G, c.B + b.B}
 }
 
+func (c Color) MAdd(s float64, b Color) Color {
+	return Color{c.R + s*b.R, c.G + s*b.G, c.B + s*b.B}
+}
+
 // Exposure value, 2^exp.
 func EV(exp float64) float64 {
 	return math.Pow(2, exp)
