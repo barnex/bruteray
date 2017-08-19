@@ -22,9 +22,22 @@ func NewEnv() *Env {
 	}
 }
 
+// Returns a copy with its own random number generator,
+// so it can be used from a different thread.
 func (e *Env) Copy() *Env {
 	e2 := *e
 	e2.rng = *(newRng())
+	return &e2
+}
+
+// Returns a copy where expensive elements are replaced by fast ones,
+// E.g. Smooth lights replaced by point lights, etc.
+func (e *Env) Preview() *Env {
+	e2 := *e
+	e2.lights = make([]Light, len(e.lights))
+	for i, l := range e.lights {
+		e2.lights[i] = toPreview(l)
+	}
 	return &e2
 }
 

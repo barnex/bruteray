@@ -27,10 +27,10 @@ func Serve(e *Env) {
 
 	env = e
 
-	http.HandleFunc("/render", renderHandler)
+	http.HandleFunc("/preview", handlePreview)
 	http.HandleFunc("/", mainHandler)
 
-	log.Println("listen", *port)
+	//log.Println("listen", *port)
 	log.Fatal(http.ListenAndServe(*port, nil))
 }
 
@@ -43,16 +43,19 @@ var cache struct {
 	data bytes.Buffer
 }
 
-func renderHandler(w http.ResponseWriter, r *http.Request) {
+func handlePreview(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	W := parseInt(q.Get("w"), DefaultWidth)
 	H := parseInt(q.Get("h"), DefaultHeight)
 
 	if W != cache.w || H != cache.h {
 		start := time.Now()
+
+		e2 := env.Preview()
 		img := MakeImage(W, H)
-		env.Camera.Render(env, 1, img)
-		log.Println("rendered", time.Since(start).Round(time.Millisecond))
+		env.Camera.Render(e2, 1, img)
+
+		log.Println("preview", time.Since(start).Round(time.Millisecond))
 		Print(jpeg.Encode(&(cache.data), img, &jpeg.Options{Quality: 95}))
 		cache.w, cache.h = W, H
 	}

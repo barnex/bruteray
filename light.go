@@ -32,3 +32,12 @@ type pointLight struct {
 func (l *pointLight) Sample(target Vec) (Vec, Color) {
 	return l.pos, l.c.Mul(1 / target.Sub(l.pos).Len2()) // TODO: 4 pi
 }
+
+// returns a cheaper, lower quality light used for quick preview.
+func toPreview(l Light) Light {
+	switch p := l.(type) {
+	default:
+		return p
+		// TODO: smoothLight
+	}
+}

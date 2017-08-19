@@ -6,7 +6,6 @@ Bruteray is a brute-force ray tracer. More precisely it implements bi-directiona
 
 TODO
 
-	- Refactor: Object(SomeShape(...), material) -> SomeShape(..., material)
 	- Slab not correct if ray starts inside (happens often with ObjAnd!)
 	- Box must handle div by zero
 */
