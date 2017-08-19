@@ -1,5 +1,6 @@
 package bruteray
-const mainHTML=`
+
+const mainHTML = `
 <html>
 
 <head>

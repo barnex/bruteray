@@ -28,6 +28,7 @@ func Serve(e *Env) {
 	env = e
 
 	http.HandleFunc("/preview", handlePreview)
+	http.HandleFunc("/render", handleRender)
 	http.HandleFunc("/", mainHandler)
 
 	//log.Println("listen", *port)
@@ -38,7 +39,11 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(mainHTML))
 }
 
-var cache struct {
+func handleRender(w http.ResponseWriter, r *http.Request) {
+
+}
+
+var preview struct {
 	w, h int
 	data bytes.Buffer
 }
@@ -48,19 +53,19 @@ func handlePreview(w http.ResponseWriter, r *http.Request) {
 	W := parseInt(q.Get("w"), DefaultWidth)
 	H := parseInt(q.Get("h"), DefaultHeight)
 
-	if W != cache.w || H != cache.h {
+	if W != preview.w || H != preview.h {
 		start := time.Now()
 
 		e2 := env.Preview()
 		img := MakeImage(W, H)
-		env.Camera.Render(e2, 1, img)
+		Render(e2, 1, img)
 
 		log.Println("preview", time.Since(start).Round(time.Millisecond))
-		Print(jpeg.Encode(&(cache.data), img, &jpeg.Options{Quality: 95}))
-		cache.w, cache.h = W, H
+		Print(jpeg.Encode(&(preview.data), img, &jpeg.Options{Quality: 95}))
+		preview.w, preview.h = W, H
 	}
 
-	w.Write(cache.data.Bytes())
+	w.Write(preview.data.Bytes())
 }
 
 func parseInt(s string, Default int) int {

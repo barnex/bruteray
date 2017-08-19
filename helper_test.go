@@ -33,9 +33,8 @@ func CompareImg(t *testing.T, e *Env, img Image, name string, tol float64) {
 func Compare(t *testing.T, e *Env, name string) {
 	t.Helper()
 
-	cam := e.Camera
 	img := MakeImage(testW, testH)
-	cam.Render(e, testRec, img)
+	Render(e, testRec, img)
 	const defaultTolerance = 10
 	CompareImg(t, e, img, name, defaultTolerance)
 }

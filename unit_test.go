@@ -258,14 +258,14 @@ func TestPointLight(t *testing.T) {
 func TestDiffuse1(t *testing.T) {
 	for _, refl := range []float64{0.8, 1} {
 		refl := refl
-		e, c := whitebox(refl)
+		e := whitebox(refl)
 		for _, rec := range []int{1, 16, 128} {
 			rec := rec
 			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, rec), func(t *testing.T) {
 				t.Parallel()
 				img := MakeImage(testW/4, testH/4)
 				nPass := 2
-				c.MultiPass(e, rec, img, nPass)
+				MultiPass(e, rec, img, nPass)
 				name := fmt.Sprintf("017-diffuse1-refl%v-rec%v", refl, rec)
 				CompareImg(t, e, img, name, 10)
 			})
@@ -273,7 +273,7 @@ func TestDiffuse1(t *testing.T) {
 	}
 }
 
-func whitebox(refl float64) (*Env, *Cam) {
+func whitebox(refl float64) *Env {
 	e := NewEnv()
 	white := Diffuse1(WHITE.Mul(refl))
 	e.Add(
@@ -285,9 +285,9 @@ func whitebox(refl float64) (*Env, *Cam) {
 		Sheet(Ez, 1, white),
 	)
 	e.AddLight(PointLight(Vec{}, WHITE.Mul(EV(-3))))
-	c := Camera(0.75).Transl(0, 0, -0.95)
-	c.AA = true
-	return e, c
+	e.Camera = Camera(0.75).Transl(0, 0, -0.95)
+	e.Camera.AA = true
+	return e
 }
 
 // There is a box buried underneath the floor,

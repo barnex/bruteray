@@ -36,6 +36,6 @@ func benchmark(b *testing.B, e *Env, c *Cam) {
 	img := MakeImage(testW, testH)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.Render(e, testRec, img)
+		Render(e, testRec, img)
 	}
 }
