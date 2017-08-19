@@ -3,8 +3,8 @@ package bruteray
 import "math"
 
 const (
-	pi  = math.Pi
-	deg = pi / 180
+	Pi  = math.Pi
+	Deg = Pi / 180
 )
 
 var (
@@ -29,7 +29,7 @@ func sin(x float64) float64 {
 	switch x {
 	default:
 		return math.Sin(x)
-	case pi, -pi:
+	case Pi, -Pi:
 		return 0
 	}
 }
@@ -38,7 +38,7 @@ func cos(x float64) float64 {
 	switch x {
 	default:
 		return math.Cos(x)
-	case pi / 2, -pi / 2:
+	case Pi / 2, -Pi / 2:
 		return 0
 	}
 }

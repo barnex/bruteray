@@ -43,7 +43,7 @@ func uniformInt(f func(Vec) float64, N int, dir Vec) float64 {
 	acc := 0.0
 	for i := 0; i < N; i++ {
 		V := RandVecDir(e, dir)
-		acc += f(V) * dir.Dot(V) * 2 * pi
+		acc += f(V) * dir.Dot(V) * 2 * Pi
 	}
 	return acc / float64(N)
 }
@@ -53,7 +53,7 @@ func importanceInt(f func(Vec) float64, N int, dir Vec) float64 {
 	acc := 0.0
 	for i := 0; i < N; i++ {
 		V := RandVecCos(e, dir)
-		acc += f(V) * pi
+		acc += f(V) * Pi
 	}
 	return acc / float64(N)
 }

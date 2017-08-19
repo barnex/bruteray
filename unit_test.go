@@ -64,7 +64,7 @@ func TestCamRot(t *testing.T) {
 	e.Add(Sphere(Vec{-2, 0, 0}, r, nz))
 	e.Add(Sphere(Vec{-2, 0, 2}, r, nz))
 	e.Add(Sphere(Vec{-2, 0, 4}, r, nz))
-	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(pi / 5))
+	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
 
 	Compare(t, e, "005-camrot")
 }
@@ -78,7 +78,7 @@ func TestObjTransf(t *testing.T) {
 	sy := Sphere(Vec{0, 0, 2}, r, ShadeNormal(Ez))
 	sz := Sphere(Vec{0.5, 0, 2}, r, ShadeNormal(Ey))
 
-	rot := RotZ4(pi / 4)
+	rot := RotZ4(Pi / 4)
 	e.Add(Transf(sx, rot))
 	e.Add(Transf(sy, rot))
 	e.Add(Transf(sz, rot))
@@ -121,7 +121,7 @@ func TestSlabIntersect(t *testing.T) {
 	s2 := Slab(Ey, -r, r, Flat(GREEN))
 	s3 := Slab(Ez, -r, r, Flat(BLUE))
 	cube := ObjAnd(ObjAnd(s1, s2), s3)
-	cube = Transf(cube, RotY4(160*deg).Mul(RotX4(20*deg)))
+	cube = Transf(cube, RotY4(160*Deg).Mul(RotX4(20*Deg)))
 	e.Add(cube)
 	e.Camera = Camera(1).Transl(0, 0, -4)
 
@@ -150,7 +150,7 @@ func TestRect(t *testing.T) {
 	const z = 10
 	nz := ShadeNormal(Ez)
 	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf, nz)
-	r2 := Transf(r1, RotZ4(-30*deg).Mul(Transl4(Vec{1, 0, 0})))
+	r2 := Transf(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
 	r3 := ObjAnd(
 		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
 		Sphere(Vec{0, 0, z}, 0.25, nz),
@@ -166,7 +166,7 @@ func TestBox(t *testing.T) {
 
 	nz := ShadeNormal(Ez)
 	b := Box(Vec{0, 0, 0}, 2, 1, 1, nz)
-	b = Transf(b, RotY4(150*deg))
+	b = Transf(b, RotY4(150*Deg))
 	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
 	e.Add(b, g)
 	e.Camera = Camera(1).Transl(0, 0, -4)
@@ -198,12 +198,12 @@ func TestObjOr1(t *testing.T) {
 	bar2 := Box(Vec{}, 0.5, 1.5, 0.5, Diffuse0(GREEN))
 	bar3 := Box(Vec{}, 0.5, 0.5, 1.5, Diffuse0(BLUE))
 	crux := ObjOr(ObjOr(box, bar1), ObjOr(bar2, bar3))
-	crux = Transf(crux, RotY4(15*deg))
+	crux = Transf(crux, RotY4(15*Deg))
 	e.Add(g, crux)
 
 	l := DirLight(Vec{4, 2, -6}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
-	e.Camera = Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15 * deg))
+	e.Camera = Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15 * Deg))
 
 	Compare(t, e, "014-objor1")
 }
@@ -215,13 +215,13 @@ func TestObjOr2(t *testing.T) {
 	b1 := Box(Vec{-2, 0, -.1}, 0.5, 1, 1, Diffuse0(RED))
 	b2 := Box(Vec{2, 0, -.1}, 0.5, 1, 1, Diffuse0(GREEN))
 	or := ObjOr(b1, b2)
-	or = Transf(or, RotY4(-15*deg))
+	or = Transf(or, RotY4(-15*Deg))
 	e.Add(g, or)
 
 	l := DirLight(Vec{8, 2, 0}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
 
-	e.Camera = Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15 * deg))
+	e.Camera = Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15 * Deg))
 
 	Compare(t, e, "015-objor2")
 }

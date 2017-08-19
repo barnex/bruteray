@@ -32,7 +32,7 @@ func ExampleMatrix4_Mul() {
 }
 
 func ExampleMatrix4_Inv() {
-	T := Transl4(Vec{2, 3, 4}).Mul(RotX4(pi / 2).Mul(Transl4(Vec{1, 2, -3})).Mul(RotY4(pi / 2)))
+	T := Transl4(Vec{2, 3, 4}).Mul(RotX4(Pi / 2).Mul(Transl4(Vec{1, 2, -3})).Mul(RotY4(Pi / 2)))
 	//fmt.Println(T)
 	fmt.Println(T.Mul(T.Inv()))
 	fmt.Println(T.Inv().Mul(T))

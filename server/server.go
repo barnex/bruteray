@@ -1,7 +1,9 @@
 package server
 
 import (
+	"bytes"
 	"flag"
+	"image/jpeg"
 	"log"
 	"net/http"
 	"strconv"
@@ -26,16 +28,36 @@ func Serve(e *bruteray.Env) {
 
 	env = e
 
-	http.HandleFunc("/render", render)
+	http.HandleFunc("/render", renderHandler)
+	http.HandleFunc("/", mainHandler)
+
 	log.Println("listen", *port)
 	log.Fatal(http.ListenAndServe(*port, nil))
 }
 
-func render(w http.ResponseWriter, r *http.Request) {
+func mainHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(mainHTML))
+}
+
+var cache struct {
+	w, h int
+	data bytes.Buffer
+}
+
+func renderHandler(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	W := parseInt(q.Get("w"), DefaultWidth)
 	H := parseInt(q.Get("h"), DefaultHeight)
 
+	if W != cache.w || H != cache.h {
+		img := bruteray.MakeImage(W, H)
+		env.Camera.Render(env, 1, img)
+		log.Println("rendered")
+		Print(jpeg.Encode(&(cache.data), img, &jpeg.Options{Quality: 95}))
+		cache.w, cache.h = W, H
+	}
+
+	w.Write(cache.data.Bytes())
 }
 
 func parseInt(s string, Default int) int {

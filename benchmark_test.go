@@ -27,7 +27,7 @@ func Benchmark9Spheres(b *testing.B) {
 	e.Add(Sphere(Vec{-2, 0, 2}, r, nz))
 	e.Add(Sphere(Vec{-2, 0, 4}, r, nz))
 
-	c := Camera(1).Transl(0, 4, -4).Transf(RotX4(pi / 5))
+	c := Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
 	benchmark(b, e, c)
 }
 
