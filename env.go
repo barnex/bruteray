@@ -22,6 +22,10 @@ func NewEnv() *Env {
 	}
 }
 
+func (e *Env) SetAmbient(m Material) {
+	e.Ambient = Surf{T: inf, Material: m}
+}
+
 // Returns a copy with its own random number generator,
 // so it can be used from a different thread.
 func (e *Env) Copy() *Env {

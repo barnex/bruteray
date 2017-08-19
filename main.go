@@ -19,6 +19,8 @@ func main() {
 		SmoothLight(Vec{8, 6, -5}, 1, WHITE.Mul(EV(7))),
 	)
 
+	e.SetAmbient(Flat(WHITE.Mul(EV(-1))))
+
 	e.Camera = Camera(1).Transl(0, 3, -5).Transf(RotX4(40 * Deg))
 
 	Serve(e)

@@ -83,6 +83,14 @@ func (s *diffuse1) Shade(e *Env, N int, pos, norm Vec) Color {
 	return acc
 }
 
+// -- ambient
+
+type ShadeDir func(Vec) Color
+
+func (s ShadeDir) Shade(e *Env, N int, pos, norm Vec) Color {
+	return s(pos)
+}
+
 // -- normal
 
 // Debug shader: colors according to the normal vector projected on dir.
