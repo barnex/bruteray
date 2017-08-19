@@ -5,6 +5,67 @@ import (
 	"sync"
 )
 
+func Render1Thread(e *Env, maxRec int, img Image) {
+	H := img.Bounds().Dy()
+	const stride = 1
+	for i := 0; i < H; i += stride {
+		renderLine(e, maxRec, img, i, i+stride)
+	}
+}
+
+func Render(e *Env, maxRec int, img Image) {
+	H := img.Bounds().Dy()
+	var wg sync.WaitGroup
+	const stride = 1
+	for i := 0; i < H; i += stride {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			renderLine(e.Copy(), maxRec, img, i, i+stride)
+		}(i)
+	}
+	wg.Wait()
+}
+
+type Loop struct {
+	env     *Env
+	r, w, h int
+	acc     Image
+	n       float64
+	mu      sync.Mutex
+}
+
+func (l *Loop) run() {
+	for {
+		img := MakeImage(l.w, l.h)
+		Render(l.env, l.r, img)
+		//log.Println("iterated")
+		l.mu.Lock()
+		l.acc.Add(img)
+		l.n++
+		l.mu.Unlock()
+	}
+}
+
+func (l *Loop) Current() Image {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	//log.Println("current")
+	img := MakeImage(l.w, l.h)
+	for i := range img {
+		for j := range img[i] {
+			img[i][j] = l.acc[i][j].Mul(1 / l.n)
+		}
+	}
+	return img
+}
+
+func RenderLoop(e *Env, maxRec int, w, h int) *Loop {
+	l := &Loop{env: e, r: maxRec, w: w, h: h, acc: MakeImage(w, h)}
+	go l.run()
+	return l
+}
+
 func MultiPass(e *Env, maxRec int, img Image, N int) {
 	que := make(chan struct{}, N)
 	var wg sync.WaitGroup
@@ -44,28 +105,6 @@ func MultiPass(e *Env, maxRec int, img Image, N int) {
 		for j := range img[i] {
 			img[i][j] = img[i][j].Mul(1 / float64(N))
 		}
-	}
-}
-
-func Render(e *Env, maxRec int, img Image) {
-	H := img.Bounds().Dy()
-	var wg sync.WaitGroup
-	const stride = 1
-	for i := 0; i < H; i += stride {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			renderLine(e.Copy(), maxRec, img, i, i+stride)
-		}(i)
-	}
-	wg.Wait()
-}
-
-func Render1Thread(e *Env, maxRec int, img Image) {
-	H := img.Bounds().Dy()
-	const stride = 1
-	for i := 0; i < H; i += stride {
-		renderLine(e, maxRec, img, i, i+stride)
 	}
 }
 

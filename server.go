@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"flag"
 	"image/jpeg"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -21,8 +23,11 @@ var (
 const (
 	DefaultWidth  = 800
 	DefaultHeight = 600
+	DefaultRec    = 4
 )
 
+// Serve starts a web UI server
+// at the port specified by flag --http.
 func Serve(e *Env) {
 
 	env = e
@@ -31,7 +36,6 @@ func Serve(e *Env) {
 	http.HandleFunc("/render", handleRender)
 	http.HandleFunc("/", mainHandler)
 
-	//log.Println("listen", *port)
 	log.Fatal(http.ListenAndServe(*port, nil))
 }
 
@@ -39,19 +43,40 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(mainHTML))
 }
 
-func handleRender(w http.ResponseWriter, r *http.Request) {
+var (
+	progressive *Loop
+	pmu         sync.Mutex
+)
 
+func handleRender(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	W := parseInt(q.Get("w"), DefaultWidth)
+	H := parseInt(q.Get("h"), DefaultHeight)
+	R := parseInt(q.Get("rec"), DefaultRec)
+
+	pmu.Lock()
+	defer pmu.Unlock()
+
+	if progressive == nil {
+		progressive = RenderLoop(env, R, W, H)
+	}
+	img := progressive.Current()
+	encode(w, img)
 }
 
 var preview struct {
 	w, h int
 	data bytes.Buffer
+	sync.Mutex
 }
 
 func handlePreview(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	W := parseInt(q.Get("w"), DefaultWidth)
 	H := parseInt(q.Get("h"), DefaultHeight)
+
+	preview.Lock()
+	defer preview.Unlock()
 
 	if W != preview.w || H != preview.h {
 		start := time.Now()
@@ -61,16 +86,20 @@ func handlePreview(w http.ResponseWriter, r *http.Request) {
 		Render(e2, 1, img)
 
 		log.Println("preview", time.Since(start).Round(time.Millisecond))
-		Print(jpeg.Encode(&(preview.data), img, &jpeg.Options{Quality: 95}))
+		encode(&preview.data, img)
 		preview.w, preview.h = W, H
 	}
 
 	w.Write(preview.data.Bytes())
 }
 
+func encode(w io.Writer, img Image) {
+	Print(jpeg.Encode(w, img, &jpeg.Options{Quality: 95}))
+}
+
 func parseInt(s string, Default int) int {
-	x, err := strconv.Atoi(s)
-	Print(err)
+	x, _ := strconv.Atoi(s)
+	//Print(err)
 	if x == 0 {
 		return Default
 	}

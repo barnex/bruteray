@@ -2,7 +2,6 @@ package main
 
 import (
 	. "github.com/barnex/bruteray"
-	"github.com/barnex/bruteray/server"
 )
 
 func main() {
@@ -22,5 +21,5 @@ func main() {
 
 	e.Camera = Camera(1).Transl(0, 3, -5).Transf(RotX4(40 * Deg))
 
-	server.Serve(e)
+	Serve(e)
 }

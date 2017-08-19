@@ -37,6 +37,23 @@ func (i Image) ColorModel() color.Model {
 	return nil
 }
 
+// Adds img2 to img, overwriting img.
+func (img Image) Add(img2 Image) {
+	for i := range img {
+		for j := range img[i] {
+			img[i][j] = img[i][j].Add(img2[i][j])
+		}
+	}
+}
+
+func (img Image) Mul(x float64) {
+	for i := range img {
+		for j := range img[i] {
+			img[i][j].Mul(x)
+		}
+	}
+}
+
 const jpegQual = 95
 
 func Encode(img Image, fname string) error {
