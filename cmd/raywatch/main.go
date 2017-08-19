@@ -18,7 +18,6 @@ var (
 )
 
 func main() {
-	log.SetFlags(0)
 
 	flag.Parse()
 	if flag.NArg() != 1 {
@@ -26,7 +25,9 @@ func main() {
 	}
 	fname := flag.Arg(0)
 
+	Print(exec.Command("x-www-browser", "localhost:3700").Start())
 	watch(fname)
+
 }
 
 func watch(fname string) {
@@ -41,7 +42,6 @@ func watch(fname string) {
 }
 
 func trigger(fname string) {
-	log.Println("triggered", fname)
 	err := build(fname)
 	if err == nil {
 		goServe()
@@ -51,24 +51,31 @@ func trigger(fname string) {
 const Executable = "/tmp/bruteray-scene"
 
 func build(fname string) error {
-	err := exec.Command("go", "build", "-o", Executable, fname).Run()
-	log.Println("build", err)
-	//Print(err)
+	start := time.Now()
+	build := exec.Command("go", "build", "-o", Executable, fname)
+	build.Stderr = os.Stderr
+	err := build.Run()
+	log.Println("build", ok(err), time.Since(start).Round(time.Millisecond))
 	return err
+}
+
+func ok(err error) string {
+	if err == nil {
+		return "OK"
+	}
+	return err.Error()
 }
 
 func goServe() {
 	if cmd != nil {
-		log.Println("killing previous...")
 		Print(cmd.Process.Kill())
 		cmd.Process.Wait()
-		log.Println("...killed")
 	}
-	log.Println("starting")
 	cmd = exec.Command(Executable)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	Print(cmd.Start())
+	err := cmd.Start()
+	log.Println("serve", ok(err))
 }
 
 // FileInfo equality.

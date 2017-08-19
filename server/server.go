@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/barnex/bruteray"
 )
@@ -50,9 +51,10 @@ func renderHandler(w http.ResponseWriter, r *http.Request) {
 	H := parseInt(q.Get("h"), DefaultHeight)
 
 	if W != cache.w || H != cache.h {
+		start := time.Now()
 		img := bruteray.MakeImage(W, H)
 		env.Camera.Render(env, 1, img)
-		log.Println("rendered")
+		log.Println("rendered", time.Since(start).Round(time.Millisecond))
 		Print(jpeg.Encode(&(cache.data), img, &jpeg.Options{Quality: 95}))
 		cache.w, cache.h = W, H
 	}

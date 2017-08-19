@@ -1,20 +1,19 @@
 package server
-
-const mainHTML = `
+const mainHTML=`
 <html>
 
 <head>
 	<script>
 function refresh(){
-	document.getElementById("preview").src = "/render?w=800&h=600&cachebreak=" + Math.random();
+	document.getElementById("preview").src = "/render?w=600&h=400&cachebreak=" + Math.random();
 }
-window.setInterval(refresh, 1000)
+window.setInterval(refresh, 500)
 
 	</script>
 </head>
 
 <body>
-	<img id="preview" width=800 height=600 src=/render?w=800&h=600></img>
+	<img id="preview" width=600 height=400></img>
 </body>
 
 </html>
