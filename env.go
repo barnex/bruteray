@@ -11,12 +11,14 @@ type Env struct {
 	lights  []Light
 	Ambient Surf
 	rng     rand.Rand
+	Camera  *Cam
 }
 
 func NewEnv() *Env {
 	return &Env{
 		Ambient: Surf{T: inf, Material: Flat(BLACK)},
 		rng:     *(newRng()),
+		Camera:  Camera(0),
 	}
 }
 

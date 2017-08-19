@@ -15,9 +15,8 @@ func TestSphere(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(Sphere(Vec{0, 0, 1}, 0.25, Flat(WHITE)))
-	c := Camera(0)
 
-	Compare(t, e, c, "001-sphere")
+	Compare(t, e, "001-sphere")
 }
 
 // Test a sphere behind the camera
@@ -26,7 +25,7 @@ func TestBehindCam(t *testing.T) {
 
 	e.Add(Sphere(Vec{0, 0, -1}, 0.25, Flat(WHITE)))
 
-	Compare(t, e, Camera(0), "002-behindcam")
+	Compare(t, e, "002-behindcam")
 }
 
 // Test normal vectors
@@ -37,7 +36,7 @@ func TestNormal(t *testing.T) {
 	e.Add(Sphere(Vec{-0.5, 0, 2}, 0.25, ShadeNormal(Ex)))
 	e.Add(Sphere(Vec{0.5, 0, 2}, 0.25, ShadeNormal(Ey)))
 
-	Compare(t, e, Camera(0), "003-normals")
+	Compare(t, e, "003-normals")
 }
 
 // Test camera translation
@@ -45,8 +44,9 @@ func TestCamTransl(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)))
+	e.Camera = Camera(0).Transl(-0.5, -0.25, 0)
 
-	Compare(t, e, Camera(0).Transl(-0.5, -0.25, 0), "004-camtransl")
+	Compare(t, e, "004-camtransl")
 }
 
 // Test camera rotation
@@ -64,8 +64,9 @@ func TestCamRot(t *testing.T) {
 	e.Add(Sphere(Vec{-2, 0, 0}, r, nz))
 	e.Add(Sphere(Vec{-2, 0, 2}, r, nz))
 	e.Add(Sphere(Vec{-2, 0, 4}, r, nz))
+	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(pi / 5))
 
-	Compare(t, e, Camera(1).Transl(0, 4, -4).Transf(RotX4(pi/5)), "005-camrot")
+	Compare(t, e, "005-camrot")
 }
 
 // Test object transform
@@ -82,7 +83,7 @@ func TestObjTransf(t *testing.T) {
 	e.Add(Transf(sy, rot))
 	e.Add(Transf(sz, rot))
 
-	Compare(t, e, Camera(0), "006-objtransf")
+	Compare(t, e, "006-objtransf")
 }
 
 // Test intersection of two spheres
@@ -95,7 +96,7 @@ func TestObjAnd(t *testing.T) {
 	s := ObjAnd(s1, s2)
 	e.Add(s)
 
-	Compare(t, e, Camera(0), "007-objand")
+	Compare(t, e, "007-objand")
 }
 
 // Test two partially overlapping spheres
@@ -108,7 +109,7 @@ func TestOverlap(t *testing.T) {
 	e.Add(s1)
 	e.Add(s2)
 
-	Compare(t, e, Camera(0), "008-overlap")
+	Compare(t, e, "008-overlap")
 }
 
 // Make a cube out of 3 intersecting slabs
@@ -122,8 +123,9 @@ func TestSlabIntersect(t *testing.T) {
 	cube := ObjAnd(ObjAnd(s1, s2), s3)
 	cube = Transf(cube, RotY4(160*deg).Mul(RotX4(20*deg)))
 	e.Add(cube)
+	e.Camera = Camera(1).Transl(0, 0, -4)
 
-	Compare(t, e, Camera(1).Transl(0, 0, -4), "009-slabintersect")
+	Compare(t, e, "009-slabintersect")
 }
 
 // Use sheets as green grass, blue sky and wall
@@ -135,8 +137,9 @@ func TestSheet(t *testing.T) {
 	s3 := Sheet(Ex, -10, Flat(WHITE))
 	s4 := Sphere(Vec{1.5, 0, 3}, 1, ShadeNormal(Ez))
 	e.Add(s1, s2, s3, s4)
+	e.Camera = Camera(1)
 
-	Compare(t, e, Camera(1), "010-sheet")
+	Compare(t, e, "010-sheet")
 }
 
 // Test rectangles
@@ -154,7 +157,7 @@ func TestRect(t *testing.T) {
 	)
 	e.Add(r1, r2, r3)
 
-	Compare(t, e, Camera(0), "011-rect")
+	Compare(t, e, "011-rect")
 }
 
 // Test Axis Aligned Box
@@ -166,8 +169,9 @@ func TestBox(t *testing.T) {
 	b = Transf(b, RotY4(150*deg))
 	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
 	e.Add(b, g)
+	e.Camera = Camera(1).Transl(0, 0, -4)
 
-	Compare(t, e, Camera(1).Transl(0, 0, -4), "012-box")
+	Compare(t, e, "012-box")
 }
 
 func TestDiffuse0(t *testing.T) {
@@ -179,8 +183,9 @@ func TestDiffuse0(t *testing.T) {
 
 	l := DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
+	e.Camera = Camera(1).Transl(0, 0, -4)
 
-	Compare(t, e, Camera(1).Transl(0, 0, -4), "013-diffuse0")
+	Compare(t, e, "013-diffuse0")
 }
 
 func TestObjOr1(t *testing.T) {
@@ -198,8 +203,9 @@ func TestObjOr1(t *testing.T) {
 
 	l := DirLight(Vec{4, 2, -6}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
+	e.Camera = Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15 * deg))
 
-	Compare(t, e, Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15*deg)), "014-objor1")
+	Compare(t, e, "014-objor1")
 }
 
 func TestObjOr2(t *testing.T) {
@@ -215,7 +221,9 @@ func TestObjOr2(t *testing.T) {
 	l := DirLight(Vec{8, 2, 0}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
 
-	Compare(t, e, Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15*deg)), "015-objor2")
+	e.Camera = Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15 * deg))
+
+	Compare(t, e, "015-objor2")
 }
 
 func TestPointLight(t *testing.T) {
@@ -233,8 +241,9 @@ func TestPointLight(t *testing.T) {
 	e.Add(s)
 
 	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE))
+	e.Camera = Camera(1).Transl(0, 1, -2)
 
-	Compare(t, e, Camera(1).Transl(0, 1, -2), "016-pointlight")
+	Compare(t, e, "016-pointlight")
 }
 
 // Test convergence of diffuse interreflection:
@@ -291,8 +300,8 @@ func TestShadowBehind(t *testing.T) {
 		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
 	)
 	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5))))
-	c := Camera(1).Transl(0, 1, -2)
-	Compare(t, e, c, "019-shadowbehind")
+	e.Camera = Camera(1).Transl(0, 1, -2)
+	Compare(t, e, "019-shadowbehind")
 }
 
 //func TestObjMinus(t *testing.T) {
