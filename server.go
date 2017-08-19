@@ -1,4 +1,4 @@
-package server
+package bruteray
 
 import (
 	"bytes"
@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/barnex/bruteray"
 )
 
 var (
@@ -17,7 +15,7 @@ var (
 )
 
 var (
-	env *bruteray.Env
+	env *Env
 )
 
 const (
@@ -25,7 +23,7 @@ const (
 	DefaultHeight = 600
 )
 
-func Serve(e *bruteray.Env) {
+func Serve(e *Env) {
 
 	env = e
 
@@ -52,7 +50,7 @@ func renderHandler(w http.ResponseWriter, r *http.Request) {
 
 	if W != cache.w || H != cache.h {
 		start := time.Now()
-		img := bruteray.MakeImage(W, H)
+		img := MakeImage(W, H)
 		env.Camera.Render(env, 1, img)
 		log.Println("rendered", time.Since(start).Round(time.Millisecond))
 		Print(jpeg.Encode(&(cache.data), img, &jpeg.Options{Quality: 95}))

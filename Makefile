@@ -1,5 +1,5 @@
 all:
-	echo package server > html.go
+	echo package bruteray > html.go
 	echo const mainHTML=\` >> html.go
 	cat main.html >> html.go
 	echo \` >> html.go
