@@ -27,7 +27,6 @@ func main() {
 
 	Print(exec.Command("x-www-browser", "localhost:3700").Start())
 	watch(fname)
-
 }
 
 func watch(fname string) {

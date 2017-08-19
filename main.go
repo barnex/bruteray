@@ -2,7 +2,7 @@
 
 package main
 
-import . "."
+import . "github.com/barnex/bruteray"
 
 func main() {
 	e := NewEnv()
@@ -16,7 +16,7 @@ func main() {
 	)
 
 	e.AddLight(
-		PointLight(Vec{8, 6, -5}, WHITE.Mul(EV(7))),
+		SmoothLight(Vec{8, 6, -5}, 1, WHITE.Mul(EV(7))),
 	)
 
 	e.Camera = Camera(1).Transl(0, 3, -5).Transf(RotX4(40 * Deg))

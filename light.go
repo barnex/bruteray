@@ -1,7 +1,7 @@
 package bruteray
 
 type Light interface {
-	Sample(target Vec) (dir Vec, intens Color)
+	Sample(e *Env, target Vec) (dir Vec, intens Color)
 }
 
 // Directed light source without fall-off.
@@ -15,7 +15,7 @@ type dirLight struct {
 	c   Color
 }
 
-func (l *dirLight) Sample(target Vec) (Vec, Color) {
+func (l *dirLight) Sample(e *Env, target Vec) (Vec, Color) {
 	return l.pos, l.c
 }
 
@@ -29,15 +29,32 @@ type pointLight struct {
 	c   Color
 }
 
-func (l *pointLight) Sample(target Vec) (Vec, Color) {
-	return l.pos, l.c.Mul(1 / target.Sub(l.pos).Len2()) // TODO: 4 pi
+func (l *pointLight) Sample(e *Env, target Vec) (Vec, Color) {
+	return l.pos, l.c.Mul((1 / (1)) / target.Sub(l.pos).Len2()) // TODO: 1-> 4*pi
+}
+
+// Smooth light source
+func SmoothLight(pos Vec, radius float64, intensity Color) Light {
+	return &smoothLight{pos, radius, intensity}
+}
+
+type smoothLight struct {
+	pos Vec
+	r   float64
+	c   Color
+}
+
+func (l *smoothLight) Sample(e *Env, target Vec) (Vec, Color) {
+	pos := l.pos.MAdd(l.r, RandVec(e))
+	return pos, l.c.Mul((1 / (1)) / target.Sub(pos).Len2()) // TODO: 1->4*pi
 }
 
 // returns a cheaper, lower quality light used for quick preview.
 func toPreview(l Light) Light {
-	switch p := l.(type) {
+	switch l := l.(type) {
 	default:
-		return p
-		// TODO: smoothLight
+		return l
+	case *smoothLight:
+		return &pointLight{l.pos, l.c}
 	}
 }

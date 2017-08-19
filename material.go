@@ -44,7 +44,7 @@ func (s *diffuse0) Shade(e *Env, N int, pos, norm Vec) Color {
 const off = 1e-6
 
 func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
-	lpos, intens := l.Sample(pos)
+	lpos, intens := l.Sample(e, pos)
 
 	pos = pos.MAdd(off, norm)
 	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
