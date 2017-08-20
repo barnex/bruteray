@@ -143,3 +143,10 @@ func (s *shadeNormal) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 		return BLUE.Mul(v) // away from cam
 	}
 }
+
+// -- utility
+
+// Shiny is shorthand for diffuse + reflection, e.g., a billiard ball.
+func Shiny(c Color, reflectivity float64) Material {
+	return Blend(1-reflectivity, Diffuse1(c), reflectivity, Reflective(WHITE))
+}

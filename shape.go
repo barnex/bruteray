@@ -61,6 +61,10 @@ func Box(center Vec, rx, ry, rz float64, m Material) Obj {
 	}, m}
 }
 
+func Cube(center Vec, r float64, m Material) Obj {
+	return Box(center, r, r, r, m)
+}
+
 func (s *box) Inters(r *Ray) Interval {
 	min := s.min
 	max := s.max

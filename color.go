@@ -30,6 +30,10 @@ func (c Color) Mul(s float64) Color {
 	return Color{s * c.R, s * c.G, s * c.B}
 }
 
+func (c Color) EV(s float64) Color {
+	return c.Mul(EV(s))
+}
+
 func (c Color) Mul3(b Color) Color {
 	return Color{c.R * b.R, c.G * b.G, c.B * b.B}
 }
