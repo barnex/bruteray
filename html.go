@@ -16,7 +16,7 @@ window.setInterval(refresh, 1000)
 </head>
 
 <body>
-	<img id="render" width=600 height=400></img>
+	<img id="render"></img>
 </body>
 
 </html>

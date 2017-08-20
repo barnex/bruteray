@@ -45,6 +45,23 @@ type smoothLight struct {
 }
 
 func (l *smoothLight) Sample(e *Env, target Vec) (Vec, Color) {
-	pos := l.pos.MAdd(l.r, RandVec(e))
+	//pos := l.pos.MAdd(l.r, RandVec(e))
+	pos := l.pos.MAdd(l.r, sphereVec(e))
 	return pos, l.c.Mul((1 / (1)) / target.Sub(pos).Len2()) // TODO: 1->4*pi
+}
+
+func sphereVec(e *Env) Vec {
+	v := cubeVec(e)
+	for v.Len2() > 1 {
+		v = cubeVec(e)
+	}
+	return v
+}
+
+func cubeVec(e *Env) Vec {
+	return Vec{
+		e.rng.Float64() - 0.5,
+		e.rng.Float64() - 0.5,
+		e.rng.Float64() - 0.5,
+	}
 }

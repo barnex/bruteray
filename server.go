@@ -20,8 +20,8 @@ var (
 )
 
 const (
-	DefaultWidth  = 800
-	DefaultHeight = 600
+	DefaultWidth  = 1920
+	DefaultHeight = 1080
 	DefaultRec    = 6
 )
 
@@ -60,7 +60,7 @@ var preview struct {
 }
 
 func encode(w io.Writer, img Image) {
-	Print(jpeg.Encode(w, img, &jpeg.Options{Quality: 90}))
+	Print(jpeg.Encode(w, img, &jpeg.Options{Quality: 95}))
 }
 
 func parseInt(s string, Default int) int {
