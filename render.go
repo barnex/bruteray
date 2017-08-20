@@ -37,14 +37,17 @@ type Loop struct {
 
 func (l *Loop) run() {
 	for {
-		img := MakeImage(l.w, l.h)
-		Render(l.env, l.r, img)
-		//log.Println("iterated")
-		l.mu.Lock()
-		l.acc.Add(img)
-		l.n++
-		l.mu.Unlock()
+		l.iter()
 	}
+}
+
+func (l *Loop) iter() {
+	img := MakeImage(l.w, l.h)
+	Render(l.env, l.r, img)
+	l.mu.Lock()
+	l.acc.Add(img)
+	l.n++
+	l.mu.Unlock()
 }
 
 func (l *Loop) Current() Image {
@@ -62,7 +65,8 @@ func (l *Loop) Current() Image {
 
 func RenderLoop(e *Env, maxRec int, w, h int) *Loop {
 	l := &Loop{env: e, r: maxRec, w: w, h: h, acc: MakeImage(w, h)}
-	go l.run()
+	l.iter()   // make sure we have 1 pass at least
+	go l.run() // refine in the background
 	return l
 }
 

@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
-	"time"
 )
 
 var (
@@ -32,9 +31,10 @@ func Serve(e *Env) {
 
 	env = e
 
-	http.HandleFunc("/preview", handlePreview)
 	http.HandleFunc("/render", handleRender)
 	http.HandleFunc("/", mainHandler)
+
+	progressive = RenderLoop(env, DefaultRec, DefaultWidth, DefaultHeight)
 
 	log.Fatal(http.ListenAndServe(*port, nil))
 }
@@ -49,17 +49,6 @@ var (
 )
 
 func handleRender(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	W := parseInt(q.Get("w"), DefaultWidth)
-	H := parseInt(q.Get("h"), DefaultHeight)
-	R := parseInt(q.Get("rec"), DefaultRec)
-
-	pmu.Lock()
-	defer pmu.Unlock()
-
-	if progressive == nil {
-		progressive = RenderLoop(env, R, W, H)
-	}
 	img := progressive.Current()
 	encode(w, img)
 }
@@ -70,31 +59,8 @@ var preview struct {
 	sync.Mutex
 }
 
-func handlePreview(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	W := parseInt(q.Get("w"), DefaultWidth)
-	H := parseInt(q.Get("h"), DefaultHeight)
-
-	preview.Lock()
-	defer preview.Unlock()
-
-	if W != preview.w || H != preview.h {
-		start := time.Now()
-
-		e2 := env.Preview()
-		img := MakeImage(W, H)
-		Render(e2, 3, img)
-
-		log.Println("preview", time.Since(start).Round(time.Millisecond))
-		encode(&preview.data, img)
-		preview.w, preview.h = W, H
-	}
-
-	w.Write(preview.data.Bytes())
-}
-
 func encode(w io.Writer, img Image) {
-	Print(jpeg.Encode(w, img, &jpeg.Options{Quality: 95}))
+	Print(jpeg.Encode(w, img, &jpeg.Options{Quality: 85}))
 }
 
 func parseInt(s string, Default int) int {

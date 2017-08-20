@@ -34,17 +34,6 @@ func (e *Env) Copy() *Env {
 	return &e2
 }
 
-// Returns a copy where expensive elements are replaced by fast ones,
-// E.g. Smooth lights replaced by point lights, etc.
-func (e *Env) Preview() *Env {
-	e2 := *e
-	e2.lights = make([]Light, len(e.lights))
-	for i, l := range e.lights {
-		e2.lights[i] = toPreview(l)
-	}
-	return &e2
-}
-
 func (e *Env) Add(o ...Obj) {
 	e.objs = append(e.objs, o...)
 }
