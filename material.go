@@ -1,7 +1,7 @@
 package bruteray
 
 type Material interface {
-	Shade(e *Env, N int, pos Vec, norm Vec) Color
+	Shade(e *Env, r *Ray, N int, pos Vec, norm Vec) Color
 }
 
 // -- flat
@@ -15,7 +15,7 @@ type flat struct {
 	c Color
 }
 
-func (s *flat) Shade(e *Env, N int, pos, norm Vec) Color {
+func (s *flat) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	return s.c
 }
 
@@ -33,7 +33,7 @@ type diffuse0 struct {
 	refl Color
 }
 
-func (s *diffuse0) Shade(e *Env, N int, pos, norm Vec) Color {
+func (s *diffuse0) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	var acc Color
 	for _, l := range e.lights {
 		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
@@ -69,7 +69,7 @@ type diffuse1 struct {
 	diffuse0
 }
 
-func (s *diffuse1) Shade(e *Env, N int, pos, norm Vec) Color {
+func (s *diffuse1) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	var acc Color
 	for _, l := range e.lights {
 		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
@@ -91,6 +91,20 @@ func (s ShadeDir) Shade(e *Env, N int, pos, norm Vec) Color {
 	return s(pos)
 }
 
+// -- reflective
+
+func Reflective(c Color) Material {
+	return &reflective{c}
+}
+
+type reflective struct {
+	c Color
+}
+
+func (s *reflective) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
+	r2 := &Ray{pos, r.Dir}
+}
+
 // -- normal
 
 // Debug shader: colors according to the normal vector projected on dir.
@@ -102,7 +116,7 @@ type shadeNormal struct {
 	dir Vec
 }
 
-func (s *shadeNormal) Shade(e *Env, N int, pos, norm Vec) Color {
+func (s *shadeNormal) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	v := norm.Dot(s.dir)
 	if v < 0 {
 		return RED.Mul(-v) // towards cam

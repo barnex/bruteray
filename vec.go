@@ -70,6 +70,10 @@ func (n Vec) Towards(d Vec) Vec {
 	return n
 }
 
+func (n Vec) Reflect(n Vec) Vec {
+
+}
+
 func (a Vec) Cross(b Vec) Vec {
 	x := a[Y]*b[Z] - a[Z]*b[Y]
 	y := a[Z]*b[X] - a[X]*b[Z]
