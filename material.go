@@ -106,6 +106,24 @@ func (s *reflective) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	return e.Shade(r2, N-1).Mul3(s.c)
 }
 
+func Blend(a float64, matA Material, b float64, matB Material) Material {
+	return &blend{a, matA, b, matB}
+}
+
+type blend struct {
+	a    float64
+	matA Material
+	b    float64
+	matB Material
+}
+
+func (s *blend) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
+	ca := s.matA.Shade(e, r, N, pos, norm)
+	cb := s.matB.Shade(e, r, N, pos, norm)
+
+	return ca.Mul(s.a).MAdd(s.b, cb)
+}
+
 // -- normal
 
 // Debug shader: colors according to the normal vector projected on dir.

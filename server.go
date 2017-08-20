@@ -22,7 +22,7 @@ var (
 const (
 	DefaultWidth  = 800
 	DefaultHeight = 600
-	DefaultRec    = 4
+	DefaultRec    = 6
 )
 
 // Serve starts a web UI server
