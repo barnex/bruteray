@@ -83,7 +83,7 @@ func handlePreview(w http.ResponseWriter, r *http.Request) {
 
 		e2 := env.Preview()
 		img := MakeImage(W, H)
-		Render(e2, 1, img)
+		Render(e2, 3, img)
 
 		log.Println("preview", time.Since(start).Round(time.Millisecond))
 		encode(&preview.data, img)

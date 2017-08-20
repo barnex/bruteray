@@ -102,7 +102,8 @@ type reflective struct {
 }
 
 func (s *reflective) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
-	r2 := &Ray{pos, r.Dir}
+	r2 := &Ray{pos, r.Dir.Reflect(norm)}
+	return e.Shade(r2, N-1).Mul3(s.c)
 }
 
 // -- normal

@@ -42,27 +42,34 @@ func (v Vec) Mul(a float64) Vec {
 	return Vec{a * v[X], a * v[Y], a * v[Z]}
 }
 
+// Scalar division.
 func (v Vec) Div(a float64) Vec {
 	return v.Mul(1 / a)
 }
 
+// Pointwise division.
 func (v Vec) Div3(a Vec) Vec {
 	return Vec{v[X] / a[X], v[Y] / a[Y], v[Z] / a[Z]}
 }
 
+// Length (norm).
 func (v Vec) Len() float64 {
 	return math.Sqrt(v.Dot(v))
 }
 
+// Length squared
 func (v Vec) Len2() float64 {
 	return v.Dot(v)
 }
 
+// Returns a copy of v, scaled to unit length.
 func (v Vec) Normalized() Vec {
 	l := 1 / math.Sqrt(v[X]*v[X]+v[Y]*v[Y]+v[Z]*v[Z])
 	return Vec{v[X] * l, v[Y] * l, v[Z] * l}
 }
 
+// May invert v to assure it points towards direction d.
+// Used to ensure normal vectors point outwards.
 func (n Vec) Towards(d Vec) Vec {
 	if n.Dot(d) > 0 {
 		return n.Mul(-1)
@@ -70,8 +77,9 @@ func (n Vec) Towards(d Vec) Vec {
 	return n
 }
 
-func (n Vec) Reflect(n Vec) Vec {
-
+// Reflects v against the plane normal to n.
+func (v Vec) Reflect(n Vec) Vec {
+	return v.MAdd(-2*v.Dot(n), n)
 }
 
 func (a Vec) Cross(b Vec) Vec {
