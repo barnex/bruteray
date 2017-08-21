@@ -2,6 +2,7 @@ package bruteray
 
 type Light interface {
 	Sample(e *Env, target Vec) (dir Vec, intens Color)
+	Obj
 }
 
 // Directed light source without fall-off.
@@ -19,6 +20,10 @@ func (l *dirLight) Sample(e *Env, target Vec) (Vec, Color) {
 	return l.pos, l.c
 }
 
+func (l *dirLight) Inters(*Ray) BiSurf {
+	return BiSurf{}
+}
+
 // Point light source (with fall-off).
 func PointLight(pos Vec, intensity Color) Light {
 	return &pointLight{pos, intensity}
@@ -30,24 +35,41 @@ type pointLight struct {
 }
 
 func (l *pointLight) Sample(e *Env, target Vec) (Vec, Color) {
-	return l.pos, l.c.Mul((1 / (1)) / target.Sub(l.pos).Len2()) // TODO: 1-> 4*pi
+	return l.pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(l.pos).Len2()) // TODO: 1-> 4*pi
+}
+
+func (l *pointLight) Inters(*Ray) BiSurf {
+	return BiSurf{}
 }
 
 // Smooth light source
 func SmoothLight(pos Vec, radius float64, intensity Color) Light {
-	return &smoothLight{pos, radius, intensity}
+	return &smoothLight{
+		sph: sphere{pos, radius},
+		r:   radius,
+		c:   intensity,
+		mat: Flat(intensity.Mul(1 / (4 * Pi * radius * radius))),
+	}
 }
 
 type smoothLight struct {
-	pos Vec
+	sph sphere
 	r   float64
 	c   Color
+	mat Material
 }
 
 func (l *smoothLight) Sample(e *Env, target Vec) (Vec, Color) {
-	//pos := l.pos.MAdd(l.r, RandVec(e))
-	pos := l.pos.MAdd(l.r, sphereVec(e))
-	return pos, l.c.Mul((1 / (1)) / target.Sub(pos).Len2()) // TODO: 1->4*pi
+	pos := l.sph.c.MAdd(l.r, sphereVec(e))
+	return pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
+}
+
+func (l *smoothLight) Inters(r *Ray) BiSurf {
+	inter := l.sph.Inters(r)
+	return BiSurf{
+		S1: Surf{inter.Min, r.At(inter.Min), l.mat},
+		S2: Surf{inter.Max, r.At(inter.Max), l.mat},
+	}
 }
 
 func sphereVec(e *Env) Vec {

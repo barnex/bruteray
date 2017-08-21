@@ -7,7 +7,7 @@ import (
 )
 
 func TestImportanceSampling(t *testing.T) {
-	t.Parallel()
+	//t.Parallel()
 
 	testFn := []func(Vec) float64{
 		func(v Vec) float64 { return 1 },
@@ -19,7 +19,7 @@ func TestImportanceSampling(t *testing.T) {
 	}
 
 	const (
-		N   = 1e4
+		N   = 2e4
 		tol = 5e-2 // a few times 1/sqrt(N)
 	)
 

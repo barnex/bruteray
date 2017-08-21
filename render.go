@@ -134,7 +134,7 @@ func renderLine(e *Env, maxRec int, img Image, hMin, hMax int) {
 			r.Transf(&(c.transf))
 
 			// accumulate ray intensity
-			v := e.Shade(r, maxRec)
+			v := e.ShadeAll(r, maxRec)
 			img[i][j] = v
 		}
 	}

@@ -240,7 +240,7 @@ func TestPointLight(t *testing.T) {
 	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse0(WHITE))
 	e.Add(s)
 
-	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE))
+	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
 	e.Camera = Camera(1).Transl(0, 1, -2)
 
 	Compare(t, e, "016-pointlight")
@@ -284,7 +284,7 @@ func whitebox(refl float64) *Env {
 		Sheet(Ez, -1, white),
 		Sheet(Ez, 1, white),
 	)
-	e.AddLight(PointLight(Vec{}, WHITE.Mul(EV(-3))))
+	e.AddLight(PointLight(Vec{}, WHITE.Mul(EV(-3)).Mul(4*Pi)))
 	e.Camera = Camera(0.75).Transl(0, 0, -0.95)
 	e.Camera.AA = true
 	return e
@@ -299,9 +299,35 @@ func TestShadowBehind(t *testing.T) {
 		Sheet(Ey, 0, Diffuse0(WHITE)),
 		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
 	)
-	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5))))
+	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
 	e.Camera = Camera(1).Transl(0, 1, -2)
 	Compare(t, e, "019-shadowbehind")
+}
+
+func TestLuminousObject(t *testing.T) {
+	e := NewEnv()
+	e.Add(
+		Sheet(Ey, -1.0, Diffuse1(WHITE.Mul(EV(-0.3)))),
+		Sphere(Vec{0, 0.5, 3}, 1.5, Shiny(RED, EV(-3))),
+		Sphere(Vec{-2, 0.1, 0}, 1.1, Shiny(BLUE.EV(-0.3), EV(-3))),
+		Sphere(Vec{2, 0, -1}, 1, Shiny(GREEN.EV(-1), EV(-3))),
+		Sphere(Vec{0, -0.2, -2}, 0.8, Shiny(WHITE, EV(-2))),
+		Sphere(Vec{4, 4, 2}, 1, Diffuse1(WHITE.EV(-8))),
+		//Sphere(Vec{7, 7, -5}, 1, Flat(WHITE.EV(-2))),
+	)
+	e.AddLight(
+		SmoothLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
+	)
+	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
+
+	e.Camera = Camera(1).Transl(0, 2.5, -6).Transf(RotX4(22 * Deg))
+	e.Camera.AA = true
+
+	img := MakeImage(testW, testH)
+	nPass := 8
+	MultiPass(e, 3, img, nPass)
+	name := "020-luminous-object"
+	CompareImg(t, e, img, name, 10)
 }
 
 //func TestObjMinus(t *testing.T) {

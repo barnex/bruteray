@@ -78,7 +78,7 @@ func (s *diffuse1) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	// random ray
 
 	sec := &Ray{pos.MAdd(off, norm), RandVecCos(e, norm)}
-	acc = acc.Add(s.refl.Mul3(e.Shade(sec, N-1)))
+	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // must not include ultra-intense objects, already added as lights
 
 	return acc
 }
@@ -103,7 +103,7 @@ type reflective struct {
 
 func (s *reflective) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	r2 := &Ray{pos, r.Dir.Reflect(norm)}
-	return e.Shade(r2, N-1).Mul3(s.c)
+	return e.ShadeAll(r2, N-1).Mul3(s.c)
 }
 
 func Blend(a float64, matA Material, b float64, matB Material) Material {

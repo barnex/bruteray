@@ -7,8 +7,9 @@ import (
 // Env stores the entire environment
 // (all objects, light sources, ... in the scene)
 type Env struct {
-	objs    []Obj
-	lights  []Light
+	objs    []Obj   // non-source objects
+	lights  []Light // light sources
+	all     []Obj   // objs + lights
 	Ambient Surf
 	rng     rand.Rand
 	Camera  *Cam
@@ -36,15 +37,38 @@ func (e *Env) Copy() *Env {
 
 func (e *Env) Add(o ...Obj) {
 	e.objs = append(e.objs, o...)
+	e.all = append(e.all, o...)
 }
 
 func (e *Env) AddLight(l ...Light) {
 	e.lights = append(e.lights, l...)
+	for _, l := range l {
+		e.all = append(e.all, l)
+	}
+}
+
+// Calculate intensity seen by ray,
+// caused by objects including lights.
+// Used by specular surfaces
+// who make no distinction between light sources and regular objects.
+func (e *Env) ShadeAll(r *Ray, N int) Color {
+	//fmt.Println(e.objs)
+	//fmt.Println(e.lights)
+	//fmt.Println(e.all)
+	return e.shade(r, N, e.all)
+}
+
+// Calculate intensity seen by ray,
+// caused by objects but excluding lights.
+// Used for diffuse inter reflection
+// where contributions of light sources are added separately.
+func (e *Env) ShadeNonLum(r *Ray, N int) Color {
+	return e.shade(r, N, e.objs)
 }
 
 // Calculate intensity seen by ray,
 // with maximum recursion depth N.
-func (e *Env) Shade(r *Ray, N int) Color {
+func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	if N <= 0 {
 		return Color{}
 	}
@@ -52,7 +76,7 @@ func (e *Env) Shade(r *Ray, N int) Color {
 	surf := e.Ambient
 	surf.T = inf
 
-	for _, o := range e.objs {
+	for _, o := range who {
 		bi := o.Inters(r)
 		Interval{bi.S1.T, bi.S2.T}.check()
 		if !bi.OK() {
@@ -63,7 +87,6 @@ func (e *Env) Shade(r *Ray, N int) Color {
 			surf = bi.S1
 		}
 	}
-
 	return surf.Shade(e, N-1, r)
 }
 
