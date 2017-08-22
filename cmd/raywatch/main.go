@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -9,8 +10,10 @@ import (
 )
 
 var (
-	poll  = flag.Duration("poll", 10*time.Millisecond, "poll interval")
-	tresh = flag.Duration("trhesh", 500*time.Millisecond, "poll interval")
+	poll       = flag.Duration("poll", 10*time.Millisecond, "poll interval")
+	tresh      = flag.Duration("trhesh", 500*time.Millisecond, "poll interval")
+	flagWidth  = flag.Int("w", 1920, "image width")
+	flagHeight = flag.Int("h", 1080, "image height")
 )
 
 var (
@@ -20,6 +23,7 @@ var (
 func main() {
 
 	flag.Parse()
+
 	if flag.NArg() != 1 {
 		log.Fatal("need one argument")
 	}
@@ -70,7 +74,7 @@ func goServe() {
 		Print(cmd.Process.Kill())
 		cmd.Process.Wait()
 	}
-	cmd = exec.Command(Executable)
+	cmd = exec.Command(Executable, fmt.Sprintf("-w=%v", *flagWidth), fmt.Sprintf("-h=%v", *flagHeight))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()

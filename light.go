@@ -42,8 +42,9 @@ func (l *pointLight) Inters(*Ray) BiSurf {
 	return BiSurf{}
 }
 
-// Smooth light source
-func SmoothLight(pos Vec, radius float64, intensity Color) Light {
+// Spherical light source.
+// Throws softer shadows than an point source and is visible in specular reflections.
+func SphereLight(pos Vec, radius float64, intensity Color) Light {
 	return &smoothLight{
 		sph: sphere{pos, radius},
 		r:   radius,

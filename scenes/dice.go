@@ -1,3 +1,5 @@
+// +build ignore
+
 package main
 
 import . "github.com/barnex/bruteray"
@@ -52,7 +54,7 @@ func main() {
 	)
 
 	e.AddLight(
-		SmoothLight(Vec{10, 25, -4}, 10, WHITE.Mul(EV(9))),
+		SphereLight(Vec{10, 25, -4}, 10, WHITE.Mul(EV(9))),
 	)
 
 	e.SetAmbient(Flat(WHITE.Mul(EV(-4))))

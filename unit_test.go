@@ -316,7 +316,7 @@ func TestLuminousObject(t *testing.T) {
 		//Sphere(Vec{7, 7, -5}, 1, Flat(WHITE.EV(-2))),
 	)
 	e.AddLight(
-		SmoothLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
+		SphereLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 

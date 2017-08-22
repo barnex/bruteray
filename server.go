@@ -12,7 +12,9 @@ import (
 )
 
 var (
-	port = flag.String("http", ":3700", "Port to serve HTTP")
+	port       = flag.String("http", ":3700", "Port to serve HTTP")
+	flagWidth  = flag.Int("w", 1920, "image width")
+	flagHeight = flag.Int("h", 1080, "image height")
 )
 
 var (
@@ -20,21 +22,21 @@ var (
 )
 
 const (
-	DefaultWidth  = 1920
-	DefaultHeight = 1080
-	DefaultRec    = 6
+	DefaultRec = 6
 )
 
 // Serve starts a web UI server
 // at the port specified by flag --http.
 func Serve(e *Env) {
 
+	flag.Parse()
+
 	env = e
 
 	http.HandleFunc("/render", handleRender)
 	http.HandleFunc("/", mainHandler)
 
-	progressive = RenderLoop(env, DefaultRec, DefaultWidth, DefaultHeight)
+	progressive = RenderLoop(env, DefaultRec, *flagWidth, *flagHeight)
 
 	log.Fatal(http.ListenAndServe(*port, nil))
 }

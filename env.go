@@ -62,6 +62,8 @@ func (e *Env) ShadeAll(r *Ray, N int) Color {
 // caused by objects but excluding lights.
 // Used for diffuse inter reflection
 // where contributions of light sources are added separately.
+// TODO: once a ray has hit a diffuse surface, luminous objects should be excluded at subsequent specular reflections.
+// Otherwise we get caustics, which are not rendered nicely.
 func (e *Env) ShadeNonLum(r *Ray, N int) Color {
 	return e.shade(r, N, e.objs)
 }
