@@ -59,6 +59,46 @@ func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	}
 }
 
+//    -- diffuse00 (debug, tutorial)
+
+// Diffuse material with direct illumination only and no shadows.
+// Intended for the tutorial.
+func Diffuse00(c Color) Material {
+	return &diffuse00{c}
+}
+
+type diffuse00 struct {
+	refl Color
+}
+
+func (s *diffuse00) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
+	var acc Color
+	for _, l := range e.lights {
+		lpos, intens := l.Sample(e, pos)
+		secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
+		pos = pos.MAdd(off, norm)
+		i := s.refl.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
+		acc = acc.Add(i)
+	}
+	return acc
+}
+
+func (s *diffuse00) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
+	lpos, intens := l.Sample(e, pos)
+
+	pos = pos.MAdd(off, norm)
+	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
+
+	t := e.IntersectAny(&secundary)
+
+	lightT := lpos.Sub(pos).Len()
+	if (t > 0) && t < lightT { // intersection between start and light position
+		return Color{} // shadow
+	} else {
+		return s.refl.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
+	}
+}
+
 //    -- diffuse 1
 
 func Diffuse1(c Color) Material {

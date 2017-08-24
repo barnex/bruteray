@@ -12,8 +12,8 @@ import (
 var (
 	poll       = flag.Duration("poll", 10*time.Millisecond, "poll interval")
 	tresh      = flag.Duration("trhesh", 500*time.Millisecond, "poll interval")
-	flagWidth  = flag.Int("w", 1920, "image width")
-	flagHeight = flag.Int("h", 1080, "image height")
+	flagWidth  = flag.Int("w", 400, "image width")
+	flagHeight = flag.Int("h", 300, "image height")
 )
 
 var (
