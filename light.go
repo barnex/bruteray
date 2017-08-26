@@ -5,33 +5,36 @@ type Light interface {
 	Obj
 }
 
+type noIntersection struct{}
+
+func (noIntersection) Inters(*Ray) BiSurf { return BiSurf{} }
+func (noIntersection) Hit(*Ray) Surf      { return Surf{} }
+
 // Directed light source without fall-off.
 // Position should be far away from the scene (indicates a direction)
 func DirLight(pos Vec, intensity Color) Light {
-	return &dirLight{pos, intensity}
+	return &dirLight{pos: pos, c: intensity}
 }
 
 type dirLight struct {
 	pos Vec
 	c   Color
+	noIntersection
 }
 
 func (l *dirLight) Sample(e *Env, target Vec) (Vec, Color) {
 	return l.pos, l.c
 }
 
-func (l *dirLight) Inters(*Ray) BiSurf {
-	return BiSurf{}
-}
-
 // Point light source (with fall-off).
 func PointLight(pos Vec, intensity Color) Light {
-	return &pointLight{pos, intensity}
+	return &pointLight{pos: pos, c: intensity}
 }
 
 type pointLight struct {
 	pos Vec
 	c   Color
+	noIntersection
 }
 
 func (l *pointLight) Sample(e *Env, target Vec) (Vec, Color) {
@@ -71,6 +74,10 @@ func (l *smoothLight) Inters(r *Ray) BiSurf {
 		S1: Surf{inter.Min, r.At(inter.Min), l.mat},
 		S2: Surf{inter.Max, r.At(inter.Max), l.mat},
 	}
+}
+
+func (l *smoothLight) Hit(r *Ray) Surf {
+	return l.Inters(r).Front()
 }
 
 func sphereVec(e *Env) Vec {

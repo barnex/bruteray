@@ -1,6 +1,7 @@
 package bruteray
 
 type Obj interface {
+	Hit(r *Ray) Surf
 	Inters(r *Ray) BiSurf
 }
 
@@ -24,6 +25,10 @@ func (o *prim) Inters(r *Ray) BiSurf {
 		S1: Surf{T: i.Min, Norm: n1, Material: o.m},
 		S2: Surf{T: i.Max, Norm: n2, Material: o.m},
 	}
+}
+
+func (o *prim) Hit(r *Ray) Surf {
+	return o.Inters(r).Front()
 }
 
 //func(p*prim)
@@ -51,6 +56,10 @@ func (o *transObj) Inters(r *Ray) BiSurf {
 	bi.S1.Norm = (&o.t).TransfDir(bi.S1.Norm)
 	bi.S2.Norm = (&o.t).TransfDir(bi.S2.Norm)
 	return bi
+}
+
+func (o *transObj) Hit(r *Ray) Surf {
+	return o.Inters(r).Front()
 }
 
 // -- CSG
@@ -96,6 +105,10 @@ func (o *objAnd) Inters(r *Ray) BiSurf {
 	return bi
 }
 
+func (o *objAnd) Hit(r *Ray) Surf {
+	return o.Inters(r).Front()
+}
+
 func ObjOr(a, b Obj) Obj {
 	return &objOr{a, b}
 }
@@ -132,6 +145,10 @@ func (o *objOr) Inters(r *Ray) BiSurf {
 	}
 
 	return bi
+}
+
+func (o *objOr) Hit(r *Ray) Surf {
+	return o.Inters(r).Front()
 }
 
 // Carve away object b from a.
@@ -172,4 +189,8 @@ func (o *objMinus) Inters(r *Ray) BiSurf {
 	}
 	bi.Normalize()
 	return bi
+}
+
+func (o *objMinus) Hit(r *Ray) Surf {
+	return o.Inters(r).Front()
 }

@@ -12,6 +12,13 @@ func (b *BiSurf) Max() float64 {
 	return b.S2.T
 }
 
+func (b BiSurf) Front() Surf {
+	if b.S1.T > 0 {
+		return b.S1
+	}
+	return b.S2
+}
+
 func (b *BiSurf) OK() bool {
 	return b.Min() != 0 && b.Max() != 0
 }
