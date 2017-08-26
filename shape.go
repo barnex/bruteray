@@ -28,7 +28,7 @@ type Shape interface {
 
 // -- sphere
 
-func Sphere(center Vec, radius float64, m Material) Obj {
+func Sphere(center Vec, radius float64, m Material) CSGObj {
 	return &prim{&sphere{center, sqr(radius)}, m}
 }
 
@@ -65,14 +65,14 @@ type box struct {
 	min, max Vec
 }
 
-func Box(center Vec, rx, ry, rz float64, m Material) Obj {
+func Box(center Vec, rx, ry, rz float64, m Material) CSGObj {
 	return &prim{&box{
 		min: center.Sub(Vec{rx, ry, rz}),
 		max: center.Add(Vec{rx, ry, rz}),
 	}, m}
 }
 
-func Cube(center Vec, r float64, m Material) Obj {
+func Cube(center Vec, r float64, m Material) CSGObj {
 	return Box(center, r, r, r, m)
 }
 
@@ -140,6 +140,7 @@ func (s *sheet) Normal(pos Vec) Vec {
 	return s.dir
 }
 
+// TODO: rm, is not a CSGObj
 func (s *sheet) Inters(r *Ray) Interval {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
@@ -155,7 +156,7 @@ func (s *sheet) Hit(r *Ray) float64 {
 
 // A rectangle (i.e. finite sheet) at given position,
 // with normal vector dir and half-axes rx, ry, rz.
-func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj {
+func Rect(pos, dir Vec, rx, ry, rz float64, m Material) CSGObj {
 	return &prim{&rect{pos, dir, rx, ry, rz}, m}
 }
 
@@ -164,6 +165,7 @@ type rect struct {
 	rx, ry, rz float64
 }
 
+// TODO: rm
 func (s *rect) Inters(r *Ray) Interval {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
@@ -187,7 +189,7 @@ func (s *rect) Normal(p Vec) Vec {
 
 // -- slab
 
-func Slab(dir Vec, off1, off2 float64, m Material) Obj {
+func Slab(dir Vec, off1, off2 float64, m Material) CSGObj {
 	return &prim{&slab{dir, off1, off2}, m}
 }
 

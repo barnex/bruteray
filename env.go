@@ -24,10 +24,6 @@ func NewEnv() *Env {
 	}
 }
 
-func (e *Env) SetAmbient(m Material) {
-	e.Ambient = Surf{T: inf, Material: m}
-}
-
 // Returns a copy with its own random number generator,
 // so it can be used from a different thread.
 func (e *Env) Copy() *Env {
@@ -46,6 +42,10 @@ func (e *Env) AddLight(l ...Light) {
 	for _, l := range l {
 		e.all = append(e.all, l)
 	}
+}
+
+func (e *Env) SetAmbient(m Material) {
+	e.Ambient = Surf{T: inf, Material: m}
 }
 
 // Calculate intensity seen by ray,
@@ -77,33 +77,27 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	surf.T = inf
 
 	for _, o := range who {
-		bi := o.Inters(r)
-		Interval{bi.S1.T, bi.S2.T}.check()
-		if !bi.OK() {
-			continue
-		}
-		assert(bi.S1.T <= bi.S2.T)
-		if t := bi.S1.T; t < surf.T && t > 0 {
-			surf = bi.S1
+		fragment := o.Hit(r)
+		t := fragment.T
+		if t < surf.T && t > 0 {
+			surf = fragment
 		}
 	}
 	return surf.Shade(e, N-1, r)
 }
 
 // Returns t > 0 if r intersects any object
+// TODO: cleanup
 func (e *Env) IntersectAny(r *Ray) float64 {
 	t := inf
 	I := -1
 	for i, o := range e.objs {
-		bi := o.Inters(r)
-		if !bi.OK() {
+		S1 := o.Hit(r)
+		if S1.T <= 0 {
 			continue
 		}
-		if bi.S1.T < 0 {
-			continue
-		}
-		if bi.S1.T < t {
-			t = bi.S1.T
+		if S1.T < t {
+			t = S1.T
 			I = i
 		}
 	}
