@@ -29,7 +29,7 @@ type Shape interface {
 // -- sphere
 
 func Sphere(center Vec, radius float64, m Material) Obj {
-	return &prim{&sphere{center, Sqr(radius)}, m}
+	return &prim{&sphere{center, sqr(radius)}, m}
 }
 
 type sphere struct {
@@ -46,7 +46,7 @@ func (s *sphere) Inters(r *Ray) Interval {
 	v := r.Start.Sub(s.c)
 	d := r.Dir
 	vd := v.Dot(d)
-	D := Sqr(vd) - (v.Len2() - s.r2)
+	D := sqr(vd) - (v.Len2() - s.r2)
 	if D < 0 {
 		return Interval{}
 	}
@@ -77,23 +77,23 @@ func Cube(center Vec, r float64, m Material) Obj {
 }
 
 func (s *box) Inters(r *Ray) Interval {
-	min := s.min
-	max := s.max
+	min_ := s.min
+	max_ := s.max
 
-	tmin := min.Sub(r.Start).Div3(r.Dir)
-	tmax := max.Sub(r.Start).Div3(r.Dir)
+	tmin := min_.Sub(r.Start).Div3(r.Dir)
+	tmax := max_.Sub(r.Start).Div3(r.Dir)
 
-	txen := Min(tmin[X], tmax[X])
-	txex := Max(tmin[X], tmax[X])
+	txen := min(tmin[X], tmax[X])
+	txex := max(tmin[X], tmax[X])
 
-	tyen := Min(tmin[Y], tmax[Y])
-	tyex := Max(tmin[Y], tmax[Y])
+	tyen := min(tmin[Y], tmax[Y])
+	tyex := max(tmin[Y], tmax[Y])
 
-	tzen := Min(tmin[Z], tmax[Z])
-	tzex := Max(tmin[Z], tmax[Z])
+	tzen := min(tmin[Z], tmax[Z])
+	tzex := max(tmin[Z], tmax[Z])
 
-	ten := Max3(txen, tyen, tzen)
-	tex := Min3(txex, tyex, tzex)
+	ten := max3(txen, tyen, tzen)
+	tex := min3(txex, tyex, tzex)
 
 	if ten > tex {
 		return Interval{}
@@ -205,7 +205,7 @@ func (s *slab) Inters(r *Ray) Interval {
 	rd := r.Dir.Dot(s.dir)
 	t1 := (s.off1 - rs) / rd
 	t2 := (s.off2 - rs) / rd
-	t1, t2 = Sort(t1, t2)
+	t1, t2 = sort(t1, t2)
 	return Interval{t1, t2}.Fix().check()
 }
 

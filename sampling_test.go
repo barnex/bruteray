@@ -11,11 +11,11 @@ func TestImportanceSampling(t *testing.T) {
 
 	testFn := []func(Vec) float64{
 		func(v Vec) float64 { return 1 },
-		func(v Vec) float64 { return Re(1 - v[Y]) },
-		func(v Vec) float64 { return Re(1 - v[Y]*v[Y] + v[Z]*v[X]) },
-		func(v Vec) float64 { return Re(v[Y]) },
+		func(v Vec) float64 { return re(1 - v[Y]) },
+		func(v Vec) float64 { return re(1 - v[Y]*v[Y] + v[Z]*v[X]) },
+		func(v Vec) float64 { return re(v[Y]) },
 		//func(v Vec) float64 { return Sqr(Sqr(1 - v[Y])) }, // converges slowly (but correct with large N)
-		func(v Vec) float64 { return Sqrt(1 - v[Y]) },
+		func(v Vec) float64 { return sqrt(1 - v[Y]) },
 	}
 
 	const (

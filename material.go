@@ -55,7 +55,7 @@ func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	if (t > 0) && t < lightT { // intersection between start and light position
 		return Color{} // shadow
 	} else {
-		return s.refl.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
+		return s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
 	}
 }
 
@@ -77,7 +77,7 @@ func (s *diffuse00) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 		lpos, intens := l.Sample(e, pos)
 		secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
 		pos = pos.MAdd(off, norm)
-		i := s.refl.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
+		i := s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
 		acc = acc.Add(i)
 	}
 	return acc
@@ -95,7 +95,7 @@ func (s *diffuse00) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	if (t > 0) && t < lightT { // intersection between start and light position
 		return Color{} // shadow
 	} else {
-		return s.refl.Mul(Re(norm.Dot(secundary.Dir))).Mul3(intens)
+		return s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
 	}
 }
 

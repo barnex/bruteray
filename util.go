@@ -11,11 +11,11 @@ var (
 	inf = math.Inf(1)
 )
 
-func Sqr(x float64) float64 {
+func sqr(x float64) float64 {
 	return x * x
 }
 
-func Sqrt(x float64) float64 {
+func sqrt(x float64) float64 {
 	return math.Sqrt(x)
 }
 
@@ -43,14 +43,14 @@ func cos(x float64) float64 {
 	}
 }
 
-func Min(x, y float64) float64 {
+func min(x, y float64) float64 {
 	if x < y {
 		return x
 	}
 	return y
 }
 
-func Min3(x, y, z float64) float64 {
+func min3(x, y, z float64) float64 {
 	min := x
 	if y < min {
 		min = y
@@ -61,7 +61,7 @@ func Min3(x, y, z float64) float64 {
 	return min
 }
 
-func Max(x, y float64) float64 {
+func max(x, y float64) float64 {
 	if x > y {
 		return x
 	}
@@ -69,14 +69,14 @@ func Max(x, y float64) float64 {
 }
 
 // Rectify: max(x, 0)
-func Re(x float64) float64 {
+func re(x float64) float64 {
 	if x < 0 {
 		return 0
 	}
 	return x
 }
 
-func Max3(x, y, z float64) float64 {
+func max3(x, y, z float64) float64 {
 	max := x
 	if y > max {
 		max = y
@@ -87,7 +87,7 @@ func Max3(x, y, z float64) float64 {
 	return max
 }
 
-func Sort(t0, t1 float64) (float64, float64) {
+func sort(t0, t1 float64) (float64, float64) {
 	if t0 < t1 {
 		return t0, t1
 	}
