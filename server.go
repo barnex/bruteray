@@ -62,7 +62,7 @@ var preview struct {
 }
 
 func encode(w io.Writer, img Image) {
-	Print(jpeg.Encode(w, img, &jpeg.Options{Quality: 95}))
+	printErr(jpeg.Encode(w, img, &jpeg.Options{Quality: 95}))
 }
 
 func parseInt(s string, Default int) int {
@@ -74,7 +74,7 @@ func parseInt(s string, Default int) int {
 	return x
 }
 
-func Print(err error) {
+func printErr(err error) {
 	if err != nil {
 		log.Println(err)
 	}

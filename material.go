@@ -117,7 +117,7 @@ func (s *diffuse1) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 
 	// random ray
 
-	sec := &Ray{pos.MAdd(off, norm), RandVecCos(e, norm)}
+	sec := &Ray{pos.MAdd(off, norm), randVecCos(e, norm)}
 	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // must not include ultra-intense objects, already added as lights
 
 	return acc

@@ -6,6 +6,7 @@ import (
 
 // Env stores the entire environment
 // (all objects, light sources, ... in the scene)
+// as well as a random-number generator needed for iterative rendering.
 type Env struct {
 	objs    []Obj   // non-source objects
 	lights  []Light // light sources
@@ -52,9 +53,6 @@ func (e *Env) AddLight(l ...Light) {
 // Used by specular surfaces
 // who make no distinction between light sources and regular objects.
 func (e *Env) ShadeAll(r *Ray, N int) Color {
-	//fmt.Println(e.objs)
-	//fmt.Println(e.lights)
-	//fmt.Println(e.all)
 	return e.shade(r, N, e.all)
 }
 

@@ -16,17 +16,17 @@ func seed() int64 {
 }
 
 // Uniform random number.
-func Rand(e *Env) float64 {
+func random(e *Env) float64 {
 	return e.rng.Float64()
 }
 
 // Normal random number.
-func RandNorm(e *Env) float64 {
+func randNorm(e *Env) float64 {
 	return e.rng.NormFloat64()
 }
 
 // Random unit vector.
-func RandVec(e *Env) Vec {
+func randVec(e *Env) Vec {
 	return Vec{
 		e.rng.NormFloat64(),
 		e.rng.NormFloat64(),
@@ -36,8 +36,8 @@ func RandVec(e *Env) Vec {
 }
 
 // Random unit vector, dot product with n >= 0.
-func RandVecDir(e *Env, n Vec) Vec {
-	v := RandVec(e)
+func randVecDir(e *Env, n Vec) Vec {
+	v := randVec(e)
 	if v.Dot(n) < 0 {
 		v = v.Mul(-1)
 	}
@@ -46,10 +46,10 @@ func RandVecDir(e *Env, n Vec) Vec {
 
 // Random unit vector, sampled with probability cos(angle with dir).
 // Used for diffuse inter-reflection importance sampling.
-func RandVecCos(e *Env, dir Vec) Vec {
-	v := RandVecDir(e, dir)
+func randVecCos(e *Env, dir Vec) Vec {
+	v := randVecDir(e, dir)
 	for v.Dot(dir) < e.rng.Float64() {
-		v = RandVecDir(e, dir)
+		v = randVecDir(e, dir)
 	}
 	return v
 }

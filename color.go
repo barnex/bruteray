@@ -26,22 +26,28 @@ func (c Color) RGBA() (r, g, b, a uint32) {
 	return r, g, b, 0xffff
 }
 
+// Multiplies the color, making it darker (s<1) or brighter (s>1).
 func (c Color) Mul(s float64) Color {
 	return Color{s * c.R, s * c.G, s * c.B}
 }
 
-func (c Color) EV(s float64) Color {
-	return c.Mul(EV(s))
+// Multiplies the color by 2^ev.
+func (c Color) EV(ev float64) Color {
+	return c.Mul(EV(ev))
 }
 
+// Point-wise multiplication of two colors.
+// E.g.: light reflecting off a colored surface.
 func (c Color) Mul3(b Color) Color {
 	return Color{c.R * b.R, c.G * b.G, c.B * b.B}
 }
 
+// Adds two colors (i.e. blends them).
 func (c Color) Add(b Color) Color {
 	return Color{c.R + b.R, c.G + b.G, c.B + b.B}
 }
 
+// Adds s*b to color c.
 func (c Color) MAdd(s float64, b Color) Color {
 	return Color{c.R + s*b.R, c.G + s*b.G, c.B + s*b.B}
 }
