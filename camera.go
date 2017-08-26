@@ -30,3 +30,10 @@ func (c *Cam) Transf(T *Matrix4) *Cam {
 	c.transf = *((&c.transf).Mul(T))
 	return c
 }
+
+func (c *Cam) RotScene(theta float64) *Cam {
+	d := Vec{c.transf[X][W], c.transf[Y][W], c.transf[Z][W]}
+	T := Transl4(d.Mul(-1)).Mul(RotY4(theta)).Mul(Transl4(d))
+	c.transf = *((&c.transf).Mul(T))
+	return c
+}
