@@ -13,11 +13,14 @@ type Interval struct {
 	Min, Max float64
 }
 
-//func Interv(min, max float64) Interval {
-//	i := Interval{min, max}
-//	i.check()
-//	return i
-//}
+// Returns the smallest, positive value of (min, max).
+// Used to implement Hit in terms of Intersect.
+func (i Interval) Front() float64 {
+	if i.Min > 0 {
+		return i.Min
+	}
+	return i.Max
+}
 
 //
 func (i Interval) Fix() Interval {

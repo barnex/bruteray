@@ -6,6 +6,13 @@ import (
 )
 
 type Shape interface {
+	// Hit returns the t-value where the ray first hits the surface.
+	// I.e. r.At(t) lies on the surface.
+	// If the ray intersects the surface multiple times,
+	// the smallest positive t must be returned.
+	// t<=0 is interpreted as the ray not intersecting the surface.
+	Hit(r *Ray) float64
+
 	// Ray-shape intersection.
 	// Special cases:
 	// 	Shape lies entirely behind ray start point: return Interval{}
@@ -46,6 +53,10 @@ func (s *sphere) Inters(r *Ray) Interval {
 	t1 := (-vd - math.Sqrt(D))
 	t2 := (-vd + math.Sqrt(D))
 	return Interval{t1, t2}.Fix().check()
+}
+
+func (s *sphere) Hit(r *Ray) float64 {
+	return s.Inters(r).Front()
 }
 
 // -- box (axis aligned)
@@ -95,6 +106,10 @@ func (s *box) Inters(r *Ray) Interval {
 	return Interval{ten, tex}.Fix().check()
 }
 
+func (s *box) Hit(r *Ray) float64 {
+	return s.Inters(r).Front()
+}
+
 func (s *box) Normal(p Vec) Vec {
 	p.check()
 	for i := range p {
@@ -132,6 +147,10 @@ func (s *sheet) Inters(r *Ray) Interval {
 	return Interval{t, t}.Fix().check()
 }
 
+func (s *sheet) Hit(r *Ray) float64 {
+	return s.Inters(r).Front()
+}
+
 // --rectangle (finite sheet)
 
 // A rectangle (i.e. finite sheet) at given position,
@@ -156,6 +175,10 @@ func (s *rect) Inters(r *Ray) Interval {
 		return Interval{}
 	}
 	return Interval{t, t}.Fix().check()
+}
+
+func (s *rect) Hit(r *Ray) float64 {
+	return s.Inters(r).Front()
 }
 
 func (s *rect) Normal(p Vec) Vec {
@@ -184,4 +207,8 @@ func (s *slab) Inters(r *Ray) Interval {
 	t2 := (s.off2 - rs) / rd
 	t1, t2 = Sort(t1, t2)
 	return Interval{t1, t2}.Fix().check()
+}
+
+func (s *slab) Hit(r *Ray) float64 {
+	return s.Inters(r).Front()
 }
