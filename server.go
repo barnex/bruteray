@@ -42,6 +42,49 @@ func Serve(e *Env) {
 	log.Fatal(http.ListenAndServe(*port, nil))
 }
 
+type Loop struct {
+	env     *Env
+	r, w, h int
+	acc     Image
+	n       float64
+	mu      sync.Mutex
+}
+
+func (l *Loop) run() {
+	for {
+		l.iter()
+	}
+}
+
+func (l *Loop) iter() {
+	img := MakeImage(l.w, l.h)
+	Render(l.env, l.r, img)
+	l.mu.Lock()
+	l.acc.Add(img)
+	l.n++
+	l.mu.Unlock()
+}
+
+func (l *Loop) Current() Image {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	//log.Println("current")
+	img := MakeImage(l.w, l.h)
+	for i := range img {
+		for j := range img[i] {
+			img[i][j] = l.acc[i][j].Mul(1 / l.n)
+		}
+	}
+	return img
+}
+
+func RenderLoop(e *Env, maxRec int, w, h int) *Loop {
+	l := &Loop{env: e, r: maxRec, w: w, h: h, acc: MakeImage(w, h)}
+	l.iter()   // make sure we have 1 pass at least
+	go l.run() // refine in the background
+	return l
+}
+
 func mainHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(mainHTML))
 }
