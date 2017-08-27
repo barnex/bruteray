@@ -56,28 +56,46 @@ A point source with power `P` (measured in Watts), creates light with intensity 
 I = P / (4*pi*r²)
 ```
 
-If light strikes a surface at an angle `θ` with respect to the surface normal `n`, this intensity is reduced by a factor `cos(θ)`
+If light strikes a surface at an angle `θ` with respect to the surface normal `n`, this intensity is reduced by a factor `cos(θ)` (and clamped to 0 when `cos(θ)<0`, i.e. lit from behind).
 
 
 ![fig](rt03.jpg)
 
 ### Shadows
 
+If the line of sight between the light source and a surface intersects an other object, the intensity received is zero, i.e., a shadow:
+
 ![fig](rt04.jpg)
 
 ### Smooth light sources
 
+The shadows cast by point sources are rather harsh. We can make them more natural by using a spatially extended light source. This can be done by randomly jittering the point source each time we illuminate a pixel. E.g. we can randomly jitter from a gaussian distribution or pick points from within a sphere, etc.
+
+Such an image is noisy:
+
 ![fig](rt05.jpg)
+
+But when we average out many such images (Monte Carlo Integration), we obtain a beautiful result:
+
 ![fig](rt06.jpg)
 
 ### Anti-aliasing
+
+Now that we are doing Monte Carlo integration, we can easily anti-alias sharp edges: simply jitter the position of each ray randomly within the pixel it starts from.
 
 ![fig](rt07.jpg)
 
 ### Bi-directional path tracing
 
+Monte Carlo integration opens the way physically accurate light transport.
+When a ray hits a diffuse surface, we now don't only add the light contributed by the sources, but also light reflected by all other objects in the scene. Monte Carlo integration makes this easy: just cast a single random ray from the surface and add the intensity of whatever this ray strikes (without light fall-off). Off course the recursion depth has to be limited lest our secondary ray bounces around for ever. Repeat many times and average out.
+
+E.g.: we now see the spheres are also indirectly illuminated from below, by the light reflected from the ground.
+
 ![fig](rt08.jpg)
 
-### Ambient
+### Ambient occlusion
+
+Let's place the spheres in a white room. The room now indirectly illuminates the spheres from all directions, making them look very soft. The relatively strong shadows directly underneath the spheres are referred to as "ambient occlusion". This effect emerges naturally with bi-directional path tracing when the recursion depth is sufficient (here: 6).
 
 ![fig](rt09.jpg)
