@@ -12,8 +12,8 @@ type prim struct {
 
 var _ Obj = (*prim)(nil)
 
-func (o *prim) Inters(r *Ray) BiSurf {
-	i := o.s.Inters(r)
+func (o *prim) Inters2(r *Ray) BiSurf {
+	i := o.s.Inters2(r)
 	if !i.OK() {
 		return BiSurf{}
 	}
@@ -27,7 +27,7 @@ func (o *prim) Inters(r *Ray) BiSurf {
 }
 
 func (o *prim) Hit(r *Ray) Surf {
-	return o.Inters(r).Front()
+	return o.Inters2(r).Front()
 }
 
 //func(p*prim)
@@ -49,15 +49,15 @@ func Transf(o CSGObj, T *Matrix4) CSGObj {
 	}
 }
 
-func (o *transObj) Inters(r *Ray) BiSurf {
+func (o *transObj) Inters2(r *Ray) BiSurf {
 	r2 := *r
 	r2.Transf(&o.tinv)
-	bi := o.orig.Inters(&r2)
+	bi := o.orig.Inters2(&r2)
 	bi.S1.Norm = (&o.t).TransfDir(bi.S1.Norm)
 	bi.S2.Norm = (&o.t).TransfDir(bi.S2.Norm)
 	return bi
 }
 
 func (o *transObj) Hit(r *Ray) Surf {
-	return o.Inters(r).Front()
+	return o.Inters2(r).Front()
 }

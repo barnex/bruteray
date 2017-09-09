@@ -7,8 +7,8 @@ type Light interface {
 
 type noIntersection struct{}
 
-func (noIntersection) Inters(*Ray) BiSurf { return BiSurf{} }
-func (noIntersection) Hit(*Ray) Surf      { return Surf{} }
+func (noIntersection) Inters2(*Ray) BiSurf { return BiSurf{} }
+func (noIntersection) Hit(*Ray) Surf       { return Surf{} }
 
 // Directed light source without fall-off.
 // Position should be far away from the scene (indicates a direction)
@@ -41,7 +41,7 @@ func (l *pointLight) Sample(e *Env, target Vec) (Vec, Color) {
 	return l.pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(l.pos).Len2()) // TODO: 1-> 4*pi
 }
 
-func (l *pointLight) Inters(*Ray) BiSurf {
+func (l *pointLight) Inters2(*Ray) BiSurf {
 	return BiSurf{}
 }
 
@@ -68,8 +68,8 @@ func (l *smoothLight) Sample(e *Env, target Vec) (Vec, Color) {
 	return pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
 }
 
-func (l *smoothLight) Inters(r *Ray) BiSurf {
-	inter := l.sph.Inters(r)
+func (l *smoothLight) Inters2(r *Ray) BiSurf {
+	inter := l.sph.Inters2(r)
 	return BiSurf{
 		S1: Surf{inter.Min, r.At(inter.Min), l.mat},
 		S2: Surf{inter.Max, r.At(inter.Max), l.mat},
@@ -77,7 +77,7 @@ func (l *smoothLight) Inters(r *Ray) BiSurf {
 }
 
 func (l *smoothLight) Hit(r *Ray) Surf {
-	return l.Inters(r).Front()
+	return l.Inters2(r).Front()
 }
 
 func sphereVec(e *Env) Vec {

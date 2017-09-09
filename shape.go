@@ -19,7 +19,11 @@ type Shape interface {
 	// 	Ray start point lies inside shape: Interval.Min < 0
 	// 	Shape does not intersect ray at all: return Interval{}
 	// 	Shape lies entirely in front of ray start: Min & Max > 0
-	Inters(r *Ray) Interval
+	// TODO: rm
+	Inters2(r *Ray) Interval
+
+	// Returns all intersection points with r
+	Inters(r *Ray) []float64
 
 	// Normal vector at position.
 	// Does not necessarily need to point outwards.
@@ -42,7 +46,7 @@ func (s *sphere) Normal(pos Vec) Vec {
 	return n
 }
 
-func (s *sphere) Inters(r *Ray) Interval {
+func (s *sphere) Inters2(r *Ray) Interval {
 	v := r.Start.Sub(s.c)
 	d := r.Dir
 	vd := v.Dot(d)
@@ -55,8 +59,12 @@ func (s *sphere) Inters(r *Ray) Interval {
 	return Interval{t1, t2}.Fix().check()
 }
 
+func (s *sphere) Inters(r *Ray) []float64 {
+	return s.Inters2(r).Slice()
+}
+
 func (s *sphere) Hit(r *Ray) float64 {
-	return s.Inters(r).Front()
+	return s.Inters2(r).Front()
 }
 
 // -- box (axis aligned)
@@ -76,7 +84,7 @@ func Cube(center Vec, r float64, m Material) CSGObj {
 	return Box(center, r, r, r, m)
 }
 
-func (s *box) Inters(r *Ray) Interval {
+func (s *box) Inters2(r *Ray) Interval {
 	min_ := s.min
 	max_ := s.max
 
@@ -106,8 +114,12 @@ func (s *box) Inters(r *Ray) Interval {
 	return Interval{ten, tex}.Fix().check()
 }
 
+func (s *box) Inters(r *Ray) []float64 {
+	return s.Inters2(r).Slice()
+}
+
 func (s *box) Hit(r *Ray) float64 {
-	return s.Inters(r).Front()
+	return s.Inters2(r).Front()
 }
 
 func (s *box) Normal(p Vec) Vec {
@@ -141,15 +153,19 @@ func (s *sheet) Normal(pos Vec) Vec {
 }
 
 // TODO: rm, is not a CSGObj
-func (s *sheet) Inters(r *Ray) Interval {
+func (s *sheet) Inters2(r *Ray) Interval {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	t := (s.off - rs) / rd
 	return Interval{t, t}.Fix().check()
 }
 
+func (s *sheet) Inters(r *Ray) []float64 {
+	return s.Inters2(r).Slice()
+}
+
 func (s *sheet) Hit(r *Ray) float64 {
-	return s.Inters(r).Front()
+	return s.Inters2(r).Front()
 }
 
 // --rectangle (finite sheet)
@@ -166,7 +182,7 @@ type rect struct {
 }
 
 // TODO: rm
-func (s *rect) Inters(r *Ray) Interval {
+func (s *rect) Inters2(r *Ray) Interval {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	t := (s.pos.Dot(s.dir) - rs) / rd
@@ -179,8 +195,12 @@ func (s *rect) Inters(r *Ray) Interval {
 	return Interval{t, t}.Fix().check()
 }
 
+func (s *rect) Inters(r *Ray) []float64 {
+	return s.Inters2(r).Slice()
+}
+
 func (s *rect) Hit(r *Ray) float64 {
-	return s.Inters(r).Front()
+	return s.Inters2(r).Front()
 }
 
 func (s *rect) Normal(p Vec) Vec {
@@ -202,7 +222,7 @@ func (s *slab) Normal(pos Vec) Vec {
 	return s.dir
 }
 
-func (s *slab) Inters(r *Ray) Interval {
+func (s *slab) Inters2(r *Ray) Interval {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	t1 := (s.off1 - rs) / rd
@@ -211,6 +231,10 @@ func (s *slab) Inters(r *Ray) Interval {
 	return Interval{t1, t2}.Fix().check()
 }
 
+func (s *slab) Inters(r *Ray) []float64 {
+	return s.Inters2(r).Slice()
+}
+
 func (s *slab) Hit(r *Ray) float64 {
-	return s.Inters(r).Front()
+	return s.Inters2(r).Front()
 }

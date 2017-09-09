@@ -2,7 +2,7 @@ package bruteray
 
 type CSGObj interface {
 	Obj
-	Inters(r *Ray) BiSurf
+	Inters2(r *Ray) BiSurf
 }
 
 // -- CSG
@@ -16,13 +16,13 @@ type objAnd struct {
 	a, b CSGObj
 }
 
-func (o *objAnd) Inters(r *Ray) BiSurf {
-	A := o.a.Inters(r)
+func (o *objAnd) Inters2(r *Ray) BiSurf {
+	A := o.a.Inters2(r)
 	if !A.OK() {
 		return A
 	}
 
-	B := o.b.Inters(r)
+	B := o.b.Inters2(r)
 	if !B.OK() {
 		return B
 	}
@@ -49,7 +49,7 @@ func (o *objAnd) Inters(r *Ray) BiSurf {
 }
 
 func (o *objAnd) Hit(r *Ray) Surf {
-	return o.Inters(r).Front()
+	return o.Inters2(r).Front()
 }
 
 func ObjOr(a, b CSGObj) CSGObj {
@@ -60,10 +60,10 @@ type objOr struct {
 	a, b CSGObj
 }
 
-func (o *objOr) Inters(r *Ray) BiSurf {
+func (o *objOr) Inters2(r *Ray) BiSurf {
 
-	A := o.a.Inters(r)
-	B := o.b.Inters(r)
+	A := o.a.Inters2(r)
+	B := o.b.Inters2(r)
 
 	// ray only hits one
 	if !A.OK() {
@@ -91,7 +91,7 @@ func (o *objOr) Inters(r *Ray) BiSurf {
 }
 
 func (o *objOr) Hit(r *Ray) Surf {
-	return o.Inters(r).Front()
+	return o.Inters2(r).Front()
 }
 
 // Carve away object b from a.
@@ -103,15 +103,15 @@ type objMinus struct {
 	a, b CSGObj
 }
 
-func (o *objMinus) Inters(r *Ray) BiSurf {
+func (o *objMinus) Inters2(r *Ray) BiSurf {
 	// not intersecting A = not intersecting anything
-	A := o.a.Inters(r)
+	A := o.a.Inters2(r)
 	if !A.OK() {
 		return BiSurf{}
 	}
 
 	// not intersecting b = intersecting A fully
-	B := o.b.Inters(r)
+	B := o.b.Inters2(r)
 	if !B.OK() {
 		return A
 	}
@@ -135,5 +135,5 @@ func (o *objMinus) Inters(r *Ray) BiSurf {
 }
 
 func (o *objMinus) Hit(r *Ray) Surf {
-	return o.Inters(r).Front()
+	return o.Inters2(r).Front()
 }
