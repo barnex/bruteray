@@ -23,7 +23,7 @@ type Shape interface {
 	Inters2(r *Ray) Interval
 
 	// Returns all intersection points with r
-	Inters(r *Ray) []float64
+	Inters(r *Ray) []Interval
 
 	// Normal vector at position.
 	// Does not necessarily need to point outwards.
@@ -59,7 +59,7 @@ func (s *sphere) Inters2(r *Ray) Interval {
 	return Interval{t1, t2}.Fix().check()
 }
 
-func (s *sphere) Inters(r *Ray) []float64 {
+func (s *sphere) Inters(r *Ray) []Interval {
 	return s.Inters2(r).Slice()
 }
 
@@ -114,7 +114,7 @@ func (s *box) Inters2(r *Ray) Interval {
 	return Interval{ten, tex}.Fix().check()
 }
 
-func (s *box) Inters(r *Ray) []float64 {
+func (s *box) Inters(r *Ray) []Interval {
 	return s.Inters2(r).Slice()
 }
 
@@ -160,7 +160,7 @@ func (s *sheet) Inters2(r *Ray) Interval {
 	return Interval{t, t}.Fix().check()
 }
 
-func (s *sheet) Inters(r *Ray) []float64 {
+func (s *sheet) Inters(r *Ray) []Interval {
 	return s.Inters2(r).Slice()
 }
 
@@ -195,7 +195,7 @@ func (s *rect) Inters2(r *Ray) Interval {
 	return Interval{t, t}.Fix().check()
 }
 
-func (s *rect) Inters(r *Ray) []float64 {
+func (s *rect) Inters(r *Ray) []Interval {
 	return s.Inters2(r).Slice()
 }
 
@@ -231,7 +231,7 @@ func (s *slab) Inters2(r *Ray) Interval {
 	return Interval{t1, t2}.Fix().check()
 }
 
-func (s *slab) Inters(r *Ray) []float64 {
+func (s *slab) Inters(r *Ray) []Interval {
 	return s.Inters2(r).Slice()
 }
 

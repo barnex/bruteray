@@ -1,8 +1,10 @@
 package bruteray
 
+// CSGObj is an Obj that can be combined with CSG operations.
 type CSGObj interface {
 	Obj
 	Inters2(r *Ray) BiSurf
+	Inters(r *Ray) []BiSurf
 }
 
 // -- CSG
@@ -48,6 +50,8 @@ func (o *objAnd) Inters2(r *Ray) BiSurf {
 	return bi
 }
 
+func (o *objAnd) Inters(r *Ray) []BiSurf { return o.Inters2(r).Slice() }
+
 func (o *objAnd) Hit(r *Ray) Surf {
 	return o.Inters2(r).Front()
 }
@@ -89,6 +93,8 @@ func (o *objOr) Inters2(r *Ray) BiSurf {
 
 	return bi
 }
+
+func (o *objOr) Inters(r *Ray) []BiSurf { return o.Inters2(r).Slice() }
 
 func (o *objOr) Hit(r *Ray) Surf {
 	return o.Inters2(r).Front()
@@ -137,3 +143,5 @@ func (o *objMinus) Inters2(r *Ray) BiSurf {
 func (o *objMinus) Hit(r *Ray) Surf {
 	return o.Inters2(r).Front()
 }
+
+func (o *objMinus) Inters(r *Ray) []BiSurf { return o.Inters2(r).Slice() }

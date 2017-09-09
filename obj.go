@@ -1,7 +1,7 @@
 package bruteray
 
 type Obj interface {
-	Hit(r *Ray) Surf
+	Hit(r *Ray) Surf // Returns the surface fragment where the ray first hits (T>0)
 }
 
 // -- Primitive Object (shape + material)
@@ -25,6 +25,8 @@ func (o *prim) Inters2(r *Ray) BiSurf {
 		S2: Surf{T: i.Max, Norm: n2, Material: o.m},
 	}
 }
+
+func (o *prim) Inters(r *Ray) []BiSurf { return o.Inters2(r).Slice() }
 
 func (o *prim) Hit(r *Ray) Surf {
 	return o.Inters2(r).Front()
@@ -57,6 +59,8 @@ func (o *transObj) Inters2(r *Ray) BiSurf {
 	bi.S2.Norm = (&o.t).TransfDir(bi.S2.Norm)
 	return bi
 }
+
+func (o *transObj) Inters(r *Ray) []BiSurf { return o.Inters2(r).Slice() }
 
 func (o *transObj) Hit(r *Ray) Surf {
 	return o.Inters2(r).Front()

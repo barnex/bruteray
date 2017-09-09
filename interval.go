@@ -22,11 +22,11 @@ func (i Interval) Front() float64 {
 	return i.Max
 }
 
-func (i Interval) Slice() []float64 {
+func (i Interval) Slice() []Interval {
 	if !i.OK() {
 		return nil
 	}
-	return []float64{i.Min, i.Max}
+	return []Interval{i}
 }
 
 //
