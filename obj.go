@@ -51,17 +51,21 @@ func Transf(o CSGObj, T *Matrix4) CSGObj {
 	}
 }
 
-func (o *transObj) Inters2(r *Ray) BiSurf {
+func (o *transObj) Inters(r *Ray) []BiSurf {
 	r2 := *r
 	r2.Transf(&o.tinv)
-	bi := o.orig.Inters2(&r2)
-	bi.S1.Norm = (&o.t).TransfDir(bi.S1.Norm)
-	bi.S2.Norm = (&o.t).TransfDir(bi.S2.Norm)
+
+	bi := o.orig.Inters(&r2)
+
+	for i := range bi {
+		bi[i].S1.Norm = (&o.t).TransfDir(bi[i].S1.Norm)
+		bi[i].S2.Norm = (&o.t).TransfDir(bi[i].S2.Norm)
+	}
 	return bi
 }
 
-func (o *transObj) Inters(r *Ray) []BiSurf { return o.Inters2(r).Slice() }
-
 func (o *transObj) Hit(r *Ray) Surf {
-	return o.Inters2(r).Front()
+	r2 := *r
+	r2.Transf(&o.tinv)
+	return o.orig.Hit(&r2)
 }

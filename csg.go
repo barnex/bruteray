@@ -1,9 +1,10 @@
 package bruteray
 
+import "fmt"
+
 // CSGObj is an Obj that can be combined with CSG operations.
 type CSGObj interface {
 	Obj
-	Inters2(r *Ray) BiSurf
 	Inters(r *Ray) []BiSurf
 }
 
@@ -19,12 +20,12 @@ type objAnd struct {
 }
 
 func (o *objAnd) Inters2(r *Ray) BiSurf {
-	A := o.a.Inters2(r)
+	A := toBi(o.a.Inters(r))
 	if !A.OK() {
 		return A
 	}
 
-	B := o.b.Inters2(r)
+	B := toBi(o.b.Inters(r))
 	if !B.OK() {
 		return B
 	}
@@ -50,6 +51,17 @@ func (o *objAnd) Inters2(r *Ray) BiSurf {
 	return bi
 }
 
+func toBi(x []BiSurf) BiSurf {
+	switch len(x) {
+	case 0:
+		return BiSurf{}
+	case 1:
+		return x[0]
+	default:
+		panic(fmt.Sprintf("TODO: CSG on > 1 interval"))
+	}
+}
+
 func (o *objAnd) Inters(r *Ray) []BiSurf { return o.Inters2(r).Slice() }
 
 func (o *objAnd) Hit(r *Ray) Surf {
@@ -66,8 +78,8 @@ type objOr struct {
 
 func (o *objOr) Inters2(r *Ray) BiSurf {
 
-	A := o.a.Inters2(r)
-	B := o.b.Inters2(r)
+	A := toBi(o.a.Inters(r))
+	B := toBi(o.b.Inters(r))
 
 	// ray only hits one
 	if !A.OK() {
@@ -111,13 +123,13 @@ type objMinus struct {
 
 func (o *objMinus) Inters2(r *Ray) BiSurf {
 	// not intersecting A = not intersecting anything
-	A := o.a.Inters2(r)
+	A := toBi(o.a.Inters(r))
 	if !A.OK() {
 		return BiSurf{}
 	}
 
 	// not intersecting b = intersecting A fully
-	B := o.b.Inters2(r)
+	B := toBi(o.b.Inters(r))
 	if !B.OK() {
 		return A
 	}
