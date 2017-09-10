@@ -2,16 +2,14 @@ package bruteray
 
 import "fmt"
 
-// CSGObj is an Obj that can be combined with CSG operations.
+// CSGObj is an Obj that can be combined with CSG operations (and, or, minus, ...).
 type CSGObj interface {
 	Obj
 	Inters(r *Ray) []BiSurf
 }
 
-// -- CSG
-
 // Intersection (boolean AND) of two objects.
-func ObjAnd(a, b CSGObj) CSGObj {
+func And(a, b CSGObj) CSGObj {
 	return &objAnd{a, b}
 }
 
@@ -68,7 +66,7 @@ func (o *objAnd) Hit(r *Ray) Surf {
 	return o.Inters2(r).Front()
 }
 
-func ObjOr(a, b CSGObj) CSGObj {
+func Or(a, b CSGObj) CSGObj {
 	return &objOr{a, b}
 }
 
@@ -113,7 +111,7 @@ func (o *objOr) Hit(r *Ray) Surf {
 }
 
 // Carve away object b from a.
-func ObjMinus(a, b CSGObj) CSGObj {
+func Minus(a, b CSGObj) CSGObj {
 	return &objMinus{a, b}
 }
 

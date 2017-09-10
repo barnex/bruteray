@@ -93,7 +93,7 @@ func TestObjAnd(t *testing.T) {
 	r := 0.5
 	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
 	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
-	s := ObjAnd(s1, s2)
+	s := And(s1, s2)
 	e.Add(s)
 
 	Compare(t, e, "007-objand")
@@ -120,7 +120,7 @@ func TestSlabIntersect(t *testing.T) {
 	s1 := Slab(Ex, -r, r, Flat(RED))
 	s2 := Slab(Ey, -r, r, Flat(GREEN))
 	s3 := Slab(Ez, -r, r, Flat(BLUE))
-	cube := ObjAnd(ObjAnd(s1, s2), s3)
+	cube := And(And(s1, s2), s3)
 	cube = Transf(cube, RotY4(160*Deg).Mul(RotX4(20*Deg)))
 	e.Add(cube)
 	e.Camera = Camera(1).Transl(0, 0, -4)
@@ -151,7 +151,7 @@ func TestRect(t *testing.T) {
 	nz := ShadeNormal(Ez)
 	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf, nz)
 	r2 := Transf(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
-	r3 := ObjAnd(
+	r3 := And(
 		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
 		Sphere(Vec{0, 0, z}, 0.25, nz),
 	)
@@ -197,7 +197,7 @@ func TestObjOr1(t *testing.T) {
 	bar1 := Box(Vec{}, 1.5, 0.5, 0.5, Diffuse0(RED))
 	bar2 := Box(Vec{}, 0.5, 1.5, 0.5, Diffuse0(GREEN))
 	bar3 := Box(Vec{}, 0.5, 0.5, 1.5, Diffuse0(BLUE))
-	crux := ObjOr(ObjOr(box, bar1), ObjOr(bar2, bar3))
+	crux := Or(Or(box, bar1), Or(bar2, bar3))
 	crux = Transf(crux, RotY4(15*Deg))
 	e.Add(g, crux)
 
@@ -214,7 +214,7 @@ func TestObjOr2(t *testing.T) {
 	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
 	b1 := Box(Vec{-2, 0, -.1}, 0.5, 1, 1, Diffuse0(RED))
 	b2 := Box(Vec{2, 0, -.1}, 0.5, 1, 1, Diffuse0(GREEN))
-	or := ObjOr(b1, b2)
+	or := Or(b1, b2)
 	or = Transf(or, RotY4(-15*Deg))
 	e.Add(g, or)
 
