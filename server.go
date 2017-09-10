@@ -1,5 +1,8 @@
 package bruteray
 
+// server severs an Env over HTTP,
+// so we can see it while being rendered.
+
 import (
 	"bytes"
 	"flag"

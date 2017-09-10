@@ -1,5 +1,7 @@
 package bruteray
 
+// Utilities for generating random numbers and vectors.
+
 import (
 	"math/rand"
 	"sync/atomic"
@@ -35,7 +37,8 @@ func randVec(e *Env) Vec {
 
 }
 
-// Random unit vector, dot product with n >= 0.
+// Random unit vector from the hemisphere around n
+// (dot product with n >= 0).
 func randVecDir(e *Env, n Vec) Vec {
 	v := randVec(e)
 	if v.Dot(n) < 0 {
