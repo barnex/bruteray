@@ -20,7 +20,7 @@ type Shape interface {
 	// 	Shape does not intersect ray at all: return Interval{}
 	// 	Shape lies entirely in front of ray start: Min & Max > 0
 	// TODO: rm
-	Inters2(r *Ray) Interval
+	//Inters2(r *Ray) Interval
 
 	// Returns all intersection points with r
 	Inters(r *Ray) []Interval
