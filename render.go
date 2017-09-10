@@ -96,12 +96,3 @@ func renderLine(e *Env, maxRec int, img Image, hMin, hMax int) {
 		}
 	}
 }
-
-// Anti-aliasing jitter
-func (c *Cam) aa(e *Env) float64 {
-	if c.AA {
-		return random(e)
-	} else {
-		return 0.5
-	}
-}

@@ -29,9 +29,9 @@ func (img Image) At(i, j int) color.Color {
 	return img[j][i]
 }
 
-func (img Image) NumPix() int {
-	return (img.Bounds().Dx() + 1) * (img.Bounds().Dy() + 1)
-}
+//func (img Image) NumPix() int {
+//	return (img.Bounds().Dx() + 1) * (img.Bounds().Dy() + 1)
+//}
 
 func (i Image) ColorModel() color.Model {
 	return nil
@@ -46,13 +46,13 @@ func (img Image) Add(img2 Image) {
 	}
 }
 
-func (img Image) Mul(x float64) {
-	for i := range img {
-		for j := range img[i] {
-			img[i][j].Mul(x)
-		}
-	}
-}
+//func (img Image) Mul(x float64) {
+//	for i := range img {
+//		for j := range img[i] {
+//			img[i][j].Mul(x)
+//		}
+//	}
+//}
 
 const jpegQual = 95
 

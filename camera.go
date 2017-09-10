@@ -37,3 +37,12 @@ func (c *Cam) RotScene(theta float64) *Cam {
 	c.transf = *((&c.transf).Mul(T))
 	return c
 }
+
+// Anti-aliasing jitter
+func (c *Cam) aa(e *Env) float64 {
+	if c.AA {
+		return random(e)
+	} else {
+		return 0.5
+	}
+}
