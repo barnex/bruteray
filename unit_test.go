@@ -330,6 +330,23 @@ func TestLuminousObject(t *testing.T) {
 	CompareImg(t, e, img, name, 10)
 }
 
+func TestQuad(t *testing.T) {
+	e := NewEnv()
+	e.Add(
+		Sheet(Ey, -1.0, Diffuse0(WHITE.Mul(EV(-0.3)))),
+		Quad(Vec{0, 0, 0}, Vec{1, -1, 1}, 1, Diffuse0(RED)),
+		//Sphere(Vec{0, 0, 0}, 1, Diffuse1(RED)),
+	)
+	e.AddLight(
+		PointLight(Vec{3, 3, -7}, WHITE.Mul(EV(9))),
+	)
+	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
+
+	e.Camera = Camera(1).Transl(0, 0, -6)
+	e.Camera.AA = false
+	Compare(t, e, "021-quad-hyper")
+}
+
 //func TestObjMinus(t *testing.T) {
 //	e := NewEnv()
 //

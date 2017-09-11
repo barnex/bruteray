@@ -41,12 +41,12 @@ func (s *diffuse0) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	return acc
 }
 
-const off = 1e-6
+const offset = 1e-6
 
 func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(e, pos)
 
-	pos = pos.MAdd(off, norm)
+	//pos = pos.MAdd(off, norm)
 	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
 
 	t := e.IntersectAny(&secundary)
@@ -76,7 +76,7 @@ func (s *diffuse00) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	for _, l := range e.lights {
 		lpos, intens := l.Sample(e, pos)
 		secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
-		pos = pos.MAdd(off, norm)
+		//pos = pos.MAdd(off, norm)
 		i := s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
 		acc = acc.Add(i)
 	}
@@ -86,7 +86,7 @@ func (s *diffuse00) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 func (s *diffuse00) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(e, pos)
 
-	pos = pos.MAdd(off, norm)
+	//pos = pos.MAdd(off, norm)
 	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
 
 	t := e.IntersectAny(&secundary)
@@ -117,7 +117,7 @@ func (s *diffuse1) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 
 	// random ray
 
-	sec := &Ray{pos.MAdd(off, norm), randVecCos(e, norm)}
+	sec := &Ray{pos.MAdd(offset, norm), randVecCos(e, norm)}
 	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // must not include ultra-intense objects, already added as lights
 
 	return acc

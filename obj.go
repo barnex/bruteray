@@ -8,7 +8,7 @@ type Obj interface {
 
 // -- Primitive Object (shape + material)
 type prim struct {
-	s Shape
+	s SolidShape
 	m Material
 }
 

@@ -42,6 +42,10 @@ func (v Vec) Mul(a float64) Vec {
 	return Vec{a * v[X], a * v[Y], a * v[Z]}
 }
 
+func (v Vec) Mul3(a Vec) Vec {
+	return Vec{a[X] * v[X], a[Y] * v[Y], a[Z] * v[Z]}
+}
+
 // Scalar division.
 func (v Vec) Div(a float64) Vec {
 	return v.Mul(1 / a)
