@@ -5,15 +5,15 @@ import (
 	"sync"
 )
 
-func Render1Thread(e *Env, maxRec int, img Image) {
+func Render1Thread(e *Env, img Image) {
 	H := img.Bounds().Dy()
 	const stride = 1
 	for i := 0; i < H; i += stride {
-		renderLine(e, maxRec, img, i, i+stride)
+		renderLine(e, img, i, i+stride)
 	}
 }
 
-func Render(e *Env, maxRec int, img Image) {
+func Render(e *Env, img Image) {
 	H := img.Bounds().Dy()
 	var wg sync.WaitGroup
 	const stride = 1
@@ -21,13 +21,13 @@ func Render(e *Env, maxRec int, img Image) {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			renderLine(e.Copy(), maxRec, img, i, i+stride)
+			renderLine(e.Copy(), img, i, i+stride)
 		}(i)
 	}
 	wg.Wait()
 }
 
-func MultiPass(e *Env, maxRec int, img Image, N int) {
+func MultiPass(e *Env, img Image, N int) {
 	que := make(chan struct{}, N)
 	var wg sync.WaitGroup
 
@@ -46,7 +46,7 @@ func MultiPass(e *Env, maxRec int, img Image, N int) {
 			defer wg.Done()
 			for range que {
 				img2 := MakeImage(w, h)
-				Render1Thread(e.Copy(), maxRec, img2)
+				Render1Thread(e.Copy(), img2)
 				img := <-imgCh
 
 				// TODO: img.Add()
@@ -69,7 +69,7 @@ func MultiPass(e *Env, maxRec int, img Image, N int) {
 	}
 }
 
-func renderLine(e *Env, maxRec int, img Image, hMin, hMax int) {
+func renderLine(e *Env, img Image, hMin, hMax int) {
 	c := e.Camera
 	focalPoint := Vec{0, 0, -c.FocalLen}
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
@@ -91,7 +91,7 @@ func renderLine(e *Env, maxRec int, img Image, hMin, hMax int) {
 			r.Transf(&(c.transf))
 
 			// accumulate ray intensity
-			v := e.ShadeAll(r, maxRec)
+			v := e.ShadeAll(r, e.Recursion)
 			img[i][j] = v
 		}
 	}

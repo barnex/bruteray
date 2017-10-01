@@ -260,12 +260,12 @@ func TestDiffuse1(t *testing.T) {
 		refl := refl
 		e := whitebox(refl)
 		for _, rec := range []int{1, 16, 128} {
-			rec := rec
+			e.Recursion = rec
 			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, rec), func(t *testing.T) {
 				t.Parallel()
 				img := MakeImage(testW/4, testH/4)
 				nPass := 2
-				MultiPass(e, rec, img, nPass)
+				MultiPass(e, img, nPass)
 				name := fmt.Sprintf("017-diffuse1-refl%v-rec%v", refl, rec)
 				CompareImg(t, e, img, name, 10)
 			})
@@ -325,7 +325,8 @@ func TestLuminousObject(t *testing.T) {
 
 	img := MakeImage(testW, testH)
 	nPass := 8
-	MultiPass(e, 3, img, nPass)
+	e.Recursion = 3
+	MultiPass(e, img, nPass)
 	name := "020-luminous-object"
 	CompareImg(t, e, img, name, 10)
 }
@@ -335,7 +336,6 @@ func TestQuad(t *testing.T) {
 	e.Add(
 		Sheet(Ey, -1.0, Diffuse0(WHITE.Mul(EV(-0.3)))),
 		Quad(Vec{0, 0, 0}, Vec{1, -1, 1}, 1, Diffuse0(RED)),
-		//Sphere(Vec{0, 0, 0}, 1, Diffuse1(RED)),
 	)
 	e.AddLight(
 		PointLight(Vec{3, 3, -7}, WHITE.Mul(EV(9))),

@@ -8,19 +8,21 @@ import (
 // (all objects, light sources, ... in the scene)
 // as well as a random-number generator needed for iterative rendering.
 type Env struct {
-	objs    []Obj   // non-source objects
-	lights  []Light // light sources
-	all     []Obj   // objs + lights
-	Ambient Surf
-	rng     rand.Rand
-	Camera  *Cam
+	objs      []Obj   // non-source objects
+	lights    []Light // light sources
+	all       []Obj   // objs + lights
+	Ambient   Surf
+	rng       rand.Rand
+	Camera    *Cam
+	Recursion int
 }
 
 func NewEnv() *Env {
 	return &Env{
-		Ambient: Surf{T: inf, Material: Flat(BLACK)},
-		rng:     *(newRng()),
-		Camera:  Camera(0),
+		Ambient:   Surf{T: inf, Material: Flat(BLACK)},
+		rng:       *(newRng()),
+		Camera:    Camera(0),
+		Recursion: DefaultRec,
 	}
 }
 

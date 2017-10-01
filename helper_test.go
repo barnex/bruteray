@@ -34,7 +34,7 @@ func Compare(t *testing.T, e *Env, name string) {
 	t.Helper()
 
 	img := MakeImage(testW, testH)
-	Render(e, testRec, img)
+	Render(e, img)
 	const defaultTolerance = 10
 	CompareImg(t, e, img, name, defaultTolerance)
 }

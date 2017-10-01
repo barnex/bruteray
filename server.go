@@ -40,17 +40,17 @@ func Serve(e *Env) {
 	http.HandleFunc("/render", handleRender)
 	http.HandleFunc("/", mainHandler)
 
-	progressive = RenderLoop(env, DefaultRec, *flagWidth, *flagHeight)
+	progressive = RenderLoop(env, *flagWidth, *flagHeight)
 
 	log.Fatal(http.ListenAndServe(*port, nil))
 }
 
 type Loop struct {
-	env     *Env
-	r, w, h int
-	acc     Image
-	n       float64
-	mu      sync.Mutex
+	env  *Env
+	w, h int
+	acc  Image
+	n    float64
+	mu   sync.Mutex
 }
 
 func (l *Loop) run() {
@@ -61,7 +61,7 @@ func (l *Loop) run() {
 
 func (l *Loop) iter() {
 	img := MakeImage(l.w, l.h)
-	Render(l.env, l.r, img)
+	Render(l.env, img)
 	l.mu.Lock()
 	l.acc.Add(img)
 	l.n++
@@ -81,8 +81,8 @@ func (l *Loop) Current() Image {
 	return img
 }
 
-func RenderLoop(e *Env, maxRec int, w, h int) *Loop {
-	l := &Loop{env: e, r: maxRec, w: w, h: h, acc: MakeImage(w, h)}
+func RenderLoop(e *Env, w, h int) *Loop {
+	l := &Loop{env: e, w: w, h: h, acc: MakeImage(w, h)}
 	l.iter()   // make sure we have 1 pass at least
 	go l.run() // refine in the background
 	return l

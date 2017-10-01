@@ -67,7 +67,7 @@ func (s *sphere) Hit(r *Ray) float64 {
 
 // -- quadric
 
-func Quad(center Vec, a Vec, b float64, m Material) Obj {
+func Quad(center Vec, a Vec, b float64, m Material) CSGObj {
 	return &prim{&quad{center, a, b}, m}
 }
 
