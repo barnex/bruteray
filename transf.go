@@ -1,35 +1,30 @@
 package bruteray
 
-//type transObj struct {
-//	orig Obj
-//	t    Matrix4
-//	tinv Matrix4
-//}
-//
-//// TODO: non-csg version
-//func Transf(o Obj, T *Matrix4) Obj {
-//	return &transObj{
-//		o,
-//		*T,
-//		*(T.Inv()),
-//	}
-//}
-//
-//func (o *transObj) Inters(r *Ray) []BiSurf {
-//	r2 := *r
-//	r2.Transf(&o.tinv)
-//
-//	bi := o.orig.Inters(&r2)
-//
-//	for i := range bi {
-//		bi[i].S1.Norm = (&o.t).TransfDir(bi[i].S1.Norm)
-//		bi[i].S2.Norm = (&o.t).TransfDir(bi[i].S2.Norm)
-//	}
-//	return bi
-//}
-//
-//func (o *transObj) Hit(r *Ray) Surf {
-//	r2 := *r
-//	r2.Transf(&o.tinv)
-//	return o.orig.Hit(&r2)
-//}
+// Transf returns a transformed version of the object.
+func Transf(o Obj, T *Matrix4) Obj {
+	return &transformed{
+		o,
+		*T,
+		*(T.Inv()),
+	}
+}
+
+type transformed struct {
+	orig Obj
+	t    Matrix4
+	tinv Matrix4
+}
+
+func (o *transformed) Hit(r *Ray, f *[]Surf) {
+	r2 := *r
+	r2.Transf(&o.tinv)
+	o.orig.Hit(&r2, f)
+	for i := range *f {
+		(*f)[i].Norm = (&o.t).TransfDir((*f)[i].Norm)
+	}
+}
+
+func (o *transformed) Inside(p Vec) bool {
+	// TODO: currently untested
+	return o.orig.Inside(o.tinv.TransfPoint(p))
+}

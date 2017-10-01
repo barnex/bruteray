@@ -79,21 +79,21 @@ func TestCamRot(t *testing.T) {
 }
 
 // Test object transform
-//func TestObjTransf(t *testing.T) {
-//	e := NewEnv()
-//
-//	r := 0.25
-//	sx := Sphere(Vec{-0.5, 0, 2}, r, ShadeNormal(Ex))
-//	sy := Sphere(Vec{0, 0, 2}, r, ShadeNormal(Ez))
-//	sz := Sphere(Vec{0.5, 0, 2}, r, ShadeNormal(Ey))
-//
-//	rot := RotZ4(Pi / 4)
-//	e.Add(Transf(sx, rot))
-//	e.Add(Transf(sy, rot))
-//	e.Add(Transf(sz, rot))
-//
-//	Compare(t, e, "006-objtransf")
-//}
+func TestObjTransf(t *testing.T) {
+	e := NewEnv()
+
+	r := 0.25
+	sx := Sphere(Vec{-0.5, 0, 2}, r, ShadeNormal(Ex))
+	sy := Sphere(Vec{0, 0, 2}, r, ShadeNormal(Ez))
+	sz := Sphere(Vec{0.5, 0, 2}, r, ShadeNormal(Ey))
+
+	rot := RotZ4(Pi / 4)
+	e.Add(Transf(sx, rot))
+	e.Add(Transf(sy, rot))
+	e.Add(Transf(sz, rot))
+
+	Compare(t, e, "006-objtransf")
+}
 
 //// Test intersection of two spheres
 ////func TestObjAnd(t *testing.T) {
