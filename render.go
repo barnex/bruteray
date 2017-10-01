@@ -91,8 +91,14 @@ func renderLine(e *Env, img Image, hMin, hMax int) {
 			r.Transf(&(c.transf))
 
 			// accumulate ray intensity
-			v := e.ShadeAll(r, e.Recursion)
-			img[i][j] = v
+			c := e.ShadeAll(r, e.Recursion)
+
+			// clip to avoid caustic noise
+			if c.R > e.Cutoff || c.G > e.Cutoff || c.B > e.Cutoff {
+				c = c.Mul(1 / c.Max())
+			}
+
+			img[i][j] = c
 		}
 	}
 }

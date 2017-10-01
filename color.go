@@ -69,6 +69,17 @@ func EV(exp float64) float64 {
 	return math.Pow(2, exp)
 }
 
+func (c *Color) Max() float64 {
+	max := c.R
+	if c.G > max {
+		max = c.G
+	}
+	if c.B > max {
+		max = c.B
+	}
+	return max
+}
+
 // linear to sRGB gamma curve
 // https://en.wikipedia.org/wiki/SRGB
 func srgb(c float64) float64 {

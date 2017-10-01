@@ -1,6 +1,7 @@
 package bruteray
 
 import (
+	"math"
 	"math/rand"
 )
 
@@ -15,6 +16,7 @@ type Env struct {
 	rng       rand.Rand
 	Camera    *Cam
 	Recursion int
+	Cutoff    float64
 }
 
 func NewEnv() *Env {
@@ -23,6 +25,7 @@ func NewEnv() *Env {
 		rng:       *(newRng()),
 		Camera:    Camera(0),
 		Recursion: DefaultRec,
+		Cutoff:    math.Inf(1),
 	}
 }
 
@@ -85,7 +88,9 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 			surf = fragment
 		}
 	}
-	return surf.Shade(e, N-1, r)
+	c := surf.Shade(e, N-1, r)
+
+	return c
 }
 
 // Returns t > 0 if r intersects any object
