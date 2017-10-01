@@ -14,7 +14,7 @@ func TestSphere(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Paint(Sphere(Vec{0, 0, 1}, 0.25), Flat(WHITE)),
+		Sphere(Vec{0, 0, 1}, 0.25, Flat(WHITE)),
 	)
 
 	Compare(t, e, "001-sphere")
@@ -25,7 +25,7 @@ func TestBehindCam(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Paint(Sphere(Vec{0, 0, -1}, 0.25), Flat(WHITE)),
+		Sphere(Vec{0, 0, -1}, 0.25, Flat(WHITE)),
 	)
 
 	Compare(t, e, "002-behindcam")
@@ -36,9 +36,9 @@ func TestNormal(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Paint(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)),
-		Paint(Sphere(Vec{-0.5, 0, 2}, 0.25), ShadeNormal(Ex)),
-		Paint(Sphere(Vec{0.5, 0, 2}, 0.25), ShadeNormal(Ey)),
+		Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)),
+		Sphere(Vec{-0.5, 0, 2}, 0.25, ShadeNormal(Ex)),
+		Sphere(Vec{0.5, 0, 2}, 0.25, ShadeNormal(Ey)),
 	)
 
 	Compare(t, e, "003-normals")
@@ -49,7 +49,7 @@ func TestCamTransl(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Paint(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)),
+		Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)),
 	)
 	e.Camera = Camera(0).Transl(-0.5, -0.25, 0)
 
@@ -63,22 +63,22 @@ func TestCamRot(t *testing.T) {
 	r := 0.5
 	nz := ShadeNormal(Ez)
 	e.Add(
-		Paint(Sphere(Vec{0, 0, 0}, r), nz),
-		Paint(Sphere(Vec{0, 0, 2}, r), nz),
-		Paint(Sphere(Vec{0, 0, 4}, r), nz),
-		Paint(Sphere(Vec{2, 0, 0}, r), nz),
-		Paint(Sphere(Vec{2, 0, 2}, r), nz),
-		Paint(Sphere(Vec{2, 0, 4}, r), nz),
-		Paint(Sphere(Vec{-2, 0, 0}, r), nz),
-		Paint(Sphere(Vec{-2, 0, 2}, r), nz),
-		Paint(Sphere(Vec{-2, 0, 4}, r), nz),
+		Sphere(Vec{0, 0, 0}, r, nz),
+		Sphere(Vec{0, 0, 2}, r, nz),
+		Sphere(Vec{0, 0, 4}, r, nz),
+		Sphere(Vec{2, 0, 0}, r, nz),
+		Sphere(Vec{2, 0, 2}, r, nz),
+		Sphere(Vec{2, 0, 4}, r, nz),
+		Sphere(Vec{-2, 0, 0}, r, nz),
+		Sphere(Vec{-2, 0, 2}, r, nz),
+		Sphere(Vec{-2, 0, 4}, r, nz),
 	)
 	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
 
 	Compare(t, e, "005-camrot")
 }
 
-//// Test object transform
+// Test object transform
 //func TestObjTransf(t *testing.T) {
 //	e := NewEnv()
 //
@@ -94,7 +94,7 @@ func TestCamRot(t *testing.T) {
 //
 //	Compare(t, e, "006-objtransf")
 //}
-//
+
 //// Test intersection of two spheres
 ////func TestObjAnd(t *testing.T) {
 ////	e := NewEnv()

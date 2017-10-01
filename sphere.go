@@ -2,13 +2,14 @@ package bruteray
 
 import "math"
 
-func Sphere(center Vec, radius float64) Obj {
-	return &sphere{center, sqr(radius)}
+func Sphere(center Vec, radius float64, m Material) Obj {
+	return &sphere{center, sqr(radius), m}
 }
 
 type sphere struct {
 	c  Vec
 	r2 float64
+	m  Material
 }
 
 func (s *sphere) Inside(p Vec) bool {
@@ -28,8 +29,8 @@ func (s *sphere) Hit(r *Ray, f *[]Surf) {
 	t2 := (-vd + math.Sqrt(D))
 
 	*f = append(*f,
-		Surf{T: t1, Norm: s.Normal(r.At(t1))},
-		Surf{T: t2, Norm: s.Normal(r.At(t2))},
+		Surf{T: t1, Norm: s.Normal(r.At(t1)), Material: s.m},
+		Surf{T: t2, Norm: s.Normal(r.At(t2)), Material: s.m},
 	)
 }
 
