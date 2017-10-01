@@ -35,7 +35,7 @@ func (s *sheet) Hit(r *Ray) float64 {
 
 // A rectangle (i.e. finite sheet) at given position,
 // with normal vector dir and half-axes rx, ry, rz.
-func Rect(pos, dir Vec, rx, ry, rz float64, m Material) CSGObj {
+func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj {
 	return &prim{&rect{pos, dir, rx, ry, rz}, m}
 }
 

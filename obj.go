@@ -14,22 +14,22 @@ type prim struct {
 
 var _ Obj = (*prim)(nil)
 
-func (o *prim) Inters(r *Ray) []BiSurf {
-
-	i := o.s.Inters(r)
-	var bi []BiSurf
-
-	for _, i := range i {
-		n1 := o.s.Normal(r.At(i.Min))
-		n2 := o.s.Normal(r.At(i.Max))
-		bi = append(bi, BiSurf{
-			S1: Surf{T: i.Min, Norm: n1, Material: o.m},
-			S2: Surf{T: i.Max, Norm: n2, Material: o.m},
-		})
-	}
-	return bi
-
-}
+//func (o *prim) Inters(r *Ray) []BiSurf {
+//
+//	i := o.s.Inters(r)
+//	var bi []BiSurf
+//
+//	for _, i := range i {
+//		n1 := o.s.Normal(r.At(i.Min))
+//		n2 := o.s.Normal(r.At(i.Max))
+//		bi = append(bi, BiSurf{
+//			S1: Surf{T: i.Min, Norm: n1, Material: o.m},
+//			S2: Surf{T: i.Max, Norm: n2, Material: o.m},
+//		})
+//	}
+//	return bi
+//
+//}
 
 func (o *prim) Hit(r *Ray) Surf {
 	t := o.s.Hit(r)

@@ -6,7 +6,7 @@ import "math"
 
 // -- sphere
 
-func Sphere(center Vec, radius float64, m Material) CSGObj {
+func Sphere(center Vec, radius float64, m Material) Obj {
 	return &prim{&sphere{center, sqr(radius)}, m}
 }
 
@@ -43,7 +43,7 @@ func (s *sphere) Hit(r *Ray) float64 {
 
 // -- quadric
 
-func Quad(center Vec, a Vec, b float64, m Material) CSGObj {
+func Quad(center Vec, a Vec, b float64, m Material) Obj {
 	return &prim{&quad{center, a, b}, m}
 }
 
