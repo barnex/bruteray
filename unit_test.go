@@ -21,55 +21,63 @@ func TestSphere(t *testing.T) {
 }
 
 // Test a sphere behind the camera
-//func TestBehindCam(t *testing.T) {
-//	e := NewEnv()
-//
-//	e.Add(Sphere(Vec{0, 0, -1}, 0.25, Flat(WHITE)))
-//
-//	Compare(t, e, "002-behindcam")
-//}
-//
-//// Test normal vectors
-//func TestNormal(t *testing.T) {
-//	e := NewEnv()
-//
-//	e.Add(Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)))
-//	e.Add(Sphere(Vec{-0.5, 0, 2}, 0.25, ShadeNormal(Ex)))
-//	e.Add(Sphere(Vec{0.5, 0, 2}, 0.25, ShadeNormal(Ey)))
-//
-//	Compare(t, e, "003-normals")
-//}
-//
-//// Test camera translation
-//func TestCamTransl(t *testing.T) {
-//	e := NewEnv()
-//
-//	e.Add(Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)))
-//	e.Camera = Camera(0).Transl(-0.5, -0.25, 0)
-//
-//	Compare(t, e, "004-camtransl")
-//}
-//
-//// Test camera rotation
-//func TestCamRot(t *testing.T) {
-//	e := NewEnv()
-//
-//	r := 0.5
-//	nz := ShadeNormal(Ez)
-//	e.Add(Sphere(Vec{0, 0, 0}, r, nz))
-//	e.Add(Sphere(Vec{0, 0, 2}, r, nz))
-//	e.Add(Sphere(Vec{0, 0, 4}, r, nz))
-//	e.Add(Sphere(Vec{2, 0, 0}, r, nz))
-//	e.Add(Sphere(Vec{2, 0, 2}, r, nz))
-//	e.Add(Sphere(Vec{2, 0, 4}, r, nz))
-//	e.Add(Sphere(Vec{-2, 0, 0}, r, nz))
-//	e.Add(Sphere(Vec{-2, 0, 2}, r, nz))
-//	e.Add(Sphere(Vec{-2, 0, 4}, r, nz))
-//	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
-//
-//	Compare(t, e, "005-camrot")
-//}
-//
+func TestBehindCam(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Paint(Sphere(Vec{0, 0, -1}, 0.25), Flat(WHITE)),
+	)
+
+	Compare(t, e, "002-behindcam")
+}
+
+// Test normal vectors
+func TestNormal(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Paint(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)),
+		Paint(Sphere(Vec{-0.5, 0, 2}, 0.25), ShadeNormal(Ex)),
+		Paint(Sphere(Vec{0.5, 0, 2}, 0.25), ShadeNormal(Ey)),
+	)
+
+	Compare(t, e, "003-normals")
+}
+
+// Test camera translation
+func TestCamTransl(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Paint(Sphere(Vec{0, 0, 2}, 0.25), ShadeNormal(Ez)),
+	)
+	e.Camera = Camera(0).Transl(-0.5, -0.25, 0)
+
+	Compare(t, e, "004-camtransl")
+}
+
+// Test camera rotation
+func TestCamRot(t *testing.T) {
+	e := NewEnv()
+
+	r := 0.5
+	nz := ShadeNormal(Ez)
+	e.Add(
+		Paint(Sphere(Vec{0, 0, 0}, r), nz),
+		Paint(Sphere(Vec{0, 0, 2}, r), nz),
+		Paint(Sphere(Vec{0, 0, 4}, r), nz),
+		Paint(Sphere(Vec{2, 0, 0}, r), nz),
+		Paint(Sphere(Vec{2, 0, 2}, r), nz),
+		Paint(Sphere(Vec{2, 0, 4}, r), nz),
+		Paint(Sphere(Vec{-2, 0, 0}, r), nz),
+		Paint(Sphere(Vec{-2, 0, 2}, r), nz),
+		Paint(Sphere(Vec{-2, 0, 4}, r), nz),
+	)
+	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
+
+	Compare(t, e, "005-camrot")
+}
+
 //// Test object transform
 //func TestObjTransf(t *testing.T) {
 //	e := NewEnv()
