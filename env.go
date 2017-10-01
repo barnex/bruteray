@@ -81,11 +81,17 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	surf := e.Ambient
 	surf.T = inf
 
+	hit := make([]Surf, 0, 2)
+
 	for _, o := range who {
-		fragment := o.Hit(r)
-		t := fragment.T
-		if t < surf.T && t > 0 {
-			surf = fragment
+		hit = hit[:0]
+		o.Hit(r, &hit)
+
+		for i := range hit {
+			t := hit[i].T
+			if t < surf.T && t > 0 {
+				surf = hit[i]
+			}
 		}
 	}
 	c := surf.Shade(e, N-1, r)
@@ -96,20 +102,42 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 // Returns t > 0 if r intersects any object
 // TODO: cleanup
 func (e *Env) IntersectAny(r *Ray) float64 {
-	t := inf
-	I := -1
-	for i, o := range e.objs {
-		S1 := o.Hit(r)
-		if S1.T <= 0 {
-			continue
-		}
-		if S1.T < t {
-			t = S1.T
-			I = i
+
+	T := inf
+	hit := make([]Surf, 0, 2)
+
+	for _, o := range e.objs {
+		hit = hit[:0]
+		o.Hit(r, &hit)
+
+		for i := range hit {
+			t := hit[i].T
+			if t < T && t > 0 {
+				T = t
+			}
 		}
 	}
-	if I == -1 {
-		t = 0
+
+	if T == inf {
+		T = 0
 	}
-	return t
+	return T
+
+	//t := inf
+	//I := -1
+
+	//for i, o := range e.objs {
+	//	S1 := o.Hit(r)
+	//	if S1.T <= 0 {
+	//		continue
+	//	}
+	//	if S1.T < t {
+	//		t = S1.T
+	//		I = i
+	//	}
+	//}
+	//if I == -1 {
+	//	t = 0
+	//}
+	//return t
 }

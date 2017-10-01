@@ -5,10 +5,11 @@ type Light interface {
 	Obj
 }
 
+// embed to get a Hit that returns no intersection.
 type noIntersection struct{}
 
-//func (noIntersection) Inters2(*Ray) BiSurf { return BiSurf{} }
-func (noIntersection) Hit(*Ray) Surf { return Surf{} }
+func (noIntersection) Hit(*Ray, *[]Surf) { return }
+func (noIntersection) Inside(Vec) bool   { return false }
 
 // Directed light source without fall-off.
 // Position should be far away from the scene (indicates a direction)
@@ -47,14 +48,14 @@ func (l *pointLight) Sample(e *Env, target Vec) (Vec, Color) {
 
 // Spherical light source.
 // Throws softer shadows than an point source and is visible in specular reflections.
-func SphereLight(pos Vec, radius float64, intensity Color) Light {
-	return &smoothLight{
-		sph: sphere{pos, radius},
-		r:   radius,
-		c:   intensity,
-		mat: Flat(intensity.Mul(1 / (4 * Pi * radius * radius))),
-	}
-}
+//func SphereLight(pos Vec, radius float64, intensity Color) Light {
+//	return &smoothLight{
+//		sph: sphere{pos, radius},
+//		r:   radius,
+//		c:   intensity,
+//		mat: Flat(intensity.Mul(1 / (4 * Pi * radius * radius))),
+//	}
+//}
 
 type smoothLight struct {
 	sph sphere
@@ -76,9 +77,11 @@ func (l *smoothLight) Sample(e *Env, target Vec) (Vec, Color) {
 //	}
 //}
 
-func (l *smoothLight) Hit(r *Ray) Surf {
-	inter := l.sph.Hit(r)
-	return Surf{inter, r.At(inter), l.mat}
+func (l *smoothLight) Hit(r *Ray, s *[]Surf) {
+	l.sph.Hit(r, s)
+	for i := range *s {
+		(*s)[i].Material = l.mat
+	}
 }
 
 func sphereVec(e *Env) Vec {

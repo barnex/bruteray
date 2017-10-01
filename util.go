@@ -8,7 +8,7 @@ const (
 )
 
 var (
-	inf = math.Inf(1)
+	inf = math.MaxFloat64 // math.Inf(1)
 )
 
 func sqr(x float64) float64 {

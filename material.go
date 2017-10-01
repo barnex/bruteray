@@ -4,6 +4,25 @@ type Material interface {
 	Shade(e *Env, r *Ray, N int, pos Vec, norm Vec) Color
 }
 
+// Paint applies a material to an object. E.g.:
+// 	Paint(Sphere(...), Shiny(RED, EV(-1)))
+// returns a red sphere
+func Paint(o Obj, m Material) Obj {
+	return &painted{o, m}
+}
+
+type painted struct {
+	Obj
+	m Material
+}
+
+func (o *painted) Hit(r *Ray, s *[]Surf) {
+	o.Obj.Hit(r, s)
+	for i := range *s {
+		(*s)[i].Material = o.m
+	}
+}
+
 // -- flat
 
 // Flat shader always returns the same color.
