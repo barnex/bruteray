@@ -258,15 +258,15 @@ func TestPointLight(t *testing.T) {
 func TestDiffuse1(t *testing.T) {
 	for _, refl := range []float64{0.8, 1} {
 		refl := refl
-		e := whitebox(refl)
-		for _, rec := range []int{1, 16, 128} {
-			e.Recursion = rec
-			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, rec), func(t *testing.T) {
+		for _, r := range []int{1, 16, 128} {
+			e := whitebox(refl)
+			e.Recursion = r
+			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, e.Recursion), func(t *testing.T) {
 				t.Parallel()
 				img := MakeImage(testW/4, testH/4)
 				nPass := 2
 				MultiPass(e, img, nPass)
-				name := fmt.Sprintf("017-diffuse1-refl%v-rec%v", refl, rec)
+				name := fmt.Sprintf("017-diffuse1-refl%v-rec%v", refl, e.Recursion)
 				CompareImg(t, e, img, name, 10)
 			})
 		}
