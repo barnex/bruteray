@@ -76,35 +76,3 @@ func (s *box) Normal(p Vec) Vec {
 func approx(a, b float64) bool {
 	return math.Abs(a-b) < 1e-4
 }
-
-//// -- slab
-//
-//func Slab(dir Vec, off1, off2 float64, m Material) CSGObj {
-//	return &prim{&slab{dir, off1, off2}, m}
-//}
-//
-//type slab struct {
-//	dir        Vec
-//	off1, off2 float64
-//}
-//
-//func (s *slab) Normal(pos Vec) Vec {
-//	return s.dir
-//}
-//
-//func (s *slab) Inters2(r *Ray) Interval {
-//	rs := r.Start.Dot(s.dir)
-//	rd := r.Dir.Dot(s.dir)
-//	t1 := (s.off1 - rs) / rd
-//	t2 := (s.off2 - rs) / rd
-//	t1, t2 = sort(t1, t2)
-//	return Interval{t1, t2}.Fix().check()
-//}
-//
-//func (s *slab) Inters(r *Ray) []Interval {
-//	return s.Inters2(r).Slice()
-//}
-//
-//func (s *slab) Hit(r *Ray) float64 {
-//	return s.Inters2(r).Front()
-//}

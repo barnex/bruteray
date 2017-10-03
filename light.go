@@ -42,46 +42,26 @@ func (l *pointLight) Sample(e *Env, target Vec) (Vec, Color) {
 	return l.pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(l.pos).Len2()) // TODO: 1-> 4*pi
 }
 
-//func (l *pointLight) Inters2(*Ray) BiSurf {
-//	return BiSurf{}
-//}
-
 // Spherical light source.
 // Throws softer shadows than an point source and is visible in specular reflections.
-//func SphereLight(pos Vec, radius float64, intensity Color) Light {
-//	return &smoothLight{
-//		sph: sphere{pos, radius},
-//		r:   radius,
-//		c:   intensity,
-//		mat: Flat(intensity.Mul(1 / (4 * Pi * radius * radius))),
-//	}
-//}
-
-type smoothLight struct {
-	sph sphere
-	r   float64
-	c   Color
-	mat Material
-}
-
-func (l *smoothLight) Sample(e *Env, target Vec) (Vec, Color) {
-	pos := l.sph.c.MAdd(l.r, sphereVec(e))
-	return pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
-}
-
-//func (l *smoothLight) Inters2(r *Ray) BiSurf {
-//	inter := l.sph.Inters2(r)
-//	return BiSurf{
-//		S1: Surf{inter.Min, r.At(inter.Min), l.mat},
-//		S2: Surf{inter.Max, r.At(inter.Max), l.mat},
-//	}
-//}
-
-func (l *smoothLight) Hit(r *Ray, s *[]Surf) {
-	l.sph.Hit(r, s)
-	for i := range *s {
-		(*s)[i].Material = l.mat
+func SphereLight(pos Vec, radius float64, intensity Color) Light {
+	mat := Flat(intensity.Mul(1 / (4 * Pi * radius * radius)))
+	return &sphereLight{
+		sphere: sphere{pos, radius, mat},
+		r:      radius,
+		c:      intensity,
 	}
+}
+
+type sphereLight struct {
+	sphere
+	r float64
+	c Color
+}
+
+func (l *sphereLight) Sample(e *Env, target Vec) (Vec, Color) {
+	pos := l.sphere.c.MAdd(l.r, sphereVec(e))
+	return pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
 }
 
 func sphereVec(e *Env) Vec {
