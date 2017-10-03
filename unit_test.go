@@ -1,6 +1,7 @@
 package bruteray
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -183,20 +184,20 @@ func TestBox(t *testing.T) {
 	Compare(t, e, "012-box")
 }
 
-//func TestDiffuse0(t *testing.T) {
-//	e := NewEnv()
-//
-//	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
-//	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
-//	e.Add(g, s)
-//
-//	l := DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
-//	e.AddLight(l)
-//	e.Camera = Camera(1).Transl(0, 0, -4)
-//
-//	Compare(t, e, "013-diffuse0")
-//}
-//
+func TestDiffuse0(t *testing.T) {
+	e := NewEnv()
+
+	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
+	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
+	e.Add(g, s)
+
+	l := DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
+	e.AddLight(l)
+	e.Camera = Camera(1).Transl(0, 0, -4)
+
+	Compare(t, e, "013-diffuse0")
+}
+
 ////func TestObjOr1(t *testing.T) {
 ////	e := NewEnv()
 ////
@@ -234,85 +235,85 @@ func TestBox(t *testing.T) {
 ////
 ////	Compare(t, e, "015-objor2")
 ////}
+
+func TestPointLight(t *testing.T) {
+	e := NewEnv()
+
+	g := Sheet(Ey, 0, Diffuse0(WHITE))
+	l := Sheet(Ex, -1, Diffuse0(RED))
+	r := Sheet(Ex, 1, Diffuse0(GREEN))
+	c := Sheet(Ey, 2.2, Diffuse0(WHITE))
+	b := Sheet(Ez, 1.1, Diffuse0(WHITE))
+	e.Add(g, l, r, c, b)
+
+	R := 0.4
+	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse0(WHITE))
+	e.Add(s)
+
+	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
+	e.Camera = Camera(1).Transl(0, 1, -2)
+
+	Compare(t, e, "016-pointlight")
+}
+
+// Test convergence of diffuse interreflection:
 //
-//func TestPointLight(t *testing.T) {
-//	e := NewEnv()
+// 1) We are inside a highly reflective white box containing a point light.
+// If the pre-factor for interreflection is slightly too high,
+// deeper recursion will diverge to an infinitely bright image instead of converge.
 //
-//	g := Sheet(Ey, 0, Diffuse0(WHITE))
-//	l := Sheet(Ex, -1, Diffuse0(RED))
-//	r := Sheet(Ex, 1, Diffuse0(GREEN))
-//	c := Sheet(Ey, 2.2, Diffuse0(WHITE))
-//	b := Sheet(Ez, 1.1, Diffuse0(WHITE))
-//	e.Add(g, l, r, c, b)
-//
-//	R := 0.4
-//	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse0(WHITE))
-//	e.Add(s)
-//
-//	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
-//	e.Camera = Camera(1).Transl(0, 1, -2)
-//
-//	Compare(t, e, "016-pointlight")
-//}
-//
-//// Test convergence of diffuse interreflection:
-////
-//// 1) We are inside a highly reflective white box containing a point light.
-//// If the pre-factor for interreflection is slightly too high,
-//// deeper recursion will diverge to an infinitely bright image instead of converge.
-////
-//// 2) We are inside a 100% reflective white box containing a point light.
-//// This is not a physical situation and the intensity should diverge to infinity.
-//// If the pre-factor for interreflection is slightly too low, divergence will not happen.
-//func TestDiffuse1(t *testing.T) {
-//	for _, refl := range []float64{0.8, 1} {
-//		refl := refl
-//		for _, r := range []int{1, 16, 128} {
-//			e := whitebox(refl)
-//			e.Recursion = r
-//			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, e.Recursion), func(t *testing.T) {
-//				t.Parallel()
-//				img := MakeImage(testW/4, testH/4)
-//				nPass := 2
-//				MultiPass(e, img, nPass)
-//				name := fmt.Sprintf("017-diffuse1-refl%v-rec%v", refl, e.Recursion)
-//				CompareImg(t, e, img, name, 10)
-//			})
-//		}
-//	}
-//}
-//
-//func whitebox(refl float64) *Env {
-//	e := NewEnv()
-//	white := Diffuse1(WHITE.Mul(refl))
-//	e.Add(
-//		Sheet(Ey, -1, white),
-//		Sheet(Ey, 1, white),
-//		Sheet(Ex, -1, white),
-//		Sheet(Ex, 1, white),
-//		Sheet(Ez, -1, white),
-//		Sheet(Ez, 1, white),
-//	)
-//	e.AddLight(PointLight(Vec{}, WHITE.Mul(EV(-3)).Mul(4*Pi)))
-//	e.Camera = Camera(0.75).Transl(0, 0, -0.95)
-//	e.Camera.AA = true
-//	return e
-//}
-//
-//// There is a box buried underneath the floor,
-//// it should not cast a shadow.
-////func TestShadowBehind(t *testing.T) {
-////	e := NewEnv()
-////	const r = 0.8
-////	e.Add(
-////		Sheet(Ey, 0, Diffuse0(WHITE)),
-////		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
-////	)
-////	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
-////	e.Camera = Camera(1).Transl(0, 1, -2)
-////	Compare(t, e, "019-shadowbehind")
-////}
-//
+// 2) We are inside a 100% reflective white box containing a point light.
+// This is not a physical situation and the intensity should diverge to infinity.
+// If the pre-factor for interreflection is slightly too low, divergence will not happen.
+func TestDiffuse1(t *testing.T) {
+	for _, refl := range []float64{0.8, 1} {
+		refl := refl
+		for _, r := range []int{1, 16, 128} {
+			e := whitebox(refl)
+			e.Recursion = r
+			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, e.Recursion), func(t *testing.T) {
+				t.Parallel()
+				img := MakeImage(testW/4, testH/4)
+				nPass := 2
+				MultiPass(e, img, nPass)
+				name := fmt.Sprintf("017-diffuse1-refl%v-rec%v", refl, e.Recursion)
+				CompareImg(t, e, img, name, 10)
+			})
+		}
+	}
+}
+
+func whitebox(refl float64) *Env {
+	e := NewEnv()
+	white := Diffuse1(WHITE.Mul(refl))
+	e.Add(
+		Sheet(Ey, -1, white),
+		Sheet(Ey, 1, white),
+		Sheet(Ex, -1, white),
+		Sheet(Ex, 1, white),
+		Sheet(Ez, -1, white),
+		Sheet(Ez, 1, white),
+	)
+	e.AddLight(PointLight(Vec{}, WHITE.Mul(EV(-3)).Mul(4*Pi)))
+	e.Camera = Camera(0.75).Transl(0, 0, -0.95)
+	e.Camera.AA = true
+	return e
+}
+
+// There is a box buried underneath the floor,
+// it should not cast a shadow.
+func TestShadowBehind(t *testing.T) {
+	e := NewEnv()
+	const r = 0.8
+	e.Add(
+		Sheet(Ey, 0, Diffuse0(WHITE)),
+		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
+	)
+	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
+	e.Camera = Camera(1).Transl(0, 1, -2)
+	Compare(t, e, "019-shadowbehind")
+}
+
 //func TestLuminousObject(t *testing.T) {
 //	e := NewEnv()
 //	e.Add(
@@ -339,7 +340,7 @@ func TestBox(t *testing.T) {
 //	name := "020-luminous-object"
 //	CompareImg(t, e, img, name, 10)
 //}
-//
+
 //func TestQuad(t *testing.T) {
 //	e := NewEnv()
 //	e.Add(
