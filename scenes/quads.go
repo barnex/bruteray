@@ -12,7 +12,7 @@ func main() {
 	e.Add(
 		Sheet(Ey, -1, Diffuse1(WHITE.Mul(EV(-.6)))),
 		//Sphere(Vec{}, 1, w),
-		And(
+		HAnd(
 			Quad(Vec{}, Vec{1, -1, 1}, 1, w),
 			Slab(Ey, 1, -1, w),
 		),

@@ -1,52 +1,57 @@
 package bruteray
 
-//// CSGObj is an Obj that can be combined with CSG operations (and, or, minus, ...).
-//type CSGObj interface {
-//	Obj
-//	Inters(r *Ray) []BiSurf
-//}
-//
-//// Intersection (boolean AND) of two objects.
-//func And(a, b CSGObj) CSGObj {
+// Intersection (boolean AND) of two objects.
+//func And(a, b Obj) Obj {
 //	return &objAnd{a, b}
 //}
 //
-//type objAnd struct {
-//	a, b CSGObj
+//type and struct {
+//	a, b Obj
 //}
 //
-//func (o *objAnd) Inters2(r *Ray) BiSurf {
-//	A := toBi(o.a.Inters(r))
-//	if !A.OK() {
-//		return A
+//func (o *and) Hit(r *Ray, f *[]Surf) {
+//
+//	o.a.Hit(r, f)
+//	if len(*f) == 0 {
+//		return
 //	}
 //
-//	B := toBi(o.b.Inters(r))
-//	if !B.OK() {
-//		return B
+//	var f2 []Surf
+//	o.b.Hit(r, f2)
+//
+//	var f3 []Surf
+//
+//	for _, s := range *f{
+//
 //	}
 //
-//	if A.Max() < B.Min() || B.Max() < A.Min() {
-//		return BiSurf{}
-//	}
-//
-//	var bi BiSurf
-//
-//	if A.Min() > B.Min() {
-//		bi.S1 = A.S1
-//	} else {
-//		bi.S1 = B.S1
-//	}
-//
-//	if A.Max() < B.Max() {
-//		bi.S2 = A.S2
-//	} else {
-//		bi.S2 = B.S2
-//	}
-//
-//	return bi
 //}
-//
+
+func HAnd(a, b Obj) Obj {
+	return &hand{a: a, b: b}
+}
+
+type hand struct {
+	a, b Obj
+	noInside
+}
+
+func (o *hand) Hit(r *Ray, f *[]Surf) {
+
+	o.a.Hit(r, f)
+	if len(*f) == 0 {
+		return
+	}
+
+	f2 := make([]Surf, 0, len(*f))
+	for i, s := range *f {
+		if o.b.Inside(r.At(s.T)) {
+			f2 = append(f2, (*f)[i])
+		}
+	}
+	*f = f2
+}
+
 //func toBi(x []BiSurf) BiSurf {
 //	switch len(x) {
 //	case 0:

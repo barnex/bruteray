@@ -14,3 +14,10 @@ type Obj interface {
 	// Objects not used for CSG may simply return false.
 	Inside(p Vec) bool
 }
+
+// embed noInside to get a hollow object.
+type noInside struct{}
+
+func (noInside) Inside(Vec) bool {
+	return false
+}

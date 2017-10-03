@@ -152,23 +152,23 @@ func TestSheet(t *testing.T) {
 	Compare(t, e, "010-sheet")
 }
 
-//// Test rectangles
-////func TestRect(t *testing.T) {
-////	e := NewEnv()
-////
-////	const d = 0.5
-////	const z = 10
-////	nz := ShadeNormal(Ez)
-////	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf, nz)
-////	r2 := Transf(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
-////	r3 := And(
-////		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
-////		Sphere(Vec{0, 0, z}, 0.25, nz),
-////	)
-////	e.Add(r1, r2, r3)
-////
-////	Compare(t, e, "011-rect")
-////}
+// Test rectangles
+//func TestRect(t *testing.T) {
+//	e := NewEnv()
+//
+//	const d = 0.5
+//	const z = 10
+//	nz := ShadeNormal(Ez)
+//	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf, nz)
+//	r2 := Transf(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
+//	r3 := And(
+//		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
+//		Sphere(Vec{0, 0, z}, 0.25, nz),
+//	)
+//	e.Add(r1, r2, r3)
+//
+//	Compare(t, e, "011-rect")
+//}
 
 // Test Axis Aligned Box
 func TestBox(t *testing.T) {
@@ -377,3 +377,29 @@ func TestLuminousObject(t *testing.T) {
 ////}
 //
 ////todo: unit test cube intersect, unit test objminus
+
+//func TestHollowAnd(t *testing.T) {
+//	e := NewEnv()
+//
+//	e.Add(
+//		Sheet(Ey, -1.0, Diffuse1(WHITE.Mul(EV(-0.3)))),
+//		HAnd(
+//			Sphere(Vec{}, 1, Shiny(RED, EV(-3))),
+//			Slab(Ey, -0.3, 0.3, Flat(RED)),
+//		),
+//	)
+//	e.AddLight(
+//		SphereLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
+//	)
+//	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
+//
+//	e.Camera = Camera(1).Transl(0, 2.5, -6).Transf(RotX4(22 * Deg))
+//	e.Camera.AA = true
+//
+//	img := MakeImage(testW, testH)
+//	nPass := 8
+//	e.Recursion = 3
+//	MultiPass(e, img, nPass)
+//	name := "021-hollowand"
+//	CompareImg(t, e, img, name, 10)
+//}
