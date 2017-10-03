@@ -107,20 +107,20 @@ func TestObjTransf(t *testing.T) {
 ////
 ////	Compare(t, e, "007-objand")
 ////}
-//
-//// Test two partially overlapping spheres
-//func TestOverlap(t *testing.T) {
-//	e := NewEnv()
-//
-//	r := 0.5
-//	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
-//	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
-//	e.Add(s1)
-//	e.Add(s2)
-//
-//	Compare(t, e, "008-overlap")
-//}
-//
+
+// Test two partially overlapping spheres
+func TestOverlap(t *testing.T) {
+	e := NewEnv()
+
+	r := 0.5
+	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
+	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
+	e.Add(s1)
+	e.Add(s2)
+
+	Compare(t, e, "008-overlap")
+}
+
 //// Make a cube out of 3 intersecting slabs
 ////func TestSlabIntersect(t *testing.T) {
 ////	e := NewEnv()
@@ -136,21 +136,21 @@ func TestObjTransf(t *testing.T) {
 ////
 ////	Compare(t, e, "009-slabintersect")
 ////}
-//
-//// Use sheets as green grass, blue sky and wall
-//func TestSheet(t *testing.T) {
-//	e := NewEnv()
-//
-//	s1 := Sheet(Ey, -1, Flat(GREEN))
-//	s2 := Sheet(Ey, 4, Flat(BLUE))
-//	s3 := Sheet(Ex, -10, Flat(WHITE))
-//	s4 := Sphere(Vec{1.5, 0, 3}, 1, ShadeNormal(Ez))
-//	e.Add(s1, s2, s3, s4)
-//	e.Camera = Camera(1)
-//
-//	Compare(t, e, "010-sheet")
-//}
-//
+
+// Use sheets as green grass, blue sky and wall
+func TestSheet(t *testing.T) {
+	e := NewEnv()
+
+	s1 := Sheet(Ey, -1, Flat(GREEN))
+	s2 := Sheet(Ey, 4, Flat(BLUE))
+	s3 := Sheet(Ex, -10, Flat(WHITE))
+	s4 := Sphere(Vec{1.5, 0, 3}, 1, ShadeNormal(Ez))
+	e.Add(s1, s2, s3, s4)
+	e.Camera = Camera(1)
+
+	Compare(t, e, "010-sheet")
+}
+
 //// Test rectangles
 ////func TestRect(t *testing.T) {
 ////	e := NewEnv()
@@ -168,21 +168,21 @@ func TestObjTransf(t *testing.T) {
 ////
 ////	Compare(t, e, "011-rect")
 ////}
-//
-//// Test Axis Aligned Box
-////func TestBox(t *testing.T) {
-////	e := NewEnv()
-////
-////	nz := ShadeNormal(Ez)
-////	b := Box(Vec{0, 0, 0}, 2, 1, 1, nz)
-////	b = Transf(b, RotY4(150*Deg))
-////	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
-////	e.Add(b, g)
-////	e.Camera = Camera(1).Transl(0, 0, -4)
-////
-////	Compare(t, e, "012-box")
-////}
-//
+
+// Test Axis Aligned Box
+func TestBox(t *testing.T) {
+	e := NewEnv()
+
+	nz := ShadeNormal(Ez)
+	b := Box(Vec{0, 0, 0}, 2, 1, 1, nz)
+	b = Transf(b, RotY4(150*Deg))
+	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
+	e.Add(b, g)
+	e.Camera = Camera(1).Transl(0, 0, -4)
+
+	Compare(t, e, "012-box")
+}
+
 //func TestDiffuse0(t *testing.T) {
 //	e := NewEnv()
 //
