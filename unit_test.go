@@ -357,26 +357,25 @@ func TestQuad(t *testing.T) {
 	Compare(t, e, "021-quad-hyper")
 }
 
-////func TestObjMinus(t *testing.T) {
-////	e := NewEnv()
-////
-////	g := Object(Sheet(Ey, 0), Diffuse0(WHITE.Mul(EV(-1))))
-////	r := 0.8
-////
-////	b := Object(Box(Vec{}, r, r, r), Diffuse0(WHITE.Mul(EV(-0))))
-////	s := Object(Sphere(Vec{}, 1), Diffuse0(WHITE))
-////
-////	dome := ObjMinus(b, s)
-////
-////	e.Add(g, dome)
-////
-////	l := DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
-////	e.AddLight(l)
-////
-////	Compare(t, e, Camera(1).Transl(0, 1, -2).Transf(RotX4(10*deg)), "014-objminus")
-////}
-//
-////todo: unit test cube intersect, unit test objminus
+func TestObjMinus(t *testing.T) {
+	e := NewEnv()
+
+	g := Sheet(Ey, 0, Diffuse0(WHITE.Mul(EV(-1))))
+	r := 0.8
+
+	b := Box(Vec{}, r, r, r, Diffuse0(WHITE.Mul(EV(-0))))
+	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
+
+	dome := Minus(b, s)
+
+	e.Add(g, dome)
+
+	l := DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
+	e.AddLight(l)
+	e.Camera = Camera(1).Transl(0, 1, -2).Transf(RotX4(10 * Deg))
+
+	Compare(t, e, "014-objminus")
+}
 
 func TestHollowAnd(t *testing.T) {
 	e := NewEnv()
@@ -400,6 +399,6 @@ func TestHollowAnd(t *testing.T) {
 	nPass := 8
 	e.Recursion = 3
 	MultiPass(e, img, nPass)
-	name := "021-hollowand"
+	name := "022-hollowand"
 	CompareImg(t, e, img, name, 10)
 }

@@ -87,7 +87,7 @@ func max3(x, y, z float64) float64 {
 	return max
 }
 
-func sort(t0, t1 float64) (float64, float64) {
+func sort2(t0, t1 float64) (float64, float64) {
 	if t0 < t1 {
 		return t0, t1
 	}

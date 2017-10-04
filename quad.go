@@ -40,7 +40,7 @@ func (s *quad) Hit(r *Ray, f *[]Surf) {
 	t1 := (-B - V) / (2 * A)
 	t2 := (-B + V) / (2 * A)
 
-	t1, t2 = sort(t1, t2)
+	t1, t2 = sort2(t1, t2)
 	*f = append(*f,
 		Surf{T: t1, Norm: s.Normal(r.At(t1)), Material: s.m},
 		Surf{T: t2, Norm: s.Normal(r.At(t2)), Material: s.m},

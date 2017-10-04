@@ -18,7 +18,7 @@ func (s *slab) Hit(r *Ray, f *[]Surf) {
 	}
 	t1 := (s.off1 - rs) / rd
 	t2 := (s.off2 - rs) / rd
-	t1, t2 = sort(t1, t2)
+	t1, t2 = sort2(t1, t2)
 
 	*f = append(*f,
 		Surf{T: t1, Norm: s.dir, Material: s.m},
