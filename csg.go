@@ -1,32 +1,50 @@
 package bruteray
 
 // Intersection (boolean AND) of two objects.
-//func And(a, b Obj) Obj {
-//	return &objAnd{a, b}
-//}
-//
-//type and struct {
-//	a, b Obj
-//}
-//
-//func (o *and) Hit(r *Ray, f *[]Surf) {
-//
-//	o.a.Hit(r, f)
-//	if len(*f) == 0 {
-//		return
-//	}
-//
-//	var f2 []Surf
-//	o.b.Hit(r, f2)
-//
-//	var f3 []Surf
-//
-//	for _, s := range *f{
-//
-//	}
-//
-//}
+func And(a, b Obj) Obj {
+	return &and{a, b}
+}
 
+type and struct {
+	a, b Obj
+}
+
+func (o *and) Hit(r *Ray, f *[]Surf) {
+
+	o.a.Hit(r, f)
+	if len(*f) == 0 {
+		return
+	}
+
+	var fb []Surf
+	o.b.Hit(r, &fb)
+
+	var f3 []Surf
+
+	for _, s := range *f {
+		if o.b.Inside(r.At(s.T)) {
+			f3 = append(f3, s)
+		}
+	}
+	for _, s := range fb {
+		if o.a.Inside(r.At(s.T)) {
+			f3 = append(f3, s)
+		}
+	}
+	*f = f3
+}
+
+func filterInside(in []Surf, ins Obj, out []*Surf) {
+
+}
+
+func (o *and) Inside(p Vec) bool {
+	return o.a.Inside(p) && o.b.Inside(p)
+}
+
+// "Hollow" AND: remove all parts of A that are not in B,
+// treating a as a hollow surface (not volume).
+// TODO: rename SurfaceAnd?
 func HAnd(a, b Obj) Obj {
 	return &hand{a: a, b: b}
 }

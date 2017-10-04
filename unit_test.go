@@ -96,18 +96,18 @@ func TestObjTransf(t *testing.T) {
 	Compare(t, e, "006-objtransf")
 }
 
-//// Test intersection of two spheres
-////func TestObjAnd(t *testing.T) {
-////	e := NewEnv()
-////
-////	r := 0.5
-////	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
-////	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
-////	s := And(s1, s2)
-////	e.Add(s)
-////
-////	Compare(t, e, "007-objand")
-////}
+// Test intersection of two spheres
+func TestObjAnd(t *testing.T) {
+	e := NewEnv()
+
+	r := 0.5
+	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
+	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
+	s := And(s1, s2)
+	e.Add(s)
+
+	Compare(t, e, "007-objand")
+}
 
 // Test two partially overlapping spheres
 func TestOverlap(t *testing.T) {
@@ -122,21 +122,21 @@ func TestOverlap(t *testing.T) {
 	Compare(t, e, "008-overlap")
 }
 
-//// Make a cube out of 3 intersecting slabs
-////func TestSlabIntersect(t *testing.T) {
-////	e := NewEnv()
-////
-////	r := 1.
-////	s1 := Slab(Ex, -r, r, Flat(RED))
-////	s2 := Slab(Ey, -r, r, Flat(GREEN))
-////	s3 := Slab(Ez, -r, r, Flat(BLUE))
-////	cube := And(And(s1, s2), s3)
-////	cube = Transf(cube, RotY4(160*Deg).Mul(RotX4(20*Deg)))
-////	e.Add(cube)
-////	e.Camera = Camera(1).Transl(0, 0, -4)
-////
-////	Compare(t, e, "009-slabintersect")
-////}
+// Make a cube out of 3 intersecting slabs
+func TestSlabIntersect(t *testing.T) {
+	e := NewEnv()
+
+	r := 1.
+	s1 := Slab(Ex, -r, r, Flat(RED))
+	s2 := Slab(Ey, -r, r, Flat(GREEN))
+	s3 := Slab(Ez, -r, r, Flat(BLUE))
+	cube := And(And(s1, s2), s3)
+	cube = Transf(cube, RotY4(160*Deg).Mul(RotX4(20*Deg)))
+	e.Add(cube)
+	e.Camera = Camera(1).Transl(0, 0, -4)
+
+	Compare(t, e, "009-slabintersect")
+}
 
 // Use sheets as green grass, blue sky and wall
 func TestSheet(t *testing.T) {
@@ -153,22 +153,22 @@ func TestSheet(t *testing.T) {
 }
 
 // Test rectangles
-//func TestRect(t *testing.T) {
-//	e := NewEnv()
-//
-//	const d = 0.5
-//	const z = 10
-//	nz := ShadeNormal(Ez)
-//	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf, nz)
-//	r2 := Transf(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
-//	r3 := And(
-//		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
-//		Sphere(Vec{0, 0, z}, 0.25, nz),
-//	)
-//	e.Add(r1, r2, r3)
-//
-//	Compare(t, e, "011-rect")
-//}
+func TestRect(t *testing.T) {
+	e := NewEnv()
+
+	const d = 0.5
+	const z = 10
+	nz := ShadeNormal(Ez)
+	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf, nz)
+	r2 := Transf(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
+	r3 := And(
+		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
+		Sphere(Vec{0, 0, z}, 0.25, nz),
+	)
+	e.Add(r1, r2, r3)
+
+	Compare(t, e, "011-rect")
+}
 
 // Test Axis Aligned Box
 func TestBox(t *testing.T) {
