@@ -17,10 +17,6 @@ func (s *flat) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	return s.c
 }
 
-// -- diffuse
-
-//    -- diffuse 0
-
 // Diffuse material with direct illumination only (no interreflection).
 // Intended for rapid previews.
 func Diffuse0(c Color) Material {
@@ -57,8 +53,6 @@ func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	}
 }
 
-//    -- diffuse00 (debug, tutorial)
-
 // Diffuse material with direct illumination only and no shadows.
 // Intended for the tutorial.
 func Diffuse00(c Color) Material {
@@ -74,7 +68,6 @@ func (s *diffuse00) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	for _, l := range e.lights {
 		lpos, intens := l.Sample(e, pos)
 		secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
-		//pos = pos.MAdd(off, norm)
 		i := s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
 		acc = acc.Add(i)
 	}
@@ -84,7 +77,6 @@ func (s *diffuse00) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 func (s *diffuse00) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(e, pos)
 
-	//pos = pos.MAdd(off, norm)
 	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
 
 	t := e.IntersectAny(&secundary)
@@ -96,8 +88,6 @@ func (s *diffuse00) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 		return s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
 	}
 }
-
-//    -- diffuse 1
 
 func Diffuse1(c Color) Material {
 	return &diffuse1{diffuse0{c}}

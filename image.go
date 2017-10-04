@@ -29,10 +29,6 @@ func (img Image) At(i, j int) color.Color {
 	return img[j][i]
 }
 
-//func (img Image) NumPix() int {
-//	return (img.Bounds().Dx() + 1) * (img.Bounds().Dy() + 1)
-//}
-
 func (i Image) ColorModel() color.Model {
 	return nil
 }

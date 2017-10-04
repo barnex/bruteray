@@ -122,22 +122,4 @@ func (e *Env) IntersectAny(r *Ray) float64 {
 		T = 0
 	}
 	return T
-
-	//t := inf
-	//I := -1
-
-	//for i, o := range e.objs {
-	//	S1 := o.Hit(r)
-	//	if S1.T <= 0 {
-	//		continue
-	//	}
-	//	if S1.T < t {
-	//		t = S1.T
-	//		I = i
-	//	}
-	//}
-	//if I == -1 {
-	//	t = 0
-	//}
-	//return t
 }
