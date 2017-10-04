@@ -31,3 +31,10 @@ This directory contains reference images for unit tests.
 ![fig](028.jpg)
 ![fig](029.jpg)
 ![fig](030.jpg)
+![fig](031.jpg)
+![fig](032.jpg)
+![fig](033.jpg)
+![fig](034.jpg)
+![fig](035.jpg)
+![fig](036.jpg)
+         
