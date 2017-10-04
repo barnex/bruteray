@@ -341,22 +341,22 @@ func TestLuminousObject(t *testing.T) {
 	CompareImg(t, e, img, name, 10)
 }
 
-//func TestQuad(t *testing.T) {
-//	e := NewEnv()
-//	e.Add(
-//		Sheet(Ey, -1.0, Diffuse0(WHITE.Mul(EV(-0.3)))),
-//		Quad(Vec{0, 0, 0}, Vec{1, -1, 1}, 1, Diffuse0(RED)),
-//	)
-//	e.AddLight(
-//		PointLight(Vec{3, 3, -7}, WHITE.Mul(EV(9))),
-//	)
-//	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
-//
-//	e.Camera = Camera(1).Transl(0, 0, -6)
-//	e.Camera.AA = false
-//	Compare(t, e, "021-quad-hyper")
-//}
-//
+func TestQuad(t *testing.T) {
+	e := NewEnv()
+	e.Add(
+		Sheet(Ey, -1.0, Diffuse0(WHITE.Mul(EV(-0.3)))),
+		Quad(Vec{0, 0, 0}, Vec{1, -1, 1}, 1, Diffuse0(RED)),
+	)
+	e.AddLight(
+		PointLight(Vec{3, 3, -7}, WHITE.Mul(EV(9))),
+	)
+	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
+
+	e.Camera = Camera(1).Transl(0, 0, -6)
+	e.Camera.AA = false
+	Compare(t, e, "021-quad-hyper")
+}
+
 ////func TestObjMinus(t *testing.T) {
 ////	e := NewEnv()
 ////
@@ -378,28 +378,28 @@ func TestLuminousObject(t *testing.T) {
 //
 ////todo: unit test cube intersect, unit test objminus
 
-//func TestHollowAnd(t *testing.T) {
-//	e := NewEnv()
-//
-//	e.Add(
-//		Sheet(Ey, -1.0, Diffuse1(WHITE.Mul(EV(-0.3)))),
-//		HAnd(
-//			Sphere(Vec{}, 1, Shiny(RED, EV(-3))),
-//			Slab(Ey, -0.3, 0.3, Flat(RED)),
-//		),
-//	)
-//	e.AddLight(
-//		SphereLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
-//	)
-//	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
-//
-//	e.Camera = Camera(1).Transl(0, 2.5, -6).Transf(RotX4(22 * Deg))
-//	e.Camera.AA = true
-//
-//	img := MakeImage(testW, testH)
-//	nPass := 8
-//	e.Recursion = 3
-//	MultiPass(e, img, nPass)
-//	name := "021-hollowand"
-//	CompareImg(t, e, img, name, 10)
-//}
+func TestHollowAnd(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Sheet(Ey, -1.0, Diffuse1(WHITE.Mul(EV(-0.3)))),
+		HAnd(
+			Sphere(Vec{}, 1, Shiny(RED, EV(-3))),
+			Slab(Ey, -0.3, 0.3, Flat(RED)),
+		),
+	)
+	e.AddLight(
+		SphereLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
+	)
+	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
+
+	e.Camera = Camera(1).Transl(0, 2.5, -6).Transf(RotX4(22 * Deg))
+	e.Camera.AA = true
+
+	img := MakeImage(testW, testH)
+	nPass := 8
+	e.Recursion = 3
+	MultiPass(e, img, nPass)
+	name := "021-hollowand"
+	CompareImg(t, e, img, name, 10)
+}
