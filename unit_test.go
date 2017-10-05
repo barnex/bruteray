@@ -382,7 +382,7 @@ func TestHollowAnd(t *testing.T) {
 
 	e.Add(
 		Sheet(Ey, -1.0, Diffuse1(WHITE.Mul(EV(-0.3)))),
-		HAnd(
+		SurfaceAnd(
 			Sphere(Vec{}, 1, Shiny(RED, EV(-3))),
 			Slab(Ey, -0.3, 0.3, Flat(RED)),
 		),
@@ -402,3 +402,9 @@ func TestHollowAnd(t *testing.T) {
 	name := "022-hollowand"
 	CompareImg(t, e, img, name, 10)
 }
+
+//func TestTexture(t*testing.T){
+//	e := NewEnv()
+//
+//
+//}

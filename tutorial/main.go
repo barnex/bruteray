@@ -156,7 +156,7 @@ func render1(e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
 	img := MakeImage(600, 400)
-	Render(e, 6, img)
+	Render(e, img)
 	Encode(img, name)
 }
 
@@ -164,6 +164,6 @@ func render2(e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
 	img := MakeImage(600, 400)
-	MultiPass(e, 6, img, 300)
+	MultiPass(e, img, 300)
 	Encode(img, name)
 }

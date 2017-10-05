@@ -29,6 +29,9 @@ func NewEnv() *Env {
 	}
 }
 
+// Default recursion depth for NewEnv
+const DefaultRec = 6
+
 // Returns a copy with its own random number generator,
 // so it can be used from a different thread.
 func (e *Env) Copy() *Env {

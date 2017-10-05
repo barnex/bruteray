@@ -1,6 +1,7 @@
 package main
 
 import . "github.com/barnex/bruteray"
+import "github.com/barnex/bruteray/serve"
 
 func main() {
 	e := NewEnv()
@@ -9,11 +10,11 @@ func main() {
 
 	e.Add(Sheet(Ey, -1, w))
 
-	e.Add(HAnd(
+	e.Add(SurfaceAnd(
 		Quad(Vec{}, Vec{1, 0, 1}, .75, w),
 		Slab(Ey, -1, 1, w),
 	))
-	e.Add(HAnd(
+	e.Add(SurfaceAnd(
 		Quad(Vec{}, Vec{1, 0, 1}, 1.5, w),
 		Slab(Ey, -1, 1, w),
 	))
@@ -26,5 +27,5 @@ func main() {
 	e.Camera = Camera(1).Transl(0, 3, -2.2).RotScene(0 * Deg).Transf(RotX4(50 * Deg))
 	e.Camera.AA = true
 
-	Serve(e)
+	serve.Env(e)
 }

@@ -1,4 +1,4 @@
-package bruteray
+package serve
 
 const mainHTML = `
 <html>

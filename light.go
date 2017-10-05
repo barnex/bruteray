@@ -64,6 +64,7 @@ func (l *sphereLight) Sample(e *Env, target Vec) (Vec, Color) {
 	return pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
 }
 
+// Samples a vector from inside the volume of a unit sphere.
 func sphereVec(e *Env) Vec {
 	v := cubeVec(e)
 	for v.Len2() > 1 {
@@ -72,10 +73,11 @@ func sphereVec(e *Env) Vec {
 	return v
 }
 
+// Samples a vector form inside a cube with edge 2.
 func cubeVec(e *Env) Vec {
 	return Vec{
-		e.rng.Float64() - 0.5,
-		e.rng.Float64() - 0.5,
-		e.rng.Float64() - 0.5,
+		2.0*e.rng.Float64() - 1,
+		2.0*e.rng.Float64() - 1,
+		2.0*e.rng.Float64() - 1,
 	}
 }

@@ -1,4 +1,4 @@
-package bruteray
+package serve
 
 // server severs an Env over HTTP,
 // so we can see it while being rendered.
@@ -13,6 +13,8 @@ import (
 	_ "net/http/pprof"
 	"strconv"
 	"sync"
+
+	"github.com/barnex/bruteray"
 )
 
 var (
@@ -22,16 +24,12 @@ var (
 )
 
 var (
-	env *Env
+	env *bruteray.Env
 )
 
-const (
-	DefaultRec = 6
-)
-
-// Serve starts a web UI server
+// Starts a web UI server
 // at the port specified by flag --http.
-func Serve(e *Env) {
+func Env(e *bruteray.Env) {
 
 	flag.Parse()
 
@@ -46,9 +44,9 @@ func Serve(e *Env) {
 }
 
 type Loop struct {
-	env  *Env
+	env  *bruteray.Env
 	w, h int
-	acc  Image
+	acc  bruteray.Image
 	n    float64
 	mu   sync.Mutex
 }
@@ -60,19 +58,19 @@ func (l *Loop) run() {
 }
 
 func (l *Loop) iter() {
-	img := MakeImage(l.w, l.h)
-	Render(l.env, img)
+	img := bruteray.MakeImage(l.w, l.h)
+	bruteray.Render(l.env, img)
 	l.mu.Lock()
 	l.acc.Add(img)
 	l.n++
 	l.mu.Unlock()
 }
 
-func (l *Loop) Current() Image {
+func (l *Loop) Current() bruteray.Image {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	//log.Println("current")
-	img := MakeImage(l.w, l.h)
+	img := bruteray.MakeImage(l.w, l.h)
 	for i := range img {
 		for j := range img[i] {
 			img[i][j] = l.acc[i][j].Mul(1 / l.n)
@@ -81,8 +79,8 @@ func (l *Loop) Current() Image {
 	return img
 }
 
-func RenderLoop(e *Env, w, h int) *Loop {
-	l := &Loop{env: e, w: w, h: h, acc: MakeImage(w, h)}
+func RenderLoop(e *bruteray.Env, w, h int) *Loop {
+	l := &Loop{env: e, w: w, h: h, acc: bruteray.MakeImage(w, h)}
 	l.iter()   // make sure we have 1 pass at least
 	go l.run() // refine in the background
 	return l
@@ -108,7 +106,7 @@ var preview struct {
 	sync.Mutex
 }
 
-func encode(w io.Writer, img Image) {
+func encode(w io.Writer, img bruteray.Image) {
 	printErr(jpeg.Encode(w, img, &jpeg.Options{Quality: 95}))
 }
 

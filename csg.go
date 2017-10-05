@@ -43,7 +43,7 @@ func (o *and) Inside(p Vec) bool {
 	return o.a.Inside(p) && o.b.Inside(p)
 }
 
-// A or B
+// Union (logical OR) of two objects.
 func Or(a, b Obj) Obj {
 	return &or{a, b}
 }
@@ -79,7 +79,7 @@ func (o *or) Inside(p Vec) bool {
 	return o.a.Inside(p) || o.b.Inside(p)
 }
 
-// A minus B
+// Subtraction (logical AND NOT) of two objects
 func Minus(a, b Obj) Obj {
 	return &minus{a, b}
 }
@@ -118,10 +118,9 @@ func (o *minus) Inside(p Vec) bool {
 	return o.a.Inside(p) && !o.b.Inside(p)
 }
 
-// "Hollow" AND: remove all parts of A that are not in B,
-// treating a as a hollow surface (not volume).
-// TODO: rename SurfaceAnd?
-func HAnd(a, b Obj) Obj {
+// Intersection, treating A as a hollow object.
+// Equivalent to, but more efficient than And(Hollow(a), b)
+func SurfaceAnd(a, b Obj) Obj {
 	return &hand{a: a, b: b}
 }
 
@@ -145,6 +144,14 @@ func (o *hand) Hit(r *Ray, f *[]Surf) {
 	}
 	*f = f2
 }
+
+// Hollow turns a into a hollow surface.
+// E.g.: a filled cylinder into a hollow tube.
+func Hollow(o Obj) Obj { return hollow{o} }
+
+type hollow struct{ Obj }
+
+func (hollow) Inside(Vec) bool { return false }
 
 func Sort(f []Surf) {
 	sort.Sort(byT(f))
