@@ -42,13 +42,13 @@ func (img Image) Add(img2 Image) {
 	}
 }
 
-//func (img Image) Mul(x float64) {
-//	for i := range img {
-//		for j := range img[i] {
-//			img[i][j].Mul(x)
-//		}
-//	}
-//}
+func (img Image) Mul(x float64) {
+	for i := range img {
+		for j := range img[i] {
+			img[i][j] = img[i][j].Mul(x)
+		}
+	}
+}
 
 const jpegQual = 95
 

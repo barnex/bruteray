@@ -147,11 +147,29 @@ func (o *hand) Hit(r *Ray, f *[]Surf) {
 
 // Hollow turns a into a hollow surface.
 // E.g.: a filled cylinder into a hollow tube.
-func Hollow(o Obj) Obj { return hollow{o} }
+func Hollow(o Obj) Obj {
+	return hollow{o}
+}
 
-type hollow struct{ Obj }
+type hollow struct {
+	Obj
+}
 
-func (hollow) Inside(Vec) bool { return false }
+func (hollow) Inside(Vec) bool {
+	return false
+}
+
+func Inverse(o Obj) Obj {
+	return inverse{o}
+}
+
+type inverse struct {
+	Obj
+}
+
+func (o inverse) Inside(p Vec) bool {
+	return !o.Obj.Inside(p)
+}
 
 func Sort(f []Surf) {
 	sort.Sort(byT(f))

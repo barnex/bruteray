@@ -26,5 +26,4 @@ func main() {
 	e.Recursion = 5
 	e.Cutoff = EV(5)
 
-	serve.Env(e)
 }

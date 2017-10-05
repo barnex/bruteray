@@ -24,7 +24,9 @@ var (
 )
 
 var (
-	env *bruteray.Env
+	env         *bruteray.Env
+	progressive *Loop
+	pmu         sync.Mutex
 )
 
 // Starts a web UI server
@@ -89,11 +91,6 @@ func RenderLoop(e *bruteray.Env, w, h int) *Loop {
 func mainHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(mainHTML))
 }
-
-var (
-	progressive *Loop
-	pmu         sync.Mutex
-)
 
 func handleRender(w http.ResponseWriter, r *http.Request) {
 	img := progressive.Current()
