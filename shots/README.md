@@ -1,6 +1,6 @@
 # testdata
 
-This directory contains reference images for unit tests.
+This directory contains randomly taken screenshots.
 
 ![fig](001.png)
 ![fig](002.png)
@@ -37,4 +37,7 @@ This directory contains reference images for unit tests.
 ![fig](034.jpg)
 ![fig](035.jpg)
 ![fig](036.jpg)
+![fig](037.jpg)
+![fig](038.jpg)
+![fig](039.jpg)
          
