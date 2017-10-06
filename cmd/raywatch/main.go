@@ -45,10 +45,8 @@ func watch(fname string) {
 }
 
 func trigger(fname string) {
-	err := build(fname)
-	if err == nil {
-		goServe()
-	}
+	build(fname)
+	goServe()
 }
 
 const Executable = "/tmp/bruteray-scene"

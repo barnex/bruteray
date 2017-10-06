@@ -1,16 +1,10 @@
 package bruteray
 
 import (
+	"log"
 	"runtime"
 	"sync"
 )
-
-func Render1Thread(e *Env, img Image) {
-	H := img.Bounds().Dy()
-	for i := 0; i < H; i++ {
-		renderLine(e, img, i)
-	}
-}
 
 func Render(e *Env, img Image) {
 	render(e, img, runtime.NumCPU())
@@ -41,18 +35,49 @@ func render(e *Env, img Image, numCPU int) {
 	wg.Wait()
 }
 
-func MultiPass(e *Env, img Image, N int) {
-	multiPass(e, img, N, runtime.NumCPU())
+func MultiPass(e *Env, img Image, passes int) {
+	multiPass(e, img, passes, runtime.NumCPU())
 }
 
-func multiPass(e *Env, img Image, N int, numCPU int) {
+func multiPass(e *Env, img Image, passes int, numCPU int) {
 	w, h := img.Bounds().Dx(), img.Bounds().Dy()
-	for i := 0; i < N; i++ {
+	for i := 0; i < passes; i++ {
 		acc := MakeImage(w, h)
 		render(e, acc, numCPU)
 		img.Add(acc)
 	}
-	img.Mul(1 / float64(N))
+	img.Mul(1 / float64(passes))
+}
+
+func RenderLoop(e *Env, w, h int, peek chan chan Image) {
+	img := MakeImage(w, h)
+	passes := 0
+
+	onePass := func() {
+		acc := MakeImage(w, h)
+		render(e, acc, runtime.NumCPU()-1)
+		passes++
+		log.Println("pass", passes)
+		img.Add(acc)
+	}
+
+	for {
+		select {
+		default:
+			onePass()
+		case resp := <-peek:
+			log.Println("peeking...")
+			cpy := MakeImage(w, h)
+			scale := 1 / float64(passes)
+			for i := range cpy {
+				for j := range cpy[i] {
+					cpy[i][j] = img[i][j].Mul(scale)
+				}
+			}
+			resp <- cpy
+			onePass() // after peeking, make sure we render at least one pass
+		}
+	}
 }
 
 func renderLine(e *Env, img Image, i int) {
