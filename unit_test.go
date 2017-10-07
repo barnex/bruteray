@@ -285,7 +285,7 @@ func TestDiffuse1(t *testing.T) {
 
 func whitebox(refl float64) *Env {
 	e := NewEnv()
-	white := Diffuse1(WHITE.Mul(refl))
+	white := Diffuse(WHITE.Mul(refl))
 	e.Add(
 		Sheet(Ey, -1, white),
 		Sheet(Ey, 1, white),
@@ -317,12 +317,12 @@ func TestShadowBehind(t *testing.T) {
 func TestLuminousObject(t *testing.T) {
 	e := NewEnv()
 	e.Add(
-		Sheet(Ey, -1.0, Diffuse1(WHITE.Mul(EV(-0.3)))),
+		Sheet(Ey, -1.0, Diffuse(WHITE.Mul(EV(-0.3)))),
 		Sphere(Vec{0, 0.5, 3}, 1.5, Shiny(RED, EV(-3))),
 		Sphere(Vec{-2, 0.1, 0}, 1.1, Shiny(BLUE.EV(-0.3), EV(-3))),
 		Sphere(Vec{2, 0, -1}, 1, Shiny(GREEN.EV(-1), EV(-3))),
 		Sphere(Vec{0, -0.2, -2}, 0.8, Shiny(WHITE, EV(-2))),
-		Sphere(Vec{4, 4, 2}, 1, Diffuse1(WHITE.EV(-8))),
+		Sphere(Vec{4, 4, 2}, 1, Diffuse(WHITE.EV(-8))),
 		//Sphere(Vec{7, 7, -5}, 1, Flat(WHITE.EV(-2))),
 	)
 	e.AddLight(
@@ -381,7 +381,7 @@ func TestHollowAnd(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sheet(Ey, -1.0, Diffuse1(WHITE.Mul(EV(-0.3)))),
+		Sheet(Ey, -1.0, Diffuse(WHITE.Mul(EV(-0.3)))),
 		SurfaceAnd(
 			Sphere(Vec{}, 1, Shiny(RED, EV(-3))),
 			Slab(Ey, -0.3, 0.3, Flat(RED)),

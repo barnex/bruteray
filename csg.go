@@ -13,17 +13,17 @@ type and struct {
 	a, b Obj
 }
 
-func (o *and) Hit(r *Ray, f *[]Surf) {
+func (o *and) Hit(r *Ray, f *[]Shader) {
 
 	o.a.Hit(r, f)
 	if len(*f) == 0 {
 		return
 	}
 
-	var fb []Surf
+	var fb []Shader
 	o.b.Hit(r, &fb)
 
-	var f3 []Surf
+	var f3 []Shader
 
 	for _, s := range *f {
 		if o.b.Inside(r.At(s.T)) {
@@ -52,14 +52,14 @@ type or struct {
 	a, b Obj
 }
 
-func (o *or) Hit(r *Ray, f *[]Surf) {
+func (o *or) Hit(r *Ray, f *[]Shader) {
 
 	o.a.Hit(r, f)
 
-	var fb []Surf
+	var fb []Shader
 	o.b.Hit(r, &fb)
 
-	var f3 []Surf
+	var f3 []Shader
 
 	for _, s := range *f {
 		if !o.b.Inside(r.At(s.T)) {
@@ -88,17 +88,17 @@ type minus struct {
 	a, b Obj
 }
 
-func (o *minus) Hit(r *Ray, f *[]Surf) {
+func (o *minus) Hit(r *Ray, f *[]Shader) {
 
 	o.a.Hit(r, f)
 	if len(*f) == 0 {
 		return
 	}
 
-	var fb []Surf
+	var fb []Shader
 	o.b.Hit(r, &fb)
 
-	var f3 []Surf
+	var f3 []Shader
 
 	for _, s := range *f {
 		if !o.b.Inside(r.At(s.T)) {
@@ -129,14 +129,14 @@ type hand struct {
 	noInside
 }
 
-func (o *hand) Hit(r *Ray, f *[]Surf) {
+func (o *hand) Hit(r *Ray, f *[]Shader) {
 
 	o.a.Hit(r, f)
 	if len(*f) == 0 {
 		return
 	}
 
-	f2 := make([]Surf, 0, len(*f))
+	f2 := make([]Shader, 0, len(*f))
 	for i, s := range *f {
 		if o.b.Inside(r.At(s.T)) {
 			f2 = append(f2, (*f)[i])
@@ -171,11 +171,11 @@ func (o inverse) Inside(p Vec) bool {
 	return !o.Obj.Inside(p)
 }
 
-func Sort(f []Surf) {
+func Sort(f []Shader) {
 	sort.Sort(byT(f))
 }
 
-type byT []Surf
+type byT []Shader
 
 func (s byT) Len() int           { return len(s) }
 func (s byT) Less(i, j int) bool { return s[i].T < s[j].T }

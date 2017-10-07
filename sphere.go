@@ -17,7 +17,7 @@ func (s *sphere) Inside(p Vec) bool {
 	return v.Len2() < s.r2
 }
 
-func (s *sphere) Hit(r *Ray, f *[]Surf) {
+func (s *sphere) Hit(r *Ray, f *[]Shader) {
 	v := r.Start.Sub(s.c)
 	d := r.Dir
 	vd := v.Dot(d)
@@ -29,8 +29,8 @@ func (s *sphere) Hit(r *Ray, f *[]Surf) {
 	t2 := (-vd + math.Sqrt(D))
 
 	*f = append(*f,
-		Surf{T: t1, Norm: s.Normal(r.At(t1)), Material: s.m},
-		Surf{T: t2, Norm: s.Normal(r.At(t2)), Material: s.m},
+		Shader{T: t1, Norm: s.Normal(r.At(t1)), Material: s.m},
+		Shader{T: t2, Norm: s.Normal(r.At(t2)), Material: s.m},
 	)
 }
 

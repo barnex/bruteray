@@ -101,9 +101,9 @@ func main() {
 
 	{
 		e := env(
-			Diffuse1(WHITE.EV(-1)),
-			Diffuse1(RED),
-			Diffuse1(BLUE),
+			Diffuse(WHITE.EV(-1)),
+			Diffuse(RED),
+			Diffuse(BLUE),
 		)
 		e.Camera = Camera(1).Transl(0, 0, -3)
 		e.Camera.AA = true
@@ -115,9 +115,9 @@ func main() {
 
 	{
 		e := env(
-			Diffuse1(WHITE.EV(-1)),
-			Diffuse1(RED),
-			Diffuse1(BLUE),
+			Diffuse(WHITE.EV(-1)),
+			Diffuse(RED),
+			Diffuse(BLUE),
 		)
 		e.Camera = Camera(1).Transl(0, 0, -3)
 		e.Camera.AA = true

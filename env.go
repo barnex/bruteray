@@ -9,19 +9,21 @@ import (
 // (all objects, light sources, ... in the scene)
 // as well as a random-number generator needed for iterative rendering.
 type Env struct {
-	objs      []Obj   // non-source objects
-	lights    []Light // light sources
-	all       []Obj   // objs + lights
-	Ambient   Surf
-	rng       rand.Rand
-	Camera    *Cam
-	Recursion int
-	Cutoff    float64
+	objs      []Obj     // non-source objects
+	lights    []Light   // light sources
+	all       []Obj     // objs + lights
+	Ambient   Shader    // Shades the background at infinity, when no object is hit
+	rng       rand.Rand // Random-number generator for use by one thread
+	Camera    *Cam      // Camera determines the point of view
+	Recursion int       // Maximum allowed recursion depth.
+	Cutoff    float64   // Maximum allowed brightness. Used to suppres spurious caustics.
 }
 
+// NewEnv creates an empty environment
+// to which objects can be added later.
 func NewEnv() *Env {
 	return &Env{
-		Ambient:   Surf{T: inf, Material: Flat(BLACK)},
+		Ambient:   Shader{T: inf, Material: Flat(BLACK)},
 		rng:       *(newRng()),
 		Camera:    Camera(0),
 		Recursion: DefaultRec,
@@ -40,11 +42,13 @@ func (e *Env) Copy() *Env {
 	return &e2
 }
 
+// Adds an object to the scene.
 func (e *Env) Add(o ...Obj) {
 	e.objs = append(e.objs, o...)
 	e.all = append(e.all, o...)
 }
 
+// Adds a light source to the scene.
 func (e *Env) AddLight(l ...Light) {
 	e.lights = append(e.lights, l...)
 	for _, l := range l {
@@ -52,12 +56,13 @@ func (e *Env) AddLight(l ...Light) {
 	}
 }
 
+// Sets the background color.
 func (e *Env) SetAmbient(m Material) {
-	e.Ambient = Surf{T: inf, Material: m}
+	e.Ambient = Shader{T: inf, Material: m}
 }
 
 // Calculate intensity seen by ray,
-// caused by objects including lights.
+// caused by all objects including lights.
 // Used by specular surfaces
 // who make no distinction between light sources and regular objects.
 func (e *Env) ShadeAll(r *Ray, N int) Color {
@@ -68,14 +73,12 @@ func (e *Env) ShadeAll(r *Ray, N int) Color {
 // caused by objects but excluding lights.
 // Used for diffuse inter reflection
 // where contributions of light sources are added separately.
-// TODO: once a ray has hit a diffuse surface, luminous objects should be excluded at subsequent specular reflections.
-// Otherwise we get caustics, which are not rendered nicely.
 func (e *Env) ShadeNonLum(r *Ray, N int) Color {
 	return e.shade(r, N, e.objs)
 }
 
-// Calculate intensity seen by ray,
-// with maximum recursion depth N.
+// Calculate intensity seen by ray, with maximum recursion depth N.
+// who = objs, lights, or all.
 func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	if N <= 0 {
 		return Color{}
@@ -84,7 +87,7 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	surf := e.Ambient
 	surf.T = inf
 
-	hit := make([]Surf, 0, 2)
+	hit := make([]Shader, 0, 2)
 
 	for _, o := range who {
 		hit = hit[:0]
@@ -102,12 +105,12 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	return c
 }
 
-// Returns t > 0 if r intersects any object
-// TODO: cleanup
+// Returns t > 0 if r intersects any object.
+// Used to determine shadows.
 func (e *Env) IntersectAny(r *Ray) float64 {
 
 	T := inf
-	hit := make([]Surf, 0, 2)
+	hit := make([]Shader, 0, 2)
 
 	for _, o := range e.objs {
 		hit = hit[:0]

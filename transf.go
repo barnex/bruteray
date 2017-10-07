@@ -15,7 +15,7 @@ type transformed struct {
 	tinv Matrix4
 }
 
-func (o *transformed) Hit(r *Ray, f *[]Surf) {
+func (o *transformed) Hit(r *Ray, f *[]Shader) {
 	r2 := *r
 	r2.Transf(&o.tinv)
 	o.orig.Hit(&r2, f)

@@ -6,7 +6,7 @@ import "github.com/barnex/bruteray/serve"
 func main() {
 	e := NewEnv()
 
-	w := Diffuse1(WHITE.EV(-.6))
+	w := Diffuse(WHITE.EV(-.6))
 
 	e.Add(Sheet(Ey, -1, w))
 

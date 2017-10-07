@@ -4,7 +4,9 @@ type Material interface {
 	Shade(e *Env, r *Ray, N int, pos Vec, norm Vec) Color
 }
 
-// Flat shader always returns the same color.
+// A Flat material always returns the same color.
+// Useful for debugging, or for rare cases like
+// a computer screen or other extended, dimly luminous surface.
 func Flat(c Color) Material {
 	return &flat{c}
 }
@@ -17,8 +19,33 @@ func (s *flat) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	return s.c
 }
 
+// A Diffuse material appears perfectly mate,
+// like paper or plaster.
+// See https://en.wikipedia.org/wiki/Lambertian_reflectance.
+func Diffuse(c Color) Material {
+	return &diffuse{diffuse0{c}}
+}
+
+type diffuse struct {
+	diffuse0
+}
+
+func (s *diffuse) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
+	var acc Color
+	for _, l := range e.lights {
+		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
+	}
+
+	// random ray
+
+	sec := &Ray{pos.MAdd(offset, norm), randVecCos(e, norm)}
+	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // must not include ultra-intense objects, already added as lights
+
+	return acc
+}
+
 // Diffuse material with direct illumination only (no interreflection).
-// Intended for rapid previews.
+// Intended for debugging or rapid previews. Diffuse is much more realistic.
 func Diffuse0(c Color) Material {
 	return &diffuse0{c}
 }
@@ -34,8 +61,6 @@ func (s *diffuse0) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	}
 	return acc
 }
-
-const offset = 1e-6
 
 func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(e, pos)
@@ -89,38 +114,18 @@ func (s *diffuse00) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	}
 }
 
-func Diffuse1(c Color) Material {
-	return &diffuse1{diffuse0{c}}
-}
-
-type diffuse1 struct {
-	diffuse0
-}
-
-func (s *diffuse1) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
-	var acc Color
-	for _, l := range e.lights {
-		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
-	}
-
-	// random ray
-
-	sec := &Ray{pos.MAdd(offset, norm), randVecCos(e, norm)}
-	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // must not include ultra-intense objects, already added as lights
-
-	return acc
-}
-
-// -- ambient
-
-type ShadeDir func(Vec) Color
+// ShadeDir returns a color based on the direction of a ray.
+// Used for shading the ambient background, E.g., the sky.
+type ShadeDir func(dir Vec) Color
 
 func (s ShadeDir) Shade(e *Env, N int, pos, norm Vec) Color {
 	return s(pos)
 }
 
-// -- reflective
-
+// A Reflective surface. E.g.:
+// 	Reflective(WHITE)        // perfectly reflective, looks like shiny metal
+// 	Reflective(WHITE.EV(-1)) // 50% reflective, looks like darker metal
+// 	Reflective(RED)          // Reflects only red, looks like metal in transparent red candy-wrap.
 func Reflective(c Color) Material {
 	return &reflective{c}
 }
@@ -134,8 +139,16 @@ func (s *reflective) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	return e.ShadeAll(r2, N-1).Mul3(s.c)
 }
 
+// Blend mixes two materials with certain weights. E.g.:
+// 	Blend(0.9, Diffuse(WHITE), 0.1, Reflective(WHITE))  // 90% mate + 10% reflective, like a shiny billiard ball.
 func Blend(a float64, matA Material, b float64, matB Material) Material {
 	return &blend{a, matA, b, matB}
+}
+
+// Shiny is shorthand for Blend-ing diffuse + reflection, e.g.:
+// Shiny(WHITE, 0.1) // a white billiard ball, 10% specular reflection
+func Shiny(c Color, reflectivity float64) Material {
+	return Blend(1-reflectivity, Diffuse(c), reflectivity, Reflective(WHITE))
 }
 
 type blend struct {
@@ -151,8 +164,6 @@ func (s *blend) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 
 	return ca.Mul(s.a).MAdd(s.b, cb)
 }
-
-// -- normal
 
 // Debug shader: colors according to the normal vector projected on dir.
 func ShadeNormal(dir Vec) Material {
@@ -170,11 +181,4 @@ func (s *shadeNormal) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	} else {
 		return BLUE.Mul(v) // away from cam
 	}
-}
-
-// -- utility
-
-// Shiny is shorthand for diffuse + reflection, e.g., a billiard ball.
-func Shiny(c Color, reflectivity float64) Material {
-	return Blend(1-reflectivity, Diffuse1(c), reflectivity, Reflective(WHITE))
 }

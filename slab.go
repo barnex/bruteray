@@ -11,7 +11,7 @@ type slab struct {
 	m          Material
 }
 
-func (s *slab) Hit(r *Ray, f *[]Surf) {
+func (s *slab) Hit(r *Ray, f *[]Shader) {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	if rd == 0 {
@@ -22,8 +22,8 @@ func (s *slab) Hit(r *Ray, f *[]Surf) {
 	t1, t2 = sort2(t1, t2)
 
 	*f = append(*f,
-		Surf{T: t1, Norm: s.dir, Material: s.m},
-		Surf{T: t2, Norm: s.dir, Material: s.m},
+		Shader{T: t1, Norm: s.dir, Material: s.m},
+		Shader{T: t2, Norm: s.dir, Material: s.m},
 	)
 }
 

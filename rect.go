@@ -13,7 +13,7 @@ type rect struct {
 	noInside
 }
 
-func (s *rect) Hit(r *Ray, f *[]Surf) {
+func (s *rect) Hit(r *Ray, f *[]Shader) {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	t := (s.pos.Dot(s.dir) - rs) / rd
@@ -24,6 +24,6 @@ func (s *rect) Hit(r *Ray, f *[]Surf) {
 		return
 	}
 	*f = append(*f,
-		Surf{T: t, Norm: s.dir, Material: s.m},
+		Shader{T: t, Norm: s.dir, Material: s.m},
 	)
 }

@@ -11,10 +11,10 @@ type sheet struct {
 	noInside
 }
 
-func (s *sheet) Hit(r *Ray, f *[]Surf) {
+func (s *sheet) Hit(r *Ray, f *[]Shader) {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir.Dot(s.dir)
 	t := (s.off - rs) / rd
 
-	*f = append(*f, Surf{T: t, Norm: s.dir, Material: s.m})
+	*f = append(*f, Shader{T: t, Norm: s.dir, Material: s.m})
 }
