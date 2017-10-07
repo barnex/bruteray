@@ -2,11 +2,27 @@ package bruteray
 
 import "math"
 
+func NewRay(start, dir Vec) *Ray {
+	r := &Ray{Start: start}
+	r.SetDir(dir)
+	return r
+}
+
+func (r *Ray) Dir() Vec {
+	return r.d
+}
+
+func (r *Ray) SetDir(dir Vec) {
+	r.d = dir
+	r.InvDir = Vec{1 / dir[X], 1 / dir[Y], 1 / dir[Z]}
+}
+
 // A Ray is a half-line,
 // starting at the Start point (exclusive) and extending in direction Dir.
 type Ray struct {
-	Start Vec
-	Dir   Vec
+	Start  Vec
+	d      Vec
+	InvDir Vec // pre-calculated inverse direction for marginal speed improvements
 }
 
 // Returns point Start + t*Dir.
@@ -15,10 +31,10 @@ func (r *Ray) At(t float64) Vec {
 	if math.IsNaN(t) {
 		panic(t)
 	}
-	return r.Start.Add(r.Dir.Mul(t))
+	return r.Start.Add(r.d.Mul(t))
 }
 
 func (r *Ray) Transf(t *Matrix4) {
 	r.Start = t.TransfPoint(r.Start)
-	r.Dir = t.TransfDir(r.Dir)
+	r.SetDir(t.TransfDir(r.d))
 }

@@ -20,7 +20,7 @@ const offset = 1. / (256 * 1024)
 // Calculate the color seen by ray.
 func (s *Shader) Shade(e *Env, recursion int, r *Ray) Color {
 	pos := r.At(s.T)
-	norm := s.Norm.Towards(r.Dir)
+	norm := s.Norm.Towards(r.Dir())
 	pos = pos.MAdd(offset, norm)
 	return s.Material.Shade(e, r, recursion, pos, norm)
 }

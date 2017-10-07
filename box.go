@@ -26,8 +26,8 @@ func (s *box) Hit(r *Ray, f *[]Shader) {
 	min_ := s.min
 	max_ := s.max
 
-	tmin := min_.Sub(r.Start).Div3(r.Dir)
-	tmax := max_.Sub(r.Start).Div3(r.Dir)
+	tmin := min_.Sub(r.Start).Mul3(r.InvDir)
+	tmax := max_.Sub(r.Start).Mul3(r.InvDir)
 
 	txen := min(tmin[X], tmax[X])
 	txex := max(tmin[X], tmax[X])

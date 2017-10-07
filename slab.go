@@ -13,7 +13,7 @@ type slab struct {
 
 func (s *slab) Hit(r *Ray, f *[]Shader) {
 	rs := r.Start.Dot(s.dir)
-	rd := r.Dir.Dot(s.dir)
+	rd := r.Dir().Dot(s.dir)
 	if rd == 0 {
 		return
 	}

@@ -52,9 +52,9 @@ func (v Vec) Div(a float64) Vec {
 }
 
 // Pointwise division.
-func (v Vec) Div3(a Vec) Vec {
-	return Vec{v[X] / a[X], v[Y] / a[Y], v[Z] / a[Z]}
-}
+//func (v Vec) Div3(a Vec) Vec {
+//	return Vec{v[X] / a[X], v[Y] / a[Y], v[Z] / a[Z]}
+//}
 
 // Length (norm).
 func (v Vec) Len() float64 {

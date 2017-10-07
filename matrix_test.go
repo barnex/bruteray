@@ -48,15 +48,15 @@ func ExampleMatrix4_Inv() {
 	//[0 0 0 1]
 }
 
-func ExampleRay_Transf() {
-	T := Transl4(Vec{2, 3, -1})
-	r := Ray{Vec{4, 3, 2}, Vec{-1, -2, -3}}
-	r.Transf(T)
-	fmt.Println(r)
-	r.Transf(T.Inv())
-	fmt.Println(r)
-
-	// Output:
-	//{[6 6 1] [-1 -2 -3]}
-	//{[4 3 2] [-1 -2 -3]}
-}
+//func ExampleRay_Transf() {
+//	T := Transl4(Vec{2, 3, -1})
+//	r := NewRay(Vec{4, 3, 2}, Vec{-1, -2, -3})
+//	r.Transf(T)
+//	fmt.Println(r)
+//	r.Transf(T.Inv())
+//	fmt.Println(r)
+//
+//	// Output:
+//	//{[6 6 1] [-1 -2 -3]}
+//	//{[4 3 2] [-1 -2 -3]}
+//}

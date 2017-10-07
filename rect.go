@@ -15,7 +15,7 @@ type rect struct {
 
 func (s *rect) Hit(r *Ray, f *[]Shader) {
 	rs := r.Start.Dot(s.dir)
-	rd := r.Dir.Dot(s.dir)
+	rd := r.Dir().Dot(s.dir)
 	t := (s.pos.Dot(s.dir) - rs) / rd
 	p := r.At(t).Sub(s.pos)
 	if p[X] < -s.rx || p[X] > s.rx ||

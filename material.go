@@ -46,7 +46,7 @@ func (s *diffuse) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	// (no fall-off, the chance of hitting an object
 	// automatically falls off correctly with distance).
 	// Choose the random ray via importance sampling.
-	sec := &Ray{pos.MAdd(offset, norm), randVecCos(e, norm)}
+	sec := NewRay(pos.MAdd(offset, norm), randVecCos(e, norm))
 	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // does not include explicit lights
 
 	return acc
@@ -73,15 +73,15 @@ func (s *diffuse0) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(e, pos)
 
-	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
+	secundary := NewRay(pos, lpos.Sub(pos).Normalized())
 
-	t := e.IntersectAny(&secundary)
+	t := e.IntersectAny(secundary)
 
 	lightT := lpos.Sub(pos).Len()
 	if (t > 0) && t < lightT { // intersection between start and light position
 		return Color{} // shadow
 	} else {
-		return s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
+		return s.refl.Mul(re(norm.Dot(secundary.Dir()))).Mul3(intens)
 	}
 }
 
@@ -99,8 +99,8 @@ func (s *diffuse00) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	var acc Color
 	for _, l := range e.lights {
 		lpos, intens := l.Sample(e, pos)
-		secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
-		i := s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
+		secundary := NewRay(pos, lpos.Sub(pos).Normalized())
+		i := s.refl.Mul(re(norm.Dot(secundary.Dir()))).Mul3(intens)
 		acc = acc.Add(i)
 	}
 	return acc
@@ -109,15 +109,15 @@ func (s *diffuse00) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 func (s *diffuse00) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(e, pos)
 
-	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
+	secundary := NewRay(pos, lpos.Sub(pos).Normalized())
 
-	t := e.IntersectAny(&secundary)
+	t := e.IntersectAny(secundary)
 
 	lightT := lpos.Sub(pos).Len()
 	if (t > 0) && t < lightT { // intersection between start and light position
 		return Color{} // shadow
 	} else {
-		return s.refl.Mul(re(norm.Dot(secundary.Dir))).Mul3(intens)
+		return s.refl.Mul(re(norm.Dot(secundary.Dir()))).Mul3(intens)
 	}
 }
 
@@ -142,7 +142,7 @@ type reflective struct {
 }
 
 func (s *reflective) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
-	r2 := &Ray{pos, r.Dir.Reflect(norm)}
+	r2 := NewRay(pos, r.Dir().Reflect(norm))
 	return e.ShadeAll(r2, N-1).Mul3(s.c)
 }
 

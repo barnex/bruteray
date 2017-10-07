@@ -19,7 +19,7 @@ func (s *sphere) Inside(p Vec) bool {
 
 func (s *sphere) Hit(r *Ray, f *[]Shader) {
 	v := r.Start.Sub(s.c)
-	d := r.Dir
+	d := r.Dir()
 	vd := v.Dot(d)
 	D := sqr(vd) - (v.Len2() - s.r2)
 	if D < 0 {

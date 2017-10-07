@@ -95,9 +95,10 @@ func renderLine(e *Env, img Image, i int) {
 		r.Start = Vec{x0, y0, 0}
 
 		// ray direction
-		r.Dir = Vec{0, 0, 1}
 		if c.FocalLen != 0 {
-			r.Dir = r.Start.Sub(focalPoint).Normalized()
+			r.SetDir(r.Start.Sub(focalPoint).Normalized())
+		} else {
+			r.SetDir(Vec{0, 0, 1})
 		}
 
 		// camera transform

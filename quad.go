@@ -23,9 +23,10 @@ func (s *quad) Hit(r *Ray, f *[]Shader) {
 	s1 := r.Start[1]
 	s2 := r.Start[2]
 
-	d0 := r.Dir[0]
-	d1 := r.Dir[1]
-	d2 := r.Dir[2]
+	d := r.Dir()
+	d0 := d[0]
+	d1 := d[1]
+	d2 := d[2]
 
 	A := a0*d0*d0 + a1*d1*d1 + a2*d2*d2
 	B := 2 * (a0*d0*s0 + a1*d1*s1 + a2*d2*s2)
