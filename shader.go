@@ -15,7 +15,7 @@ type Shader struct {
 // we add this tiny offset to its starting position.
 // This avoids that numerical round-off
 // would cause the ray to start inside the surface.
-const offset = 1. / (1024 * 1024)
+const offset = 1. / (256 * 1024)
 
 // Calculate the color seen by ray.
 func (s *Shader) Shade(e *Env, recursion int, r *Ray) Color {

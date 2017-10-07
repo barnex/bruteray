@@ -31,15 +31,23 @@ type diffuse struct {
 }
 
 func (s *diffuse) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
+	// This is the core of bi-directonial path tracing.
+
+	// accumulates the result
 	var acc Color
+
+	// first sum over all explicit sources
+	// (with fall-off)
 	for _, l := range e.lights {
 		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
 	}
 
-	// random ray
-
+	// add one random ray to sample (only!) the indirect sources.
+	// (no fall-off, the chance of hitting an object
+	// automatically falls off correctly with distance).
+	// Choose the random ray via importance sampling.
 	sec := &Ray{pos.MAdd(offset, norm), randVecCos(e, norm)}
-	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // must not include ultra-intense objects, already added as lights
+	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // does not include explicit lights
 
 	return acc
 }
@@ -65,7 +73,6 @@ func (s *diffuse0) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(e, pos)
 
-	//pos = pos.MAdd(off, norm)
 	secundary := Ray{Start: pos, Dir: lpos.Sub(pos).Normalized()}
 
 	t := e.IntersectAny(&secundary)

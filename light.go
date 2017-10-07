@@ -1,7 +1,7 @@
 package bruteray
 
 type Light interface {
-	Sample(e *Env, target Vec) (dir Vec, intens Color)
+	Sample(e *Env, target Vec) (pos Vec, intens Color)
 	Obj
 }
 
@@ -39,7 +39,7 @@ type pointLight struct {
 }
 
 func (l *pointLight) Sample(e *Env, target Vec) (Vec, Color) {
-	return l.pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(l.pos).Len2()) // TODO: 1-> 4*pi
+	return l.pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(l.pos).Len2())
 }
 
 // Spherical light source.
@@ -81,3 +81,19 @@ func cubeVec(e *Env) Vec {
 		2.0*e.rng.Float64() - 1,
 	}
 }
+
+//func RectLight(pos Vec, dir Vec, rx, ry, rz float64, c Color) Light {
+//	return &rectLight{r.(*rect), c}
+//}
+//
+//type rectLight struct {
+//	*rect
+//	color Color
+//}
+//
+//func (l *rectLight) Sample(e *Env, target Vec) (Vec, Color) {
+//	rnd := cubeVec(e)
+//	rnd = rnd.Mul3(Vec{l.rx, l.ry, l.rz})
+//	pos := l.pos.Add(rnd)
+//	return pos, l.color.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
+//}
