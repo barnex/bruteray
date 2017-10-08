@@ -62,7 +62,7 @@ var preview struct {
 }
 
 func encode(w io.Writer, img bruteray.Image) {
-	printErr(jpeg.Encode(w, img, &jpeg.Options{Quality: 80}))
+	printErr(jpeg.Encode(w, img, &jpeg.Options{Quality: 90}))
 }
 
 func parseInt(s string, Default int) int {

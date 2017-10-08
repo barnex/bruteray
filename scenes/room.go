@@ -18,14 +18,14 @@ func main() {
 	e.Add(
 		Box(Vec{0, 0, 0}, rWidth, ceil, rDepth, wall),
 		Sheet(Ey, 0, Checkboard(rWidth/5, white, black)),
-		Rect(Vec{rWidth - off, 1.7, .75}, Ex, 0, 1, .7, Flat(WHITE.EV(1))),
-		Rect(Vec{rWidth - off, 1.7, -.75}, Ex, 0, 1, .7, Flat(WHITE.EV(1))),
+		//Rect(Vec{rWidth - off, 1.7, .75}, Ex, 0, 1, .7, Flat(WHITE.EV(1))),
+		//Rect(Vec{rWidth - off, 1.7, -.75}, Ex, 0, 1, .7, Flat(WHITE.EV(1))),
 	)
 
 	e.AddLight(
-		SphereLight(Vec{0, ceil - 0.0, 0}, .1, WHITE.EV(1)),
-	//RectLight(Rect(Vec{rWidth - off, ceil / 2, .6}, Ex, 0, 1, .5, Flat(BLUE)), WHITE.EV(2)),
-	//RectLight(Rect(Vec{rWidth - off, ceil / 2, -.5}, Ex, 0, 1, .5, Flat(RED)), WHITE.EV(2)),
+		SphereLight(Vec{0, ceil - 0.4, 0}, .1, WHITE.EV(2)),
+		RectLight(Vec{rWidth - off, ceil / 2, .6}, 0, 1, .5, WHITE.EV(1)),
+		RectLight(Vec{rWidth - off, ceil / 2, -.5}, 0, 1, .5, WHITE.EV(1)),
 	)
 
 	e.SetAmbient(Flat(WHITE.EV(-4)))

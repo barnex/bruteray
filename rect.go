@@ -2,6 +2,8 @@ package bruteray
 
 // A rectangle (i.e. finite sheet) at given position,
 // with normal vector dir and half-axes rx, ry, rz.
+//
+// TODO: pass Vec normal, U, V
 func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj {
 	return &rect{pos, dir, rx, ry, rz, m, noInside{}}
 }

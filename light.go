@@ -82,18 +82,33 @@ func cubeVec(e *Env) Vec {
 	}
 }
 
-//func RectLight(pos Vec, dir Vec, rx, ry, rz float64, c Color) Light {
-//	return &rectLight{r.(*rect), c}
-//}
-//
-//type rectLight struct {
-//	*rect
-//	color Color
-//}
-//
-//func (l *rectLight) Sample(e *Env, target Vec) (Vec, Color) {
-//	rnd := cubeVec(e)
-//	rnd = rnd.Mul3(Vec{l.rx, l.ry, l.rz})
-//	pos := l.pos.Add(rnd)
-//	return pos, l.color.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
-//}
+func RectLight(pos Vec, rx, ry, rz float64, c Color) Light {
+	var dir Vec
+	surf := 1.0
+	R := Vec{rx, ry, rz}
+	for i, r := range R {
+		if r == 0 {
+			dir = Unit[i]
+			R[i] = 1 // rect does not work with r=0
+		} else {
+			surf *= r
+		}
+	}
+
+	intens := c.Mul(1 / surf)
+	return &rectLight{
+		rect:  Rect(pos, dir, R[X], R[Y], R[Z], Flat(intens)).(*rect),
+		color: c,
+	}
+}
+
+type rectLight struct {
+	*rect
+	color Color
+}
+
+func (l *rectLight) Sample(e *Env, target Vec) (Vec, Color) {
+	rnd := cubeVec(e).Mul3(Vec{l.rx, l.ry, l.rz})
+	pos := l.pos.Add(rnd)
+	return pos, l.color.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
+}
