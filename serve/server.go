@@ -21,6 +21,7 @@ var (
 	port       = flag.String("http", ":3700", "Port to serve HTTP")
 	flagWidth  = flag.Int("w", 1920, "image width")
 	flagHeight = flag.Int("h", 1080, "image height")
+	qual       = flag.Int("q", 90, "jpeg quality")
 )
 
 var (
@@ -62,7 +63,7 @@ var preview struct {
 }
 
 func encode(w io.Writer, img bruteray.Image) {
-	printErr(jpeg.Encode(w, img, &jpeg.Options{Quality: 90}))
+	printErr(jpeg.Encode(w, img, &jpeg.Options{Quality: *qual}))
 }
 
 func parseInt(s string, Default int) int {

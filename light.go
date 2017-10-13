@@ -1,5 +1,7 @@
 package bruteray
 
+import "math"
+
 type Light interface {
 	Sample(e *Env, target Vec) (pos Vec, intens Color)
 	Obj
@@ -110,5 +112,7 @@ type rectLight struct {
 func (l *rectLight) Sample(e *Env, target Vec) (Vec, Color) {
 	rnd := cubeVec(e).Mul3(Vec{l.rx, l.ry, l.rz})
 	pos := l.pos.Add(rnd)
-	return pos, l.color.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
+	delta := target.Sub(pos)
+	lamb := math.Abs(l.dir.Dot(delta.Normalized()))
+	return pos, l.color.Mul((lamb / (4 * Pi)) / delta.Len2())
 }
