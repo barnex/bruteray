@@ -57,7 +57,7 @@ func RenderLoop(e *Env, w, h int, peek chan chan Image) {
 	onePass := func() {
 		start := time.Now()
 		acc := MakeImage(w, h)
-		render(e, acc, runtime.NumCPU()-1)
+		render(e, acc, runtime.NumCPU())
 		passes++
 		rate := float64(w*h) / time.Since(start).Seconds()
 		log.Printf("pass: %v, %.1f Mpixel/s", passes, rate/1e6)
