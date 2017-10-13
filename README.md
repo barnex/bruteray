@@ -20,4 +20,8 @@ A few scenes rendered by bruteray:
 
 ![fig](shots/039.jpg)
 
+## Cornell box
 
+The obligatory [Cornell box](https://en.wikipedia.org/wiki/Cornell_box):
+
+![fig](shots/042.jpg)
