@@ -1,5 +1,9 @@
 package bruteray
 
+import (
+	"fmt"
+)
+
 type Material interface {
 	Shade(e *Env, N int, r *Ray, frag *Fragment) Color
 }
@@ -178,7 +182,7 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 
 	i := r.Dir().Normalized()                  // incident direction
 	n := frag.Norm.Normalized()                // normal direction
-	costhi := i.Dot(n)                         // cos theta_i
+	costhi := -i.Dot(n)                        // cos theta_i // sign!
 	sin2tht := n12 * n12 * (1 - costhi*costhi) // sin² theta_t
 
 	if sin2tht > 1 {
@@ -186,7 +190,7 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 		return e.ShadeAll(r2, N)
 	}
 
-	costht := -sqrt(1 - sin2tht)
+	costht := sqrt(1 - sin2tht)
 	RT := sqr((n1*costhi - n2*costht) / (n1*costhi + n2*costht))
 	RI := sqr((n1*costht - n2*costhi) / (n1*costht + n2*costhi))
 	R := 0.5 * (RT + RI)
@@ -197,18 +201,18 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	//log.Printf("teller=%v", (n1*costhi - n2*costht))
 	//log.Printf("noemer=%v", (n1*costhi + n2*costht))
 
-	//if costhi < -1 || costhi > 1 {
-	//	panic(fmt.Sprintf("costhi=%v", costhi))
-	//}
-	//if costht < -1 || costht > 1 {
-	//	panic(fmt.Sprintf("costht=%v", costht))
-	//}
-	//if RI < 0 || RI > 1 || RT < 0 || RT > 1 {
-	//	panic(fmt.Sprintf("RI=%v, RT=%v", RI, RT))
-	//}
-	//if R < 0 || R > 1 || T < 0 || T > 1 {
-	//	panic(fmt.Sprintf("R=%v, T=%v", R, T))
-	//}
+	if costhi < -1 || costhi > 1 {
+		panic(fmt.Sprintf("costhi=%v", costhi))
+	}
+	if costht < -1 || costht > 1 {
+		panic(fmt.Sprintf("costht=%v", costht))
+	}
+	if RI < 0 || RI > 1 || RT < 0 || RT > 1 {
+		panic(fmt.Sprintf("RI=%v, RT=%v", RI, RT))
+	}
+	if R < 0 || R > 1 || T < 0 || T > 1 {
+		panic(fmt.Sprintf("R=%v, T=%v", R, T))
+	}
 
 	fact := (n12*costhi - sqrt(1-(sin2tht)))
 	t := i.Mul(n12).MAdd(fact, frag.Norm)

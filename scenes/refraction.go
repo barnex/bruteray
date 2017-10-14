@@ -39,7 +39,7 @@ func main() {
 	e.Camera = Camera(focalLen).Transl(0, h/2, -1050)
 	e.Camera.AA = true
 	e.Recursion = 6
-	e.Cutoff = EV(13)
+	e.Cutoff = EV(7)
 
 	serve.Env(e)
 }
