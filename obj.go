@@ -21,3 +21,7 @@ type noInside struct{}
 func (noInside) Inside(Vec) bool {
 	return false
 }
+
+type Insider interface {
+	Inside(pos Vec) bool
+}

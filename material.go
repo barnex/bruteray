@@ -146,6 +146,19 @@ func (s *reflective) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
 	return e.ShadeAll(r2, N-1).Mul3(s.c)
 }
 
+func Refractive(n float64, obj Insider) Material {
+	return &refractive{n, obj}
+}
+
+type refractive struct {
+	n float64 // index of refraction
+	i Insider
+}
+
+func (s *refractive) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
+	return Color{}
+}
+
 // Blend mixes two materials with certain weights. E.g.:
 // 	Blend(0.9, Diffuse(WHITE), 0.1, Reflective(WHITE))  // 90% mate + 10% reflective, like a shiny billiard ball.
 func Blend(a float64, matA Material, b float64, matB Material) Material {
