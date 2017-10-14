@@ -97,6 +97,7 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 			t := hit[i].T
 			if t < surf.T && t > 0 {
 				surf = hit[i]
+				surf.Object = o
 			}
 		}
 	}

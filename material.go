@@ -49,7 +49,7 @@ func (s *diffuse) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	// automatically falls off correctly with distance).
 	// Choose the random ray via importance sampling.
 	sec := NewRay(pos.MAdd(offset, norm), randVecCos(e, norm))
-	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N-1))) // does not include explicit lights
+	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N))) // does not include explicit lights
 
 	return acc
 }
@@ -149,20 +149,79 @@ type reflective struct {
 func (s *reflective) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	r2 := NewRay(pos, r.Dir().Reflect(norm))
-	return e.ShadeAll(r2, N-1).Mul3(s.c)
+	return e.ShadeAll(r2, N).Mul3(s.c)
 }
 
-func Refractive(n float64, obj Insider) Material {
-	return &refractive{n, obj}
+func Refractive(n1, n2 float64) Material {
+	return &refractive{n1, n2}
 }
 
 type refractive struct {
-	n float64 // index of refraction
-	i Insider
+	n1, n2 float64 // relative index of refraction
 }
 
+// https://en.wikipedia.org/wiki/Fresnel_equations
 func (s *refractive) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
-	return Color{}
+	//pos, norm := r.At(frag.T-offset), frag.Norm
+	//r2 := NewRay(pos, r.Dir().Reflect(norm))
+	//c2 := e.ShadeAll(r2, N).Mul(0.5)
+
+	const offset = 1e-3
+	posAhead := r.At(frag.T + offset)
+	posBehind := r.At(frag.T - offset)
+
+	n1, n2 := s.n1, s.n2
+	if !frag.Object.Inside(posAhead) {
+		n1, n2 = n2, n1
+	}
+	n12 := n1 / n2
+
+	i := r.Dir().Normalized()                  // incident direction
+	n := frag.Norm.Normalized()                // normal direction
+	costhi := i.Dot(n)                         // cos theta_i
+	sin2tht := n12 * n12 * (1 - costhi*costhi) // sin² theta_t
+
+	if sin2tht > 1 {
+		r2 := NewRay(posBehind, r.Dir().Reflect(frag.Norm))
+		return e.ShadeAll(r2, N)
+	}
+
+	costht := -sqrt(1 - sin2tht)
+	RT := sqr((n1*costhi - n2*costht) / (n1*costhi + n2*costht))
+	RI := sqr((n1*costht - n2*costhi) / (n1*costht + n2*costhi))
+	R := 0.5 * (RT + RI)
+	T := 1 - R
+
+	//log.Printf("n1=%v, n2=%v, n12=%v", n1, n2, n12)
+	//log.Printf("costhi=%v, costht=%v", costhi, costht)
+	//log.Printf("teller=%v", (n1*costhi - n2*costht))
+	//log.Printf("noemer=%v", (n1*costhi + n2*costht))
+
+	//if costhi < -1 || costhi > 1 {
+	//	panic(fmt.Sprintf("costhi=%v", costhi))
+	//}
+	//if costht < -1 || costht > 1 {
+	//	panic(fmt.Sprintf("costht=%v", costht))
+	//}
+	//if RI < 0 || RI > 1 || RT < 0 || RT > 1 {
+	//	panic(fmt.Sprintf("RI=%v, RT=%v", RI, RT))
+	//}
+	//if R < 0 || R > 1 || T < 0 || T > 1 {
+	//	panic(fmt.Sprintf("R=%v, T=%v", R, T))
+	//}
+
+	fact := (n12*costhi - sqrt(1-(sin2tht)))
+	t := i.Mul(n12).MAdd(fact, frag.Norm)
+
+	r2 := NewRay(posAhead, t)
+	cT := e.ShadeAll(r2, N).Mul(T)
+
+	// reflected
+	r3 := NewRay(posBehind, i.Reflect(n))
+	cR := e.ShadeAll(r3, N).Mul(R)
+
+	return cR.Add(cT)
+
 }
 
 // Blend mixes two materials with certain weights. E.g.:
