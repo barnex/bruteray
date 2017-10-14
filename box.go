@@ -22,7 +22,7 @@ func Cube(center Vec, r float64, m Material) Obj {
 	return Box(center, r, r, r, m)
 }
 
-func (s *box) Hit(r *Ray, f *[]Shader) {
+func (s *box) Hit(r *Ray, f *[]Fragment) {
 	min_ := s.min
 	max_ := s.max
 
@@ -50,8 +50,8 @@ func (s *box) Hit(r *Ray, f *[]Shader) {
 	}
 
 	*f = append(*f,
-		Shader{T: ten, Norm: s.Normal(r.At(ten)), Material: s.m},
-		Shader{T: tex, Norm: s.Normal(r.At(tex)), Material: s.m},
+		Fragment{T: ten, Norm: s.Normal(r.At(ten)), Material: s.m},
+		Fragment{T: tex, Norm: s.Normal(r.At(tex)), Material: s.m},
 	)
 
 }

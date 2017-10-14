@@ -12,7 +12,7 @@ type Env struct {
 	objs      []Obj     // non-source objects
 	lights    []Light   // light sources
 	all       []Obj     // objs + lights
-	Ambient   Shader    // Shades the background at infinity, when no object is hit
+	Ambient   Fragment  // Shades the background at infinity, when no object is hit
 	rng       rand.Rand // Random-number generator for use by one thread
 	Camera    *Cam      // Camera determines the point of view
 	Recursion int       // Maximum allowed recursion depth.
@@ -23,7 +23,7 @@ type Env struct {
 // to which objects can be added later.
 func NewEnv() *Env {
 	return &Env{
-		Ambient:   Shader{T: inf, Material: Flat(BLACK)},
+		Ambient:   Fragment{T: inf, Material: Flat(BLACK)},
 		rng:       *(newRng()),
 		Camera:    Camera(0),
 		Recursion: DefaultRec,
@@ -58,7 +58,7 @@ func (e *Env) AddLight(l ...Light) {
 
 // Sets the background color.
 func (e *Env) SetAmbient(m Material) {
-	e.Ambient = Shader{T: inf, Material: m}
+	e.Ambient = Fragment{T: inf, Material: m}
 }
 
 // Calculate intensity seen by ray,
@@ -87,7 +87,7 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	surf := e.Ambient
 	surf.T = inf
 
-	hit := make([]Shader, 0, 2)
+	hit := make([]Fragment, 0, 2)
 
 	for _, o := range who {
 		hit = hit[:0]
@@ -110,7 +110,7 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 func (e *Env) IntersectAny(r *Ray) float64 {
 
 	T := inf
-	hit := make([]Shader, 0, 2)
+	hit := make([]Fragment, 0, 2)
 
 	for _, o := range e.objs {
 		hit = hit[:0]

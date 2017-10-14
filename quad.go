@@ -14,7 +14,7 @@ type quad struct {
 	m Material
 }
 
-func (s *quad) Hit(r *Ray, f *[]Shader) {
+func (s *quad) Hit(r *Ray, f *[]Fragment) {
 	a0 := s.a[0]
 	a1 := s.a[1]
 	a2 := s.a[2]
@@ -43,8 +43,8 @@ func (s *quad) Hit(r *Ray, f *[]Shader) {
 
 	t1, t2 = sort2(t1, t2)
 	*f = append(*f,
-		Shader{T: t1, Norm: s.Normal(r.At(t1)), Material: s.m},
-		Shader{T: t2, Norm: s.Normal(r.At(t2)), Material: s.m},
+		Fragment{T: t1, Norm: s.Normal(r.At(t1)), Material: s.m},
+		Fragment{T: t2, Norm: s.Normal(r.At(t2)), Material: s.m},
 	)
 }
 

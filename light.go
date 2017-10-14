@@ -10,8 +10,8 @@ type Light interface {
 // embed to get a Hit that returns no intersection.
 type noIntersection struct{}
 
-func (noIntersection) Hit(*Ray, *[]Shader) { return }
-func (noIntersection) Inside(Vec) bool     { return false }
+func (noIntersection) Hit(*Ray, *[]Fragment) { return }
+func (noIntersection) Inside(Vec) bool       { return false }
 
 // Directed light source without fall-off.
 // Position should be far away from the scene (indicates a direction)

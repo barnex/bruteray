@@ -9,13 +9,14 @@ type checkboard struct {
 	a, b Material
 }
 
-func (c *checkboard) Shade(e *Env, r *Ray, N int, pos, norm Vec) Color {
+func (c *checkboard) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+	pos := r.At(frag.T)
 	x := int(pos[X]*c.invs + 10000)
 	y := int(pos[Z]*c.invs + 10000)
 	i := (x + y) & 0x1
 	if i == 0 {
-		return c.a.Shade(e, r, N, pos, norm)
+		return c.a.Shade(e, N, r, frag)
 	} else {
-		return c.b.Shade(e, r, N, pos, norm)
+		return c.b.Shade(e, N, r, frag)
 	}
 }

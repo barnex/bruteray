@@ -15,7 +15,7 @@ type rect struct {
 	noInside
 }
 
-func (s *rect) Hit(r *Ray, f *[]Shader) {
+func (s *rect) Hit(r *Ray, f *[]Fragment) {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir().Dot(s.dir)
 	t := (s.pos.Dot(s.dir) - rs) / rd
@@ -26,6 +26,6 @@ func (s *rect) Hit(r *Ray, f *[]Shader) {
 		return
 	}
 	*f = append(*f,
-		Shader{T: t, Norm: s.dir, Material: s.m},
+		Fragment{T: t, Norm: s.dir, Material: s.m},
 	)
 }
