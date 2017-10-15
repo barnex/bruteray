@@ -1,6 +1,5 @@
 # Bruteray
 
-
 Bruteray is a hobby ray tracer. It employs bi-directional path tracing, a ray tracing method that:
   - is physically accurate and produces realistic images
   - is relatively simple to implement
