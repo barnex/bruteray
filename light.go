@@ -114,5 +114,5 @@ func (l *rectLight) Sample(e *Env, target Vec) (Vec, Color) {
 	pos := l.pos.Add(rnd)
 	delta := target.Sub(pos)
 	lamb := math.Abs(l.dir.Dot(delta.Normalized()))
-	return pos, l.color.Mul((lamb / (4 * Pi)) / delta.Len2())
+	return pos, l.color.Mul((lamb) / delta.Len2())
 }

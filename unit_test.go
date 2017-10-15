@@ -403,6 +403,44 @@ func TestHollowAnd(t *testing.T) {
 	CompareImg(t, e, img, name, 10)
 }
 
+func TestRectLight(t *testing.T) {
+	e := NewEnv()
+
+	r := 0.3
+
+	e.Add(
+		Sphere(Vec{0, 2, 0}, r, Diffuse(WHITE)),
+		Sphere(Vec{1.41, 1.41, 0}, r, Diffuse(WHITE)),
+		Sphere(Vec{2, 0, 0}, r, Diffuse(WHITE)),
+		Sphere(Vec{1.41, -1.41, 0}, r, Diffuse(WHITE)),
+		Sphere(Vec{0, -2, 0}, r, Diffuse(WHITE)),
+		Sphere(Vec{-2, 2, 0}, r, Diffuse(WHITE)),
+		Sphere(Vec{-2, -2, 0}, r, Diffuse(WHITE)),
+	)
+
+	reference := false
+	intens := WHITE.EV(-1)
+	if reference {
+		e.Add(
+			Rect(Vec{0, 0, 0}, Ey, 1, 1, 1, Flat(intens)), // add for the reference image
+		)
+	} else {
+		e.AddLight(
+			RectLight(Vec{0, 0, 0}, 1, 0, 1, intens), // remove for reference image
+		)
+	}
+
+	e.Camera = Camera(1).Transl(0, -.5, -6)
+
+	img := MakeImage(testW, testH)
+	nPass := 300
+	e.Recursion = 2
+	MultiPass(e, img, nPass)
+	name := "023-rectlight"
+	CompareImg(t, e, img, name, 10)
+
+}
+
 //func TestTexture(t*testing.T){
 //	e := NewEnv()
 //
