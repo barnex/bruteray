@@ -433,12 +433,54 @@ func TestRectLight(t *testing.T) {
 	e.Camera = Camera(1).Transl(0, -.5, -6)
 
 	img := MakeImage(testW, testH)
-	nPass := 300
+	nPass := 50
 	e.Recursion = 2
 	MultiPass(e, img, nPass)
 	name := "023-rectlight"
 	CompareImg(t, e, img, name, 10)
 
+}
+
+func TestCornellBox(t *testing.T) {
+	e := NewEnv()
+
+	white := Diffuse(WHITE.EV(-.6))
+	green := Diffuse(GREEN.EV(-1.6))
+	red := Diffuse(RED.EV(-.6))
+
+	const (
+		w = 550
+		h = 550
+		U = 66666
+	)
+
+	e.Add(
+		Rect(Vec{0, 0, 0}, Ey, w/2, U, w/2, white),
+		Rect(Vec{0, h, 0}, Ey, w/2, U, w/2, white),
+		Rect(Vec{0, h / 2, w / 2}, Ez, w/2, h/2, U, white),
+		Rect(Vec{w / 2, h / 2, 0}, Ex, U, h/2, w/2, green),
+		Rect(Vec{-w / 2, h / 2, 0}, Ex, U, h/2, w/2, red),
+		Transf(Box(Vec{120, 80, -80}, 80, 80, 80, white), RotY4(-18*Deg)),
+		Transf(Box(Vec{-50, 165, 100}, 85, 180, 70, white), RotY4(20*Deg)),
+	)
+
+	e.AddLight(
+		RectLight(Vec{0, h - 1e-4, 0}, 120/2, 0, 120/2, Color{1.0, 1.0, 0.6}.EV(1)),
+	)
+
+	e.SetAmbient(Flat(WHITE.EV(-10)))
+
+	focalLen := 0.035 / 0.025
+	e.Camera = Camera(focalLen).Transl(0, h/2, -1050)
+	e.Camera.AA = true
+	e.Recursion = 10
+	e.Cutoff = EV(6)
+
+	nPass := 20
+	img := MakeImage(testW, testH)
+	MultiPass(e, img, nPass)
+	name := "024-cornellbox"
+	CompareImg(t, e, img, name, 10)
 }
 
 //func TestTexture(t*testing.T){

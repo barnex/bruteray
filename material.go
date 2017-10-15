@@ -1,9 +1,5 @@
 package bruteray
 
-import (
-	"fmt"
-)
-
 type Material interface {
 	Shade(e *Env, N int, r *Ray, frag *Fragment) Color
 }
@@ -166,66 +162,62 @@ type refractive struct {
 
 // https://en.wikipedia.org/wiki/Fresnel_equations
 func (s *refractive) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
-	//pos, norm := r.At(frag.T-offset), frag.Norm
-	//r2 := NewRay(pos, r.Dir().Reflect(norm))
-	//c2 := e.ShadeAll(r2, N).Mul(0.5)
 
 	const offset = 1e-3
-	posAhead := r.At(frag.T + offset)
-	posBehind := r.At(frag.T - offset)
 
+	posAhead := r.At(frag.T + offset)  // point in front of us, inside glass object
+	posBehind := r.At(frag.T - offset) // point behind, outside of glass
+
+	// if we are exiting rather than entering the refractive material,
+	// swap refractive indices.
 	n1, n2 := s.n1, s.n2
 	if !frag.Object.Inside(posAhead) {
 		n1, n2 = n2, n1
 	}
 	n12 := n1 / n2
 
-	i := r.Dir().Normalized()                  // incident direction
-	n := frag.Norm.Normalized()                // normal direction
-	costhi := -i.Dot(n)                        // cos theta_i // sign!
-	sin2tht := n12 * n12 * (1 - costhi*costhi) // sin² theta_t
+	i := r.Dir().Normalized()               // incident direction
+	n := frag.Norm.Normalized()             // normal direction
+	cosθi := -i.Dot(n)                      // cos of incident angle. Sign because ray points away from normal.
+	sin2θt := n12 * n12 * (1 - cosθi*cosθi) // sin² of transsion angle, using Snell's law.
 
-	if sin2tht > 1 {
+	// Total internal reflection?
+	if sin2θt > 1 {
 		r2 := NewRay(posBehind, r.Dir().Reflect(frag.Norm))
 		return e.ShadeAll(r2, N)
 	}
 
-	costht := sqrt(1 - sin2tht)
-	RT := sqr((n1*costhi - n2*costht) / (n1*costhi + n2*costht))
-	RI := sqr((n1*costht - n2*costhi) / (n1*costht + n2*costhi))
-	R := 0.5 * (RT + RI)
+	cosθt := sqrt(1 - sin2θt)
+
+	// Fresnel equations for reflected intensity:
+	Rp := sqr((n1*cosθi - n2*cosθt) / (n1*cosθi + n2*cosθt))
+	Rs := sqr((n1*cosθt - n2*cosθi) / (n1*cosθt + n2*cosθi))
+	R := 0.5 * (Rp + Rs)
 	T := 1 - R
 
-	//log.Printf("n1=%v, n2=%v, n12=%v", n1, n2, n12)
-	//log.Printf("costhi=%v, costht=%v", costhi, costht)
-	//log.Printf("teller=%v", (n1*costhi - n2*costht))
-	//log.Printf("noemer=%v", (n1*costhi + n2*costht))
-
-	if costhi < -1 || costhi > 1 {
-		panic(fmt.Sprintf("costhi=%v", costhi))
-	}
-	if costht < -1 || costht > 1 {
-		panic(fmt.Sprintf("costht=%v", costht))
-	}
-	if RI < 0 || RI > 1 || RT < 0 || RT > 1 {
-		panic(fmt.Sprintf("RI=%v, RT=%v", RI, RT))
-	}
-	if R < 0 || R > 1 || T < 0 || T > 1 {
-		panic(fmt.Sprintf("R=%v, T=%v", R, T))
-	}
-
-	fact := (n12*costhi - sqrt(1-(sin2tht)))
-	t := i.Mul(n12).MAdd(fact, frag.Norm)
-
+	// transmitted ray
+	t := i.Mul(n12).MAdd((n12*cosθi - sqrt(1-(sin2θt))), frag.Norm)
 	r2 := NewRay(posAhead, t)
 	cT := e.ShadeAll(r2, N).Mul(T)
 
-	// reflected
+	// reflected ray
 	r3 := NewRay(posBehind, i.Reflect(n))
 	cR := e.ShadeAll(r3, N).Mul(R)
 
 	return cR.Add(cT)
 
+	//if costhi < -1 || costhi > 1 {
+	//	panic(fmt.Sprintf("costhi=%v", costhi))
+	//}
+	//if costht < -1 || costht > 1 {
+	//	panic(fmt.Sprintf("costht=%v", costht))
+	//}
+	//if RI < 0 || RI > 1 || RT < 0 || RT > 1 {
+	//	panic(fmt.Sprintf("RI=%v, RT=%v", RI, RT))
+	//}
+	//if R < 0 || R > 1 || T < 0 || T > 1 {
+	//	panic(fmt.Sprintf("R=%v, T=%v", R, T))
+	//}
 }
 
 // Blend mixes two materials with certain weights. E.g.:

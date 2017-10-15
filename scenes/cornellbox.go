@@ -26,17 +26,9 @@ func main() {
 		Rect(Vec{-w / 2, h / 2, 0}, Ex, U, h/2, w/2, red),
 		Transf(Box(Vec{120, 80, -80}, 80, 80, 80, white), RotY4(-18*Deg)),
 		Transf(Box(Vec{-50, 165, 100}, 85, 180, 70, white), RotY4(20*Deg)),
-		//Box(Vec{0, 0, 0}, rWidth, ceil, rDepth, wall),
-		//Sheet(Ey, 0, Checkboard(rWidth/5, white, black)),
-		//Sphere(Vec{0, .5, 1}, .5, Reflective(WHITE.EV(-.3))),
-		//Rect(Vec{rWidth - off, 1.7, .75}, Ex, 0, 1, .7, Flat(WHITE.EV(1))),
-		//Rect(Vec{rWidth - off, 1.7, -.75}, Ex, 0, 1, .7, Flat(WHITE.EV(1))),
 	)
 
 	e.AddLight(
-		//PointLight(Vec{0, h - 100, 0}, WHITE.EV(10)),
-		//SphereLight(Vec{0, h - 100, 0}, 50, WHITE.EV(30)),
-		//RectLight(Vec{rWidth - off, ceil / 2, .6}, 0, 1, .45, WHITE.EV(2)),
 		RectLight(Vec{0, h - 1e-4, 0}, 120/2, 0, 120/2, Color{1.0, 1.0, 0.6}.EV(20)),
 	)
 

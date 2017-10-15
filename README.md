@@ -2,7 +2,7 @@
 
 
 Bruteray is a hobby ray tracer. It employs bi-directional path tracing, a ray tracing method that:
-  - produces very realistic images
+  - is physically accurate and produces realistic images
   - is relatively simple to implement
   - is rather brute force.
 
@@ -22,6 +22,8 @@ A few scenes rendered by bruteray:
 
 ## Cornell box
 
-The obligatory [Cornell box](https://en.wikipedia.org/wiki/Cornell_box):
+The [Cornell box](https://en.wikipedia.org/wiki/Cornell_box) is a standard scene used to compare rendering techinques.
 
 ![fig](shots/042.jpg)
+
+![fig](shots/044.jpg)
