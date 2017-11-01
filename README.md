@@ -19,6 +19,8 @@ A few scenes rendered by bruteray:
 
 ![fig](shots/039.jpg)
 
+![fig](shots/045.jpg)
+
 ## Cornell box
 
 The [Cornell box](https://en.wikipedia.org/wiki/Cornell_box) is a standard scene used to compare rendering techinques.
@@ -26,3 +28,4 @@ The [Cornell box](https://en.wikipedia.org/wiki/Cornell_box) is a standard scene
 ![fig](shots/042.jpg)
 
 ![fig](shots/044.jpg)
+

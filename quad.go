@@ -6,6 +6,17 @@ func Quad(center Vec, a Vec, b float64, m Material) Obj {
 	return &quad{center, a, b, m}
 }
 
+func Cyl(center Vec, r float64, m Material) Obj {
+	return &quad{center, Vec{1, 0, 1}, r * r, m}
+}
+
+func CapCyl(center Vec, r, h float64, m Material) Obj {
+	return And(
+		Cyl(center, r, m),
+		Slab(Ey, center[Y]-h, center[Y]+h, m),
+	)
+}
+
 // a0 x² + a1 y² + a2 z² = 1
 type quad struct {
 	c Vec // unused
