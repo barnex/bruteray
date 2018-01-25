@@ -480,7 +480,7 @@ func TestCornellBox(t *testing.T) {
 	img := MakeImage(testW, testH)
 	MultiPass(e, img, nPass)
 	name := "024-cornellbox"
-	CompareImg(t, e, img, name, 10)
+	CompareImg(t, e, img, name, 100)
 }
 
 //func TestTexture(t*testing.T){

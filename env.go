@@ -17,6 +17,7 @@ type Env struct {
 	Camera    *Cam      // Camera determines the point of view
 	Recursion int       // Maximum allowed recursion depth.
 	Cutoff    float64   // Maximum allowed brightness. Used to suppres spurious caustics.
+	Fog       float64
 }
 
 // NewEnv creates an empty environment
@@ -102,6 +103,39 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 		}
 	}
 	c := surf.Shade(e, N-1, r)
+
+	if e.Fog != 0 && N == e.Recursion && e.Recursion > 1 {
+		c = e.addFog(c, r, surf.T)
+	}
+
+	return c
+}
+
+func (e *Env) addFog(c Color, r *Ray, t float64) Color {
+	ts := e.rng.ExpFloat64() * e.Fog
+
+	if ts > t {
+		return c
+	}
+
+	c = Color{}
+
+	pos := r.At(ts)
+	for _, l := range e.lights {
+		lpos, intens := l.Sample(e, pos)
+		secundary := NewRay(pos, lpos.Sub(pos).Normalized())
+		ti := e.IntersectAny(secundary)
+		lightT := lpos.Sub(pos).Len()
+		if (ti > 0) && ti < lightT { // intersection between start and light position
+			// shadow
+		} else {
+			c = c.MAdd(1/e.Fog, intens)
+		}
+	}
+
+	r2 := NewRay(pos, randVec(e))
+	fogc := e.shade(r2, 1, e.objs)
+	c = c.MAdd(1, fogc)
 
 	return c
 }
