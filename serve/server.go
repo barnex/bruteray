@@ -15,6 +15,7 @@ import (
 	"sync"
 
 	"github.com/barnex/bruteray"
+	"golang.org/x/image/tiff"
 )
 
 var (
@@ -38,6 +39,7 @@ func Env(e *bruteray.Env) {
 	env = e
 
 	http.HandleFunc("/render", handleRender)
+	http.HandleFunc("/tiff", handleTiff)
 	http.HandleFunc("/", mainHandler)
 
 	go bruteray.RenderLoop(e, *flagWidth, *flagHeight, peek)
@@ -46,10 +48,18 @@ func Env(e *bruteray.Env) {
 }
 
 func handleRender(w http.ResponseWriter, r *http.Request) {
+	encode(w, peekImg())
+}
+
+func peekImg() bruteray.Image {
 	resp := make(chan bruteray.Image)
 	peek <- resp
-	img := <-resp
-	encode(w, img)
+	return <-resp
+}
+
+func handleTiff(w http.ResponseWriter, r *http.Request) {
+	img := peekImg()
+	printErr(tiff.Encode(w, img, &tiff.Options{Predictor: true, Compression: tiff.Deflate}))
 }
 
 func mainHandler(w http.ResponseWriter, r *http.Request) {
