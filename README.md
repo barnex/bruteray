@@ -25,7 +25,7 @@ A few scenes rendered by bruteray:
 
 ![fig](shots/047.jpg)
 
-![fig](shots/048.jpg)
+![fig](shots/050.jpg)
 
 ## Cornell box
 
