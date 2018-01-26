@@ -109,7 +109,7 @@ func renderLine(e *Env, img Image, i int) {
 
 		// clip to avoid caustic noise
 		if c.R > e.Cutoff || c.G > e.Cutoff || c.B > e.Cutoff {
-			c = c.Mul(4 / c.Max()) // TODO: why does 1/... not work well?
+			c = c.Mul(e.Cutoff / c.Max())
 		}
 
 		img[i][j] = c

@@ -5,6 +5,7 @@ package bruteray
 import (
 	"math/rand"
 	"sync/atomic"
+	"time"
 )
 
 func newRng() *rand.Rand {
@@ -14,7 +15,7 @@ func newRng() *rand.Rand {
 var _seed int64 = 1
 
 func seed() int64 {
-	return atomic.AddInt64(&_seed, 1)
+	return atomic.AddInt64(&_seed, 12345) + time.Now().UnixNano()
 }
 
 // Uniform random number.

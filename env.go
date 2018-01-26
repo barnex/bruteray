@@ -17,7 +17,7 @@ type Env struct {
 	Camera    *Cam      // Camera determines the point of view
 	Recursion int       // Maximum allowed recursion depth.
 	Cutoff    float64   // Maximum allowed brightness. Used to suppres spurious caustics.
-	Fog       float64
+	Fog       float64   // Fog distance
 }
 
 // NewEnv creates an empty environment
@@ -55,6 +55,12 @@ func (e *Env) AddLight(l ...Light) {
 	for _, l := range l {
 		e.all = append(e.all, l)
 	}
+}
+
+// Adds a light source to the scene.
+// The source itself is not visible, only its light.
+func (e *Env) AddInvisibleLight(l ...Light) {
+	e.lights = append(e.lights, l...)
 }
 
 // Sets the background color.
@@ -102,25 +108,26 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 			}
 		}
 	}
-	c := surf.Shade(e, N-1, r)
 
 	if e.Fog != 0 && N == e.Recursion && e.Recursion > 1 {
-		c = e.addFog(c, r, surf.T)
+		// add fog only to primary ray,
+		// it's very expensive and the indirect effect is hardly visible.
+		return e.withFog(surf, N-1, r)
+	} else {
+		return surf.Shade(e, N-1, r)
 	}
-
-	return c
 }
 
-func (e *Env) addFog(c Color, r *Ray, t float64) Color {
-	ts := e.rng.ExpFloat64() * e.Fog
-
-	if ts > t {
-		return c
+func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
+	tObject := surf.T
+	tScatter := e.rng.ExpFloat64() * e.Fog
+	if tScatter > tObject {
+		return surf.Shade(e, N, r) // hit object without scattering
 	}
+	// else: ray scattered on fog
 
-	c = Color{}
-
-	pos := r.At(ts)
+	c := Color{}
+	pos := r.At(tScatter)
 	for _, l := range e.lights {
 		lpos, intens := l.Sample(e, pos)
 		secundary := NewRay(pos, lpos.Sub(pos).Normalized())
@@ -133,9 +140,9 @@ func (e *Env) addFog(c Color, r *Ray, t float64) Color {
 		}
 	}
 
-	r2 := NewRay(pos, randVec(e))
-	fogc := e.shade(r2, 1, e.objs)
-	c = c.MAdd(1, fogc)
+	//r2 := NewRay(pos, randVec(e))
+	//fogc := e.shade(r2, 1, e.objs)
+	//c = c.MAdd(1, fogc)
 
 	return c
 }
