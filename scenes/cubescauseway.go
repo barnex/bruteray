@@ -50,7 +50,8 @@ func main() {
 	e.Camera.AA = true
 	e.Recursion = 3
 	e.Cutoff = EV(40)
-	e.Fog = 8
+	e.IndirectFog = true
+	e.Fog = 5
 
 	serve.Env(e)
 }

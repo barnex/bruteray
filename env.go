@@ -9,15 +9,16 @@ import (
 // (all objects, light sources, ... in the scene)
 // as well as a random-number generator needed for iterative rendering.
 type Env struct {
-	objs      []Obj     // non-source objects
-	lights    []Light   // light sources
-	all       []Obj     // objs + lights
-	Ambient   Fragment  // Shades the background at infinity, when no object is hit
-	rng       rand.Rand // Random-number generator for use by one thread
-	Camera    *Cam      // Camera determines the point of view
-	Recursion int       // Maximum allowed recursion depth.
-	Cutoff    float64   // Maximum allowed brightness. Used to suppres spurious caustics.
-	Fog       float64   // Fog distance
+	objs        []Obj     // non-source objects
+	lights      []Light   // light sources
+	all         []Obj     // objs + lights
+	Ambient     Fragment  // Shades the background at infinity, when no object is hit
+	rng         rand.Rand // Random-number generator for use by one thread
+	Camera      *Cam      // Camera determines the point of view
+	Recursion   int       // Maximum allowed recursion depth.
+	Cutoff      float64   // Maximum allowed brightness. Used to suppres spurious caustics.
+	Fog         float64   // Fog distance
+	IndirectFog bool      // Include fog interreflection
 }
 
 // NewEnv creates an empty environment
@@ -140,9 +141,11 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 		}
 	}
 
-	//r2 := NewRay(pos, randVec(e))
-	//fogc := e.shade(r2, 1, e.objs)
-	//c = c.MAdd(1, fogc)
+	if e.IndirectFog {
+		r2 := NewRay(pos, randVec(e))
+		fogc := e.shade(r2, 1, e.objs)
+		c = c.Add(fogc)
+	}
 
 	return c
 }
