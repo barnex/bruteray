@@ -11,6 +11,8 @@ A few scenes rendered by bruteray:
 
 ![fig](shots/031.jpg)
 
+![fig](shots/051.jpg)
+
 ![fig](shots/030.jpg)
 
 ![fig](shots/029.jpg)

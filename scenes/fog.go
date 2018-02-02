@@ -46,8 +46,8 @@ func main() {
 	e.Recursion = 3
 	e.Cutoff = EV(10)
 
-	e.Fog = 2.1
-
+	//e.Camera.Focus = 2
+	//e.Camera.Aperture = 0.5
 	serve.Env(e)
 }
 

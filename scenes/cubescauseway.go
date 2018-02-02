@@ -46,12 +46,14 @@ func main() {
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 
 	e.Camera = Camera(.9).Transl(0, 3.0, -7).RotScene(20 * Deg).Transf(RotX4(30 * Deg))
+	//e.Camera.Focus = 5
+	//e.Camera.Aperture = 0.1
 
 	e.Camera.AA = true
 	e.Recursion = 3
 	e.Cutoff = EV(40)
-	e.IndirectFog = true
-	e.Fog = 5
+	//e.IndirectFog = true
+	//e.Fog = 5
 
 	serve.Env(e)
 }

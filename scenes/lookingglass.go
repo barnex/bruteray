@@ -49,5 +49,8 @@ func main() {
 	e.Recursion = 5
 	e.Cutoff = EV(40)
 
+	//e.Camera.Focus = 30
+	//e.Camera.Aperture = .2
+
 	serve.Env(e)
 }
