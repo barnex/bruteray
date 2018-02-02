@@ -133,7 +133,7 @@ func TestSlabIntersect(t *testing.T) {
 	cube := And(And(s1, s2), s3)
 	cube = Transf(cube, RotY4(160*Deg).Mul(RotX4(20*Deg)))
 	e.Add(cube)
-	e.Camera = Camera(1).Transl(0, 0, -4)
+	e.Camera = Camera(1).Transl(0, 0, -5)
 
 	Compare(t, e, "009-slabintersect")
 }
@@ -147,7 +147,7 @@ func TestSheet(t *testing.T) {
 	s3 := Sheet(Ex, -10, Flat(WHITE))
 	s4 := Sphere(Vec{1.5, 0, 3}, 1, ShadeNormal(Ez))
 	e.Add(s1, s2, s3, s4)
-	e.Camera = Camera(1)
+	e.Camera = Camera(1).Transl(0, 0, -1)
 
 	Compare(t, e, "010-sheet")
 }
@@ -179,7 +179,7 @@ func TestBox(t *testing.T) {
 	b = Transf(b, RotY4(150*Deg))
 	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
 	e.Add(b, g)
-	e.Camera = Camera(1).Transl(0, 0, -4)
+	e.Camera = Camera(1).Transl(0, 0, -5)
 
 	Compare(t, e, "012-box")
 }
@@ -193,7 +193,7 @@ func TestDiffuse0(t *testing.T) {
 
 	l := DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
-	e.Camera = Camera(1).Transl(0, 0, -4)
+	e.Camera = Camera(1).Transl(0, 0, -5)
 
 	Compare(t, e, "013-diffuse0")
 }
@@ -213,7 +213,7 @@ func TestObjOr1(t *testing.T) {
 
 	l := DirLight(Vec{4, 2, -6}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
-	e.Camera = Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15 * Deg))
+	e.Camera = Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
 
 	Compare(t, e, "014-objor1")
 }
@@ -231,7 +231,7 @@ func TestObjOr2(t *testing.T) {
 	l := DirLight(Vec{8, 2, 0}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
 
-	e.Camera = Camera(1).Transl(0, 1.5, -5).Transf(RotX4(15 * Deg))
+	e.Camera = Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
 
 	Compare(t, e, "015-objor2")
 }
@@ -251,7 +251,7 @@ func TestPointLight(t *testing.T) {
 	e.Add(s)
 
 	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
-	e.Camera = Camera(1).Transl(0, 1, -2)
+	e.Camera = Camera(1).Transl(0, 1, -3)
 
 	Compare(t, e, "016-pointlight")
 }
@@ -295,7 +295,7 @@ func whitebox(refl float64) *Env {
 		Sheet(Ez, 1, white),
 	)
 	e.AddLight(PointLight(Vec{}, WHITE.Mul(EV(-3)).Mul(4*Pi)))
-	e.Camera = Camera(0.75).Transl(0, 0, -0.95)
+	e.Camera = Camera(0.75).Transl(0, 0, -1)
 	e.Camera.AA = true
 	return e
 }
@@ -310,7 +310,7 @@ func TestShadowBehind(t *testing.T) {
 		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
 	)
 	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
-	e.Camera = Camera(1).Transl(0, 1, -2)
+	e.Camera = Camera(1).Transl(0, 1, -3)
 	Compare(t, e, "019-shadowbehind")
 }
 
@@ -330,7 +330,7 @@ func TestLuminousObject(t *testing.T) {
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 
-	e.Camera = Camera(1).Transl(0, 2.5, -6).Transf(RotX4(22 * Deg))
+	e.Camera = Camera(1).Transl(0, 2.5, -7).Transf(RotX4(22 * Deg))
 	e.Camera.AA = true
 
 	img := MakeImage(testW, testH)
@@ -352,7 +352,7 @@ func TestQuad(t *testing.T) {
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 
-	e.Camera = Camera(1).Transl(0, 0, -6)
+	e.Camera = Camera(1).Transl(0, 0, -7)
 	e.Camera.AA = false
 	Compare(t, e, "021-quad-hyper")
 }
@@ -372,7 +372,7 @@ func TestObjMinus(t *testing.T) {
 
 	l := DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
-	e.Camera = Camera(1).Transl(0, 1, -2).Transf(RotX4(10 * Deg))
+	e.Camera = Camera(1).Transl(0, 1, -3).Transf(RotX4(10 * Deg))
 
 	Compare(t, e, "014-objminus")
 }
@@ -392,7 +392,7 @@ func TestHollowAnd(t *testing.T) {
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 
-	e.Camera = Camera(1).Transl(0, 2.5, -6).Transf(RotX4(22 * Deg))
+	e.Camera = Camera(1).Transl(0, 2.5, -7).Transf(RotX4(22 * Deg))
 	e.Camera.AA = true
 
 	img := MakeImage(testW, testH)
@@ -465,26 +465,41 @@ func TestCornellBox(t *testing.T) {
 	)
 
 	e.AddLight(
-		RectLight(Vec{0, h - 1e-4, 0}, 120/2, 0, 120/2, Color{1.0, 1.0, 0.6}.EV(1)),
+		RectLight(Vec{0, h - 1e-4, 0}, 120/2, 0, 120/2, Color{1.0, 1.0, 0.6}.EV(18)),
 	)
 
-	e.SetAmbient(Flat(WHITE.EV(-10)))
+	e.SetAmbient(Flat(WHITE.EV(-6)))
 
 	focalLen := 0.035 / 0.025
-	e.Camera = Camera(focalLen).Transl(0, h/2, -1050)
+	e.Camera = Camera(focalLen).Transl(0, h/2, -1000)
 	e.Camera.AA = true
 	e.Recursion = 10
-	e.Cutoff = EV(6)
+	e.Cutoff = EV(3)
 
 	nPass := 20
 	img := MakeImage(testW, testH)
 	MultiPass(e, img, nPass)
 	name := "024-cornellbox"
-	CompareImg(t, e, img, name, 100)
+	CompareImg(t, e, img, name, 10)
 }
 
-//func TestTexture(t*testing.T){
-//	e := NewEnv()
-//
-//
-//}
+func TestDOF(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Sheet(Ey, 0, Checkboard(1, Flat(WHITE), Flat(BLACK))),
+	)
+
+	e.SetAmbient(Flat(WHITE.EV(-2)))
+
+	e.Camera = Camera(1).Transl(0, 10, 0).Transf(RotX4(30 * Deg)) //.RotScene(30 * Deg).Transf(RotX4(30 * Deg))
+	e.Camera.AA = true
+	e.Camera.Aperture = 1
+	e.Camera.Focus = 20
+	e.Recursion = 1
+
+	nPass := 30
+	img := MakeImage(testW, testH)
+	MultiPass(e, img, nPass)
+	CompareImg(t, e, img, "025-dof", 10)
+}

@@ -3,6 +3,8 @@ package bruteray
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
 	FocalLen float64
+	Focus    float64
+	Aperture float64
 	transf   Matrix4
 	AA       bool
 }
@@ -19,20 +21,34 @@ func Camera(focalLen float64) *Cam {
 }
 
 func (c *Cam) RayFrom(e *Env, i, j int, W, H int) *Ray {
-	focalPoint := Vec{0, 0, -c.FocalLen}
+	//focalPoint := Vec{0, 0, 0}
 
 	r := new(Ray)
+	r.Start = Vec{}
 
-	// ray start point
-	y0 := (-float64(i) + c.aa(e) + float64(H)/2) / float64(H)
-	x0 := (float64(j) + c.aa(e) - float64(W)/2) / float64(H)
-	r.Start = Vec{x0, y0, 0}
+	if c.Aperture > 0 {
+		xs, ys := randCircle(e)
+		xs *= c.Aperture
+		ys *= c.Aperture
+		r.Start = Vec{xs, ys, 0}
+	}
+
+	// ray end point
+	y0 := ((-float64(i) + c.aa(e) + float64(H)/2) / float64(H))
+	x0 := ((float64(j) + c.aa(e) - float64(W)/2) / float64(H))
+	z0 := c.FocalLen
+
+	end := Vec{x0, y0, z0}
+	if c.Focus > 0 {
+		end = end.Mul(c.Focus)
+	}
 
 	// ray direction
 	if c.FocalLen != 0 {
-		r.SetDir(r.Start.Sub(focalPoint).Normalized())
+		r.SetDir(end.Sub(r.Start).Normalized())
 	} else {
 		r.SetDir(Vec{0, 0, 1})
+		r.Start = Vec{x0, y0, 0}
 	}
 
 	// camera transform

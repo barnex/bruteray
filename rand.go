@@ -57,3 +57,14 @@ func randVecCos(e *Env, dir Vec) Vec {
 	}
 	return v
 }
+
+// randCircle draws a point from the unit disk.
+func randCircle(e *Env) (x, y float64) {
+	x = 2*random(e) - 1
+	y = 2*random(e) - 1
+	for sqrt(x*x+y*y) > 1 {
+		x = 2*random(e) - 1
+		y = 2*random(e) - 1
+	}
+	return x, y
+}
