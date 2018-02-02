@@ -84,25 +84,11 @@ func RenderLoop(e *Env, w, h int, peek chan chan Image) {
 }
 
 func renderLine(e *Env, img Image, i int) {
-	c := e.Camera
-	focalPoint := Vec{0, 0, -c.FocalLen}
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
-	r := &Ray{}
+
 	for j := 0; j < W; j++ {
-		// ray start point
-		y0 := (-float64(i) + c.aa(e) + float64(H)/2) / float64(H)
-		x0 := (float64(j) + c.aa(e) - float64(W)/2) / float64(H)
-		r.Start = Vec{x0, y0, 0}
 
-		// ray direction
-		if c.FocalLen != 0 {
-			r.SetDir(r.Start.Sub(focalPoint).Normalized())
-		} else {
-			r.SetDir(Vec{0, 0, 1})
-		}
-
-		// camera transform
-		r.Transf(&(c.transf))
+		r := e.Camera.RayFrom(e, i, j, W, H)
 
 		// accumulate ray intensity
 		c := e.ShadeAll(r, e.Recursion)

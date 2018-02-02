@@ -18,6 +18,29 @@ func Camera(focalLen float64) *Cam {
 	}
 }
 
+func (c *Cam) RayFrom(e *Env, i, j int, W, H int) *Ray {
+	focalPoint := Vec{0, 0, -c.FocalLen}
+
+	r := new(Ray)
+
+	// ray start point
+	y0 := (-float64(i) + c.aa(e) + float64(H)/2) / float64(H)
+	x0 := (float64(j) + c.aa(e) - float64(W)/2) / float64(H)
+	r.Start = Vec{x0, y0, 0}
+
+	// ray direction
+	if c.FocalLen != 0 {
+		r.SetDir(r.Start.Sub(focalPoint).Normalized())
+	} else {
+		r.SetDir(Vec{0, 0, 1})
+	}
+
+	// camera transform
+	r.Transf(&(c.transf))
+
+	return r
+}
+
 // Translates the camera.
 func (c *Cam) Transl(dx, dy, dz float64) *Cam {
 	c.Transf(Transl4(Vec{dx, dy, dz}))
