@@ -542,3 +542,16 @@ func TestDiaphragmHex(t *testing.T) {
 	MultiPass(e, img, nPass)
 	CompareImg(t, e, img, "027-diaphragm-hex", 20)
 }
+
+func TestWaves(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Sheet(Ey, 0, Waves()),
+	)
+
+	e.Camera = Camera(1).Transl(0, 100, 0).Transf(RotX4(90 * Deg))
+	e.Camera.AA = true
+
+	Compare(t, e, "028-waves")
+}

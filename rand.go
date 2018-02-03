@@ -30,19 +30,19 @@ func randNorm(e *Env) float64 {
 }
 
 // Random unit vector.
-func randVec(e *Env) Vec {
+func randVec(rng *rand.Rand) Vec {
 	return Vec{
-		e.rng.NormFloat64(),
-		e.rng.NormFloat64(),
-		e.rng.NormFloat64(),
+		rng.NormFloat64(),
+		rng.NormFloat64(),
+		rng.NormFloat64(),
 	}.Normalized()
 
 }
 
 // Random unit vector from the hemisphere around n
 // (dot product with n >= 0).
-func randVecDir(e *Env, n Vec) Vec {
-	v := randVec(e)
+func randVecDir(rng *rand.Rand, n Vec) Vec {
+	v := randVec(rng)
 	if v.Dot(n) < 0 {
 		v = v.Mul(-1)
 	}
@@ -52,9 +52,9 @@ func randVecDir(e *Env, n Vec) Vec {
 // Random unit vector, sampled with probability cos(angle with dir).
 // Used for diffuse inter-reflection importance sampling.
 func randVecCos(e *Env, dir Vec) Vec {
-	v := randVecDir(e, dir)
+	v := randVecDir(&e.rng, dir)
 	for v.Dot(dir) < e.rng.Float64() {
-		v = randVecDir(e, dir)
+		v = randVecDir(&e.rng, dir)
 	}
 	return v
 }

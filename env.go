@@ -142,7 +142,7 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 	}
 
 	if e.IndirectFog {
-		r2 := NewRay(pos, randVec(e))
+		r2 := NewRay(pos, randVec(&e.rng))
 		fogc := e.shade(r2, 1, e.objs)
 		c = c.Add(fogc)
 	}

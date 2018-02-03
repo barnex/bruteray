@@ -41,7 +41,7 @@ func uniformInt(f func(Vec) float64, N int, dir Vec) float64 {
 	e := NewEnv()
 	acc := 0.0
 	for i := 0; i < N; i++ {
-		V := randVecDir(e, dir)
+		V := randVecDir(&e.rng, dir)
 		acc += f(V) * dir.Dot(V) * 2 * Pi
 	}
 	return acc / float64(N)
