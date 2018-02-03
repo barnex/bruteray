@@ -503,3 +503,42 @@ func TestDOF(t *testing.T) {
 	MultiPass(e, img, nPass)
 	CompareImg(t, e, img, "025-dof", 10)
 }
+
+func TestDiafragmDisk(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Sphere(Vec{0, 0, 20}, 1, Flat(WHITE.EV(8))),
+	)
+
+	e.Camera = Camera(1)
+	e.Camera.AA = true
+	e.Camera.Aperture = 0.7
+	e.Camera.Focus = 2
+	e.Recursion = 1
+
+	nPass := 100
+	img := MakeImage(testW, testH)
+	MultiPass(e, img, nPass)
+	CompareImg(t, e, img, "026-diaphragm-disk", 20)
+}
+
+func TestDiaphragmHex(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Sphere(Vec{0, 0, 20}, 1, Flat(WHITE.EV(8))),
+	)
+
+	e.Camera = Camera(1)
+	e.Camera.AA = true
+	e.Camera.Aperture = 0.7
+	e.Camera.Focus = 2
+	e.Camera.Diaphragm = randHex
+	e.Recursion = 1
+
+	nPass := 100
+	img := MakeImage(testW, testH)
+	MultiPass(e, img, nPass)
+	CompareImg(t, e, img, "027-diaphragm-hex", 20)
+}

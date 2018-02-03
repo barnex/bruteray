@@ -3,6 +3,7 @@ package bruteray
 // Utilities for generating random numbers and vectors.
 
 import (
+	"math"
 	"math/rand"
 	"sync/atomic"
 	"time"
@@ -68,3 +69,18 @@ func randCircle(e *Env) (x, y float64) {
 	}
 	return x, y
 }
+
+// randHex draws a point from the unit hexagon.
+func randHex(e *Env) (x, y float64) {
+	x = 2*random(e) - 1
+	y = 2*random(e) - 1
+	for abs(y) > sqrt3/2 || abs(x+y/sqrt3) > 1 || abs(x-y/sqrt3) > 1 {
+		x = 2*random(e) - 1
+		y = 2*random(e) - 1
+	}
+	return x, y
+}
+
+func abs(x float64) float64 { return math.Abs(x) }
+
+const sqrt3 = 1.7320508075688772935

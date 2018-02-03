@@ -2,11 +2,12 @@ package bruteray
 
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
-	FocalLen float64
-	Focus    float64
-	Aperture float64
-	transf   Matrix4
-	AA       bool
+	FocalLen  float64
+	Focus     float64
+	Aperture  float64
+	Diaphragm func(*Env) (x, y float64)
+	transf    Matrix4
+	AA        bool
 }
 
 // Constructs a camera with given focal length.
@@ -15,8 +16,9 @@ type Cam struct {
 // and can be transformed later.
 func Camera(focalLen float64) *Cam {
 	return &Cam{
-		FocalLen: focalLen,
-		transf:   *UnitMatrix4(),
+		FocalLen:  focalLen,
+		transf:    *UnitMatrix4(),
+		Diaphragm: randCircle,
 	}
 }
 
@@ -27,7 +29,7 @@ func (c *Cam) RayFrom(e *Env, i, j int, W, H int) *Ray {
 	r.Start = Vec{}
 
 	if c.Aperture > 0 {
-		xs, ys := randCircle(e)
+		xs, ys := c.Diaphragm(e)
 		xs *= c.Aperture
 		ys *= c.Aperture
 		r.Start = Vec{xs, ys, 0}
