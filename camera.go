@@ -18,7 +18,7 @@ func Camera(focalLen float64) *Cam {
 	return &Cam{
 		FocalLen:  focalLen,
 		transf:    *UnitMatrix4(),
-		Diaphragm: randCircle,
+		Diaphragm: DiaCircle,
 	}
 }
 

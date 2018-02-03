@@ -534,7 +534,7 @@ func TestDiaphragmHex(t *testing.T) {
 	e.Camera.AA = true
 	e.Camera.Aperture = 0.7
 	e.Camera.Focus = 2
-	e.Camera.Diaphragm = randHex
+	e.Camera.Diaphragm = DiaHex
 	e.Recursion = 1
 
 	nPass := 100

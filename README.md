@@ -9,9 +9,7 @@ Bruteray is a hobby ray tracer. It employs bi-directional path tracing, a ray tr
 
 A few scenes rendered by bruteray:
 
-![fig](shots/031.jpg)
-
-![fig](shots/051.jpg)
+![fig](shots/052.jpg)
 
 ![fig](shots/030.jpg)
 

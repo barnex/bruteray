@@ -59,8 +59,8 @@ func randVecCos(e *Env, dir Vec) Vec {
 	return v
 }
 
-// randCircle draws a point from the unit disk.
-func randCircle(e *Env) (x, y float64) {
+// DiaCircle draws a point from the unit disk.
+func DiaCircle(e *Env) (x, y float64) {
 	x = 2*random(e) - 1
 	y = 2*random(e) - 1
 	for sqrt(x*x+y*y) > 1 {
@@ -70,8 +70,8 @@ func randCircle(e *Env) (x, y float64) {
 	return x, y
 }
 
-// randHex draws a point from the unit hexagon.
-func randHex(e *Env) (x, y float64) {
+// DiaHex draws a point from the unit hexagon.
+func DiaHex(e *Env) (x, y float64) {
 	x = 2*random(e) - 1
 	y = 2*random(e) - 1
 	for abs(y) > sqrt3/2 || abs(x+y/sqrt3) > 1 || abs(x-y/sqrt3) > 1 {
