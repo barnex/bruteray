@@ -1,9 +1,13 @@
 # Bruteray
 
-Bruteray is a hobby ray tracer. It employs bi-directional path tracing, a ray tracing method that:
-  - is physically accurate and produces realistic images
-  - is relatively simple to implement
-  - is rather brute force.
+Bruteray is a hobby ray tracer. It employs bi-directional path tracing, a physically accurate method that produces realistic images.
+
+Features:
+
+  * Indirect lighting (global illuminiation)
+  * Volumetric lighting
+  * Refraction
+  * Depth of field
 
 ## Gallery
 
@@ -13,7 +17,7 @@ A few scenes rendered by bruteray:
 
 ![fig](shots/030.jpg)
 
-![fig](shots/029.jpg)
+![fig](shots/050.jpg)
 
 ![fig](shots/032.jpg)
 
@@ -21,11 +25,8 @@ A few scenes rendered by bruteray:
 
 ![fig](shots/045.jpg)
 
-![fig](shots/046.jpg)
-
 ![fig](shots/047.jpg)
 
-![fig](shots/050.jpg)
 
 ## Cornell box
 
