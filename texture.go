@@ -23,16 +23,15 @@ func (c *checkboard) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	}
 }
 
-func Waves() Material {
-	rng := rand.New(rand.NewSource(1))
-	terms := make([]term, 30)
+func Waves(n int, K Vec, col func(float64) Material) Material {
+	rng := rand.New(rand.NewSource(int64(1)))
+	terms := make([]term, n)
 	for i := range terms {
 		r := randVec(rng)
-		r[Y] = 0
-		r = r.Normalized()
+		r = r.Mul3(K)
 		terms[i].k = r.Mul(1 - 0.5*rng.Float64())
 	}
-	return &series{terms}
+	return &series{terms, col}
 }
 
 func (m *series) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
@@ -45,17 +44,12 @@ func (m *series) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 
 	v /= sqrt(float64(len(m.terms)))
 
-	v /= 2
-	//v = v * v
-	if v > 0 {
-		return Color{v, v, v}
-	} else {
-		return Color{0, 0, 0}
-	}
+	return m.col(v).Shade(e, N, r, frag)
 }
 
 type series struct {
 	terms []term
+	col   func(float64) Material
 }
 
 type term struct {

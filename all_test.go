@@ -543,15 +543,26 @@ func TestDiaphragmHex(t *testing.T) {
 	CompareImg(t, e, img, "027-diaphragm-hex", 20)
 }
 
-func TestWaves(t *testing.T) {
-	e := NewEnv()
-
-	e.Add(
-		Sheet(Ey, 0, Waves()),
-	)
-
-	e.Camera = Camera(1).Transl(0, 100, 0).Transf(RotX4(90 * Deg))
-	e.Camera.AA = true
-
-	Compare(t, e, "028-waves")
-}
+//func TestWaves(t *testing.T) {
+//	e := NewEnv()
+//
+//	a := Diffuse(WHITE.EV(-.3))
+//	b := Diffuse(WHITE.EV(-3))
+//	f := func(v float64) Material {
+//		if v > 0 {
+//			return a
+//		} else {
+//			return b
+//		}
+//	}
+//	m := Waves(20, Vec{1, 1, 1}, f)
+//	e.Add(
+//
+//		Sheet(Ey, 0, m),
+//	)
+//
+//	e.Camera = Camera(1).Transl(0, 100, 0).Transf(RotX4(90 * Deg))
+//	e.Camera.AA = true
+//
+//	Compare(t, e, "028-waves")
+//}
