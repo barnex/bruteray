@@ -23,33 +23,58 @@ func (c *checkboard) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	}
 }
 
-func Waves(n int, K Vec, col func(float64) Material) Material {
-	rng := rand.New(rand.NewSource(int64(1)))
+func Distort(seed int, n int, K Vec, ampli float64, m Material) Material {
+	return &distort{
+	//f: [
+	}
+}
+
+type distort struct {
+	orig Material
+	f    [3]series
+}
+
+func (m distort) Shade() Color {
+
+}
+
+func Waves(seed int, n int, K Vec, col func(float64) Material) Material {
+	return &waves{makeWaveSeries(seed, n, K), col}
+}
+
+type waves struct {
+	series
+	col func(float64) Material
+}
+
+func makeWaveSeries(seed int, n int, K Vec) {
+	rng := rand.New(rand.NewSource(int64(seed)))
 	terms := make([]term, n)
 	for i := range terms {
 		r := randVec(rng)
 		r = r.Mul3(K)
 		terms[i].k = r.Mul(1 - 0.5*rng.Float64())
 	}
-	return &series{terms, col}
+	return terms
 }
 
 func (m *series) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
-	v := 0.0
-
-	pos := r.At(frag.T)
-	for _, t := range m.terms {
-		v += sin(t.k.Dot(pos))
-	}
-
-	v /= sqrt(float64(len(m.terms)))
-
+	v := m.Eval(r.At(frag.T))
 	return m.col(v).Shade(e, N, r, frag)
 }
 
+// series is a sum of a number of sines.
 type series struct {
 	terms []term
-	col   func(float64) Material
+}
+
+func (s *series) Eval(pos Vec) float64 {
+	v := 0.0
+	for _, t := range s.terms {
+		v += sin(t.k.Dot(pos))
+	}
+	v /= sqrt(float64(len(s.terms)))
+	return v
 }
 
 type term struct {
