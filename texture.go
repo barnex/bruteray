@@ -23,19 +23,31 @@ func (c *checkboard) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	}
 }
 
-func Distort(seed int, n int, K Vec, ampli float64, m Material) Material {
-	return &distort{
-	//f: [
+func Distort(seed int, n int, K Vec, ampli float64, orig Material) Material {
+	m := &distort{
+		orig:  orig,
+		ampli: ampli,
 	}
+	for i := range m.f {
+		m.f[i] = makeWaveSeries(seed*i*100, n, K)
+	}
+	return m
 }
 
 type distort struct {
-	orig Material
-	f    [3]series
+	orig  Material
+	ampli float64
+	f     [3]series
 }
 
-func (m distort) Shade() Color {
-
+func (m distort) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+	pos := r.At(frag.T)
+	var delta Vec
+	for i := range delta {
+		delta[i] = m.f[i].Eval(pos)
+	}
+	frag.Norm = frag.Norm.MAdd(m.ampli, delta).Normalized()
+	return m.orig.Shade(e, N, r, frag)
 }
 
 func Waves(seed int, n int, K Vec, col func(float64) Material) Material {
@@ -47,18 +59,7 @@ type waves struct {
 	col func(float64) Material
 }
 
-func makeWaveSeries(seed int, n int, K Vec) {
-	rng := rand.New(rand.NewSource(int64(seed)))
-	terms := make([]term, n)
-	for i := range terms {
-		r := randVec(rng)
-		r = r.Mul3(K)
-		terms[i].k = r.Mul(1 - 0.5*rng.Float64())
-	}
-	return terms
-}
-
-func (m *series) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (m *waves) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	v := m.Eval(r.At(frag.T))
 	return m.col(v).Shade(e, N, r, frag)
 }
@@ -68,6 +69,21 @@ type series struct {
 	terms []term
 }
 
+type term struct {
+	k Vec
+}
+
+func makeWaveSeries(seed int, n int, K Vec) series {
+	rng := rand.New(rand.NewSource(int64(seed)))
+	terms := make([]term, n)
+	for i := range terms {
+		r := randVec(rng)
+		r = r.Mul3(K)
+		terms[i].k = r.Mul(1 - 0.5*rng.Float64())
+	}
+	return series{terms}
+}
+
 func (s *series) Eval(pos Vec) float64 {
 	v := 0.0
 	for _, t := range s.terms {
@@ -75,8 +91,4 @@ func (s *series) Eval(pos Vec) float64 {
 	}
 	v /= sqrt(float64(len(s.terms)))
 	return v
-}
-
-type term struct {
-	k Vec
 }
