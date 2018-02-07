@@ -9,6 +9,8 @@ const (
 	testRec      = 3        // test recursion depth
 )
 
+const defaultTol = 1.0
+
 // Test a flat sphere
 func TestSphere(t *testing.T) {
 	e := NewEnv()
@@ -17,7 +19,7 @@ func TestSphere(t *testing.T) {
 		Sphere(Vec{0, 0, 1}, 0.25, Flat(WHITE)),
 	)
 
-	Compare(t, e, 1, "sphere")
+	Compare(t, e, 1, "sphere", defaultTol)
 }
 
 // Test a sphere behind the camera,
@@ -29,7 +31,7 @@ func TestBehindCam(t *testing.T) {
 		Sphere(Vec{0, 0, -1}, 0.25, Flat(WHITE)),
 	)
 
-	Compare(t, e, 2, "behindcam")
+	Compare(t, e, 2, "behindcam", defaultTol)
 }
 
 // Test normal vectors.
@@ -42,7 +44,7 @@ func TestNormal(t *testing.T) {
 		Sphere(Vec{0.5, 0, 2}, 0.25, ShadeNormal(Ey)),
 	)
 
-	Compare(t, e, 3, "normals")
+	Compare(t, e, 3, "normals", defaultTol)
 }
 
 // Test camera translation.
@@ -54,7 +56,7 @@ func TestCamTransl(t *testing.T) {
 	)
 	e.Camera = Camera(0).Transl(-0.5, -0.25, 0)
 
-	Compare(t, e, 4, "camtransl")
+	Compare(t, e, 4, "camtransl", defaultTol)
 }
 
 // Test camera rotation
@@ -76,7 +78,7 @@ func TestCamRot(t *testing.T) {
 	)
 	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
 
-	Compare(t, e, 5, "camrot")
+	Compare(t, e, 5, "camrot", defaultTol)
 }
 
 // Test object transform
@@ -93,7 +95,7 @@ func TestObjTransf(t *testing.T) {
 	e.Add(Transf(sy, rot))
 	e.Add(Transf(sz, rot))
 
-	Compare(t, e, 6, "objtransf")
+	Compare(t, e, 6, "objtransf", defaultTol)
 }
 
 // Test intersection of two spheres
@@ -106,7 +108,7 @@ func TestObjAnd(t *testing.T) {
 	s := And(s1, s2)
 	e.Add(s)
 
-	Compare(t, e, 7, "objand")
+	Compare(t, e, 7, "objand", defaultTol)
 }
 
 // Test two partially overlapping spheres
@@ -119,7 +121,7 @@ func TestOverlap(t *testing.T) {
 	e.Add(s1)
 	e.Add(s2)
 
-	Compare(t, e, 8, "overlap")
+	Compare(t, e, 8, "overlap", defaultTol)
 }
 
 // Make a cube out of 3 intersecting slabs
@@ -135,7 +137,7 @@ func TestSlabIntersect(t *testing.T) {
 	e.Add(cube)
 	e.Camera = Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, 9, "slabintersect")
+	Compare(t, e, 9, "slabintersect", defaultTol)
 }
 
 // Use sheets as green grass, blue sky and wall
@@ -149,7 +151,7 @@ func TestSheet(t *testing.T) {
 	e.Add(s1, s2, s3, s4)
 	e.Camera = Camera(1).Transl(0, 0, -1)
 
-	Compare(t, e, 10, "sheet")
+	Compare(t, e, 10, "sheet", defaultTol)
 }
 
 // Test rectangles
@@ -167,7 +169,7 @@ func TestRect(t *testing.T) {
 	)
 	e.Add(r1, r2, r3)
 
-	Compare(t, e, 11, "rect")
+	Compare(t, e, 11, "rect", defaultTol)
 }
 
 // Test Axis Aligned Box
@@ -181,7 +183,7 @@ func TestBox(t *testing.T) {
 	e.Add(b, g)
 	e.Camera = Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, 12, "box")
+	Compare(t, e, 12, "box", defaultTol)
 }
 
 // Test Diffuse material without interreflection.
@@ -196,7 +198,7 @@ func TestDiffuse0(t *testing.T) {
 	e.AddLight(l)
 	e.Camera = Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, 13, "diffuse0")
+	Compare(t, e, 13, "diffuse0", defaultTol)
 }
 
 // Test CSG OR of objects.
@@ -217,7 +219,7 @@ func TestObjOr1(t *testing.T) {
 	e.AddLight(l)
 	e.Camera = Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
 
-	Compare(t, e, 14, "objor1")
+	Compare(t, e, 14, "objor1", defaultTol)
 }
 
 // Test CSG OR of objects.
@@ -236,7 +238,7 @@ func TestObjOr2(t *testing.T) {
 
 	e.Camera = Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
 
-	Compare(t, e, 15, "objor2")
+	Compare(t, e, 15, "objor2", defaultTol)
 }
 
 func TestPointLight(t *testing.T) {
@@ -256,7 +258,7 @@ func TestPointLight(t *testing.T) {
 	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
 	e.Camera = Camera(1).Transl(0, 1, -3)
 
-	Compare(t, e, 16, "pointlight")
+	Compare(t, e, 16, "pointlight", defaultTol)
 }
 
 // Test CSG MINUS of objects.
@@ -277,7 +279,7 @@ func TestObjMinus(t *testing.T) {
 	e.AddLight(l)
 	e.Camera = Camera(1).Transl(0, 1, -3).Transf(RotX4(10 * Deg))
 
-	Compare(t, e, 17, "objminus")
+	Compare(t, e, 17, "objminus", defaultTol)
 }
 
 // There is a box buried underneath the floor,
@@ -291,7 +293,7 @@ func TestShadowBehind(t *testing.T) {
 	)
 	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
 	e.Camera = Camera(1).Transl(0, 1, -3)
-	Compare(t, e, 19, "shadowbehind")
+	Compare(t, e, 19, "shadowbehind", defaultTol)
 }
 
 // Test that we can see the reflection of a light.
@@ -335,7 +337,7 @@ func TestQuad(t *testing.T) {
 
 	e.Camera = Camera(1).Transl(0, 0, -7)
 	e.Camera.AA = false
-	Compare(t, e, 21, "quad-hyper")
+	Compare(t, e, 21, "quad-hyper", defaultTol)
 }
 
 func TestHollowAnd(t *testing.T) {
@@ -355,12 +357,11 @@ func TestHollowAnd(t *testing.T) {
 
 	e.Camera = Camera(1).Transl(0, 2.5, -7).Transf(RotX4(22 * Deg))
 	e.Camera.AA = true
-
-	img := MakeImage(testW, testH)
-	nPass := 8
 	e.Recursion = 3
-	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, 22, "hollowand", 10)
+
+	nPass := 8
+	tol := 10.0
+	CompareNPass(t, e, 22, "hollowand", nPass, tol)
 }
 
 // Test a rectangular light source.
@@ -393,12 +394,10 @@ func TestRectLight(t *testing.T) {
 	}
 
 	e.Camera = Camera(1).Transl(0, -.5, -6)
-
-	img := MakeImage(testW, testH)
-	nPass := 50
 	e.Recursion = 2
-	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, 23, "rectlight", 10)
+
+	nPass := 50
+	CompareNPass(t, e, 23, "rectlight", nPass, 10)
 
 }
 
@@ -438,9 +437,7 @@ func TestCornellBox(t *testing.T) {
 	e.Cutoff = EV(3)
 
 	nPass := 20
-	img := MakeImage(testW, testH)
-	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, 24, "cornellbox", 10)
+	CompareNPass(t, e, 24, "cornellbox", nPass, 10)
 }
 
 func TestDOF(t *testing.T) {
@@ -459,9 +456,7 @@ func TestDOF(t *testing.T) {
 	e.Recursion = 1
 
 	nPass := 30
-	img := MakeImage(testW, testH)
-	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, 25, "dof", 10)
+	CompareNPass(t, e, 25, "dof", nPass, 10)
 }
 
 func TestDiafragmDisk(t *testing.T) {
@@ -478,9 +473,7 @@ func TestDiafragmDisk(t *testing.T) {
 	e.Recursion = 1
 
 	nPass := 100
-	img := MakeImage(testW, testH)
-	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, 26, "diaphragm-disk", 20)
+	CompareNPass(t, e, 26, "diaphragm-disk", nPass, 20)
 }
 
 func TestDiaphragmHex(t *testing.T) {
@@ -498,9 +491,7 @@ func TestDiaphragmHex(t *testing.T) {
 	e.Recursion = 1
 
 	nPass := 100
-	img := MakeImage(testW, testH)
-	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, 27, "diaphragm-hex", 20)
+	CompareNPass(t, e, 27, "diaphragm-hex", nPass, 20)
 }
 
 //func TestDistort(t *testing.T) {

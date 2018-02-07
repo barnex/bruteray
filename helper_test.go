@@ -6,9 +6,28 @@ import (
 	"image/png"
 	"math"
 	"os"
+	"path"
 	"reflect"
 	"testing"
+	"time"
 )
+
+func CompareNPass(t *testing.T, e *Env, number int, name string, nPass int, tolerance float64) {
+	img := MakeImage(testW, testH)
+
+	start := time.Now()
+	MultiPass(e, img, nPass)
+	duration := time.Since(start)
+
+	CompareImg(t, e, img, number, name, tolerance)
+	fmt.Println("t=", duration.Round(time.Millisecond/10))
+}
+
+// Compare renders the environment with standard resolution
+// and compares the output against testdata/00number-name.png.
+func Compare(t *testing.T, e *Env, number int, name string, tolerance float64) {
+	CompareNPass(t, e, number, name, 1, tolerance)
+}
 
 func CompareImg(t *testing.T, e *Env, img Image, number int, testName string, tol float64) {
 	t.Helper()
@@ -31,17 +50,6 @@ func CompareImg(t *testing.T, e *Env, img Image, number int, testName string, to
 	}
 }
 
-// Compare renders the environment with standard resolution
-// and compares the output against testdata/00number-name.png.
-func Compare(t *testing.T, e *Env, number int, name string) {
-	t.Helper()
-
-	img := MakeImage(testW, testH)
-	Render(e, img)
-	const defaultTolerance = 10
-	CompareImg(t, e, img, number, name, defaultTolerance)
-}
-
 func imgComp(a, b string) (float64, error) {
 	A, err := imgRead(a)
 	if err != nil {
@@ -62,7 +70,7 @@ func imgComp(a, b string) (float64, error) {
 	}
 	NPix := (A.Bounds().Dx() + 1) * (A.Bounds().Dx() + 1)
 	deviation := float64(delta) / (3 * 255 * float64(NPix))
-	fmt.Println(a, ": deviation=", deviation)
+	fmt.Printf("%-25s: err=%1.3f ", path.Base(a), deviation)
 	return deviation, nil
 }
 
