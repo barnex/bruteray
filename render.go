@@ -86,9 +86,11 @@ func RenderLoop(e *Env, w, h int, peek chan chan Image) {
 func renderLine(e *Env, img Image, i int) {
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
 
+	r := e.NewRay(Vec{}, Vec{})
+	defer e.RRay(r)
 	for j := 0; j < W; j++ {
 
-		r := e.Camera.RayFrom(e, i, j, W, H)
+		e.Camera.RayFrom(e, i, j, W, H, r)
 
 		// accumulate ray intensity
 		c := e.ShadeAll(r, e.Recursion)

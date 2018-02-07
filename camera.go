@@ -22,10 +22,9 @@ func Camera(focalLen float64) *Cam {
 	}
 }
 
-func (c *Cam) RayFrom(e *Env, i, j int, W, H int) *Ray {
-	//focalPoint := Vec{0, 0, 0}
+// RayFrom set r to a ray for pixel i,j.
+func (c *Cam) RayFrom(e *Env, i, j int, W, H int, r *Ray) {
 
-	r := new(Ray)
 	r.Start = Vec{}
 
 	if c.Aperture > 0 {
@@ -56,7 +55,6 @@ func (c *Cam) RayFrom(e *Env, i, j int, W, H int) *Ray {
 	// camera transform
 	r.Transf(&(c.transf))
 
-	return r
 }
 
 // Translates the camera.
