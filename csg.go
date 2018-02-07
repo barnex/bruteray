@@ -8,7 +8,7 @@ import (
 var (
 	fbBuf = sync.Pool{
 		New: func() interface{} {
-			fb := (make([]Fragment, 0, 4))
+			fb := (make([]Fragment, 0, 8))
 			return &fb
 		},
 	}
@@ -76,25 +76,31 @@ type or struct {
 func (o *or) Hit(r *Ray, f *[]Fragment) {
 
 	o.a.Hit(r, f)
+	fa := *f
 
-	fb := fb()
-	defer rfb(fb)
-	o.b.Hit(r, fb)
+	//fb := fb()
+	//defer rfb(fb)
+	o.b.Hit(r, f)
+	fb := (*f)[len(fa):]
 
-	var f3 []Fragment
+	fab := *f
 
-	for _, s := range *f {
+	for _, s := range fa {
 		if !o.b.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
-	for _, s := range *fb {
+	for _, s := range fb {
 		if !o.a.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
-	Sort(f3)
-	*f = f3
+	f3 := (*f)[len(fab):]
+	if len(*f) < len(f3) {
+		*f = append(*f, f3...)
+	}
+	*f = (*f)[:len(f3)]
+	copy(*f, f3)
 }
 
 func (o *or) Inside(p Vec) bool {
