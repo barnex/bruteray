@@ -10,11 +10,12 @@ import (
 	"testing"
 )
 
-func CompareImg(t *testing.T, e *Env, img Image, name string, tol float64) {
+func CompareImg(t *testing.T, e *Env, img Image, number int, testName string, tol float64) {
 	t.Helper()
 
 	os.Mkdir("out", 0777)
 
+	name := fmt.Sprintf("%03d-%v", number, testName)
 	name = name + ".png"
 	have := "out/" + name
 	want := "testdata/" + name
@@ -30,13 +31,15 @@ func CompareImg(t *testing.T, e *Env, img Image, name string, tol float64) {
 	}
 }
 
-func Compare(t *testing.T, e *Env, name string) {
+// Compare renders the environment with standard resolution
+// and compares the output against testdata/00number-name.png.
+func Compare(t *testing.T, e *Env, number int, name string) {
 	t.Helper()
 
 	img := MakeImage(testW, testH)
 	Render(e, img)
 	const defaultTolerance = 10
-	CompareImg(t, e, img, name, defaultTolerance)
+	CompareImg(t, e, img, number, name, defaultTolerance)
 }
 
 func imgComp(a, b string) (float64, error) {

@@ -1,6 +1,6 @@
 # testdata
 
-This directory contains reference images for unit tests.
+This directory contains reference images for tests.
 
 ![fig](001-sphere.png)
 ![fig](002-behindcam.png)
@@ -15,11 +15,16 @@ This directory contains reference images for unit tests.
 ![fig](011-rect.png)
 ![fig](012-box.png)
 ![fig](013-diffuse0.png)
-![fig](014-objminus.png)
 ![fig](014-objor1.png)
 ![fig](015-objor2.png)
 ![fig](016-pointlight.png)
+![fig](017-objminus.png)
 ![fig](019-shadowbehind.png)
 ![fig](020-luminous-object.png)
 ![fig](021-quad-hyper.png)
 ![fig](022-hollowand.png)
+![fig](023-rectlight.png)
+![fig](024-cornellbox.png)
+![fig](025-dof.png)
+![fig](026-diaphragm-disk.png)
+![fig](027-diaphragm-hex.png)

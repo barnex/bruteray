@@ -1,7 +1,6 @@
 package bruteray
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -18,10 +17,11 @@ func TestSphere(t *testing.T) {
 		Sphere(Vec{0, 0, 1}, 0.25, Flat(WHITE)),
 	)
 
-	Compare(t, e, "001-sphere")
+	Compare(t, e, 1, "sphere")
 }
 
-// Test a sphere behind the camera
+// Test a sphere behind the camera,
+// it should be invisible.
 func TestBehindCam(t *testing.T) {
 	e := NewEnv()
 
@@ -29,10 +29,10 @@ func TestBehindCam(t *testing.T) {
 		Sphere(Vec{0, 0, -1}, 0.25, Flat(WHITE)),
 	)
 
-	Compare(t, e, "002-behindcam")
+	Compare(t, e, 2, "behindcam")
 }
 
-// Test normal vectors
+// Test normal vectors.
 func TestNormal(t *testing.T) {
 	e := NewEnv()
 
@@ -42,10 +42,10 @@ func TestNormal(t *testing.T) {
 		Sphere(Vec{0.5, 0, 2}, 0.25, ShadeNormal(Ey)),
 	)
 
-	Compare(t, e, "003-normals")
+	Compare(t, e, 3, "normals")
 }
 
-// Test camera translation
+// Test camera translation.
 func TestCamTransl(t *testing.T) {
 	e := NewEnv()
 
@@ -54,7 +54,7 @@ func TestCamTransl(t *testing.T) {
 	)
 	e.Camera = Camera(0).Transl(-0.5, -0.25, 0)
 
-	Compare(t, e, "004-camtransl")
+	Compare(t, e, 4, "camtransl")
 }
 
 // Test camera rotation
@@ -76,7 +76,7 @@ func TestCamRot(t *testing.T) {
 	)
 	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
 
-	Compare(t, e, "005-camrot")
+	Compare(t, e, 5, "camrot")
 }
 
 // Test object transform
@@ -93,7 +93,7 @@ func TestObjTransf(t *testing.T) {
 	e.Add(Transf(sy, rot))
 	e.Add(Transf(sz, rot))
 
-	Compare(t, e, "006-objtransf")
+	Compare(t, e, 6, "objtransf")
 }
 
 // Test intersection of two spheres
@@ -106,7 +106,7 @@ func TestObjAnd(t *testing.T) {
 	s := And(s1, s2)
 	e.Add(s)
 
-	Compare(t, e, "007-objand")
+	Compare(t, e, 7, "objand")
 }
 
 // Test two partially overlapping spheres
@@ -119,7 +119,7 @@ func TestOverlap(t *testing.T) {
 	e.Add(s1)
 	e.Add(s2)
 
-	Compare(t, e, "008-overlap")
+	Compare(t, e, 8, "overlap")
 }
 
 // Make a cube out of 3 intersecting slabs
@@ -135,7 +135,7 @@ func TestSlabIntersect(t *testing.T) {
 	e.Add(cube)
 	e.Camera = Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, "009-slabintersect")
+	Compare(t, e, 9, "slabintersect")
 }
 
 // Use sheets as green grass, blue sky and wall
@@ -149,7 +149,7 @@ func TestSheet(t *testing.T) {
 	e.Add(s1, s2, s3, s4)
 	e.Camera = Camera(1).Transl(0, 0, -1)
 
-	Compare(t, e, "010-sheet")
+	Compare(t, e, 10, "sheet")
 }
 
 // Test rectangles
@@ -167,7 +167,7 @@ func TestRect(t *testing.T) {
 	)
 	e.Add(r1, r2, r3)
 
-	Compare(t, e, "011-rect")
+	Compare(t, e, 11, "rect")
 }
 
 // Test Axis Aligned Box
@@ -181,9 +181,10 @@ func TestBox(t *testing.T) {
 	e.Add(b, g)
 	e.Camera = Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, "012-box")
+	Compare(t, e, 12, "box")
 }
 
+// Test Diffuse material without interreflection.
 func TestDiffuse0(t *testing.T) {
 	e := NewEnv()
 
@@ -195,9 +196,10 @@ func TestDiffuse0(t *testing.T) {
 	e.AddLight(l)
 	e.Camera = Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, "013-diffuse0")
+	Compare(t, e, 13, "diffuse0")
 }
 
+// Test CSG OR of objects.
 func TestObjOr1(t *testing.T) {
 	e := NewEnv()
 
@@ -215,9 +217,10 @@ func TestObjOr1(t *testing.T) {
 	e.AddLight(l)
 	e.Camera = Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
 
-	Compare(t, e, "014-objor1")
+	Compare(t, e, 14, "objor1")
 }
 
+// Test CSG OR of objects.
 func TestObjOr2(t *testing.T) {
 	e := NewEnv()
 
@@ -233,7 +236,7 @@ func TestObjOr2(t *testing.T) {
 
 	e.Camera = Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
 
-	Compare(t, e, "015-objor2")
+	Compare(t, e, 15, "objor2")
 }
 
 func TestPointLight(t *testing.T) {
@@ -253,51 +256,28 @@ func TestPointLight(t *testing.T) {
 	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
 	e.Camera = Camera(1).Transl(0, 1, -3)
 
-	Compare(t, e, "016-pointlight")
+	Compare(t, e, 16, "pointlight")
 }
 
-// Test convergence of diffuse interreflection:
-//
-// 1) We are inside a highly reflective white box containing a point light.
-// If the pre-factor for interreflection is slightly too high,
-// deeper recursion will diverge to an infinitely bright image instead of converge.
-//
-// 2) We are inside a 100% reflective white box containing a point light.
-// This is not a physical situation and the intensity should diverge to infinity.
-// If the pre-factor for interreflection is slightly too low, divergence will not happen.
-func TestDiffuse1(t *testing.T) {
-	for _, refl := range []float64{0.8, 1} {
-		refl := refl
-		for _, r := range []int{1, 16, 128} {
-			e := whitebox(refl)
-			e.Recursion = r
-			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, e.Recursion), func(t *testing.T) {
-				t.Parallel()
-				img := MakeImage(testW/4, testH/4)
-				nPass := 2
-				MultiPass(e, img, nPass)
-				name := fmt.Sprintf("017-diffuse1-refl%v-rec%v", refl, e.Recursion)
-				CompareImg(t, e, img, name, 10)
-			})
-		}
-	}
-}
-
-func whitebox(refl float64) *Env {
+// Test CSG MINUS of objects.
+func TestObjMinus(t *testing.T) {
 	e := NewEnv()
-	white := Diffuse(WHITE.Mul(refl))
-	e.Add(
-		Sheet(Ey, -1, white),
-		Sheet(Ey, 1, white),
-		Sheet(Ex, -1, white),
-		Sheet(Ex, 1, white),
-		Sheet(Ez, -1, white),
-		Sheet(Ez, 1, white),
-	)
-	e.AddLight(PointLight(Vec{}, WHITE.Mul(EV(-3)).Mul(4*Pi)))
-	e.Camera = Camera(0.75).Transl(0, 0, -1)
-	e.Camera.AA = true
-	return e
+
+	g := Sheet(Ey, 0, Diffuse0(WHITE.Mul(EV(-1))))
+	r := 0.8
+
+	b := Box(Vec{}, r, r, r, Diffuse0(WHITE.Mul(EV(-0))))
+	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
+
+	dome := Minus(b, s)
+
+	e.Add(g, dome)
+
+	l := DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
+	e.AddLight(l)
+	e.Camera = Camera(1).Transl(0, 1, -3).Transf(RotX4(10 * Deg))
+
+	Compare(t, e, 17, "objminus")
 }
 
 // There is a box buried underneath the floor,
@@ -311,9 +291,10 @@ func TestShadowBehind(t *testing.T) {
 	)
 	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
 	e.Camera = Camera(1).Transl(0, 1, -3)
-	Compare(t, e, "019-shadowbehind")
+	Compare(t, e, 19, "shadowbehind")
 }
 
+// Test that we can see the reflection of a light.
 func TestLuminousObject(t *testing.T) {
 	e := NewEnv()
 	e.Add(
@@ -337,10 +318,10 @@ func TestLuminousObject(t *testing.T) {
 	nPass := 8
 	e.Recursion = 3
 	MultiPass(e, img, nPass)
-	name := "020-luminous-object"
-	CompareImg(t, e, img, name, 10)
+	CompareImg(t, e, img, 20, "luminous-object", 10)
 }
 
+// Test a quad surface
 func TestQuad(t *testing.T) {
 	e := NewEnv()
 	e.Add(
@@ -354,27 +335,7 @@ func TestQuad(t *testing.T) {
 
 	e.Camera = Camera(1).Transl(0, 0, -7)
 	e.Camera.AA = false
-	Compare(t, e, "021-quad-hyper")
-}
-
-func TestObjMinus(t *testing.T) {
-	e := NewEnv()
-
-	g := Sheet(Ey, 0, Diffuse0(WHITE.Mul(EV(-1))))
-	r := 0.8
-
-	b := Box(Vec{}, r, r, r, Diffuse0(WHITE.Mul(EV(-0))))
-	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
-
-	dome := Minus(b, s)
-
-	e.Add(g, dome)
-
-	l := DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
-	e.AddLight(l)
-	e.Camera = Camera(1).Transl(0, 1, -3).Transf(RotX4(10 * Deg))
-
-	Compare(t, e, "014-objminus")
+	Compare(t, e, 21, "quad-hyper")
 }
 
 func TestHollowAnd(t *testing.T) {
@@ -399,10 +360,11 @@ func TestHollowAnd(t *testing.T) {
 	nPass := 8
 	e.Recursion = 3
 	MultiPass(e, img, nPass)
-	name := "022-hollowand"
-	CompareImg(t, e, img, name, 10)
+	CompareImg(t, e, img, 22, "hollowand", 10)
 }
 
+// Test a rectangular light source.
+// Light fall-off should follow cosine.
 func TestRectLight(t *testing.T) {
 	e := NewEnv()
 
@@ -436,8 +398,7 @@ func TestRectLight(t *testing.T) {
 	nPass := 50
 	e.Recursion = 2
 	MultiPass(e, img, nPass)
-	name := "023-rectlight"
-	CompareImg(t, e, img, name, 10)
+	CompareImg(t, e, img, 23, "rectlight", 10)
 
 }
 
@@ -479,8 +440,7 @@ func TestCornellBox(t *testing.T) {
 	nPass := 20
 	img := MakeImage(testW, testH)
 	MultiPass(e, img, nPass)
-	name := "024-cornellbox"
-	CompareImg(t, e, img, name, 10)
+	CompareImg(t, e, img, 24, "cornellbox", 10)
 }
 
 func TestDOF(t *testing.T) {
@@ -501,7 +461,7 @@ func TestDOF(t *testing.T) {
 	nPass := 30
 	img := MakeImage(testW, testH)
 	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, "025-dof", 10)
+	CompareImg(t, e, img, 25, "dof", 10)
 }
 
 func TestDiafragmDisk(t *testing.T) {
@@ -520,7 +480,7 @@ func TestDiafragmDisk(t *testing.T) {
 	nPass := 100
 	img := MakeImage(testW, testH)
 	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, "026-diaphragm-disk", 20)
+	CompareImg(t, e, img, 26, "diaphragm-disk", 20)
 }
 
 func TestDiaphragmHex(t *testing.T) {
@@ -540,25 +500,25 @@ func TestDiaphragmHex(t *testing.T) {
 	nPass := 100
 	img := MakeImage(testW, testH)
 	MultiPass(e, img, nPass)
-	CompareImg(t, e, img, "027-diaphragm-hex", 20)
+	CompareImg(t, e, img, 27, "diaphragm-hex", 20)
 }
 
-func TestDistort(t *testing.T) {
-	e := NewEnv()
-
-	m := Shiny(RED, EV(-2))
-	m = Distort(1, 10, Vec{50, 50, 50}, 0.03, m)
-
-	e.Add(
-		Sheet(Ey, 0, Checkboard(1, Diffuse0(BLUE.EV(-3)), Diffuse0(WHITE))),
-		Sphere(Vec{0, 0.5, 0}, 1, m),
-	)
-
-	e.AddLight(
-		SphereLight(Vec{4, 5, -3}, 1, WHITE.EV(10)),
-	)
-
-	e.Camera = Camera(1).Transl(0, 2, -3).Transf(RotX4(25 * Deg))
-
-	Compare(t, e, "028-waves")
-}
+//func TestDistort(t *testing.T) {
+//	e := NewEnv()
+//
+//	m := Shiny(RED, EV(-2))
+//	m = Distort(1, 10, Vec{50, 50, 50}, 0.03, m)
+//
+//	e.Add(
+//		Sheet(Ey, 0, Checkboard(1, Diffuse0(BLUE.EV(-3)), Diffuse0(WHITE))),
+//		Sphere(Vec{0, 0.5, 0}, 1, m),
+//	)
+//
+//	e.AddLight(
+//		SphereLight(Vec{4, 5, -3}, 1, WHITE.EV(10)),
+//	)
+//
+//	e.Camera = Camera(1).Transl(0, 2, -3).Transf(RotX4(25 * Deg))
+//
+//	Compare(t, e, 25, "028-waves")
+//}
