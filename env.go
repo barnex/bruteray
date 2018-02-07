@@ -107,8 +107,10 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 		return Color{}
 	}
 
-	surf := e.Ambient
+	var surf Fragment
+
 	surf.T = inf
+	surf.Material = e.Ambient.Material
 
 	hit := e.fb()
 	defer e.rfb(hit)

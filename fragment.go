@@ -19,7 +19,7 @@ type Fragment struct {
 const offset = 1. / (256 * 1024)
 
 // Calculate the color seen by ray.
-func (frag *Fragment) Shade(e *Env, recursion int, r *Ray) Color {
+func (frag Fragment) Shade(e *Env, recursion int, r *Ray) Color {
 	//pos := r.At(frag.T - offset)
 	frag.Norm = frag.Norm.Towards(r.Dir()).Normalized()
 	//pos = pos.MAdd(offset, norm)

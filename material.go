@@ -1,7 +1,7 @@
 package bruteray
 
 type Material interface {
-	Shade(e *Env, N int, r *Ray, frag *Fragment) Color
+	Shade(e *Env, N int, r *Ray, frag Fragment) Color
 }
 
 // A Flat material always returns the same color.
@@ -15,7 +15,7 @@ type flat struct {
 	c Color
 }
 
-func (s *flat) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s *flat) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	return s.c
 }
 
@@ -30,7 +30,7 @@ type diffuse struct {
 	diffuse0
 }
 
-func (s *diffuse) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s *diffuse) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	// This is the core of bi-directonial path tracing.
 
 	pos, norm := r.At(frag.T-offset), frag.Norm
@@ -65,7 +65,7 @@ type diffuse0 struct {
 	refl Color
 }
 
-func (s *diffuse0) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s *diffuse0) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	var acc Color
 	for _, l := range e.lights {
@@ -101,7 +101,7 @@ type diffuse00 struct {
 	refl Color
 }
 
-func (s *diffuse00) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s *diffuse00) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	var acc Color
 	for _, l := range e.lights {
@@ -118,7 +118,7 @@ func (s *diffuse00) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 // Used for shading the ambient background, E.g., the sky.
 type ShadeDir func(dir Vec) Color
 
-func (s ShadeDir) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s ShadeDir) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	pos := r.At(frag.T - offset)
 	return s(pos)
 }
@@ -135,7 +135,7 @@ type reflective struct {
 	c Color
 }
 
-func (s *reflective) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s *reflective) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	r2 := e.NewRay(pos, r.Dir().Reflect(norm))
 	defer e.RRay(r2)
@@ -151,7 +151,7 @@ type refractive struct {
 }
 
 // https://en.wikipedia.org/wiki/Fresnel_equations
-func (s *refractive) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s *refractive) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 
 	const offset = 1e-3
 
@@ -232,7 +232,7 @@ type blend struct {
 	matB Material
 }
 
-func (s *blend) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s *blend) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	ca := s.matA.Shade(e, N, r, frag)
 	cb := s.matB.Shade(e, N, r, frag)
 
@@ -248,7 +248,7 @@ type shadeNormal struct {
 	dir Vec
 }
 
-func (s *shadeNormal) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (s *shadeNormal) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	v := frag.Norm.Dot(s.dir)
 	if v < 0 {
 		return RED.Mul(-v) // towards cam

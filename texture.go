@@ -11,7 +11,7 @@ type checkboard struct {
 	a, b Material
 }
 
-func (c *checkboard) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (c *checkboard) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	pos := r.At(frag.T)
 	x := int(pos[X]*c.invs + 10000)
 	y := int(pos[Z]*c.invs + 10000)
@@ -40,7 +40,7 @@ type distort struct {
 	f     [3]series
 }
 
-func (m distort) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (m distort) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	pos := r.At(frag.T)
 	var delta Vec
 	for i := range delta {
@@ -59,7 +59,7 @@ type waves struct {
 	col func(float64) Material
 }
 
-func (m *waves) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
+func (m *waves) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	v := m.Eval(r.At(frag.T))
 	return m.col(v).Shade(e, N, r, frag)
 }
