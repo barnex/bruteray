@@ -1,5 +1,6 @@
 package serve
-const mainHTML=`
+
+const mainHTML = `
 <html>
 
 <head>
