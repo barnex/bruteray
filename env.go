@@ -196,15 +196,15 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 // This means a light source at endpoint casts a shadow at the ray start point.
 func (e *Env) Occludes(r *Ray, endpoint float64) bool {
 
-	hit := make([]Fragment, 0, 2)
+	hit := e.fb()
+	defer e.rfb(hit)
 
 	for _, o := range e.objs {
 
-		hit = hit[:0]
-		o.Hit(r, &hit)
+		o.Hit(r, hit)
 
-		for i := range hit {
-			t := hit[i].T
+		for i := range *hit {
+			t := (*hit)[i].T
 			if t > 0 && t < endpoint {
 				return true
 			}
