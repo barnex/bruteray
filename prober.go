@@ -12,9 +12,9 @@ type Prober interface {
 // Probe implementation for objects that only have Hit.
 // TODO: remove.
 func Probe(r *Ray, o Obj) float64 {
-	if p, ok := o.(Prober); ok {
-		return p.Probe(r)
-	}
+	//if p, ok := o.(Prober); ok {
+	//	return p.Probe(r)
+	//}
 
 	T := inf
 	hit := make([]Fragment, 0, 2)

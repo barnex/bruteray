@@ -22,7 +22,7 @@ func main() {
 			return a
 		}
 	}
-	green := Waves(9, Vec{20, 20, 20}, f)
+	green := Waves(9, 9, Vec{20, 20, 20}, f)
 
 	e.Add(
 		Sheet(Ey, 0, green),
@@ -79,7 +79,7 @@ func cross(x, z float64) Obj {
 			return a
 		}
 	}
-	m1 := Waves(10, Vec{50, 50, 50}, f)
+	m1 := Waves(10, 10, Vec{50, 50, 50}, f)
 
 	const d = 0.2
 	return Or(

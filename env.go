@@ -132,9 +132,8 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 	for _, l := range e.lights {
 		lpos, intens := l.Sample(e, pos)
 		secundary := NewRay(pos, lpos.Sub(pos).Normalized())
-		ti := e.IntersectAny(secundary)
 		lightT := lpos.Sub(pos).Len()
-		if (ti > 0) && ti < lightT { // intersection between start and light position
+		if e.Occludes(secundary, lightT) { // intersection between start and light position
 			// shadow
 		} else {
 			c = c.MAdd(1/e.Fog, intens)
@@ -152,37 +151,44 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 
 // Returns t > 0 if r intersects any object.
 // Used to determine shadows.
-func (e *Env) IntersectAny(r *Ray) float64 {
-
-	T := inf
-	hit := make([]Fragment, 0, 2)
-
-	for _, o := range e.objs {
-		hit = hit[:0]
-		o.Hit(r, &hit)
-
-		for i := range hit {
-			t := hit[i].T
-			if t < T && t > 0 {
-				T = t
-			}
-		}
-	}
-
-	if T == inf {
-		T = 0
-	}
-	return T
-}
+//func (e *Env) IntersectAny(r *Ray) float64 {
+//
+//	T := inf
+//	hit := make([]Fragment, 0, 2)
+//
+//	for _, o := range e.objs {
+//		hit = hit[:0]
+//		o.Hit(r, &hit)
+//
+//		for i := range hit {
+//			t := hit[i].T
+//			if t < T && t > 0 {
+//				T = t
+//			}
+//		}
+//	}
+//
+//	if T == inf {
+//		T = 0
+//	}
+//	return T
+//}
 
 // Occludes returns true when an object intersects r
 // between t=0 and t=endpoint.
 // This means a light source at endpoint casts a shadow at the ray start point.
 func (e *Env) Occludes(r *Ray, endpoint float64) bool {
+	hit := make([]Fragment, 0, 2)
 	for _, o := range e.objs {
-		t := Probe(r, o)
-		if t > 0 && t < endpoint {
-			return true
+
+		hit = hit[:0]
+		o.Hit(r, &hit)
+
+		for i := range hit {
+			t := hit[i].T
+			if t > 0 && t < endpoint {
+				return true
+			}
 		}
 	}
 	return false

@@ -111,21 +111,6 @@ func (s *diffuse00) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	return acc
 }
 
-func (s *diffuse00) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
-	lpos, intens := l.Sample(e, pos)
-
-	secundary := NewRay(pos, lpos.Sub(pos).Normalized())
-
-	t := e.IntersectAny(secundary)
-
-	lightT := lpos.Sub(pos).Len()
-	if (t > 0) && t < lightT { // intersection between start and light position
-		return Color{} // shadow
-	} else {
-		return s.refl.Mul(re(norm.Dot(secundary.Dir()))).Mul3(intens)
-	}
-}
-
 // ShadeDir returns a color based on the direction of a ray.
 // Used for shading the ambient background, E.g., the sky.
 type ShadeDir func(dir Vec) Color
