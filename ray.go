@@ -3,13 +3,17 @@ package bruteray
 import "math"
 
 func (e *Env) NewRay(start, dir Vec) *Ray {
-	r := &Ray{Start: start}
+	//r := &Ray{Start: start}
+	//r.SetDir(dir)
+	//return r
+	r := e.rayPool.Get().(*Ray)
+	r.Start = start
 	r.SetDir(dir)
 	return r
 }
 
 func (e *Env) RRay(r *Ray) {
-
+	e.rayPool.Put(r)
 }
 
 func (r *Ray) Dir() Vec {

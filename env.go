@@ -20,7 +20,8 @@ type Env struct {
 	Fog         float64   // Fog distance
 	IndirectFog bool      // Include fog interreflection
 
-	fbBuf Pool
+	fragPool Pool
+	rayPool  Pool
 }
 
 // NewEnv creates an empty environment
@@ -32,7 +33,8 @@ func NewEnv() *Env {
 		Camera:    Camera(0),
 		Recursion: DefaultRec,
 		Cutoff:    math.Inf(1),
-		fbBuf:     Pool{New: func() interface{} { v := make([]Fragment, 0, 8); return &v }},
+		fragPool:  Pool{New: func() interface{} { v := make([]Fragment, 0, 8); return &v }},
+		rayPool:   Pool{New: func() interface{} { return new(Ray) }},
 	}
 }
 
@@ -89,13 +91,13 @@ func (e *Env) ShadeNonLum(r *Ray, N int) Color {
 }
 
 func (e *Env) fb() *[]Fragment {
-	fb := e.fbBuf.Get().(*[]Fragment)
+	fb := e.fragPool.Get().(*[]Fragment)
 	*fb = (*fb)[:0]
 	return fb
 }
 
 func (e *Env) rfb(fb *[]Fragment) {
-	e.fbBuf.Put(fb)
+	e.fragPool.Put(fb)
 }
 
 // Calculate intensity seen by ray, with maximum recursion depth N.
