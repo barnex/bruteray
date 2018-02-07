@@ -174,3 +174,16 @@ func (e *Env) IntersectAny(r *Ray) float64 {
 	}
 	return T
 }
+
+// Occludes returns true when an object intersects r
+// between t=0 and t=endpoint.
+// This means a light source at endpoint casts a shadow at the ray start point.
+func (e *Env) Occludes(r *Ray, endpoint float64) bool {
+	for _, o := range e.objs {
+		t := Probe(r, o)
+		if t > 0 && t < endpoint {
+			return true
+		}
+	}
+	return false
+}

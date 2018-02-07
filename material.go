@@ -78,10 +78,11 @@ func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 
 	secundary := NewRay(pos, lpos.Sub(pos).Normalized())
 
-	t := e.IntersectAny(secundary)
+	//t := e.IntersectAny(secundary)
 
 	lightT := lpos.Sub(pos).Len()
-	if (t > 0) && t < lightT { // intersection between start and light position
+
+	if e.Occludes(secundary, lightT) {
 		return Color{} // shadow
 	} else {
 		return s.refl.Mul(re(norm.Dot(secundary.Dir()))).Mul3(intens)
