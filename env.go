@@ -19,6 +19,8 @@ type Env struct {
 	Cutoff      float64   // Maximum allowed brightness. Used to suppres spurious caustics.
 	Fog         float64   // Fog distance
 	IndirectFog bool      // Include fog interreflection
+
+	//fbBuf []*[]Fragment
 }
 
 // NewEnv creates an empty environment
@@ -178,7 +180,9 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 // between t=0 and t=endpoint.
 // This means a light source at endpoint casts a shadow at the ray start point.
 func (e *Env) Occludes(r *Ray, endpoint float64) bool {
+
 	hit := make([]Fragment, 0, 2)
+
 	for _, o := range e.objs {
 
 		hit = hit[:0]

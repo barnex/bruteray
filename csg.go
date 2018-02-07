@@ -2,7 +2,27 @@ package bruteray
 
 import (
 	"sort"
+	"sync"
 )
+
+var (
+	fbBuf = sync.Pool{
+		New: func() interface{} {
+			fb := (make([]Fragment, 0, 4))
+			return &fb
+		},
+	}
+)
+
+func fb() *[]Fragment {
+	fb := fbBuf.Get().(*[]Fragment)
+	*fb = (*fb)[:0]
+	return fb
+}
+
+func rfb(fb *[]Fragment) {
+	fbBuf.Put(fb)
+}
 
 // Intersection (boolean AND) of two objects.
 func And(a, b Obj) Obj {
@@ -20,8 +40,9 @@ func (o *and) Hit(r *Ray, f *[]Fragment) {
 		return
 	}
 
-	var fb []Fragment
-	o.b.Hit(r, &fb)
+	fb := fb()
+	defer rfb(fb)
+	o.b.Hit(r, fb)
 
 	var f3 []Fragment
 
@@ -30,7 +51,7 @@ func (o *and) Hit(r *Ray, f *[]Fragment) {
 			f3 = append(f3, s)
 		}
 	}
-	for _, s := range fb {
+	for _, s := range *fb {
 		if o.a.Inside(r.At(s.T)) {
 			f3 = append(f3, s)
 		}
@@ -56,8 +77,9 @@ func (o *or) Hit(r *Ray, f *[]Fragment) {
 
 	o.a.Hit(r, f)
 
-	var fb []Fragment
-	o.b.Hit(r, &fb)
+	fb := fb()
+	defer rfb(fb)
+	o.b.Hit(r, fb)
 
 	var f3 []Fragment
 
@@ -66,7 +88,7 @@ func (o *or) Hit(r *Ray, f *[]Fragment) {
 			f3 = append(f3, s)
 		}
 	}
-	for _, s := range fb {
+	for _, s := range *fb {
 		if !o.a.Inside(r.At(s.T)) {
 			f3 = append(f3, s)
 		}
