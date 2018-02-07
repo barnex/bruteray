@@ -144,7 +144,8 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 	pos := r.At(tScatter)
 	for _, l := range e.lights {
 		lpos, intens := l.Sample(e, pos)
-		secundary := NewRay(pos, lpos.Sub(pos).Normalized())
+		secundary := e.NewRay(pos, lpos.Sub(pos).Normalized())
+		defer e.RRay(secundary) //TODO: out of loop
 		lightT := lpos.Sub(pos).Len()
 		if e.Occludes(secundary, lightT) { // intersection between start and light position
 			// shadow
@@ -154,7 +155,8 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 	}
 
 	if e.IndirectFog {
-		r2 := NewRay(pos, randVec(&e.rng))
+		r2 := e.NewRay(pos, randVec(&e.rng))
+		defer e.RRay(r2)
 		fogc := e.shade(r2, 1, e.objs)
 		c = c.Add(fogc)
 	}

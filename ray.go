@@ -2,10 +2,14 @@ package bruteray
 
 import "math"
 
-func NewRay(start, dir Vec) *Ray {
+func (e *Env) NewRay(start, dir Vec) *Ray {
 	r := &Ray{Start: start}
 	r.SetDir(dir)
 	return r
+}
+
+func (e *Env) RRay(r *Ray) {
+
 }
 
 func (r *Ray) Dir() Vec {

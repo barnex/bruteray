@@ -48,7 +48,8 @@ func (s *diffuse) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	// (no fall-off, the chance of hitting an object
 	// automatically falls off correctly with distance).
 	// Choose the random ray via importance sampling.
-	sec := NewRay(pos.MAdd(offset, norm), randVecCos(e, norm))
+	sec := e.NewRay(pos.MAdd(offset, norm), randVecCos(e, norm))
+	defer e.RRay(sec)
 	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N))) // does not include explicit lights
 
 	return acc
@@ -76,7 +77,8 @@ func (s *diffuse0) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
 	lpos, intens := l.Sample(e, pos)
 
-	secundary := NewRay(pos, lpos.Sub(pos).Normalized())
+	secundary := e.NewRay(pos, lpos.Sub(pos).Normalized())
+	defer e.RRay(secundary)
 
 	//t := e.IntersectAny(secundary)
 
@@ -104,7 +106,8 @@ func (s *diffuse00) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	var acc Color
 	for _, l := range e.lights {
 		lpos, intens := l.Sample(e, pos)
-		secundary := NewRay(pos, lpos.Sub(pos).Normalized())
+		secundary := e.NewRay(pos, lpos.Sub(pos).Normalized())
+		defer e.RRay(secundary)
 		i := s.refl.Mul(re(norm.Dot(secundary.Dir()))).Mul3(intens)
 		acc = acc.Add(i)
 	}
@@ -134,7 +137,8 @@ type reflective struct {
 
 func (s *reflective) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
-	r2 := NewRay(pos, r.Dir().Reflect(norm))
+	r2 := e.NewRay(pos, r.Dir().Reflect(norm))
+	defer e.RRay(r2)
 	return e.ShadeAll(r2, N).Mul3(s.c)
 }
 
@@ -169,7 +173,8 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 
 	// Total internal reflection?
 	if sin2θt > 1 {
-		r2 := NewRay(posBehind, r.Dir().Reflect(frag.Norm))
+		r2 := e.NewRay(posBehind, r.Dir().Reflect(frag.Norm))
+		defer e.RRay(r2)
 		return e.ShadeAll(r2, N)
 	}
 
@@ -183,11 +188,13 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag *Fragment) Color {
 
 	// transmitted ray
 	t := i.Mul(n12).MAdd((n12*cosθi - sqrt(1-(sin2θt))), frag.Norm)
-	r2 := NewRay(posAhead, t)
+	r2 := e.NewRay(posAhead, t)
+	defer e.RRay(r2)
 	cT := e.ShadeAll(r2, N).Mul(T)
 
 	// reflected ray
-	r3 := NewRay(posBehind, i.Reflect(n))
+	r3 := e.NewRay(posBehind, i.Reflect(n))
+	defer e.RRay(r3)
 	cR := e.ShadeAll(r3, N).Mul(R)
 
 	return cR.Add(cT)
