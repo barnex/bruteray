@@ -3,6 +3,7 @@ package bruteray
 import (
 	"math"
 	"math/rand"
+	"sync"
 )
 
 // Env stores the entire environment
@@ -87,6 +88,25 @@ func (e *Env) ShadeNonLum(r *Ray, N int) Color {
 	return e.shade(r, N, e.objs)
 }
 
+var (
+	fbBuf = sync.Pool{
+		New: func() interface{} {
+			fb := (make([]Fragment, 0, 8))
+			return &fb
+		},
+	}
+)
+
+func fb() *[]Fragment {
+	fb := fbBuf.Get().(*[]Fragment)
+	*fb = (*fb)[:0]
+	return fb
+}
+
+func rfb(fb *[]Fragment) {
+	fbBuf.Put(fb)
+}
+
 // Calculate intensity seen by ray, with maximum recursion depth N.
 // who = objs, lights, or all.
 func (e *Env) shade(r *Ray, N int, who []Obj) Color {
@@ -97,7 +117,7 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	surf := e.Ambient
 	surf.T = inf
 
-	hit := make([]Fragment, 0, 2)
+	hit := make([]Fragment, 0, 8)
 
 	for _, o := range who {
 		hit = hit[:0]

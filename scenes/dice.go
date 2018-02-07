@@ -23,7 +23,7 @@ func main() {
 			return a
 		}
 	}
-	m1 := Waves(10, Vec{1, 9, 60}, f)
+	m1 := Waves(10, 10, Vec{1, 9, 60}, f)
 
 	e.Add(
 		Sheet(Ey, -1, m1),

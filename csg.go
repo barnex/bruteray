@@ -2,27 +2,7 @@ package bruteray
 
 import (
 	"sort"
-	"sync"
 )
-
-var (
-	fbBuf = sync.Pool{
-		New: func() interface{} {
-			fb := (make([]Fragment, 0, 8))
-			return &fb
-		},
-	}
-)
-
-func fb() *[]Fragment {
-	fb := fbBuf.Get().(*[]Fragment)
-	*fb = (*fb)[:0]
-	return fb
-}
-
-func rfb(fb *[]Fragment) {
-	fbBuf.Put(fb)
-}
 
 // Intersection (boolean AND) of two objects.
 func And(a, b Obj) Obj {
@@ -40,24 +20,30 @@ func (o *and) Hit(r *Ray, f *[]Fragment) {
 		return
 	}
 
-	fb := fb()
-	defer rfb(fb)
-	o.b.Hit(r, fb)
+	fa := *f
 
-	var f3 []Fragment
+	o.b.Hit(r, f)
+	fb := (*f)[len(fa):]
 
-	for _, s := range *f {
+	fab := *f
+
+	for _, s := range fa {
 		if o.b.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
-	for _, s := range *fb {
+	for _, s := range fb {
 		if o.a.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
-	Sort(f3)
-	*f = f3
+
+	f3 := (*f)[len(fab):]
+	if len(*f) < len(f3) {
+		*f = append(*f, f3...)
+	}
+	*f = (*f)[:len(f3)]
+	copy(*f, f3)
 }
 
 func (o *and) Inside(p Vec) bool {
@@ -95,6 +81,7 @@ func (o *or) Hit(r *Ray, f *[]Fragment) {
 			*f = append(*f, s)
 		}
 	}
+
 	f3 := (*f)[len(fab):]
 	if len(*f) < len(f3) {
 		*f = append(*f, f3...)
@@ -122,24 +109,29 @@ func (o *minus) Hit(r *Ray, f *[]Fragment) {
 	if len(*f) == 0 {
 		return
 	}
+	fa := *f
 
-	var fb []Fragment
-	o.b.Hit(r, &fb)
+	o.b.Hit(r, f)
+	fb := (*f)[len(fa):]
 
-	var f3 []Fragment
-
-	for _, s := range *f {
+	fab := *f
+	for _, s := range fa {
 		if !o.b.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
 	for _, s := range fb {
 		if o.a.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
-	Sort(f3)
-	*f = f3
+
+	f3 := (*f)[len(fab):]
+	if len(*f) < len(f3) {
+		*f = append(*f, f3...)
+	}
+	*f = (*f)[:len(f3)]
+	copy(*f, f3)
 }
 
 func (o *minus) Inside(p Vec) bool {
