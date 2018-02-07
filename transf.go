@@ -16,12 +16,15 @@ type transformed struct {
 }
 
 func (o *transformed) Hit(r *Ray, f *[]Fragment) {
-	r2 := *r
-	r2.Transf(&o.tinv)
-	o.orig.Hit(&r2, f)
+	backup := *r
+
+	r.Transf(&o.tinv)
+	o.orig.Hit(r, f)
 	for i := range *f {
 		(*f)[i].Norm = (&o.t).TransfDir((*f)[i].Norm)
 	}
+
+	*r = backup
 }
 
 func (o *transformed) Inside(p Vec) bool {
