@@ -3,7 +3,6 @@ package bruteray
 import (
 	"math"
 	"math/rand"
-	"sync"
 )
 
 // Env stores the entire environment
@@ -21,7 +20,7 @@ type Env struct {
 	Fog         float64   // Fog distance
 	IndirectFog bool      // Include fog interreflection
 
-	//fbBuf []*[]Fragment
+	fbBuf []*[]Fragment
 }
 
 // NewEnv creates an empty environment
@@ -88,23 +87,20 @@ func (e *Env) ShadeNonLum(r *Ray, N int) Color {
 	return e.shade(r, N, e.objs)
 }
 
-var (
-	fbBuf = sync.Pool{
-		New: func() interface{} {
-			fb := (make([]Fragment, 0, 8))
-			return &fb
-		},
+func (e *Env) fb() *[]Fragment {
+	p := e.fbBuf
+	if len(p) == 0 {
+		fb := make([]Fragment, 0, 8)
+		return &fb
 	}
-)
-
-func fb() *[]Fragment {
-	fb := fbBuf.Get().(*[]Fragment)
+	fb := p[len(p)-1]
+	e.fbBuf = p[:len(p)-1]
 	*fb = (*fb)[:0]
 	return fb
 }
 
-func rfb(fb *[]Fragment) {
-	fbBuf.Put(fb)
+func (e *Env) rfb(fb *[]Fragment) {
+	e.fbBuf = append(e.fbBuf, fb)
 }
 
 // Calculate intensity seen by ray, with maximum recursion depth N.
@@ -117,16 +113,16 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 	surf := e.Ambient
 	surf.T = inf
 
-	hit := make([]Fragment, 0, 8)
+	hit := e.fb()
+	defer e.rfb(hit)
 
 	for _, o := range who {
-		hit = hit[:0]
-		o.Hit(r, &hit)
+		o.Hit(r, hit)
 
-		for i := range hit {
-			t := hit[i].T
+		for i := range *hit {
+			t := (*hit)[i].T
 			if t < surf.T && t > 0 {
-				surf = hit[i]
+				surf = (*hit)[i]
 				surf.Object = o
 			}
 		}
