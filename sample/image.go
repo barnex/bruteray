@@ -1,4 +1,4 @@
-package bruteray
+package sample
 
 import (
 	"fmt"
@@ -8,15 +8,17 @@ import (
 	"image/png"
 	"os"
 	"path"
+
+	"github.com/barnex/bruteray"
 )
 
 // Image with float64 precission.
-type Image [][]Color
+type Image [][]bruteray.Color
 
 func MakeImage(W, H int) Image {
 	img := make(Image, H)
 	for i := range img {
-		img[i] = make([]Color, W)
+		img[i] = make([]bruteray.Color, W)
 	}
 	return img
 }

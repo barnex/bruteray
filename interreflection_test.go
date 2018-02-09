@@ -1,8 +1,11 @@
-package bruteray
+package bruteray_test
 
 import (
 	"fmt"
 	"testing"
+
+	. "github.com/barnex/bruteray"
+	"github.com/barnex/bruteray/sample"
 )
 
 // Test convergence of diffuse interreflection:
@@ -22,9 +25,9 @@ func TestDiffuse1(t *testing.T) {
 			e.Recursion = r
 			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, e.Recursion), func(t *testing.T) {
 				t.Parallel()
-				img := MakeImage(testW/4, testH/4)
+				img := sample.MakeImage(testW/4, testH/4)
 				nPass := 2
-				MultiPass(e, img, nPass)
+				sample.MultiPass(e, img, nPass)
 				name := fmt.Sprintf("diffuse1-refl%v-rec%v", refl, e.Recursion)
 				CompareImg(t, e, img, 0, name, 10)
 			})

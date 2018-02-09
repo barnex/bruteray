@@ -1,7 +1,11 @@
-package bruteray
+package bruteray_test
 
 import (
+	"math"
 	"testing"
+
+	. "github.com/barnex/bruteray"
+	"github.com/barnex/bruteray/sample"
 )
 
 const (
@@ -161,7 +165,7 @@ func TestRect(t *testing.T) {
 	const d = 0.5
 	const z = 10
 	nz := ShadeNormal(Ez)
-	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, inf, nz)
+	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, math.Inf(1), nz)
 	r2 := Transf(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
 	r3 := And(
 		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
@@ -316,10 +320,10 @@ func TestLuminousObject(t *testing.T) {
 	e.Camera = Camera(1).Transl(0, 2.5, -7).Transf(RotX4(22 * Deg))
 	e.Camera.AA = true
 
-	img := MakeImage(testW, testH)
+	img := sample.MakeImage(testW, testH)
 	nPass := 8
 	e.Recursion = 3
-	MultiPass(e, img, nPass)
+	sample.MultiPass(e, img, nPass)
 	CompareImg(t, e, img, 20, "luminous-object", 10)
 }
 

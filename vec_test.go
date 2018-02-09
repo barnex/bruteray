@@ -1,6 +1,7 @@
-package bruteray
+package bruteray_test
 
 import "testing"
+import . "github.com/barnex/bruteray"
 
 func TestVec(tst *testing.T) {
 	t := Helper(tst)

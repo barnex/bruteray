@@ -1,17 +1,22 @@
-package bruteray
+// Package sample provides functionality to render a bruteray.Env into an image.
+package sample
 
 import (
 	"log"
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/barnex/bruteray"
 )
 
-func Render(e *Env, img Image) {
+// SinglePass renders a scene by evaluating each pixel once.
+// Suited if no Monte-Carlo methods (e.g. Diffuse Material) are involved.
+func SinglePass(e *bruteray.Env, img Image) {
 	render(e, img, runtime.NumCPU())
 }
 
-func render(e *Env, img Image, numCPU int) {
+func render(e *bruteray.Env, img Image, numCPU int) {
 	H := img.Bounds().Dy()
 
 	// numCPU goroutines will each render
@@ -36,11 +41,13 @@ func render(e *Env, img Image, numCPU int) {
 	wg.Wait()
 }
 
-func MultiPass(e *Env, img Image, passes int) {
+// MutliPass renders a scene by evaluating each pixel a fixed number of times and averaging the results.
+// Suited for Monte-Carlo methods.
+func MultiPass(e *bruteray.Env, img Image, passes int) {
 	multiPass(e, img, passes, runtime.NumCPU())
 }
 
-func multiPass(e *Env, img Image, passes int, numCPU int) {
+func multiPass(e *bruteray.Env, img Image, passes int, numCPU int) {
 	w, h := img.Bounds().Dx(), img.Bounds().Dy()
 	for i := 0; i < passes; i++ {
 		acc := MakeImage(w, h)
@@ -50,7 +57,10 @@ func multiPass(e *Env, img Image, passes int, numCPU int) {
 	img.Mul(1 / float64(passes))
 }
 
-func RenderLoop(e *Env, w, h int, peek chan chan Image) {
+// RenderLoop starts an infinite loop, continuously improving the image quality.
+// Intermediate images can be queried from the peek channel.
+// Used for live previews.
+func RenderLoop(e *bruteray.Env, w, h int, peek chan chan Image) {
 	img := MakeImage(w, h)
 	passes := 0
 
@@ -83,10 +93,10 @@ func RenderLoop(e *Env, w, h int, peek chan chan Image) {
 	}
 }
 
-func renderLine(e *Env, img Image, i int) {
+func renderLine(e *bruteray.Env, img Image, i int) {
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
 
-	r := e.NewRay(Vec{}, Vec{})
+	r := e.NewRay(bruteray.Vec{}, bruteray.Vec{})
 	defer e.RRay(r)
 	for j := 0; j < W; j++ {
 

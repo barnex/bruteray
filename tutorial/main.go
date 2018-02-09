@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/barnex/bruteray"
+	"github.com/barnex/bruteray/sample"
 )
 
 func main() {
@@ -155,15 +156,15 @@ var cnt = 0
 func render1(e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
-	img := MakeImage(600, 400)
-	Render(e, img)
-	Encode(img, name)
+	img := sample.MakeImage(600, 400)
+	sample.SinglePass(e, img)
+	sample.Encode(img, name)
 }
 
 func render2(e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
-	img := MakeImage(600, 400)
-	MultiPass(e, img, 300)
-	Encode(img, name)
+	img := sample.MakeImage(600, 400)
+	sample.MultiPass(e, img, 300)
+	sample.Encode(img, name)
 }

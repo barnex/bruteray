@@ -1,4 +1,4 @@
-package bruteray
+package bruteray_test
 
 import (
 	"fmt"
@@ -10,13 +10,16 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	. "github.com/barnex/bruteray"
+	"github.com/barnex/bruteray/sample"
 )
 
 func CompareNPass(t *testing.T, e *Env, number int, name string, nPass int, tolerance float64) {
-	img := MakeImage(testW, testH)
+	img := sample.MakeImage(testW, testH)
 
 	start := time.Now()
-	MultiPass(e, img, nPass)
+	sample.MultiPass(e, img, nPass)
 	duration := time.Since(start)
 
 	CompareImg(t, e, img, number, name, tolerance)
@@ -29,7 +32,7 @@ func Compare(t *testing.T, e *Env, number int, name string, tolerance float64) {
 	CompareNPass(t, e, number, name, 1, tolerance)
 }
 
-func CompareImg(t *testing.T, e *Env, img Image, number int, testName string, tol float64) {
+func CompareImg(t *testing.T, e *Env, img sample.Image, number int, testName string, tol float64) {
 	t.Helper()
 
 	os.Mkdir("out", 0777)
@@ -39,7 +42,7 @@ func CompareImg(t *testing.T, e *Env, img Image, number int, testName string, to
 	have := "out/" + name
 	want := "testdata/" + name
 
-	Encode(img, have)
+	sample.Encode(img, have)
 	deviation, err := imgComp(have, want)
 
 	if err != nil {

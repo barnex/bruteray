@@ -1,6 +1,11 @@
-package bruteray
+package bruteray_test
 
-import "testing"
+import (
+	"testing"
+
+	. "github.com/barnex/bruteray"
+	"github.com/barnex/bruteray/sample"
+)
 
 func BenchmarkSphere(b *testing.B) {
 	e := NewEnv()
@@ -33,9 +38,9 @@ func Benchmark9Spheres(b *testing.B) {
 
 func benchmark(b *testing.B, e *Env, c *Cam) {
 	b.SetBytes((testW + 1) * (testH + 1))
-	img := MakeImage(testW, testH)
+	img := sample.MakeImage(testW, testH)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		Render(e, img)
+		sample.SinglePass(e, img)
 	}
 }

@@ -15,6 +15,7 @@ import (
 	"sync"
 
 	"github.com/barnex/bruteray"
+	"github.com/barnex/bruteray/sample"
 	"golang.org/x/image/tiff"
 )
 
@@ -27,7 +28,7 @@ var (
 
 var (
 	env  *bruteray.Env
-	peek = make(chan chan bruteray.Image)
+	peek = make(chan chan sample.Image)
 )
 
 // Starts a web UI server
@@ -42,7 +43,7 @@ func Env(e *bruteray.Env) {
 	http.HandleFunc("/tiff", handleTiff)
 	http.HandleFunc("/", mainHandler)
 
-	go bruteray.RenderLoop(e, *flagWidth, *flagHeight, peek)
+	go sample.RenderLoop(e, *flagWidth, *flagHeight, peek)
 
 	log.Fatal(http.ListenAndServe(*port, nil))
 }
@@ -51,8 +52,8 @@ func handleRender(w http.ResponseWriter, r *http.Request) {
 	encode(w, peekImg())
 }
 
-func peekImg() bruteray.Image {
-	resp := make(chan bruteray.Image)
+func peekImg() sample.Image {
+	resp := make(chan sample.Image)
 	peek <- resp
 	return <-resp
 }
@@ -72,7 +73,7 @@ var preview struct {
 	sync.Mutex
 }
 
-func encode(w io.Writer, img bruteray.Image) {
+func encode(w io.Writer, img sample.Image) {
 	printErr(jpeg.Encode(w, img, &jpeg.Options{Quality: *qual}))
 }
 

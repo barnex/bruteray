@@ -29,7 +29,7 @@ func main() {
 	)
 
 	e.AddLight(
-		RectLight(Vec{0, h - 1e-4, 0}, 120/2, 0, 120/2, Color{1.0, 1.0, 0.6}.EV(20)),
+		RectLight(Vec{0, h - 1e-4, 0}, 120/2, 0, 120/2, Color{1.0, 1.0, 0.6}.EV(18)),
 	)
 
 	e.SetAmbient(Flat(WHITE.EV(-10)))
@@ -38,7 +38,7 @@ func main() {
 	e.Camera = Camera(focalLen).Transl(0, h/2, -1050)
 	e.Camera.AA = true
 	e.Recursion = 10
-	e.Cutoff = EV(6)
+	e.Cutoff = EV(4)
 
 	serve.Env(e)
 }
