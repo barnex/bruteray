@@ -10,6 +10,10 @@ func Cyl(center Vec, r float64, m Material) Obj {
 	return &quad{center, Vec{1, 0, 1}, r * r, m}
 }
 
+func CylZ(r, h float64, m Material) Obj {
+	return And(&quad{Vec{}, Vec{1, 1, 0}, r * r, m}, Slab(Ez, -h/2, h/2, m))
+}
+
 func CapCyl(center Vec, r, h float64, m Material) Obj {
 	return And(
 		Cyl(center, r, m),
