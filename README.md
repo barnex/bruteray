@@ -13,6 +13,8 @@ Features:
 
 A few scenes rendered by bruteray:
 
+![fig](shots/058.jpg)
+
 ![fig](shots/052.jpg)
 
 ![fig](shots/055.jpg)
@@ -28,8 +30,6 @@ A few scenes rendered by bruteray:
 ![fig](shots/045.jpg)
 
 ![fig](shots/047.jpg)
-
-![fig](shots/058.jpg)
 
 
 ## Cornell box
