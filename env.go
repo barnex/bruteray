@@ -148,7 +148,8 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 	}
 	// else: ray scattered on fog
 
-	c := Color{}
+	//c := Color{}
+	c := surf.Shade(e, N, r)
 	pos := r.At(tScatter)
 	for _, l := range e.lights {
 		lpos, intens := l.Sample(e, pos)

@@ -1,4 +1,4 @@
 if (git ls-files --others --exclude-standard | grep \.go) then echo "untracked files"; exit 1; fi
-if (gofmt -l . ./*.go | grep \.go) then echo "formatted files"; exit 1; fi
+if (gofmt -w -l . ./*.go | grep \.go) then echo "formatted files"; exit 1; fi
 go test
 

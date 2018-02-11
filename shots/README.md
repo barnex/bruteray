@@ -56,3 +56,4 @@ This directory contains randomly taken screenshots.
 ![fig](054.jpg)
 ![fig](055.jpg)
 ![fig](056.jpg)
+![fig](057.jpg)

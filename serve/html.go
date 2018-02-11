@@ -11,7 +11,7 @@ const mainHTML = `
 function refresh(){
 	document.getElementById("render").src = "/render?cachebreak=" + Math.random();
 }
-window.setInterval(refresh, 1000)
+window.setInterval(refresh, 2000)
 
 	</script>
 </head>

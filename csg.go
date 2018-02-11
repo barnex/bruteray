@@ -1,7 +1,6 @@
 package bruteray
 
 import (
-	"sort"
 	"sync"
 )
 
@@ -56,7 +55,7 @@ func (o *and) Hit(r *Ray, f *[]Fragment) {
 			f3 = append(f3, s)
 		}
 	}
-	Sort(f3)
+	//Sort(f3)
 	*f = f3
 }
 
@@ -93,11 +92,35 @@ func (o *or) Hit(r *Ray, f *[]Fragment) {
 			f3 = append(f3, s)
 		}
 	}
-	Sort(f3)
+	//Sort(f3)
 	*f = f3
 }
 
 func (o *or) Inside(p Vec) bool {
+	return o.a.Inside(p) || o.b.Inside(p)
+}
+
+// Union (logical OR) of two objects, without optimizing result.
+// Best suited for a small number of simple objects.
+func Or0(a, b Obj) Obj {
+	return &or0{a, b}
+}
+
+type or0 struct {
+	a, b Obj
+}
+
+func (o *or0) Hit(r *Ray, f *[]Fragment) {
+	o.a.Hit(r, f)
+	fa := *f
+
+	fb := (*f)[len(fa):]
+	o.b.Hit(r, &fb)
+
+	*f = append(fa, fb...)
+}
+
+func (o *or0) Inside(p Vec) bool {
 	return o.a.Inside(p) || o.b.Inside(p)
 }
 
@@ -132,7 +155,7 @@ func (o *minus) Hit(r *Ray, f *[]Fragment) {
 			f3 = append(f3, s)
 		}
 	}
-	Sort(f3)
+	//Sort(f3)
 	*f = f3
 }
 
@@ -193,12 +216,12 @@ func (o inverse) Inside(p Vec) bool {
 	return !o.Obj.Inside(p)
 }
 
-func Sort(f []Fragment) {
-	sort.Sort(byT(f))
-}
-
-type byT []Fragment
-
-func (s byT) Len() int           { return len(s) }
-func (s byT) Less(i, j int) bool { return s[i].T < s[j].T }
-func (s byT) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+//func Sort(f []Fragment) {
+//	sort.Sort(byT(f))
+//}
+//
+//type byT []Fragment
+//
+//func (s byT) Len() int           { return len(s) }
+//func (s byT) Less(i, j int) bool { return s[i].T < s[j].T }
+//func (s byT) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
