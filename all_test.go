@@ -498,6 +498,25 @@ func TestDiaphragmHex(t *testing.T) {
 	CompareNPass(t, e, 27, "diaphragm-hex", nPass, 8, testW/4, testH/4)
 }
 
+func TestCyl(t *testing.T) {
+	e := NewEnv()
+
+	e.Add(
+		Sheet(Ey, 0.0, Checkboard(1, Diffuse0(WHITE), Diffuse0(GREY))),
+		Cyl(Y, Vec{1, 0.5, 0}, 2, 0.5, Diffuse0(RED)),
+		Cyl(X, Vec{-0.8, 0.5, 0}, 1, 0.5, Diffuse0(GREEN)),
+		Cyl(Z, Vec{-2, 1, 2}, 2, 1, Diffuse0(BLUE)),
+	)
+	e.AddLight(
+		PointLight(Vec{-3, 5, -2}, WHITE.Mul(EV(8))),
+		PointLight(Vec{3, 8, -6}, WHITE.Mul(EV(8))),
+	)
+
+	e.Camera = Camera(1).Transl(0, 3, -3).Transf(RotX4(30 * Deg))
+	e.Camera.AA = false
+	Compare(t, e, 28, "cyl", defaultTol)
+}
+
 //func TestDistort(t *testing.T) {
 //	e := NewEnv()
 //

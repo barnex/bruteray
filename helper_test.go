@@ -16,6 +16,7 @@ import (
 )
 
 func CompareNPass(t *testing.T, e *Env, number int, name string, nPass int, tolerance float64, w, h int) {
+	t.Helper()
 	img := sample.MakeImage(w, h)
 
 	start := time.Now()
@@ -29,6 +30,7 @@ func CompareNPass(t *testing.T, e *Env, number int, name string, nPass int, tole
 // Compare renders the environment with standard resolution
 // and compares the output against testdata/00number-name.png.
 func Compare(t *testing.T, e *Env, number int, name string, tolerance float64) {
+	t.Helper()
 	CompareNPass(t, e, number, name, 1, tolerance, testW, testH)
 }
 

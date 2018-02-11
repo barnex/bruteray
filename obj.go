@@ -6,6 +6,7 @@ type Obj interface {
 
 	// Hit calculates the intersection between the object and a ray.
 	// It appends to *f a surface fragment for each intersection with the ray.
+	// The fragments do not need to be sorted.
 	Hit(r *Ray, f *[]Fragment)
 
 	// Inside returns true if point p lies inside the object.

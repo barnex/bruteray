@@ -2,23 +2,18 @@ package bruteray
 
 import "math"
 
+// Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
+func Cyl(dir int, center Vec, diam, h float64, m Material) Obj {
+	r := diam / 2
+	coeff := Vec{1, 1, 1}
+	coeff[dir] = 0
+	infCyl := &quad{center, coeff, r * r, m}
+	capped := And(infCyl, Slab(Unit[dir], center[dir]-h/2, center[dir]+h/2, m))
+	return capped
+}
+
 func Quad(center Vec, a Vec, b float64, m Material) Obj {
 	return &quad{center, a, b, m}
-}
-
-func Cyl(center Vec, r float64, m Material) Obj {
-	return &quad{center, Vec{1, 0, 1}, r * r, m}
-}
-
-func CylZ(r, h float64, m Material) Obj {
-	return And(&quad{Vec{}, Vec{1, 1, 0}, r * r, m}, Slab(Ez, -h/2, h/2, m))
-}
-
-func CapCyl(center Vec, r, h float64, m Material) Obj {
-	return And(
-		Cyl(center, r, m),
-		Slab(Ey, center[Y]-h, center[Y]+h, m),
-	)
 }
 
 // a0 x² + a1 y² + a2 z² = 1
@@ -34,9 +29,9 @@ func (s *quad) Hit(r *Ray, f *[]Fragment) {
 	a1 := s.a[1]
 	a2 := s.a[2]
 
-	s0 := r.Start[0]
-	s1 := r.Start[1]
-	s2 := r.Start[2]
+	s0 := r.Start[0] - s.c[0]
+	s1 := r.Start[1] - s.c[1]
+	s2 := r.Start[2] - s.c[2]
 
 	d := r.Dir()
 	d0 := d[0]
@@ -56,7 +51,7 @@ func (s *quad) Hit(r *Ray, f *[]Fragment) {
 	t1 := (-B - V) / (2 * A)
 	t2 := (-B + V) / (2 * A)
 
-	t1, t2 = sort2(t1, t2)
+	//t1, t2 = sort2(t1, t2)
 	*f = append(*f,
 		Fragment{T: t1, Norm: s.Normal(r.At(t1)), Material: s.m},
 		Fragment{T: t2, Norm: s.Normal(r.At(t2)), Material: s.m},
@@ -64,9 +59,11 @@ func (s *quad) Hit(r *Ray, f *[]Fragment) {
 }
 
 func (s *quad) Inside(p Vec) bool {
+	p = p.Sub(s.c)
 	return s.a.Mul3(p).Dot(p) < s.b
 }
 
 func (s *quad) Normal(x Vec) Vec {
+	x = x.Sub(s.c)
 	return s.a.Mul3(x)
 }
