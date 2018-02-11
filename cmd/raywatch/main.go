@@ -1,3 +1,11 @@
+/*
+Command raywatch watches a source file defining a bruteray scene,
+and starts rendering the scene each time the file is changed.
+The result is rendered in a browser.
+
+E.g.:
+	raywatch scenes/myscene.go
+*/
 package main
 
 import (
@@ -10,26 +18,32 @@ import (
 )
 
 var (
-	poll       = flag.Duration("poll", 10*time.Millisecond, "poll interval")
-	tresh      = flag.Duration("trhesh", 500*time.Millisecond, "poll interval")
-	flagWidth  = flag.Int("w", 960, "image width")
-	flagHeight = flag.Int("h", 540, "image height")
+	poll        = flag.Duration("poll", 10*time.Millisecond, "poll interval")
+	tresh       = flag.Duration("trhesh", 500*time.Millisecond, "poll interval")
+	flagWidth   = flag.Int("w", 960, "image width")
+	flagHeight  = flag.Int("h", 540, "image height")
+	flagBrowser = flag.String("browser", "x-www-browser", "display in this browser")
 )
 
 var (
 	cmd *exec.Cmd
 )
 
+const Executable = "/tmp/bruteray-scene"
+
 func main() {
 
+	log.SetFlags(0)
 	flag.Parse()
 
 	if flag.NArg() != 1 {
-		log.Fatal("need one argument")
+		log.Fatal("raywatch: need one argument")
 	}
 	fname := flag.Arg(0)
 
-	Print(exec.Command("x-www-browser", "localhost:3700").Start())
+	if *flagBrowser != "" {
+		Print(exec.Command(*flagBrowser, "localhost:3700").Start())
+	}
 	watch(fname)
 }
 
@@ -45,38 +59,43 @@ func watch(fname string) {
 }
 
 func trigger(fname string) {
-	build(fname)
-	goServe()
+	log.Println("raywatch:", fname, "modified")
+	kill()
+	err := build(fname)
+	if err != nil {
+		return
+	} else {
+		goServe()
+	}
 }
-
-const Executable = "/tmp/bruteray-scene"
 
 func build(fname string) error {
 	start := time.Now()
 	build := exec.Command("go", "build", "-o", Executable, fname)
 	build.Stderr = os.Stderr
 	err := build.Run()
-	log.Println("build", ok(err), time.Since(start).Round(time.Millisecond))
+	log.Println("raywatch: build", ok(err), time.Since(start).Round(time.Millisecond))
 	return err
 }
 
-func ok(err error) string {
-	if err == nil {
-		return "OK"
-	}
-	return err.Error()
-}
-
 func goServe() {
-	if cmd != nil {
-		Print(cmd.Process.Kill())
-		cmd.Process.Wait()
-	}
 	cmd = exec.Command(Executable, fmt.Sprintf("-w=%v", *flagWidth), fmt.Sprintf("-h=%v", *flagHeight))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()
-	log.Println("serve", ok(err))
+	log.Println("raywatch: serve", ok(err))
+}
+
+func kill() {
+	if cmd != nil {
+		log.Println("raywatch: kill", cmd.Path)
+		err := cmd.Process.Kill()
+		if err != nil {
+			log.Fatal(err)
+		}
+		cmd.Process.Wait()
+		cmd = nil
+	}
 }
 
 // FileInfo equality.
@@ -93,6 +112,13 @@ func fiEq(a, b os.FileInfo) bool {
 	case a != nil && b != nil:
 		return a.ModTime() == b.ModTime() && a.Size() == b.Size()
 	}
+}
+
+func ok(err error) string {
+	if err == nil {
+		return "OK"
+	}
+	return err.Error()
 }
 
 func Print(err error) {

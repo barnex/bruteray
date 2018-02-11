@@ -2,7 +2,27 @@ package bruteray
 
 import (
 	"sort"
+	"sync"
 )
+
+var (
+	fbBuf = sync.Pool{
+		New: func() interface{} {
+			fb := (make([]Fragment, 0, 4))
+			return &fb
+		},
+	}
+)
+
+func fb() *[]Fragment {
+	fb := fbBuf.Get().(*[]Fragment)
+	*fb = (*fb)[:0]
+	return fb
+}
+
+func rfb(fb *[]Fragment) {
+	fbBuf.Put(fb)
+}
 
 // Intersection (boolean AND) of two objects.
 func And(a, b Obj) Obj {
@@ -20,30 +40,24 @@ func (o *and) Hit(r *Ray, f *[]Fragment) {
 		return
 	}
 
-	fa := *f
+	fb := fb()
+	defer rfb(fb)
+	o.b.Hit(r, fb)
 
-	o.b.Hit(r, f)
-	fb := (*f)[len(fa):]
+	var f3 []Fragment
 
-	fab := *f
-
-	for _, s := range fa {
+	for _, s := range *f {
 		if o.b.Inside(r.At(s.T)) {
-			*f = append(*f, s)
+			f3 = append(f3, s)
 		}
 	}
-	for _, s := range fb {
+	for _, s := range *fb {
 		if o.a.Inside(r.At(s.T)) {
-			*f = append(*f, s)
+			f3 = append(f3, s)
 		}
 	}
-
-	f3 := (*f)[len(fab):]
-	if len(*f) < len(f3) {
-		*f = append(*f, f3...)
-	}
-	*f = (*f)[:len(f3)]
-	copy(*f, f3)
+	Sort(f3)
+	*f = f3
 }
 
 func (o *and) Inside(p Vec) bool {
@@ -62,32 +76,25 @@ type or struct {
 func (o *or) Hit(r *Ray, f *[]Fragment) {
 
 	o.a.Hit(r, f)
-	fa := *f
 
-	//fb := fb()
-	//defer rfb(fb)
-	o.b.Hit(r, f)
-	fb := (*f)[len(fa):]
+	fb := fb()
+	defer rfb(fb)
+	o.b.Hit(r, fb)
 
-	fab := *f
+	var f3 []Fragment
 
-	for _, s := range fa {
+	for _, s := range *f {
 		if !o.b.Inside(r.At(s.T)) {
-			*f = append(*f, s)
+			f3 = append(f3, s)
 		}
 	}
-	for _, s := range fb {
+	for _, s := range *fb {
 		if !o.a.Inside(r.At(s.T)) {
-			*f = append(*f, s)
+			f3 = append(f3, s)
 		}
 	}
-
-	f3 := (*f)[len(fab):]
-	if len(*f) < len(f3) {
-		*f = append(*f, f3...)
-	}
-	*f = (*f)[:len(f3)]
-	copy(*f, f3)
+	Sort(f3)
+	*f = f3
 }
 
 func (o *or) Inside(p Vec) bool {
@@ -109,29 +116,24 @@ func (o *minus) Hit(r *Ray, f *[]Fragment) {
 	if len(*f) == 0 {
 		return
 	}
-	fa := *f
 
-	o.b.Hit(r, f)
-	fb := (*f)[len(fa):]
+	var fb []Fragment
+	o.b.Hit(r, &fb)
 
-	fab := *f
-	for _, s := range fa {
+	var f3 []Fragment
+
+	for _, s := range *f {
 		if !o.b.Inside(r.At(s.T)) {
-			*f = append(*f, s)
+			f3 = append(f3, s)
 		}
 	}
 	for _, s := range fb {
 		if o.a.Inside(r.At(s.T)) {
-			*f = append(*f, s)
+			f3 = append(f3, s)
 		}
 	}
-
-	f3 := (*f)[len(fab):]
-	if len(*f) < len(f3) {
-		*f = append(*f, f3...)
-	}
-	*f = (*f)[:len(f3)]
-	copy(*f, f3)
+	Sort(f3)
+	*f = f3
 }
 
 func (o *minus) Inside(p Vec) bool {

@@ -1,5 +1,3 @@
-// +build ignore
-
 package main
 
 import (
@@ -11,7 +9,6 @@ func main() {
 	e := NewEnv()
 
 	white := Diffuse0(WHITE.EV(-.6))
-	//blue := Diffuse0(BLUE.EV(-.6))
 
 	const (
 		w     = 1.
@@ -20,13 +17,10 @@ func main() {
 		d2    = 2.
 		brick = 0.05
 	)
-	main := chest(w, h, d, white)
-	cross := Transf(chest(w, h, d2, white), RotY4(90*Deg).Mul(Transl4(Vec{1, 0, 0})))
-	hull := Box(Vec{0, h / 2, 0}, d2/2+brick, h/2+brick, d/2+brick, white)
 
 	e.Add(
 		Sheet(Ey, 0, Checkboard(1, white, Diffuse0(RED))),
-		Minus(hull, Or(main, cross)),
+		chest(w, h, d, white),
 	)
 
 	e.AddLight(

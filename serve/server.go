@@ -23,7 +23,7 @@ var (
 	port       = flag.String("http", ":3700", "Port to serve HTTP")
 	flagWidth  = flag.Int("w", 1920, "image width")
 	flagHeight = flag.Int("h", 1080, "image height")
-	qual       = flag.Int("q", 90, "jpeg quality")
+	qual       = flag.Int("q", 85, "jpeg quality")
 )
 
 var (
@@ -35,6 +35,7 @@ var (
 // at the port specified by flag --http.
 func Env(e *bruteray.Env) {
 
+	log.SetFlags(0)
 	flag.Parse()
 
 	env = e
