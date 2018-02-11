@@ -1,12 +1,22 @@
 package bruteray
 
+import "math"
+
+// A Material determines the color of a surface fragment.
+// E.g.: mate white, glossy red, ...
 type Material interface {
+
+	// Shade must return the color of the given surface fragment,
+	// as seen by Ray r.
+	// If Shade uses recursion, e.g., to calculate reflections,
+	// it must pass N-1 as the new recursion depth, so that
+	// recursion can eventually be terminated (by Env.Shade).
 	Shade(e *Env, N int, r *Ray, frag Fragment) Color
 }
 
 // A Flat material always returns the same color.
 // Useful for debugging, or for rare cases like
-// a computer screen or other extended, dimly luminous surface.
+// a computer screen or other extended, dimly luminous surfaces.
 func Flat(c Color) Material {
 	return &flat{c}
 }
@@ -198,19 +208,6 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	cR := e.ShadeAll(r3, N).Mul(R)
 
 	return cR.Add(cT)
-
-	//if costhi < -1 || costhi > 1 {
-	//	panic(fmt.Sprintf("costhi=%v", costhi))
-	//}
-	//if costht < -1 || costht > 1 {
-	//	panic(fmt.Sprintf("costht=%v", costht))
-	//}
-	//if RI < 0 || RI > 1 || RT < 0 || RT > 1 {
-	//	panic(fmt.Sprintf("RI=%v, RT=%v", RI, RT))
-	//}
-	//if R < 0 || R > 1 || T < 0 || T > 1 {
-	//	panic(fmt.Sprintf("R=%v, T=%v", R, T))
-	//}
 }
 
 // Blend mixes two materials with certain weights. E.g.:
@@ -255,4 +252,19 @@ func (s *shadeNormal) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	} else {
 		return BLUE.Mul(v) // away from cam
 	}
+}
+
+// ShadeShape is a debug material that renders the object's shape only,
+// even if no lighting is present. Useful while defining a scene before
+// worrying about lighting.
+func ShadeShape() Material {
+	return &shadeShape{}
+}
+
+type shadeShape struct{}
+
+func (s *shadeShape) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+	v := frag.Norm.Dot(r.Dir())
+	v = math.Abs(v)
+	return Color{v, v, v}
 }

@@ -8,7 +8,8 @@ import (
 func main() {
 	e := NewEnv()
 
-	white := Diffuse0(WHITE.EV(-.6))
+	//white := Diffuse0(WHITE.EV(-.6))
+	white := ShadeShape()
 
 	const (
 		w     = 1.
@@ -24,8 +25,8 @@ func main() {
 	)
 
 	e.AddLight(
-		PointLight(Vec{0, 0.5, 0}, WHITE.EV(1)),
-		//PointLight(Vec{1, 5, -3}, WHITE.EV(7)),
+	//PointLight(Vec{0, 0.5, 0}, WHITE.EV(1)),
+	//PointLight(Vec{1, 5, -3}, WHITE.EV(7)),
 	)
 
 	e.Camera = Camera(1).Transl(0, .7, -1).RotScene(0 * Deg).Transf(RotX4(0 * Deg))
