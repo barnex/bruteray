@@ -1,7 +1,6 @@
 package bruteray
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -93,14 +92,14 @@ func (a Vec) Cross(b Vec) Vec {
 	return Vec{x, y, z}
 }
 
-func (v Vec) check() Vec {
-	for _, x := range v {
-		if math.IsNaN(x) {
-			panic(fmt.Sprintf("bad vector: %v", v))
-		}
-	}
-	return v
-}
+//func (v Vec) check() Vec {
+//	for _, x := range v {
+//		if math.IsNaN(x) {
+//			panic(fmt.Sprintf("bad vector: %v", v))
+//		}
+//	}
+//	return v
+//}
 
 type Vec4 [4]float64
 

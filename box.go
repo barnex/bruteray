@@ -5,6 +5,16 @@ import (
 	"math"
 )
 
+// NBox constructs a box with given width, depth and height.
+func NBox(center Vec, w, h, d float64, m Material) *box {
+	rx, ry, rz := w/2, h/2, d/2
+	return &box{
+		min: center.Sub(Vec{rx, ry, rz}),
+		max: center.Add(Vec{rx, ry, rz}),
+		m:   m,
+	}
+}
+
 type box struct {
 	min, max Vec
 	m        Material
@@ -63,7 +73,7 @@ func (s *box) Inside(v Vec) bool {
 }
 
 func (s *box) Normal(p Vec) Vec {
-	p.check()
+	//p.check()
 	for i := range p {
 		if approx(p[i], s.min[i]) || approx(p[i], s.max[i]) {
 			return Unit[i]

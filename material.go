@@ -1,6 +1,6 @@
 package bruteray
 
-import "math"
+import "fmt"
 
 // A Material determines the color of a surface fragment.
 // E.g.: mate white, glossy red, ...
@@ -257,14 +257,16 @@ func (s *shadeNormal) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 // ShadeShape is a debug material that renders the object's shape only,
 // even if no lighting is present. Useful while defining a scene before
 // worrying about lighting.
-func ShadeShape() Material {
-	return &shadeShape{}
+func ShadeShape(c Color) Material {
+	return &shadeShape{c}
 }
 
-type shadeShape struct{}
+type shadeShape struct{ c Color }
 
 func (s *shadeShape) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
-	v := frag.Norm.Dot(r.Dir())
-	v = math.Abs(v)
-	return Color{v, v, v}
+	v := -frag.Norm.Dot(r.Dir())
+	if v < 0 || v > 1 {
+		panic(fmt.Sprintf("norm=%v, norm.len=%v, dir=%v, dir.len=%v, dot=%v", frag.Norm, frag.Norm.Len(), r.Dir(), r.Dir().Len(), v))
+	}
+	return s.c.Mul(v)
 }

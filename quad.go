@@ -68,5 +68,5 @@ func (s *quad) Inside(p Vec) bool {
 }
 
 func (s *quad) Normal(x Vec) Vec {
-	return s.a.Mul3(x).Normalized()
+	return s.a.Mul3(x)
 }

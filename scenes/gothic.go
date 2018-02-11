@@ -9,19 +9,21 @@ func main() {
 	e := NewEnv()
 
 	//white := Diffuse0(WHITE.EV(-.6))
-	white := ShadeShape()
+	white := ShadeShape(WHITE)
 
 	const (
-		w     = 1.
-		h     = 2.
-		d     = 3.
-		d2    = 2.
-		brick = 0.05
+		w  = 3.0 // central width
+		h1 = 2.0 // pillar height
+		d  = 6.0 // central depth
+		//d2    = 2.0
+		//brick = 0.05
 	)
 
+	xx
+
 	e.Add(
-		Sheet(Ey, 0, Checkboard(1, white, Diffuse0(RED))),
-		chest(w, h, d, white),
+		Sheet(Ey, 0, Checkboard(1, white, Flat(BLACK))),
+		chestz(Vec{}, w, h1, d, white),
 	)
 
 	e.AddLight(
@@ -29,12 +31,12 @@ func main() {
 	//PointLight(Vec{1, 5, -3}, WHITE.EV(7)),
 	)
 
-	e.Camera = Camera(1).Transl(0, .7, -1).RotScene(0 * Deg).Transf(RotX4(0 * Deg))
+	e.Camera = Camera(1).Transl(0, 4, -7).RotScene(0 * Deg).Transf(RotX4(30 * Deg))
 	//e.Camera.AA = true
 
 	serve.Env(e)
 }
 
-func chest(w, h, d float64, m Material) Obj {
-	return Or(Transf(CylZ(w/2, d, m), Transl4(Vec{0, h - w, 0})), Box(Vec{}, w/2, h/2, d/2-1e-6, m))
+func chestz(pos Vec, w, h, d float64, m Material) Obj {
+	return NBox(pos.Add(Vec{Y: h / 2}), w, h, d, m)
 }

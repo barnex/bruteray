@@ -79,7 +79,7 @@ func (e *Env) SetAmbient(m Material) {
 // Used by specular surfaces
 // who make no distinction between light sources and regular objects.
 func (e *Env) ShadeAll(r *Ray, N int) Color {
-	return e.shade(r, N, e.all)
+	return e.Shade(r, N, e.all)
 }
 
 // Calculate intensity seen by ray,
@@ -87,7 +87,7 @@ func (e *Env) ShadeAll(r *Ray, N int) Color {
 // Used for diffuse inter reflection
 // where contributions of light sources are added separately.
 func (e *Env) ShadeNonLum(r *Ray, N int) Color {
-	return e.shade(r, N, e.objs)
+	return e.Shade(r, N, e.objs)
 }
 
 func (e *Env) fb() *[]Fragment {
@@ -102,7 +102,7 @@ func (e *Env) rfb(fb *[]Fragment) {
 
 // Calculate intensity seen by ray, with maximum recursion depth N.
 // who = objs, lights, or all.
-func (e *Env) shade(r *Ray, N int, who []Obj) Color {
+func (e *Env) Shade(r *Ray, N int, who []Obj) Color {
 	if N <= 0 {
 		return Color{}
 	}
@@ -126,6 +126,10 @@ func (e *Env) shade(r *Ray, N int, who []Obj) Color {
 			}
 		}
 	}
+
+	// Shapes are not obliged to normalized and orient their surface normal.
+	// Let's do it here, only for the normal that's going to be used.
+	surf.Norm = surf.Norm.Normalized().Towards(r.Dir())
 
 	if e.Fog != 0 && N == e.Recursion && e.Recursion > 1 {
 		// add fog only to primary ray,
@@ -161,7 +165,7 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 	if e.IndirectFog {
 		r2 := e.NewRay(pos, randVec(&e.rng))
 		defer e.RRay(r2)
-		fogc := e.shade(r2, 1, e.objs)
+		fogc := e.Shade(r2, 1, e.objs)
 		c = c.Add(fogc)
 	}
 

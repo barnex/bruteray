@@ -35,6 +35,6 @@ func (s *sphere) Hit(r *Ray, f *[]Fragment) {
 }
 
 func (s *sphere) Normal(pos Vec) Vec {
-	n := pos.Sub(s.c).Normalized().check()
+	n := pos.Sub(s.c)
 	return n
 }

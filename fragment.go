@@ -1,15 +1,23 @@
 package bruteray
 
-// A Fragment calculates the color seen by a ray.
-// Fregment shading is lazily evaluated:
+// A Fragment is an infinitesimally small surface element.
+//
+// Fragment shading is lazily evaluated:
 // only when the frontmost shader has been determined
 // will we call its Shade method. Shaders returned by
 // objects hidden behind others will eventually not be used.
 type Fragment struct {
-	T        float64 // The t-value where the ray hit the object. Used to determine the frontmost Shader.
-	Norm     Vec     // Surface normal where the ray hit the object. Passed to Material.
-	Material         // Material.Shade will be called with the relevant position and normal to finally calculate the color.
-	Object   Obj
+	// The distance where the ray hit the object.
+	// Used to determine the frontmost Shader.
+	T float64
+
+	// Surface normal where the ray hit the object.
+	// Does not need to be normalized, does not need to point outwards.
+	Norm Vec
+
+	// Material.Shade will be called with the relevant position and normal to finally calculate the color.
+	Material
+	Object Obj
 }
 
 // When a secondary ray is cast from a surface,
