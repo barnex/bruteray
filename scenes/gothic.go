@@ -9,7 +9,7 @@ func main() {
 	e := NewEnv()
 
 	white := Diffuse(WHITE.EV(-.9))
-	//white := ShadeShape(WHITE)
+	//white = Checkboard(1, ShadeShape(WHITE), ShadeShape(WHITE.EV(-.3)))
 
 	const (
 		w      = 3.0            // central width
@@ -38,13 +38,13 @@ func main() {
 
 	tileB := Shiny(WHITE.EV(-5), EV(-5))
 	tileW := Shiny(WHITE.EV(-1), EV(-5))
-	//black := Flat(BLACK)
+
+	tileB = Flat(BLACK)
+	tileW = Flat(WHITE)
+
 	e.Add(
 		Sheet(Ey, 0.01, Checkboard(1, tileW, tileB)),
 		all,
-		//Minus(hull, all),
-		//chestz(Vec{}, w, h1, d, pointy, white),
-		//chestx(Vec{}, w, h1, d, pointy, white),
 	)
 
 	lighth := h1/2 + w/4 + pointy/2
@@ -55,10 +55,10 @@ func main() {
 	)
 
 	e.Camera = Camera(0.65).Transl(0, 2.2, -4.9).RotScene(0 * Deg).Transf(RotX4(-0 * Deg))
-	e.Camera.Aperture = 0.05
-	e.Camera.Focus = 8
-	e.Camera.AA = true
-	e.Recursion = 3
+	//e.Camera.Aperture = 0.05
+	//e.Camera.Focus = 8
+	//e.Camera.AA = true
+	//e.Recursion = 3
 	//e.Fog = 8
 
 	serve.Env(e)

@@ -70,7 +70,7 @@ func RenderLoop(e *bruteray.Env, w, h int, peek chan chan Image) {
 		render(e, acc, runtime.NumCPU())
 		passes++
 		rate := float64(w*h) / time.Since(start).Seconds()
-		log.Printf("pass: %v, %.1f Mpixel/s", passes, rate/1e6)
+		log.Printf("pass: %v, %.2f Mpixel/s", passes, rate/1e6)
 		img.Add(acc)
 	}
 

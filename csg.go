@@ -13,13 +13,13 @@ var (
 	}
 )
 
-func fb() *[]Fragment {
+func getFrags() *[]Fragment {
 	fb := fbBuf.Get().(*[]Fragment)
 	*fb = (*fb)[:0]
 	return fb
 }
 
-func rfb(fb *[]Fragment) {
+func putFrags(fb *[]Fragment) {
 	fbBuf.Put(fb)
 }
 
@@ -34,29 +34,26 @@ type and struct {
 
 func (o *and) Hit(r *Ray, f *[]Fragment) {
 
-	o.a.Hit(r, f)
-	if len(*f) == 0 {
+	fa := getFrags()
+	defer putFrags(fa)
+	o.a.Hit(r, fa)
+	if len(*fa) == 0 {
 		return
 	}
-
-	fb := fb()
-	defer rfb(fb)
-	o.b.Hit(r, fb)
-
-	var f3 []Fragment
-
-	for _, s := range *f {
+	for _, s := range *fa {
 		if o.b.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
+
+	fb := getFrags()
+	defer putFrags(fb)
+	o.b.Hit(r, fb)
 	for _, s := range *fb {
 		if o.a.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
-	//Sort(f3)
-	*f = f3
 }
 
 func (o *and) Inside(p Vec) bool {
@@ -74,26 +71,29 @@ type or struct {
 
 func (o *or) Hit(r *Ray, f *[]Fragment) {
 
-	o.a.Hit(r, f)
+	fa := getFrags()
+	defer putFrags(fa)
 
-	fb := fb()
-	defer rfb(fb)
+	o.a.Hit(r, fa)
+	if len(*fa) == 0 {
+		o.b.Hit(r, f)
+		return
+	}
+
+	fb := getFrags()
+	defer putFrags(fb)
 	o.b.Hit(r, fb)
 
-	var f3 []Fragment
-
-	for _, s := range *f {
+	for _, s := range *fa {
 		if !o.b.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
 	for _, s := range *fb {
 		if !o.a.Inside(r.At(s.T)) {
-			f3 = append(f3, s)
+			*f = append(*f, s)
 		}
 	}
-	//Sort(f3)
-	*f = f3
 }
 
 func (o *or) Inside(p Vec) bool {
