@@ -517,6 +517,59 @@ func TestCyl(t *testing.T) {
 	Compare(t, e, 28, "cyl", defaultTol)
 }
 
+func TestMultiOr(t *testing.T) {
+	e := NewEnv()
+
+	const (
+		w      = 3.0            // central width
+		h1     = 3.0            // pillar height
+		pill   = 0.5            // pillar width
+		d      = 3 * (w + pill) // central depth
+		pointy = 0.8            //
+		b      = 0.5
+	)
+
+	chestz := func(pos Vec, w, h1, d, pointy float64, m Material) Obj {
+		const off = 1e-4
+		c1 := Cyl(Z, Vec{pointy / 2, h1, 0}.Add(pos), w+pointy, d-off, m)
+		c2 := Cyl(Z, Vec{-pointy / 2, h1, 0}.Add(pos), w+pointy, d+off, m)
+		ceil := And(c1, c2)
+		box := NBox(pos.Add(Vec{Y: h1 / 2}), w, h1, d+2*off, m)
+		return Or(box, ceil)
+	}
+
+	chestx := func(pos Vec, w, h1, d, pointy float64, m Material) Obj {
+		const off = 1e-4
+		c1 := Cyl(X, Vec{0, h1, pointy / 2}.Add(pos), w+pointy, d-off, m)
+		c2 := Cyl(X, Vec{0, h1, -pointy / 2}.Add(pos), w+pointy, d+off, m)
+		ceil := And(c1, c2)
+		box := NBox(pos.Add(Vec{Y: h1 / 2}), d+2*off, h1, w, m)
+		return Or(box, ceil)
+	}
+
+	white := ShadeShape(WHITE)
+	tileB := ShadeShape(WHITE.EV(-5))
+	tileW := ShadeShape(WHITE.EV(-1))
+
+	e.Add(
+		Sheet(Ey, 0.01, Checkboard(1, tileW, tileB)),
+		MultiOr(
+			chestz(Vec{}, w, h1, d, pointy, white),
+			chestz(Vec{Y: b}, w-b, h1-b, d+4, pointy, Flat(WHITE)),
+
+			chestz(Vec{X: -w - pill}, w, h1, d, pointy, white),
+			chestz(Vec{X: +w + pill}, w, h1, d, pointy, white),
+
+			chestx(Vec{}, w, h1, d, pointy, white),
+			chestx(Vec{Z: -w - pill}, w, h1, d, pointy, white),
+			chestx(Vec{Z: +w + pill}, w, h1, d, pointy, white),
+		),
+	)
+
+	e.Camera = Camera(0.65).Transl(0, 2.2, -4.9).RotScene(0 * Deg).Transf(RotX4(-0 * Deg))
+	Compare(t, e, 29, "multi-or", defaultTol)
+}
+
 //func TestDistort(t *testing.T) {
 //	e := NewEnv()
 //

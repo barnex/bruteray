@@ -22,9 +22,7 @@ func main() {
 		//brick = 0.05
 	)
 
-	//hull := NBox(Vec{}, d+1, d+1, d+1, white)
-
-	all := multiOr(
+	all := MultiOr(
 		chestz(Vec{}, w, h1, d, pointy, white),
 		chestz(Vec{Y: b}, w-b, h1-b, d+4, pointy, Flat(WHITE)),
 
@@ -80,12 +78,4 @@ func chestx(pos Vec, w, h1, d, pointy float64, m Material) Obj {
 	ceil := And(c1, c2)
 	box := NBox(pos.Add(Vec{Y: h1 / 2}), d+2*off, h1, w, m)
 	return Or(box, ceil)
-}
-
-func multiOr(o ...Obj) Obj {
-	obj := o[0]
-	for i := 1; i < len(o); i++ {
-		obj = Or(obj, o[i])
-	}
-	return obj
 }

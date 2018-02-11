@@ -29,3 +29,4 @@ This directory contains reference images for tests.
 ![fig](026-diaphragm-disk.png)
 ![fig](027-diaphragm-hex.png)
 ![fig](028-cyl.png)
+![fig](029-multi-or.png)

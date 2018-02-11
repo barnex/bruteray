@@ -100,6 +100,53 @@ func (o *or) Inside(p Vec) bool {
 	return o.a.Inside(p) || o.b.Inside(p)
 }
 
+func MultiOr(o ...Obj) Obj {
+	return &multiOr{o}
+}
+
+type multiOr struct {
+	o []Obj
+}
+
+func (o *multiOr) Hit(r *Ray, f *[]Fragment) {
+	fa := getFrags()
+	defer putFrags(fa)
+
+	for i, a := range o.o {
+		*fa = (*fa)[:0]
+		a.Hit(r, fa)
+
+		for _, s := range *fa {
+
+			pos := r.At(s.T)
+			inside := false
+
+			for j, b := range o.o {
+				if i == j {
+					continue
+				}
+				if b.Inside(pos) {
+					inside = true
+					break
+				}
+			}
+			if !inside {
+				*f = append(*f, s)
+			}
+
+		}
+	}
+}
+
+func (o *multiOr) Inside(pos Vec) bool {
+	for _, o := range o.o {
+		if o.Inside(pos) {
+			return true
+		}
+	}
+	return false
+}
+
 // Union (logical OR) of two objects, without optimizing result.
 // Best suited for a small number of simple objects.
 func Or0(a, b Obj) Obj {
