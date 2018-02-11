@@ -15,8 +15,8 @@ import (
 	"github.com/barnex/bruteray/sample"
 )
 
-func CompareNPass(t *testing.T, e *Env, number int, name string, nPass int, tolerance float64) {
-	img := sample.MakeImage(testW, testH)
+func CompareNPass(t *testing.T, e *Env, number int, name string, nPass int, tolerance float64, w, h int) {
+	img := sample.MakeImage(w, h)
 
 	start := time.Now()
 	sample.MultiPass(e, img, nPass)
@@ -29,7 +29,7 @@ func CompareNPass(t *testing.T, e *Env, number int, name string, nPass int, tole
 // Compare renders the environment with standard resolution
 // and compares the output against testdata/00number-name.png.
 func Compare(t *testing.T, e *Env, number int, name string, tolerance float64) {
-	CompareNPass(t, e, number, name, 1, tolerance)
+	CompareNPass(t, e, number, name, 1, tolerance, testW, testH)
 }
 
 func CompareImg(t *testing.T, e *Env, img sample.Image, number int, testName string, tol float64) {

@@ -365,7 +365,7 @@ func TestHollowAnd(t *testing.T) {
 
 	nPass := 8
 	tol := 10.0
-	CompareNPass(t, e, 22, "hollowand", nPass, tol)
+	CompareNPass(t, e, 22, "hollowand", nPass, tol, testW, testH)
 }
 
 // Test a rectangular light source.
@@ -401,7 +401,7 @@ func TestRectLight(t *testing.T) {
 	e.Recursion = 2
 
 	nPass := 50
-	CompareNPass(t, e, 23, "rectlight", nPass, 10)
+	CompareNPass(t, e, 23, "rectlight", nPass, 10, testW, testH)
 
 }
 
@@ -441,7 +441,7 @@ func TestCornellBox(t *testing.T) {
 	e.Cutoff = EV(3)
 
 	nPass := 20
-	CompareNPass(t, e, 24, "cornellbox", nPass, 10)
+	CompareNPass(t, e, 24, "cornellbox", nPass, 10, testW, testH)
 }
 
 func TestDOF(t *testing.T) {
@@ -460,7 +460,7 @@ func TestDOF(t *testing.T) {
 	e.Recursion = 1
 
 	nPass := 30
-	CompareNPass(t, e, 25, "dof", nPass, 10)
+	CompareNPass(t, e, 25, "dof", nPass, 10, testW, testH)
 }
 
 func TestDiafragmDisk(t *testing.T) {
@@ -472,12 +472,12 @@ func TestDiafragmDisk(t *testing.T) {
 
 	e.Camera = Camera(1)
 	e.Camera.AA = true
-	e.Camera.Aperture = 0.7
+	e.Camera.Aperture = 0.8
 	e.Camera.Focus = 2
 	e.Recursion = 1
 
-	nPass := 100
-	CompareNPass(t, e, 26, "diaphragm-disk", nPass, 20)
+	nPass := 300
+	CompareNPass(t, e, 26, "diaphragm-disk", nPass, 8, testW/4, testH/4)
 }
 
 func TestDiaphragmHex(t *testing.T) {
@@ -489,13 +489,13 @@ func TestDiaphragmHex(t *testing.T) {
 
 	e.Camera = Camera(1)
 	e.Camera.AA = true
-	e.Camera.Aperture = 0.7
+	e.Camera.Aperture = 0.8
 	e.Camera.Focus = 2
 	e.Camera.Diaphragm = DiaHex
 	e.Recursion = 1
 
-	nPass := 100
-	CompareNPass(t, e, 27, "diaphragm-hex", nPass, 20)
+	nPass := 300
+	CompareNPass(t, e, 27, "diaphragm-hex", nPass, 8, testW/4, testH/4)
 }
 
 //func TestDistort(t *testing.T) {

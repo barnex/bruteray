@@ -19,8 +19,6 @@ func main() {
 		//brick = 0.05
 	)
 
-	xx
-
 	e.Add(
 		Sheet(Ey, 0, Checkboard(1, white, Flat(BLACK))),
 		chestz(Vec{}, w, h1, d, white),
@@ -38,5 +36,6 @@ func main() {
 }
 
 func chestz(pos Vec, w, h, d float64, m Material) Obj {
+	CylZ(w/2 + pointy)
 	return NBox(pos.Add(Vec{Y: h / 2}), w, h, d, m)
 }
