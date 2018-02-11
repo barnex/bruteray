@@ -41,6 +41,10 @@ func main() {
 	}
 	fname := flag.Arg(0)
 
+	if _, err := os.Stat(fname); err != nil {
+		log.Fatal("raywatch: ", err)
+	}
+
 	if *flagBrowser != "" {
 		Print(exec.Command(*flagBrowser, "localhost:3700").Start())
 	}
