@@ -1,6 +1,9 @@
 package bruteray
 
-import "math/rand"
+import (
+	"math"
+	"math/rand"
+)
 
 func Checkboard(stride float64, a, b Material) Material {
 	return &checkboard{1 / stride, a, b}
@@ -20,6 +23,47 @@ func (c *checkboard) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 		return c.a.Shade(e, N, r, frag)
 	} else {
 		return c.b.Shade(e, N, r, frag)
+	}
+}
+
+func Bricks(stride, width float64, a, b Material) Material {
+	return &bricks{1 / stride, width, a, b}
+}
+
+type bricks struct {
+	invs  float64
+	width float64
+	a, b  Material
+}
+
+func (c *bricks) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+	pos := r.At(frag.T)
+
+	x, y, z := pos[X]*c.invs, pos[Y]*c.invs, pos[Z]*c.invs
+
+	rx := x - math.Floor(x)
+	ry := y - math.Floor(y)
+	rz := z - math.Floor(z)
+
+	ix := int(math.Floor(x)) + 100000
+	iy := int(math.Floor(y)) + 100000
+	iz := int(math.Floor(z)) + 100000
+
+	w := c.width
+
+	hit := ry < w
+
+	hit = hit || (rx < w) && (((ix+iy)%2) == 1)
+	hit = hit || (rz < w) && (((iz+iy)%2) == 1)
+
+	//(math.Floor(y) < w) ||
+	//(math.Ceil(y) > 1-w) ||
+	//(math.Floor(z) < w) ||
+	//(math.Ceil(z) > 1-w)
+	if hit {
+		return c.b.Shade(e, N, r, frag)
+	} else {
+		return c.a.Shade(e, N, r, frag)
 	}
 }
 

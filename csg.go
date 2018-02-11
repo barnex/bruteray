@@ -1,6 +1,7 @@
 package bruteray
 
 import (
+	"math"
 	"sync"
 )
 
@@ -208,6 +209,28 @@ func (o *minus) Hit(r *Ray, f *[]Fragment) {
 
 func (o *minus) Inside(p Vec) bool {
 	return o.a.Inside(p) && !o.b.Inside(p)
+}
+
+func Cutout(a, b Obj) Obj {
+	return &cutout{a, b}
+}
+
+type cutout struct {
+	a Obj
+	b Obj // TODO -> Insider
+}
+
+func (o *cutout) Hit(r *Ray, f *[]Fragment) {
+	o.a.Hit(r, f)
+	for i, s := range *f {
+		if o.b.Inside(r.At(s.T)) {
+			(*f)[i].T = math.NaN()
+		}
+	}
+}
+
+func (o *cutout) Inside(pos Vec) bool {
+	return o.a.Inside(pos)
 }
 
 // Intersection, treating A as a hollow object.
