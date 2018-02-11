@@ -1,7 +1,5 @@
 package bruteray
 
-import "math"
-
 func (e *Env) NewRay(start, dir Vec) *Ray {
 	//r := &Ray{Start: start}
 	//r.SetDir(dir)
@@ -36,10 +34,15 @@ type Ray struct {
 // Returns point Start + t*Dir.
 // t must be > 0 for the point to lie on the Ray.
 func (r *Ray) At(t float64) Vec {
-	if math.IsNaN(t) {
-		panic(t)
+	//return r.Start.Add(r.d.Mul(t))
+
+	// pprof shows this is where we spend most of our time.
+	// manually inlined for ~10% overall performance improvement.
+	return Vec{
+		r.Start[X] + t*r.d[X],
+		r.Start[Y] + t*r.d[Y],
+		r.Start[Z] + t*r.d[Z],
 	}
-	return r.Start.Add(r.d.Mul(t))
 }
 
 func (r *Ray) Transf(t *Matrix4) {

@@ -58,7 +58,7 @@ func main() {
 	//e.Camera.Aperture = 0.05
 	//e.Camera.Focus = 8
 	//e.Camera.AA = true
-	//e.Recursion = 3
+	e.Recursion = 2
 	//e.Fog = 8
 
 	serve.Env(e)
