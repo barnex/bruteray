@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	. "github.com/barnex/bruteray"
+	. "github.com/barnex/bruteray/csg"
 	"github.com/barnex/bruteray/sample"
 )
 

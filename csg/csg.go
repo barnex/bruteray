@@ -1,6 +1,7 @@
-package bruteray
+package csg
 
 import (
+	. "github.com/barnex/bruteray"
 	"math"
 	"sync"
 )
@@ -22,6 +23,10 @@ func getFrags() *[]Fragment {
 
 func putFrags(fb *[]Fragment) {
 	fbBuf.Put(fb)
+}
+
+func init() {
+	CsgAnd_ = And // TODO: remove
 }
 
 // Intersection (boolean AND) of two objects.

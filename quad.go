@@ -2,13 +2,16 @@ package bruteray
 
 import "math"
 
+// TODO: remove
+var CsgAnd_ func(a, b CSGObj) CSGObj
+
 // Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
 func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj {
 	r := diam / 2
 	coeff := Vec{1, 1, 1}
 	coeff[dir] = 0
 	infCyl := &quad{center, coeff, r * r, m}
-	capped := And(infCyl, Slab(Unit[dir], center[dir]-h/2, center[dir]+h/2, m))
+	capped := CsgAnd_(infCyl, Slab(Unit[dir], center[dir]-h/2, center[dir]+h/2, m))
 	return capped
 }
 
