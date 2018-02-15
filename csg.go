@@ -33,11 +33,13 @@ type and struct {
 	a, b CSGObj
 }
 
-func (o *and) Hit(r *Ray, f *[]Fragment) {
+func (o *and) Hit1(r *Ray, f *[]Fragment) { o.HitAll(r, f) }
+
+func (o *and) HitAll(r *Ray, f *[]Fragment) {
 
 	fa := getFrags()
 	defer putFrags(fa)
-	o.a.Hit(r, fa)
+	o.a.HitAll(r, fa)
 	if len(*fa) == 0 {
 		return
 	}
@@ -49,7 +51,7 @@ func (o *and) Hit(r *Ray, f *[]Fragment) {
 
 	fb := getFrags()
 	defer putFrags(fb)
-	o.b.Hit(r, fb)
+	o.b.HitAll(r, fb)
 	for _, s := range *fb {
 		if o.a.Inside(r.At(s.T)) {
 			*f = append(*f, s)
@@ -62,6 +64,7 @@ func (o *and) Inside(p Vec) bool {
 }
 
 // Union (logical OR) of two objects.
+// TODO: remove in favor of MultiOr
 func Or(a, b CSGObj) CSGObj {
 	return &or{a, b}
 }
@@ -70,20 +73,22 @@ type or struct {
 	a, b CSGObj
 }
 
-func (o *or) Hit(r *Ray, f *[]Fragment) {
+func (o *or) Hit1(r *Ray, f *[]Fragment) { o.HitAll(r, f) }
+
+func (o *or) HitAll(r *Ray, f *[]Fragment) {
 
 	fa := getFrags()
 	defer putFrags(fa)
 
-	o.a.Hit(r, fa)
+	o.a.HitAll(r, fa)
 	if len(*fa) == 0 {
-		o.b.Hit(r, f)
+		o.b.HitAll(r, f)
 		return
 	}
 
 	fb := getFrags()
 	defer putFrags(fb)
-	o.b.Hit(r, fb)
+	o.b.HitAll(r, fb)
 
 	for _, s := range *fa {
 		if !o.b.Inside(r.At(s.T)) {
@@ -109,13 +114,15 @@ type multiOr struct {
 	o []CSGObj
 }
 
-func (o *multiOr) Hit(r *Ray, f *[]Fragment) {
+func (o *multiOr) Hit1(r *Ray, f *[]Fragment) { o.HitAll(r, f) }
+
+func (o *multiOr) HitAll(r *Ray, f *[]Fragment) {
 	fa := getFrags()
 	defer putFrags(fa)
 
 	for i, a := range o.o {
 		*fa = (*fa)[:0]
-		a.Hit(r, fa)
+		a.HitAll(r, fa)
 
 		for _, s := range *fa {
 
@@ -150,27 +157,29 @@ func (o *multiOr) Inside(pos Vec) bool {
 
 // Union (logical OR) of two objects, without optimizing result.
 // Best suited for a small number of simple objects.
-func Or0(a, b CSGObj) CSGObj {
-	return &or0{a, b}
-}
-
-type or0 struct {
-	a, b CSGObj
-}
-
-func (o *or0) Hit(r *Ray, f *[]Fragment) {
-	o.a.Hit(r, f)
-	fa := *f
-
-	fb := (*f)[len(fa):]
-	o.b.Hit(r, &fb)
-
-	*f = append(fa, fb...)
-}
-
-func (o *or0) Inside(p Vec) bool {
-	return o.a.Inside(p) || o.b.Inside(p)
-}
+//func Or0(a, b CSGObj) CSGObj {
+//	return &or0{a, b}
+//}
+//
+//type or0 struct {
+//	a, b CSGObj
+//}
+//
+//func (o *or0) Hit1(r *Ray, f *[]Fragment) {}
+//
+//func (o *or0) Hit(r *Ray, f *[]Fragment) {
+//	o.a.Hit(r, f)
+//	fa := *f
+//
+//	fb := (*f)[len(fa):]
+//	o.b.Hit(r, &fb)
+//
+//	*f = append(fa, fb...)
+//}
+//
+//func (o *or0) Inside(p Vec) bool {
+//	return o.a.Inside(p) || o.b.Inside(p)
+//}
 
 // Subtraction (logical AND NOT) of two objects
 func Minus(a, b CSGObj) CSGObj {
@@ -181,15 +190,17 @@ type minus struct {
 	a, b CSGObj
 }
 
-func (o *minus) Hit(r *Ray, f *[]Fragment) {
+func (o *minus) Hit1(r *Ray, f *[]Fragment) { o.HitAll(r, f) }
 
-	o.a.Hit(r, f)
+func (o *minus) HitAll(r *Ray, f *[]Fragment) {
+
+	o.a.HitAll(r, f)
 	if len(*f) == 0 {
 		return
 	}
 
 	var fb []Fragment
-	o.b.Hit(r, &fb)
+	o.b.HitAll(r, &fb)
 
 	var f3 []Fragment
 
@@ -220,8 +231,10 @@ type cutout struct {
 	b CSGObj // TODO -> Insider
 }
 
-func (o *cutout) Hit(r *Ray, f *[]Fragment) {
-	o.a.Hit(r, f)
+func (o *cutout) Hit1(r *Ray, f *[]Fragment) { o.HitAll(r, f) }
+
+func (o *cutout) HitAll(r *Ray, f *[]Fragment) {
+	o.a.HitAll(r, f)
 	for i, s := range *f {
 		if o.b.Inside(r.At(s.T)) {
 			(*f)[i].T = math.NaN()
@@ -235,22 +248,23 @@ func (o *cutout) Inside(pos Vec) bool {
 
 // Intersection, treating A as a hollow object.
 // Equivalent to, but more efficient than And(Hollow(a), b)
-func SurfaceAnd(a, b CSGObj) CSGObj {
+func SurfaceAnd(a Obj, b CSGObj) Obj {
 	return &hand{a: a, b: b}
 }
 
 type hand struct {
-	a, b CSGObj
-	noInside
+	a Obj
+	b CSGObj
 }
 
-func (o *hand) Hit(r *Ray, f *[]Fragment) {
+func (o *hand) Hit1(r *Ray, f *[]Fragment) {
 
-	o.a.Hit(r, f)
+	o.a.Hit1(r, f)
 	if len(*f) == 0 {
 		return
 	}
 
+	// TODO: optimize
 	f2 := make([]Fragment, 0, len(*f))
 	for i, s := range *f {
 		if o.b.Inside(r.At(s.T)) {

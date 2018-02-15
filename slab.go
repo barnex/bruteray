@@ -11,7 +11,9 @@ type slab struct {
 	m          Material
 }
 
-func (s *slab) Hit(r *Ray, f *[]Fragment) {
+func (s *slab) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
+
+func (s *slab) HitAll(r *Ray, f *[]Fragment) {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir().Dot(s.dir)
 	if rd == 0 {

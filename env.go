@@ -116,7 +116,7 @@ func (e *Env) Shade(r *Ray, N int, who []Obj) Color {
 	defer e.rfb(hit)
 
 	for _, o := range who {
-		o.Hit(r, hit)
+		o.Hit1(r, hit)
 
 		for i := range *hit {
 			t := (*hit)[i].T
@@ -208,7 +208,7 @@ func (e *Env) Occludes(r *Ray, endpoint float64) bool {
 
 	for _, o := range e.objs {
 
-		o.Hit(r, hit)
+		o.Hit1(r, hit)
 
 		for i := range *hit {
 			t := (*hit)[i].T

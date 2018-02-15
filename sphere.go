@@ -17,7 +17,9 @@ func (s *sphere) Inside(p Vec) bool {
 	return v.Len2() < s.r2
 }
 
-func (s *sphere) Hit(r *Ray, f *[]Fragment) {
+func (s *sphere) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
+
+func (s *sphere) HitAll(r *Ray, f *[]Fragment) {
 	v := r.Start.Sub(s.c)
 	d := r.Dir()
 	vd := v.Dot(d)

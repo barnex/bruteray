@@ -166,8 +166,8 @@ func TestRect(t *testing.T) {
 	const z = 10
 	nz := ShadeNormal(Ez)
 	r1 := Rect(Vec{-d, 0, z}, Ez, 0.2, 0.1, math.Inf(1), nz)
-	r2 := Transf(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
-	r3 := And(
+	r2 := TransfNonCSG(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
+	r3 := SurfaceAnd(
 		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
 		Sphere(Vec{0, 0, z}, 0.25, nz),
 	)

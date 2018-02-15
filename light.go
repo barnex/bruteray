@@ -4,14 +4,12 @@ import "math"
 
 type Light interface {
 	Sample(e *Env, target Vec) (pos Vec, intens Color)
-	CSGObj
+	Obj
 }
 
-// embed to get a Hit that returns no intersection.
 type noIntersection struct{}
 
-func (noIntersection) Hit(*Ray, *[]Fragment) { return }
-func (noIntersection) Inside(Vec) bool       { return false }
+func (noIntersection) Hit1(*Ray, *[]Fragment) { return }
 
 // Directed light source without fall-off.
 // Position should be far away from the scene (indicates a direction)

@@ -32,7 +32,9 @@ func Cube(center Vec, r float64, m Material) CSGObj {
 	return Box(center, r, r, r, m)
 }
 
-func (s *box) Hit(r *Ray, f *[]Fragment) {
+func (s *box) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
+
+func (s *box) HitAll(r *Ray, f *[]Fragment) {
 	min_ := s.min
 	max_ := s.max
 

@@ -24,7 +24,9 @@ type quad struct {
 	m Material
 }
 
-func (s *quad) Hit(r *Ray, f *[]Fragment) {
+func (s *quad) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
+
+func (s *quad) HitAll(r *Ray, f *[]Fragment) {
 	a0 := s.a[0]
 	a1 := s.a[1]
 	a2 := s.a[2]

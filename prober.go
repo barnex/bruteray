@@ -19,7 +19,7 @@ func Probe(r *Ray, o CSGObj) float64 {
 	T := inf
 	hit := make([]Fragment, 0, 2)
 
-	o.Hit(r, &hit)
+	o.Hit1(r, &hit)
 
 	for i := range hit {
 		t := hit[i].T
