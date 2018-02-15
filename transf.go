@@ -1,7 +1,7 @@
 package bruteray
 
 // Transf returns a transformed version of the object.
-func Transf(o Obj, T *Matrix4) Obj {
+func Transf(o CSGObj, T *Matrix4) CSGObj {
 	return &transformed{
 		o,
 		*T,
@@ -10,7 +10,7 @@ func Transf(o Obj, T *Matrix4) Obj {
 }
 
 type transformed struct {
-	orig Obj
+	orig CSGObj
 	t    Matrix4
 	tinv Matrix4
 }

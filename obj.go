@@ -8,11 +8,13 @@ type Obj interface {
 	// It appends to *f a surface fragment for each intersection with the ray.
 	// The fragments do not need to be sorted.
 	Hit(r *Ray, f *[]Fragment)
+}
+
+// CSGObj is an object that can be used with Constructive Solid Geometry.
+type CSGObj interface {
+	Obj
 
 	// Inside returns true if point p lies inside the object.
-	//
-	// Used only for constructive solid geometry.
-	// Objects not used for CSG may simply return false.
 	Inside(p Vec) bool
 }
 

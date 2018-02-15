@@ -3,7 +3,7 @@ package bruteray
 import "math"
 
 // Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
-func Cyl(dir int, center Vec, diam, h float64, m Material) Obj {
+func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj {
 	r := diam / 2
 	coeff := Vec{1, 1, 1}
 	coeff[dir] = 0
@@ -12,7 +12,7 @@ func Cyl(dir int, center Vec, diam, h float64, m Material) Obj {
 	return capped
 }
 
-func Quad(center Vec, a Vec, b float64, m Material) Obj {
+func Quad(center Vec, a Vec, b float64, m Material) CSGObj {
 	return &quad{center, a, b, m}
 }
 

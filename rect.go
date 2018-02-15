@@ -4,7 +4,7 @@ package bruteray
 // with normal vector dir and half-axes rx, ry, rz.
 //
 // TODO: pass Vec normal, U, V
-func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj {
+func Rect(pos, dir Vec, rx, ry, rz float64, m Material) CSGObj {
 	return &rect{pos, dir, rx, ry, rz, m, noInside{}}
 }
 

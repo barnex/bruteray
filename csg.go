@@ -25,12 +25,12 @@ func putFrags(fb *[]Fragment) {
 }
 
 // Intersection (boolean AND) of two objects.
-func And(a, b Obj) Obj {
+func And(a, b CSGObj) CSGObj {
 	return &and{a, b}
 }
 
 type and struct {
-	a, b Obj
+	a, b CSGObj
 }
 
 func (o *and) Hit(r *Ray, f *[]Fragment) {
@@ -62,12 +62,12 @@ func (o *and) Inside(p Vec) bool {
 }
 
 // Union (logical OR) of two objects.
-func Or(a, b Obj) Obj {
+func Or(a, b CSGObj) CSGObj {
 	return &or{a, b}
 }
 
 type or struct {
-	a, b Obj
+	a, b CSGObj
 }
 
 func (o *or) Hit(r *Ray, f *[]Fragment) {
@@ -101,12 +101,12 @@ func (o *or) Inside(p Vec) bool {
 	return o.a.Inside(p) || o.b.Inside(p)
 }
 
-func MultiOr(o ...Obj) Obj {
+func MultiOr(o ...CSGObj) CSGObj {
 	return &multiOr{o}
 }
 
 type multiOr struct {
-	o []Obj
+	o []CSGObj
 }
 
 func (o *multiOr) Hit(r *Ray, f *[]Fragment) {
@@ -150,12 +150,12 @@ func (o *multiOr) Inside(pos Vec) bool {
 
 // Union (logical OR) of two objects, without optimizing result.
 // Best suited for a small number of simple objects.
-func Or0(a, b Obj) Obj {
+func Or0(a, b CSGObj) CSGObj {
 	return &or0{a, b}
 }
 
 type or0 struct {
-	a, b Obj
+	a, b CSGObj
 }
 
 func (o *or0) Hit(r *Ray, f *[]Fragment) {
@@ -173,12 +173,12 @@ func (o *or0) Inside(p Vec) bool {
 }
 
 // Subtraction (logical AND NOT) of two objects
-func Minus(a, b Obj) Obj {
+func Minus(a, b CSGObj) CSGObj {
 	return &minus{a, b}
 }
 
 type minus struct {
-	a, b Obj
+	a, b CSGObj
 }
 
 func (o *minus) Hit(r *Ray, f *[]Fragment) {
@@ -211,13 +211,13 @@ func (o *minus) Inside(p Vec) bool {
 	return o.a.Inside(p) && !o.b.Inside(p)
 }
 
-func Cutout(a, b Obj) Obj {
+func Cutout(a, b CSGObj) CSGObj {
 	return &cutout{a, b}
 }
 
 type cutout struct {
-	a Obj
-	b Obj // TODO -> Insider
+	a CSGObj
+	b CSGObj // TODO -> Insider
 }
 
 func (o *cutout) Hit(r *Ray, f *[]Fragment) {
@@ -235,12 +235,12 @@ func (o *cutout) Inside(pos Vec) bool {
 
 // Intersection, treating A as a hollow object.
 // Equivalent to, but more efficient than And(Hollow(a), b)
-func SurfaceAnd(a, b Obj) Obj {
+func SurfaceAnd(a, b CSGObj) CSGObj {
 	return &hand{a: a, b: b}
 }
 
 type hand struct {
-	a, b Obj
+	a, b CSGObj
 	noInside
 }
 
@@ -262,28 +262,28 @@ func (o *hand) Hit(r *Ray, f *[]Fragment) {
 
 // Hollow turns a into a hollow surface.
 // E.g.: a filled cylinder into a hollow tube.
-func Hollow(o Obj) Obj {
+func Hollow(o CSGObj) CSGObj {
 	return hollow{o}
 }
 
 type hollow struct {
-	Obj
+	CSGObj
 }
 
 func (hollow) Inside(Vec) bool {
 	return false
 }
 
-func Inverse(o Obj) Obj {
+func Inverse(o CSGObj) CSGObj {
 	return inverse{o}
 }
 
 type inverse struct {
-	Obj
+	CSGObj
 }
 
 func (o inverse) Inside(p Vec) bool {
-	return !o.Obj.Inside(p)
+	return !o.CSGObj.Inside(p)
 }
 
 //func Sort(f []Fragment) {

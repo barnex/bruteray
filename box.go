@@ -20,7 +20,7 @@ type box struct {
 	m        Material
 }
 
-func Box(center Vec, rx, ry, rz float64, m Material) Obj {
+func Box(center Vec, rx, ry, rz float64, m Material) CSGObj {
 	return &box{
 		min: center.Sub(Vec{rx, ry, rz}),
 		max: center.Add(Vec{rx, ry, rz}),
@@ -28,7 +28,7 @@ func Box(center Vec, rx, ry, rz float64, m Material) Obj {
 	}
 }
 
-func Cube(center Vec, r float64, m Material) Obj {
+func Cube(center Vec, r float64, m Material) CSGObj {
 	return Box(center, r, r, r, m)
 }
 

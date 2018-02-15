@@ -1,6 +1,6 @@
 package bruteray
 
-func Sheet(dir Vec, off float64, m Material) Obj {
+func Sheet(dir Vec, off float64, m Material) CSGObj {
 	return &sheet{dir: dir, off: off, m: m}
 }
 

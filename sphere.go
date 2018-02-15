@@ -2,7 +2,7 @@ package bruteray
 
 import "math"
 
-func Sphere(center Vec, radius float64, m Material) Obj {
+func Sphere(center Vec, radius float64, m Material) CSGObj {
 	return &sphere{center, sqr(radius), m}
 }
 

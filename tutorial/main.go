@@ -132,10 +132,10 @@ func main() {
 }
 
 var (
-	shapes = []func(Material) Obj{
-		func(m Material) Obj { return Sheet(Ey, -1.0, m) },
-		func(m Material) Obj { return Sphere(Vec{}, 1.0, m) },
-		func(m Material) Obj { return Sphere(Vec{1.5, 0, 1}, 1.0, m) },
+	shapes = []func(Material) CSGObj{
+		func(m Material) CSGObj { return Sheet(Ey, -1.0, m) },
+		func(m Material) CSGObj { return Sphere(Vec{}, 1.0, m) },
+		func(m Material) CSGObj { return Sphere(Vec{1.5, 0, 1}, 1.0, m) },
 	}
 	lightPos = Vec{4, 5, -1}
 	lightCol = WHITE.Mul(EV(8))

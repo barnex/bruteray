@@ -8,9 +8,9 @@ import (
 func main() {
 	e := NewEnv()
 
-	//white := Diffuse(WHITE.EV(-.9))
-	white := Bricks(0.3778, 0.05, Diffuse(WHITE.EV(-.9)), Diffuse(WHITE.EV(-1.3)))
-	//white = Bricks(0.3778, 0.05, ShadeShape(WHITE.EV(-.9)), ShadeShape(WHITE.EV(-1.3)))
+	white := Bricks(0.3778, 0.05, ShadeShape(WHITE.EV(-1)), ShadeShape(WHITE.EV(-1.3)))
+
+	//white = Bricks(0.3778, 0.05, brick(), cement())
 
 	const (
 		w      = 4.0              // central width
@@ -33,15 +33,15 @@ func main() {
 		chestz(Vec{X: -w - pill}, w, h1, d, pointy, white),
 		chestz(Vec{X: +w + pill}, w, h1, d, pointy, white),
 
-		Cutout(
-			chestx(Vec{}, w, h1, d, pointy, white),
-			chestx(Vec{X: 1, Y: b}, w-2*b, h1-b, d+1, pointy, white),
-		),
+		//Cutout(
+		chestx(Vec{}, w, h1, d, pointy, white),
+		chestx(Vec{X: 1, Y: b}, w-2*b, h1-b, d+.1, pointy, white),
+		//),
 
-		Cutout(
-			chestx(Vec{Z: -w - pill}, w, h1, d, pointy, white),
-			chestx(Vec{X: 1, Y: b, Z: -w - pill}, w-2*b, h1-b, d+1, pointy, white),
-		),
+		//Cutout(
+		chestx(Vec{Z: -w - pill}, w, h1, d, pointy, white),
+		chestx(Vec{X: 1, Y: b, Z: -w - pill}, w-2*b, h1-b, d+.1, pointy, white),
+		//),
 
 		Cutout(
 			chestx(Vec{Z: +w + pill}, w, h1, d, pointy, white),
@@ -52,11 +52,14 @@ func main() {
 	tileB := speckled()
 	tileW := marmer()
 
+	tileB = Flat(BLACK)
+	tileW = Flat(WHITE)
+
 	barx := 2*w - 0.4
 	barw := 0.099
-	barc := Diffuse(WHITE.EV(-4))
+	barc := Distort(5, 5, Vec{400, 400, 400}, 0.2, Reflective(WHITE.EV(-4)))
 	e.Add(
-		Rect(Ey, Vec{0, 0.03, 0}, w+pill, 0.01, d, Checkboard(1, tileW, tileB)),
+		Box(Vec{0, 0.00, 0}, 2*w+2*pill, 0.01, d, Checkboard(1, tileW, tileB)),
 		all,
 
 		Box(Vec{barx, 4, 0}, barw, barw, 20, barc),
@@ -68,27 +71,27 @@ func main() {
 		Rect(Vec{0.1, 1, 9.35}, Ez, 0.5, 2, 0.01, Flat(BLACK)),
 	)
 
-	//lighth := h1/2 + w/4 + pointy/2
 	dst := 8.0
 	e.AddLight(
-		SphereLight(Vec{12, 3, -2}.Mul(dst), 0.04*dst*dst, WHITE.EV(13).Mul(dst*dst)),
-	//PointLight(Vec{1, 5, -3}, WHITE.EV(7)),
-	//RectLight(Vec{0, lighth, d/2 + b}, w/2, lighth, 0, WHITE.EV(5.6)),
+		SphereLight(Vec{12, 2.7, -2.85}.Mul(dst), 0.04*dst*dst, WHITE.EV(11.9).Mul(dst*dst)),
+		SphereLight(Vec{w + pill, 3, -w - pill - 0.5}, 0.1, WHITE.EV(0.3).Mul(dst*dst)),
+		//SphereLight(Vec{w + pill - 1, 3, -w - pill + 0.5}, 0.2, WHITE.EV(3).Mul(dst*dst)),
 	)
 
-	e.Camera = Camera(0.65).Transl(0, 2.5, -7.0).RotScene(0 * Deg).Transf(RotX4(-0 * Deg))
+	e.Camera = Camera(0.65).Transl(0, 2.5, -6.9).RotScene(-0 * Deg).Transf(RotX4(-0 * Deg))
 	e.SetAmbient(Flat(WHITE.EV(0)))
-	e.Camera.Aperture = 0.03
+	//e.Camera.Aperture = 0.04
 	e.Camera.Focus = 9
 	e.Camera.AA = true
-	e.Recursion = 4
-	e.Cutoff = EV(4)
-	e.Fog = 7
+	e.Recursion = 3
+	e.Cutoff = EV(2.6)
+	//e.Fog = 10
+	//e.IndirectFog = true
 
 	serve.Env(e)
 }
 
-func chestz(pos Vec, w, h1, d, pointy float64, m Material) Obj {
+func chestz(pos Vec, w, h1, d, pointy float64, m Material) CSGObj {
 	const off = 1e-4
 	c1 := Cyl(Z, Vec{pointy / 2, h1, 0}.Add(pos), w+pointy, d-off, m)
 	c2 := Cyl(Z, Vec{-pointy / 2, h1, 0}.Add(pos), w+pointy, d+off, m)
@@ -97,7 +100,7 @@ func chestz(pos Vec, w, h1, d, pointy float64, m Material) Obj {
 	return Or(box, ceil)
 }
 
-func chestx(pos Vec, w, h1, d, pointy float64, m Material) Obj {
+func chestx(pos Vec, w, h1, d, pointy float64, m Material) CSGObj {
 	const off = 1e-4
 	c1 := Cyl(X, Vec{0, h1, pointy / 2}.Add(pos), w+pointy, d-off, m)
 	c2 := Cyl(X, Vec{0, h1, -pointy / 2}.Add(pos), w+pointy, d+off, m)
@@ -108,9 +111,7 @@ func chestx(pos Vec, w, h1, d, pointy float64, m Material) Obj {
 
 func marmer() Material {
 	a := Shiny(WHITE.EV(-0.9), EV(-5))
-	b := Shiny(WHITE.EV(-2), EV(-4))
-	//a = Flat(WHITE)
-	//b = Flat(BLACK)
+	b := Shiny(WHITE.EV(-1.6), EV(-3))
 	f := func(v float64) Material {
 		//v = v * v
 		if v > 0.2 && v < 0.6 {
@@ -122,13 +123,19 @@ func marmer() Material {
 	return Waves(20, 20, Vec{50, 50, 50}, f)
 }
 
+func brick() Material {
+	m := Diffuse(WHITE.EV(-.9))
+	return Distort(25, 25, Vec{40, 300, 40}, 0.03, m)
+}
+
+func cement() Material {
+	m := Diffuse(WHITE.EV(-1.3))
+	return Distort(10, 10, Vec{400, 400, 400}, 0.2, m)
+}
+
 func speckled() Material {
-	//return Distort(123, 20, Vec{500, 500, 500}, 0.1, Reflective(WHITE.EV(-4)))
-	//return Reflective(WHITE.EV(-4))
-	a := Shiny(WHITE.EV(-6), EV(-5))
-	b := Diffuse(WHITE.EV(-6))
-	//a = Flat(WHITE)
-	//b = Flat(BLACK)
+	a := Reflective(WHITE.EV(-4))
+	b := Diffuse(WHITE.EV(-4))
 	f := func(v float64) Material {
 		//v = v * v
 		if v*v > 0.9 {

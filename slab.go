@@ -1,6 +1,6 @@
 package bruteray
 
-func Slab(dir Vec, off1, off2 float64, m Material) Obj {
+func Slab(dir Vec, off1, off2 float64, m Material) CSGObj {
 	off1, off2 = sort2(off1, off2)
 	return &slab{dir.Normalized(), off1, off2, m}
 }

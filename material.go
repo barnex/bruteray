@@ -152,6 +152,10 @@ func (s *reflective) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	return e.ShadeAll(r2, N).Mul3(s.c)
 }
 
+// Refractive material with index of refraction n1 outside and n2 inside.
+// E.g.:
+// 	Refractive(1, 1.5) // glass in air
+// 	Refractive(1.5, 1) // air in glass
 func Refractive(n1, n2 float64) Material {
 	return &refractive{n1, n2}
 }
@@ -171,7 +175,7 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	// if we are exiting rather than entering the refractive material,
 	// swap refractive indices.
 	n1, n2 := s.n1, s.n2
-	if !frag.Object.Inside(posAhead) {
+	if !frag.Object.(CSGObj).Inside(posAhead) { // TODO: avoid cast?
 		n1, n2 = n2, n1
 	}
 	n12 := n1 / n2
@@ -236,7 +240,7 @@ func (s *blend) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	return ca.Mul(s.a).MAdd(s.b, cb)
 }
 
-// Debug shader: colors according to the normal vector projected on dir.
+// ShadeNormal is a debug shader that colors according to the normal vector projected on dir.
 func ShadeNormal(dir Vec) Material {
 	return &shadeNormal{dir}
 }

@@ -11,7 +11,7 @@ type Prober interface {
 
 // Probe implementation for objects that only have Hit.
 // TODO: remove.
-func Probe(r *Ray, o Obj) float64 {
+func Probe(r *Ray, o CSGObj) float64 {
 	//if p, ok := o.(Prober); ok {
 	//	return p.Probe(r)
 	//}

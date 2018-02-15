@@ -4,7 +4,7 @@ import "math"
 
 type Light interface {
 	Sample(e *Env, target Vec) (pos Vec, intens Color)
-	Obj
+	CSGObj
 }
 
 // embed to get a Hit that returns no intersection.

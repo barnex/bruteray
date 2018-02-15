@@ -529,7 +529,7 @@ func TestMultiOr(t *testing.T) {
 		b      = 0.5
 	)
 
-	chestz := func(pos Vec, w, h1, d, pointy float64, m Material) Obj {
+	chestz := func(pos Vec, w, h1, d, pointy float64, m Material) CSGObj {
 		const off = 1e-4
 		c1 := Cyl(Z, Vec{pointy / 2, h1, 0}.Add(pos), w+pointy, d-off, m)
 		c2 := Cyl(Z, Vec{-pointy / 2, h1, 0}.Add(pos), w+pointy, d+off, m)
@@ -538,7 +538,7 @@ func TestMultiOr(t *testing.T) {
 		return Or(box, ceil)
 	}
 
-	chestx := func(pos Vec, w, h1, d, pointy float64, m Material) Obj {
+	chestx := func(pos Vec, w, h1, d, pointy float64, m Material) CSGObj {
 		const off = 1e-4
 		c1 := Cyl(X, Vec{0, h1, pointy / 2}.Add(pos), w+pointy, d-off, m)
 		c2 := Cyl(X, Vec{0, h1, -pointy / 2}.Add(pos), w+pointy, d+off, m)
