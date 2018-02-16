@@ -1,8 +1,12 @@
 package main
 
 import (
-	. "github.com/barnex/bruteray"
+	. "github.com/barnex/bruteray/br"
+	. "github.com/barnex/bruteray/csg"
+	. "github.com/barnex/bruteray/light"
+	. "github.com/barnex/bruteray/mat"
 	"github.com/barnex/bruteray/serve"
+	. "github.com/barnex/bruteray/shape"
 )
 
 func main() {

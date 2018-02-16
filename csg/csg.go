@@ -1,9 +1,11 @@
 package csg
 
 import (
-	. "github.com/barnex/bruteray"
 	"math"
 	"sync"
+
+	. "github.com/barnex/bruteray/br"
+	"github.com/barnex/bruteray/shape"
 )
 
 var (
@@ -26,7 +28,7 @@ func putFrags(fb *[]Fragment) {
 }
 
 func init() {
-	CsgAnd_ = And // TODO: remove
+	shape.CsgAnd_ = And // TODO: remove
 }
 
 // Intersection (boolean AND) of two objects.

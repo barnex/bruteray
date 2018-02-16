@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 
-	. "github.com/barnex/bruteray"
-	"github.com/barnex/bruteray/sample"
+	. "github.com/barnex/bruteray/br"
+	. "github.com/barnex/bruteray/light"
+	. "github.com/barnex/bruteray/mat"
+	"github.com/barnex/bruteray/raster"
+	"github.com/barnex/bruteray/shape"
 )
 
 func main() {
@@ -132,10 +135,10 @@ func main() {
 }
 
 var (
-	shapes = []func(Material) CSGObj{
-		func(m Material) CSGObj { return Sheet(Ey, -1.0, m) },
-		func(m Material) CSGObj { return Sphere(Vec{}, 1.0, m) },
-		func(m Material) CSGObj { return Sphere(Vec{1.5, 0, 1}, 1.0, m) },
+	shapes = []func(Material) Obj{
+		func(m Material) Obj { return shape.Sheet(Ey, -1.0, m) },
+		func(m Material) Obj { return shape.Sphere(Vec{}, 1.0, m) },
+		func(m Material) Obj { return shape.Sphere(Vec{1.5, 0, 1}, 1.0, m) },
 	}
 	lightPos = Vec{4, 5, -1}
 	lightCol = WHITE.Mul(EV(8))
@@ -156,15 +159,15 @@ var cnt = 0
 func render1(e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
-	img := sample.MakeImage(600, 400)
-	sample.SinglePass(e, img)
-	sample.Encode(img, name)
+	img := raster.MakeImage(600, 400)
+	raster.SinglePass(e, img)
+	raster.Encode(img, name)
 }
 
 func render2(e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
-	img := sample.MakeImage(600, 400)
-	sample.MultiPass(e, img, 300)
-	sample.Encode(img, name)
+	img := raster.MakeImage(600, 400)
+	raster.MultiPass(e, img, 300)
+	raster.Encode(img, name)
 }
