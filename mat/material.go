@@ -18,7 +18,7 @@ type flat struct {
 	c Color
 }
 
-func (s *flat) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s *flat) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	return s.c
 }
 
@@ -35,7 +35,7 @@ type diffuse struct {
 
 const offset = 1e-6 // TODO: Ray.Offset
 
-func (s *diffuse) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s *diffuse) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	// This is the core of bi-directonial path tracing.
 
 	pos, norm := r.At(frag.T-offset), frag.Norm
@@ -55,7 +55,7 @@ func (s *diffuse) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	// Choose the random ray via importance sampling.
 	sec := e.NewRay(pos.MAdd(offset, norm), RandVecCos(e, norm))
 	defer e.RRay(sec)
-	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(sec, N))) // does not include explicit lights
+	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(ctx, sec, N))) // does not include explicit lights
 
 	return acc
 }
@@ -70,7 +70,7 @@ type diffuse0 struct {
 	refl Color
 }
 
-func (s *diffuse0) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s *diffuse0) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	var acc Color
 	for _, l := range e.Lights {
@@ -114,7 +114,7 @@ type diffuse00 struct {
 	refl Color
 }
 
-func (s *diffuse00) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s *diffuse00) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	var acc Color
 	for _, l := range e.Lights {
@@ -131,7 +131,7 @@ func (s *diffuse00) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 // Used for shading the ambient background, E.g., the sky.
 type ShadeDir func(dir Vec) Color
 
-func (s ShadeDir) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos := r.At(frag.T - offset)
 	return s(pos)
 }
@@ -148,11 +148,11 @@ type reflective struct {
 	c Color
 }
 
-func (s *reflective) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s *reflective) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	r2 := e.NewRay(pos, r.Dir().Reflect(norm))
 	defer e.RRay(r2)
-	return e.ShadeAll(r2, N).Mul3(s.c)
+	return e.ShadeAll(ctx, r2, N).Mul3(s.c)
 }
 
 // Refractive material with index of refraction n1 outside and n2 inside.
@@ -168,7 +168,7 @@ type refractive struct {
 }
 
 // https://en.wikipedia.org/wiki/Fresnel_equations
-func (s *refractive) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s *refractive) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 
 	const offset = 1e-3
 
@@ -192,7 +192,7 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	if sin2θt > 1 {
 		r2 := e.NewRay(posBehind, r.Dir().Reflect(frag.Norm))
 		defer e.RRay(r2)
-		return e.ShadeAll(r2, N)
+		return e.ShadeAll(ctx, r2, N)
 	}
 
 	cosθt := math.Sqrt(1 - sin2θt)
@@ -207,12 +207,12 @@ func (s *refractive) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	t := i.Mul(n12).MAdd((n12*cosθi - math.Sqrt(1-(sin2θt))), frag.Norm)
 	r2 := e.NewRay(posAhead, t)
 	defer e.RRay(r2)
-	cT := e.ShadeAll(r2, N).Mul(T)
+	cT := e.ShadeAll(ctx, r2, N).Mul(T)
 
 	// reflected ray
 	r3 := e.NewRay(posBehind, i.Reflect(n))
 	defer e.RRay(r3)
-	cR := e.ShadeAll(r3, N).Mul(R)
+	cR := e.ShadeAll(ctx, r3, N).Mul(R)
 
 	return cR.Add(cT)
 }
@@ -240,9 +240,9 @@ type blend struct {
 	matB Material
 }
 
-func (s *blend) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
-	ca := s.matA.Shade(e, N, r, frag)
-	cb := s.matB.Shade(e, N, r, frag)
+func (s *blend) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
+	ca := s.matA.Shade(ctx, e, N, r, frag)
+	cb := s.matB.Shade(ctx, e, N, r, frag)
 
 	return ca.Mul(s.a).MAdd(s.b, cb)
 }
@@ -256,7 +256,7 @@ type shadeNormal struct {
 	dir Vec
 }
 
-func (s *shadeNormal) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s *shadeNormal) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	v := frag.Norm.Dot(s.dir)
 	if v < 0 {
 		return RED.Mul(-v) // towards cam
@@ -274,7 +274,7 @@ func ShadeShape(c Color) Material {
 
 type shadeShape struct{ c Color }
 
-func (s *shadeShape) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (s *shadeShape) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	v := -frag.Norm.Dot(r.Dir())
 	if v < 0 || v > 1 {
 		panic(fmt.Sprintf("norm=%v, norm.len=%v, dir=%v, dir.len=%v, dot=%v", frag.Norm, frag.Norm.Len(), r.Dir(), r.Dir().Len(), v))

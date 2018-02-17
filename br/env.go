@@ -42,8 +42,7 @@ func NewEnv() *Env {
 // Default recursion depth for NewEnv
 const DefaultRec = 6
 
-// Returns a copy with its own random number generator,
-// so it can be used from a different thread.
+// TODO: rm
 func (e *Env) Copy() *Env {
 	e2 := *e
 	e2.Rng = *(newRng())
@@ -79,16 +78,16 @@ func (e *Env) SetAmbient(m Material) {
 // caused by all objects including lights.
 // Used by specular surfaces
 // who make no distinction between light sources and regular objects.
-func (e *Env) ShadeAll(r *Ray, N int) Color {
-	return e.Shade(r, N, e.all)
+func (e *Env) ShadeAll(ctx *Ctx, r *Ray, N int) Color {
+	return e.Shade(ctx, r, N, e.all)
 }
 
 // Calculate intensity seen by ray,
 // caused by objects but excluding lights.
 // Used for diffuse inter reflection
 // where contributions of light sources are added separately.
-func (e *Env) ShadeNonLum(r *Ray, N int) Color {
-	return e.Shade(r, N, e.objs)
+func (e *Env) ShadeNonLum(ctx *Ctx, r *Ray, N int) Color {
+	return e.Shade(ctx, r, N, e.objs)
 }
 
 func (e *Env) fb() *[]Fragment {
@@ -103,7 +102,7 @@ func (e *Env) rfb(fb *[]Fragment) {
 
 // Calculate intensity seen by ray, with maximum recursion depth N.
 // who = objs, lights, or all.
-func (e *Env) Shade(r *Ray, N int, who []Obj) Color {
+func (e *Env) Shade(ctx *Ctx, r *Ray, N int, who []Obj) Color {
 	if N <= 0 {
 		return Color{}
 	}
@@ -135,22 +134,22 @@ func (e *Env) Shade(r *Ray, N int, who []Obj) Color {
 	if e.Fog != 0 && N == e.Recursion && e.Recursion > 1 {
 		// add fog only to primary ray,
 		// it's very expensive and the indirect effect is hardly visible.
-		return e.withFog(surf, N-1, r)
+		return e.withFog(ctx, surf, N-1, r)
 	} else {
-		return surf.Shade(e, N-1, r)
+		return surf.Shade(ctx, e, N-1, r)
 	}
 }
 
-func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
+func (e *Env) withFog(ctx *Ctx, surf Fragment, N int, r *Ray) Color {
 	tObject := surf.T
 	tScatter := e.Rng.ExpFloat64() * e.Fog
 	if tScatter > tObject {
-		return surf.Shade(e, N, r) // hit object without scattering
+		return surf.Shade(ctx, e, N, r) // hit object without scattering
 	}
 	// else: ray scattered on fog
 
 	//c := Color{}
-	c := surf.Shade(e, N, r)
+	c := surf.Shade(ctx, e, N, r)
 	pos := r.At(tScatter)
 	for _, l := range e.Lights {
 		lpos, intens := l.Sample(e, pos)
@@ -167,7 +166,7 @@ func (e *Env) withFog(surf Fragment, N int, r *Ray) Color {
 	if e.IndirectFog {
 		r2 := e.NewRay(pos, randVec(&e.Rng))
 		defer e.RRay(r2)
-		fogc := e.Shade(r2, 1, e.objs)
+		fogc := e.Shade(ctx, r2, 1, e.objs)
 		c = c.Add(fogc)
 	}
 

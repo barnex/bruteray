@@ -9,5 +9,5 @@ type Material interface {
 	// If Shade uses recursion, e.g., to calculate reflections,
 	// it must pass N-1 as the new recursion depth, so that
 	// recursion can eventually be terminated (by Env.Shade).
-	Shade(e *Env, N int, r *Ray, frag Fragment) Color
+	Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 }

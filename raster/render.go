@@ -29,12 +29,13 @@ func render(cam *Cam, e *br.Env, img Image, numCPU int) {
 
 	var wg sync.WaitGroup
 	for i := 0; i < numCPU; i++ {
-		eCopy := e.Copy()
+		eCopy := e.Copy() // TODO: rm
+		ctx := &br.Ctx{}
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			for i := range ch {
-				renderLine(cam, eCopy, img, i)
+				renderLine(ctx, cam, eCopy, img, i)
 			}
 		}()
 	}
@@ -93,7 +94,7 @@ func RenderLoop(cam *Cam, e *br.Env, w, h int, peek chan chan Image) {
 	}
 }
 
-func renderLine(cam *Cam, e *br.Env, img Image, i int) {
+func renderLine(ctx *br.Ctx, cam *Cam, e *br.Env, img Image, i int) {
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
 
 	r := e.NewRay(br.Vec{}, br.Vec{})
@@ -103,7 +104,7 @@ func renderLine(cam *Cam, e *br.Env, img Image, i int) {
 		cam.RayFrom(e, i, j, W, H, r)
 
 		// accumulate ray intensity
-		c := e.ShadeAll(r, e.Recursion)
+		c := e.ShadeAll(ctx, r, e.Recursion)
 
 		// clip to avoid caustic noise
 		if c.R > e.Cutoff || c.G > e.Cutoff || c.B > e.Cutoff {

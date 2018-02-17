@@ -14,15 +14,15 @@ type checkboard struct {
 	a, b Material
 }
 
-func (c *checkboard) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (c *checkboard) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos := r.At(frag.T)
 	x := int(pos[X]*c.invs + 10000)
 	y := int(pos[Z]*c.invs + 10000)
 	i := (x + y) & 0x1
 	if i == 0 {
-		return c.a.Shade(e, N, r, frag)
+		return c.a.Shade(ctx, e, N, r, frag)
 	} else {
-		return c.b.Shade(e, N, r, frag)
+		return c.b.Shade(ctx, e, N, r, frag)
 	}
 }
 
@@ -36,7 +36,7 @@ type bricks struct {
 	a, b  Material
 }
 
-func (c *bricks) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (c *bricks) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos := r.At(frag.T)
 
 	x, y, z := pos[X]*c.invs, pos[Y]*c.invs, pos[Z]*c.invs
@@ -61,9 +61,9 @@ func (c *bricks) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
 	//(math.Floor(z) < w) ||
 	//(math.Ceil(z) > 1-w)
 	if hit {
-		return c.b.Shade(e, N, r, frag)
+		return c.b.Shade(ctx, e, N, r, frag)
 	} else {
-		return c.a.Shade(e, N, r, frag)
+		return c.a.Shade(ctx, e, N, r, frag)
 	}
 }
 
@@ -84,14 +84,14 @@ type distort struct {
 	f     [3]series
 }
 
-func (m distort) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (m distort) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos := r.At(frag.T)
 	var delta Vec
 	for i := range delta {
 		delta[i] = m.f[i].Eval(pos)
 	}
 	frag.Norm = frag.Norm.MAdd(m.ampli, delta).Normalized()
-	return m.orig.Shade(e, N, r, frag)
+	return m.orig.Shade(ctx, e, N, r, frag)
 }
 
 func Waves(seed int, n int, K Vec, col func(float64) Material) Material {
@@ -103,9 +103,9 @@ type waves struct {
 	col func(float64) Material
 }
 
-func (m *waves) Shade(e *Env, N int, r *Ray, frag Fragment) Color {
+func (m *waves) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	v := m.Eval(r.At(frag.T))
-	return m.col(v).Shade(e, N, r, frag)
+	return m.col(v).Shade(ctx, e, N, r, frag)
 }
 
 // series is a sum of a number of sines.

@@ -25,7 +25,7 @@ type Color struct {
 	R, G, B float64
 }
 
-func (c Color) Shade(_ *Env, _ int, _ *Ray, _ Fragment) Color {
+func (c Color) Shade(_ *Ctx, _ *Env, _ int, _ *Ray, _ Fragment) Color {
 	return c
 }
 
