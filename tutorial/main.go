@@ -17,7 +17,7 @@ func main() {
 			Flat(BLACK),
 			Flat(RED),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		render1(cam, e)
 	}
 
@@ -27,7 +27,7 @@ func main() {
 			Flat(RED),
 			Flat(BLUE),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		render1(cam, e)
 	}
 
@@ -37,7 +37,7 @@ func main() {
 			Diffuse00(RED),
 			Diffuse00(BLUE),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
 			PointLight(lightPos, lightCol),
 		)
@@ -50,7 +50,7 @@ func main() {
 			Diffuse0(RED),
 			Diffuse0(BLUE),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
 			PointLight(lightPos, lightCol),
 		)
@@ -63,7 +63,7 @@ func main() {
 			Diffuse0(RED),
 			Diffuse0(BLUE),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
 		)
@@ -76,7 +76,7 @@ func main() {
 			Diffuse0(RED),
 			Diffuse0(BLUE),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
 		)
@@ -89,7 +89,7 @@ func main() {
 			Diffuse0(RED),
 			Diffuse0(BLUE),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
@@ -103,7 +103,7 @@ func main() {
 			Diffuse(RED),
 			Diffuse(BLUE),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
@@ -117,7 +117,7 @@ func main() {
 			Diffuse(RED),
 			Diffuse(BLUE),
 		)
-		cam := Camera(1).Transl(0, 0, -3)
+		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
@@ -148,7 +148,7 @@ func env(m ...Material) *Env {
 
 var cnt = 0
 
-func render1(cam *Cam, e *Env) {
+func render1(cam *raster.Cam, e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
 	img := raster.MakeImage(600, 400)
@@ -156,7 +156,7 @@ func render1(cam *Cam, e *Env) {
 	raster.Encode(img, name)
 }
 
-func render2(cam *Cam, e *Env) {
+func render2(cam *raster.Cam, e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
 	img := raster.MakeImage(600, 400)

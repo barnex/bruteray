@@ -33,7 +33,7 @@ var (
 
 // Starts a web UI server
 // at the port specified by flag --http.
-func Env(cam *br.Cam, e *br.Env) {
+func Env(cam *raster.Cam, e *br.Env) {
 
 	log.SetFlags(0)
 	flag.Parse()

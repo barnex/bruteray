@@ -12,11 +12,11 @@ import (
 
 // SinglePass renders a scene by evaluating each pixel once.
 // Suited if no Monte-Carlo methods (e.g. Diffuse Material) are involved.
-func SinglePass(cam *br.Cam, e *br.Env, img Image) {
+func SinglePass(cam *Cam, e *br.Env, img Image) {
 	render(cam, e, img, runtime.NumCPU())
 }
 
-func render(cam *br.Cam, e *br.Env, img Image, numCPU int) {
+func render(cam *Cam, e *br.Env, img Image, numCPU int) {
 	H := img.Bounds().Dy()
 
 	// numCPU goroutines will each render
@@ -43,11 +43,11 @@ func render(cam *br.Cam, e *br.Env, img Image, numCPU int) {
 
 // MutliPass renders a scene by evaluating each pixel a fixed number of times and averaging the results.
 // Suited for Monte-Carlo methods.
-func MultiPass(cam *br.Cam, e *br.Env, img Image, passes int) {
+func MultiPass(cam *Cam, e *br.Env, img Image, passes int) {
 	multiPass(cam, e, img, passes, runtime.NumCPU())
 }
 
-func multiPass(cam *br.Cam, e *br.Env, img Image, passes int, numCPU int) {
+func multiPass(cam *Cam, e *br.Env, img Image, passes int, numCPU int) {
 	w, h := img.Bounds().Dx(), img.Bounds().Dy()
 	for i := 0; i < passes; i++ {
 		acc := MakeImage(w, h)
@@ -60,7 +60,7 @@ func multiPass(cam *br.Cam, e *br.Env, img Image, passes int, numCPU int) {
 // RenderLoop starts an infinite loop, continuously improving the image quality.
 // Intermediate images can be queried from the peek channel.
 // Used for live previews.
-func RenderLoop(cam *br.Cam, e *br.Env, w, h int, peek chan chan Image) {
+func RenderLoop(cam *Cam, e *br.Env, w, h int, peek chan chan Image) {
 	img := MakeImage(w, h)
 	passes := 0
 
@@ -93,7 +93,7 @@ func RenderLoop(cam *br.Cam, e *br.Env, w, h int, peek chan chan Image) {
 	}
 }
 
-func renderLine(cam *br.Cam, e *br.Env, img Image, i int) {
+func renderLine(cam *Cam, e *br.Env, img Image, i int) {
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
 
 	r := e.NewRay(br.Vec{}, br.Vec{})

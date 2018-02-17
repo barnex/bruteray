@@ -21,7 +21,7 @@ type Env struct {
 	fragPool Pool
 	rayPool  Pool
 
-	Cutoff float64 // Maximum allowed brightness. Used to suppres spurious caustics. TODO rm
+	Cutoff float64 // Maximum allowed brightness. Used to suppress spurious caustics. TODO rm
 	//Camera      *Cam      // Camera determines the point of view
 }
 

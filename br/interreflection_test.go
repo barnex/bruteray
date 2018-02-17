@@ -26,7 +26,7 @@ func TestDiffuse1(t *testing.T) {
 		for _, r := range []int{1, 16, 128} {
 			e := whitebox(refl)
 			e.Recursion = r
-			cam := Camera(0.75).Transl(0, 0, -1)
+			cam := raster.Camera(0.75).Transl(0, 0, -1)
 			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, e.Recursion), func(t *testing.T) {
 				t.Parallel()
 				img := raster.MakeImage(testW/4, testH/4)

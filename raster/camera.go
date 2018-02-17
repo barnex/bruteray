@@ -1,11 +1,17 @@
-package br
+package raster
+
+import (
+	"math/rand"
+
+	. "github.com/barnex/bruteray/br"
+)
 
 // Camera renders a scene into a raw intensity image.
 type Cam struct {
 	FocalLen  float64
 	Focus     float64
 	Aperture  float64
-	Diaphragm func(*Env) (x, y float64) // TODO: func(rng)
+	Diaphragm func(e *Env) (x, y float64) // TODO: func(rng)
 	transf    Matrix4
 	AA        bool
 }
@@ -35,8 +41,8 @@ func (c *Cam) RayFrom(e *Env, i, j int, W, H int, r *Ray) {
 	}
 
 	// ray end point
-	y0 := ((-float64(i) + c.aa(e) + float64(H)/2) / float64(H))
-	x0 := ((float64(j) + c.aa(e) - float64(W)/2) / float64(H))
+	y0 := ((-float64(i) + c.aa(&e.Rng) + float64(H)/2) / float64(H))
+	x0 := ((float64(j) + c.aa(&e.Rng) - float64(W)/2) / float64(H))
 	z0 := c.FocalLen
 
 	end := Vec{x0, y0, z0}
@@ -78,9 +84,9 @@ func (c *Cam) RotScene(theta float64) *Cam {
 }
 
 // Anti-aliasing jitter
-func (c *Cam) aa(e *Env) float64 {
+func (c *Cam) aa(rng *rand.Rand) float64 {
 	if c.AA {
-		return random(e)
+		return rng.Float64()
 	} else {
 		return 0.5
 	}

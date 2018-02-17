@@ -5,6 +5,7 @@ import (
 	. "github.com/barnex/bruteray/csg"
 	. "github.com/barnex/bruteray/light"
 	. "github.com/barnex/bruteray/mat"
+	"github.com/barnex/bruteray/raster"
 	"github.com/barnex/bruteray/serve"
 	. "github.com/barnex/bruteray/shape"
 )
@@ -85,7 +86,7 @@ func main() {
 	e.Recursion = 3
 	e.Cutoff = EV(2.6)
 
-	cam := Camera(0.65).Transl(0, 2.5, -6.9).RotScene(-0 * Deg).Transf(RotX4(-0 * Deg))
+	cam := raster.Camera(0.65).Transl(0, 2.5, -6.9).RotScene(-0 * Deg).Transf(RotX4(-0 * Deg))
 	cam.Aperture = 0.04
 	cam.Focus = 9
 	cam.AA = true
