@@ -13,24 +13,25 @@ type Env struct {
 	Lights      []Light   // light sources
 	all         []Obj     // objs + lights
 	Ambient     Fragment  // Shades the background at infinity, when no object is hit
-	Rng         rand.Rand // Random-number generator for use by one thread
-	Camera      *Cam      // Camera determines the point of view
+	Rng         rand.Rand // Random-number generator for use by one thread // TODO: rm
 	Recursion   int       // Maximum allowed recursion depth.
-	Cutoff      float64   // Maximum allowed brightness. Used to suppres spurious caustics.
 	Fog         float64   // Fog distance
 	IndirectFog bool      // Include fog interreflection
 
 	fragPool Pool
 	rayPool  Pool
+
+	Cutoff float64 // Maximum allowed brightness. Used to suppres spurious caustics. TODO rm
+	//Camera      *Cam      // Camera determines the point of view
 }
 
 // NewEnv creates an empty environment
 // to which objects can be added later.
 func NewEnv() *Env {
 	return &Env{
-		Ambient:   Fragment{T: inf, Material: BLACK},
-		Rng:       *(newRng()),
-		Camera:    Camera(0),
+		Ambient: Fragment{T: inf, Material: BLACK},
+		Rng:     *(newRng()),
+		//Camera:    Camera(0),
 		Recursion: DefaultRec,
 		Cutoff:    math.Inf(1),
 		fragPool:  Pool{New: func() interface{} { v := make([]Fragment, 0, 8); return &v }},

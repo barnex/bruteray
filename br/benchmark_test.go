@@ -43,6 +43,6 @@ func benchmark(b *testing.B, e *Env, c *Cam) {
 	img := raster.MakeImage(testW, testH)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		raster.SinglePass(e, img)
+		raster.SinglePass(c, e, img)
 	}
 }

@@ -33,7 +33,7 @@ var (
 
 // Starts a web UI server
 // at the port specified by flag --http.
-func Env(e *br.Env) {
+func Env(cam *br.Cam, e *br.Env) {
 
 	log.SetFlags(0)
 	flag.Parse()
@@ -44,7 +44,7 @@ func Env(e *br.Env) {
 	http.HandleFunc("/tiff", handleTiff)
 	http.HandleFunc("/", mainHandler)
 
-	go raster.RenderLoop(e, *flagWidth, *flagHeight, peek)
+	go raster.RenderLoop(cam, e, *flagWidth, *flagHeight, peek)
 
 	log.Fatal(http.ListenAndServe(*port, nil))
 }

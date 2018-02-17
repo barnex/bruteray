@@ -17,9 +17,8 @@ func main() {
 			Flat(BLACK),
 			Flat(RED),
 		)
-		e.Camera.AA = false
-		e.Camera = Camera(1).Transl(0, 0, -3)
-		render1(e)
+		cam := Camera(1).Transl(0, 0, -3)
+		render1(cam, e)
 	}
 
 	{
@@ -28,9 +27,8 @@ func main() {
 			Flat(RED),
 			Flat(BLUE),
 		)
-		e.Camera.AA = false
-		e.Camera = Camera(1).Transl(0, 0, -3)
-		render1(e)
+		cam := Camera(1).Transl(0, 0, -3)
+		render1(cam, e)
 	}
 
 	{
@@ -39,12 +37,11 @@ func main() {
 			Diffuse00(RED),
 			Diffuse00(BLUE),
 		)
-		e.Camera.AA = false
-		e.Camera = Camera(1).Transl(0, 0, -3)
+		cam := Camera(1).Transl(0, 0, -3)
 		e.AddLight(
 			PointLight(lightPos, lightCol),
 		)
-		render1(e)
+		render1(cam, e)
 	}
 
 	{
@@ -53,12 +50,11 @@ func main() {
 			Diffuse0(RED),
 			Diffuse0(BLUE),
 		)
-		e.Camera.AA = false
-		e.Camera = Camera(1).Transl(0, 0, -3)
+		cam := Camera(1).Transl(0, 0, -3)
 		e.AddLight(
 			PointLight(lightPos, lightCol),
 		)
-		render1(e)
+		render1(cam, e)
 	}
 
 	{
@@ -67,12 +63,11 @@ func main() {
 			Diffuse0(RED),
 			Diffuse0(BLUE),
 		)
-		e.Camera.AA = false
-		e.Camera = Camera(1).Transl(0, 0, -3)
+		cam := Camera(1).Transl(0, 0, -3)
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
 		)
-		render1(e)
+		render1(cam, e)
 	}
 
 	{
@@ -81,12 +76,11 @@ func main() {
 			Diffuse0(RED),
 			Diffuse0(BLUE),
 		)
-		e.Camera.AA = false
-		e.Camera = Camera(1).Transl(0, 0, -3)
+		cam := Camera(1).Transl(0, 0, -3)
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
 		)
-		render2(e)
+		render2(cam, e)
 	}
 
 	{
@@ -95,12 +89,12 @@ func main() {
 			Diffuse0(RED),
 			Diffuse0(BLUE),
 		)
-		e.Camera = Camera(1).Transl(0, 0, -3)
-		e.Camera.AA = true
+		cam := Camera(1).Transl(0, 0, -3)
+		cam.AA = true
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
 		)
-		render2(e)
+		render2(cam, e)
 	}
 
 	{
@@ -109,12 +103,12 @@ func main() {
 			Diffuse(RED),
 			Diffuse(BLUE),
 		)
-		e.Camera = Camera(1).Transl(0, 0, -3)
-		e.Camera.AA = true
+		cam := Camera(1).Transl(0, 0, -3)
+		cam.AA = true
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
 		)
-		render2(e)
+		render2(cam, e)
 	}
 
 	{
@@ -123,13 +117,13 @@ func main() {
 			Diffuse(RED),
 			Diffuse(BLUE),
 		)
-		e.Camera = Camera(1).Transl(0, 0, -3)
-		e.Camera.AA = true
+		cam := Camera(1).Transl(0, 0, -3)
+		cam.AA = true
 		e.AddLight(
 			SphereLight(lightPos, 2, lightCol),
 		)
 		e.SetAmbient(Flat(WHITE))
-		render2(e)
+		render2(cam, e)
 	}
 
 }
@@ -149,25 +143,23 @@ func env(m ...Material) *Env {
 	for i, m := range m {
 		e.Add(shapes[i](m))
 	}
-	e.Camera = Camera(1).Transl(0, 1, -3)
-	e.Camera.AA = true
 	return e
 }
 
 var cnt = 0
 
-func render1(e *Env) {
+func render1(cam *Cam, e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
 	img := raster.MakeImage(600, 400)
-	raster.SinglePass(e, img)
+	raster.SinglePass(cam, e, img)
 	raster.Encode(img, name)
 }
 
-func render2(e *Env) {
+func render2(cam *Cam, e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
 	img := raster.MakeImage(600, 400)
-	raster.MultiPass(e, img, 300)
+	raster.MultiPass(cam, e, img, 300)
 	raster.Encode(img, name)
 }

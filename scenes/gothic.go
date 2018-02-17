@@ -81,18 +81,18 @@ func main() {
 		SphereLight(Vec{w + pill, 3, -w - pill - 0.5}, 0.1, WHITE.EV(0.3).Mul(dst*dst)),
 		//SphereLight(Vec{w + pill - 1, 3, -w - pill + 0.5}, 0.2, WHITE.EV(3).Mul(dst*dst)),
 	)
-
-	e.Camera = Camera(0.65).Transl(0, 2.5, -6.9).RotScene(-0 * Deg).Transf(RotX4(-0 * Deg))
 	e.SetAmbient(Flat(WHITE.EV(0)))
-	//e.Camera.Aperture = 0.04
-	e.Camera.Focus = 9
-	e.Camera.AA = true
 	e.Recursion = 3
 	e.Cutoff = EV(2.6)
+
+	cam := Camera(0.65).Transl(0, 2.5, -6.9).RotScene(-0 * Deg).Transf(RotX4(-0 * Deg))
+	cam.Aperture = 0.04
+	cam.Focus = 9
+	cam.AA = true
 	//e.Fog = 10
 	//e.IndirectFog = true
 
-	serve.Env(e)
+	serve.Env(cam, e)
 }
 
 func chestz(pos Vec, w, h1, d, pointy float64, m Material) CSGObj {

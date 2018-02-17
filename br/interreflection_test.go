@@ -26,13 +26,14 @@ func TestDiffuse1(t *testing.T) {
 		for _, r := range []int{1, 16, 128} {
 			e := whitebox(refl)
 			e.Recursion = r
+			cam := Camera(0.75).Transl(0, 0, -1)
 			t.Run(fmt.Sprintf("refl=%v,rec=%v", refl, e.Recursion), func(t *testing.T) {
 				t.Parallel()
 				img := raster.MakeImage(testW/4, testH/4)
 				nPass := 2
-				raster.MultiPass(e, img, nPass)
+				raster.MultiPass(cam, e, img, nPass)
 				name := fmt.Sprintf("diffuse1-refl%v-rec%v", refl, e.Recursion)
-				CompareImg(t, e, img, 0, name, 10)
+				CompareImg(t, cam, e, img, 0, name, 10)
 			})
 		}
 	}
@@ -50,7 +51,5 @@ func whitebox(refl float64) *Env {
 		shape.Sheet(Ez, 1, white),
 	)
 	e.AddLight(light.PointLight(Vec{}, WHITE.Mul(EV(-3)).Mul(4*Pi)))
-	e.Camera = Camera(0.75).Transl(0, 0, -1)
-	e.Camera.AA = true
 	return e
 }

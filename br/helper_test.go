@@ -15,26 +15,26 @@ import (
 	"github.com/barnex/bruteray/raster"
 )
 
-func CompareNPass(t *testing.T, e *Env, number int, name string, nPass int, tolerance float64, w, h int) {
+func CompareNPass(t *testing.T, cam *Cam, e *Env, number int, name string, nPass int, tolerance float64, w, h int) {
 	t.Helper()
 	img := raster.MakeImage(w, h)
 
 	start := time.Now()
-	raster.MultiPass(e, img, nPass)
+	raster.MultiPass(cam, e, img, nPass)
 	duration := time.Since(start)
 
-	CompareImg(t, e, img, number, name, tolerance)
+	CompareImg(t, cam, e, img, number, name, tolerance)
 	fmt.Println("t=", duration.Round(time.Millisecond/10))
 }
 
 // Compare renders the environment with standard resolution
 // and compares the output against testdata/00number-name.png.
-func Compare(t *testing.T, e *Env, number int, name string, tolerance float64) {
+func Compare(t *testing.T, cam *Cam, e *Env, number int, name string, tolerance float64) {
 	t.Helper()
-	CompareNPass(t, e, number, name, 1, tolerance, testW, testH)
+	CompareNPass(t, cam, e, number, name, 1, tolerance, testW, testH)
 }
 
-func CompareImg(t *testing.T, e *Env, img raster.Image, number int, testName string, tol float64) {
+func CompareImg(t *testing.T, cam *Cam, e *Env, img raster.Image, number int, testName string, tol float64) {
 	t.Helper()
 
 	os.Mkdir("out", 0777)

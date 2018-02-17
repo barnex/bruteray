@@ -5,7 +5,7 @@ type Cam struct {
 	FocalLen  float64
 	Focus     float64
 	Aperture  float64
-	Diaphragm func(*Env) (x, y float64)
+	Diaphragm func(*Env) (x, y float64) // TODO: func(rng)
 	transf    Matrix4
 	AA        bool
 }

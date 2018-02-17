@@ -28,7 +28,7 @@ func TestSphere(t *testing.T) {
 		Sphere(Vec{0, 0, 1}, 0.25, Flat(WHITE)),
 	)
 
-	Compare(t, e, 1, "sphere", defaultTol)
+	Compare(t, Camera(0), e, 1, "sphere", defaultTol)
 }
 
 // Test a sphere behind the camera,
@@ -40,7 +40,7 @@ func TestBehindCam(t *testing.T) {
 		Sphere(Vec{0, 0, -1}, 0.25, Flat(WHITE)),
 	)
 
-	Compare(t, e, 2, "behindcam", defaultTol)
+	Compare(t, Camera(0), e, 2, "behindcam", defaultTol)
 }
 
 // Test normal vectors.
@@ -53,7 +53,7 @@ func TestNormal(t *testing.T) {
 		Sphere(Vec{0.5, 0, 2}, 0.25, ShadeNormal(Ey)),
 	)
 
-	Compare(t, e, 3, "normals", defaultTol)
+	Compare(t, Camera(0), e, 3, "normals", defaultTol)
 }
 
 // Test camera translation.
@@ -63,9 +63,9 @@ func TestCamTransl(t *testing.T) {
 	e.Add(
 		Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)),
 	)
-	e.Camera = Camera(0).Transl(-0.5, -0.25, 0)
+	cam := Camera(0).Transl(-0.5, -0.25, 0)
 
-	Compare(t, e, 4, "camtransl", defaultTol)
+	Compare(t, cam, e, 4, "camtransl", defaultTol)
 }
 
 // Test camera rotation
@@ -85,9 +85,9 @@ func TestCamRot(t *testing.T) {
 		Sphere(Vec{-2, 0, 2}, r, nz),
 		Sphere(Vec{-2, 0, 4}, r, nz),
 	)
-	e.Camera = Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
+	cam := Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
 
-	Compare(t, e, 5, "camrot", defaultTol)
+	Compare(t, cam, e, 5, "camrot", defaultTol)
 }
 
 // Test object transform
@@ -104,7 +104,7 @@ func TestObjTransf(t *testing.T) {
 	e.Add(Transf(sy, rot))
 	e.Add(Transf(sz, rot))
 
-	Compare(t, e, 6, "objtransf", defaultTol)
+	Compare(t, Camera(0), e, 6, "objtransf", defaultTol)
 }
 
 // Test intersection of two spheres
@@ -117,7 +117,7 @@ func TestObjAnd(t *testing.T) {
 	s := And(s1, s2)
 	e.Add(s)
 
-	Compare(t, e, 7, "objand", defaultTol)
+	Compare(t, Camera(0), e, 7, "objand", defaultTol)
 }
 
 // Test two partially overlapping spheres
@@ -130,7 +130,7 @@ func TestOverlap(t *testing.T) {
 	e.Add(s1)
 	e.Add(s2)
 
-	Compare(t, e, 8, "overlap", defaultTol)
+	Compare(t, Camera(0), e, 8, "overlap", defaultTol)
 }
 
 // Make a cube out of 3 intersecting slabs
@@ -144,9 +144,9 @@ func TestSlabIntersect(t *testing.T) {
 	cube := And(And(s1, s2), s3)
 	cube = Transf(cube, RotY4(160*Deg).Mul(RotX4(20*Deg)))
 	e.Add(cube)
-	e.Camera = Camera(1).Transl(0, 0, -5)
+	cam := Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, 9, "slabintersect", defaultTol)
+	Compare(t, cam, e, 9, "slabintersect", defaultTol)
 }
 
 // Use sheets as green grass, blue sky and wall
@@ -158,9 +158,9 @@ func TestSheet(t *testing.T) {
 	s3 := Sheet(Ex, -10, Flat(WHITE))
 	s4 := Sphere(Vec{1.5, 0, 3}, 1, ShadeNormal(Ez))
 	e.Add(s1, s2, s3, s4)
-	e.Camera = Camera(1).Transl(0, 0, -1)
+	cam := Camera(1).Transl(0, 0, -1)
 
-	Compare(t, e, 10, "sheet", defaultTol)
+	Compare(t, cam, e, 10, "sheet", defaultTol)
 }
 
 // Test rectangles
@@ -178,7 +178,7 @@ func TestRect(t *testing.T) {
 	)
 	e.Add(r1, r2, r3)
 
-	Compare(t, e, 11, "rect", defaultTol)
+	Compare(t, Camera(0), e, 11, "rect", defaultTol)
 }
 
 // Test Axis Aligned Box
@@ -190,9 +190,9 @@ func TestBox(t *testing.T) {
 	b = Transf(b, RotY4(150*Deg))
 	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
 	e.Add(b, g)
-	e.Camera = Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, 12, "box", defaultTol)
+	cam := Camera(1).Transl(0, 0, -5)
+	Compare(t, cam, e, 12, "box", defaultTol)
 }
 
 // Test Diffuse material without interreflection.
@@ -205,9 +205,9 @@ func TestDiffuse0(t *testing.T) {
 
 	l := DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
-	e.Camera = Camera(1).Transl(0, 0, -5)
 
-	Compare(t, e, 13, "diffuse0", defaultTol)
+	cam := Camera(1).Transl(0, 0, -5)
+	Compare(t, cam, e, 13, "diffuse0", defaultTol)
 }
 
 // Test CSG OR of objects.
@@ -226,9 +226,9 @@ func TestObjOr1(t *testing.T) {
 
 	l := DirLight(Vec{4, 2, -6}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
-	e.Camera = Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
 
-	Compare(t, e, 14, "objor1", defaultTol)
+	cam := Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
+	Compare(t, cam, e, 14, "objor1", defaultTol)
 }
 
 // Test CSG OR of objects.
@@ -245,9 +245,8 @@ func TestObjOr2(t *testing.T) {
 	l := DirLight(Vec{8, 2, 0}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
 
-	e.Camera = Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
-
-	Compare(t, e, 15, "objor2", defaultTol)
+	cam := Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
+	Compare(t, cam, e, 15, "objor2", defaultTol)
 }
 
 func TestPointLight(t *testing.T) {
@@ -265,9 +264,9 @@ func TestPointLight(t *testing.T) {
 	e.Add(s)
 
 	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
-	e.Camera = Camera(1).Transl(0, 1, -3)
 
-	Compare(t, e, 16, "pointlight", defaultTol)
+	cam := Camera(1).Transl(0, 1, -3)
+	Compare(t, cam, e, 16, "pointlight", defaultTol)
 }
 
 // Test CSG MINUS of objects.
@@ -286,9 +285,9 @@ func TestObjMinus(t *testing.T) {
 
 	l := DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
-	e.Camera = Camera(1).Transl(0, 1, -3).Transf(RotX4(10 * Deg))
 
-	Compare(t, e, 17, "objminus", defaultTol)
+	cam := Camera(1).Transl(0, 1, -3).Transf(RotX4(10 * Deg))
+	Compare(t, cam, e, 17, "objminus", defaultTol)
 }
 
 // There is a box buried underneath the floor,
@@ -301,8 +300,9 @@ func TestShadowBehind(t *testing.T) {
 		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
 	)
 	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
-	e.Camera = Camera(1).Transl(0, 1, -3)
-	Compare(t, e, 19, "shadowbehind", defaultTol)
+
+	cam := Camera(1).Transl(0, 1, -3)
+	Compare(t, cam, e, 19, "shadowbehind", defaultTol)
 }
 
 // Test that we can see the reflection of a light.
@@ -321,15 +321,14 @@ func TestLuminousObject(t *testing.T) {
 		SphereLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
+	e.Recursion = 3
 
-	e.Camera = Camera(1).Transl(0, 2.5, -7).Transf(RotX4(22 * Deg))
-	e.Camera.AA = true
-
+	cam := Camera(1).Transl(0, 2.5, -7).Transf(RotX4(22 * Deg))
+	cam.AA = true
 	img := raster.MakeImage(testW, testH)
 	nPass := 8
-	e.Recursion = 3
-	raster.MultiPass(e, img, nPass)
-	CompareImg(t, e, img, 20, "luminous-object", 10)
+	raster.MultiPass(cam, e, img, nPass)
+	CompareImg(t, cam, e, img, 20, "luminous-object", 10)
 }
 
 // Test a quad surface
@@ -344,9 +343,9 @@ func TestQuad(t *testing.T) {
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 
-	e.Camera = Camera(1).Transl(0, 0, -7)
-	e.Camera.AA = false
-	Compare(t, e, 21, "quad-hyper", defaultTol)
+	cam := Camera(1).Transl(0, 0, -7)
+	cam.AA = false
+	Compare(t, cam, e, 21, "quad-hyper", defaultTol)
 }
 
 func TestHollowAnd(t *testing.T) {
@@ -363,14 +362,13 @@ func TestHollowAnd(t *testing.T) {
 		SphereLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
-
-	e.Camera = Camera(1).Transl(0, 2.5, -7).Transf(RotX4(22 * Deg))
-	e.Camera.AA = true
 	e.Recursion = 3
 
+	cam := Camera(1).Transl(0, 2.5, -7).Transf(RotX4(22 * Deg))
+	cam.AA = true
 	nPass := 8
 	tol := 10.0
-	CompareNPass(t, e, 22, "hollowand", nPass, tol, testW, testH)
+	CompareNPass(t, cam, e, 22, "hollowand", nPass, tol, testW, testH)
 }
 
 // Test a rectangular light source.
@@ -401,12 +399,11 @@ func TestRectLight(t *testing.T) {
 			RectLight(Vec{0, 0, 0}, 1, 0, 1, intens), // remove for reference image
 		)
 	}
-
-	e.Camera = Camera(1).Transl(0, -.5, -6)
 	e.Recursion = 2
 
+	cam := Camera(1).Transl(0, -.5, -6)
 	nPass := 50
-	CompareNPass(t, e, 23, "rectlight", nPass, 10, testW, testH)
+	CompareNPass(t, cam, e, 23, "rectlight", nPass, 10, testW, testH)
 
 }
 
@@ -438,15 +435,14 @@ func TestCornellBox(t *testing.T) {
 	)
 
 	e.SetAmbient(Flat(WHITE.EV(-6)))
-
-	focalLen := 0.035 / 0.025
-	e.Camera = Camera(focalLen).Transl(0, h/2, -1000)
-	e.Camera.AA = true
 	e.Recursion = 10
 	e.Cutoff = EV(3)
 
+	focalLen := 0.035 / 0.025
+	cam := Camera(focalLen).Transl(0, h/2, -1000)
+	cam.AA = true
 	nPass := 20
-	CompareNPass(t, e, 24, "cornellbox", nPass, 10, testW, testH)
+	CompareNPass(t, cam, e, 24, "cornellbox", nPass, 10, testW, testH)
 }
 
 func TestDOF(t *testing.T) {
@@ -458,14 +454,13 @@ func TestDOF(t *testing.T) {
 
 	e.SetAmbient(Flat(WHITE.EV(-2)))
 
-	e.Camera = Camera(1).Transl(0, 10, 0).Transf(RotX4(30 * Deg)) //.RotScene(30 * Deg).Transf(RotX4(30 * Deg))
-	e.Camera.AA = true
-	e.Camera.Aperture = 1
-	e.Camera.Focus = 20
+	cam := Camera(1).Transl(0, 10, 0).Transf(RotX4(30 * Deg)) //.RotScene(30 * Deg).Transf(RotX4(30 * Deg))
+	cam.AA = true
+	cam.Aperture = 1
+	cam.Focus = 20
 	e.Recursion = 1
-
 	nPass := 30
-	CompareNPass(t, e, 25, "dof", nPass, 10, testW, testH)
+	CompareNPass(t, cam, e, 25, "dof", nPass, 10, testW, testH)
 }
 
 func TestDiafragmDisk(t *testing.T) {
@@ -475,14 +470,14 @@ func TestDiafragmDisk(t *testing.T) {
 		Sphere(Vec{0, 0, 20}, 1, Flat(WHITE.EV(8))),
 	)
 
-	e.Camera = Camera(1)
-	e.Camera.AA = true
-	e.Camera.Aperture = 0.8
-	e.Camera.Focus = 2
+	cam := Camera(1)
+	cam.AA = true
+	cam.Aperture = 0.8
+	cam.Focus = 2
 	e.Recursion = 1
 
 	nPass := 300
-	CompareNPass(t, e, 26, "diaphragm-disk", nPass, 8, testW/4, testH/4)
+	CompareNPass(t, cam, e, 26, "diaphragm-disk", nPass, 8, testW/4, testH/4)
 }
 
 func TestDiaphragmHex(t *testing.T) {
@@ -491,16 +486,15 @@ func TestDiaphragmHex(t *testing.T) {
 	e.Add(
 		Sphere(Vec{0, 0, 20}, 1, Flat(WHITE.EV(8))),
 	)
-
-	e.Camera = Camera(1)
-	e.Camera.AA = true
-	e.Camera.Aperture = 0.8
-	e.Camera.Focus = 2
-	e.Camera.Diaphragm = DiaHex
 	e.Recursion = 1
 
+	cam := Camera(1)
+	cam.AA = true
+	cam.Aperture = 0.8
+	cam.Focus = 2
+	cam.Diaphragm = DiaHex
 	nPass := 300
-	CompareNPass(t, e, 27, "diaphragm-hex", nPass, 8, testW/4, testH/4)
+	CompareNPass(t, cam, e, 27, "diaphragm-hex", nPass, 8, testW/4, testH/4)
 }
 
 func TestCyl(t *testing.T) {
@@ -517,9 +511,9 @@ func TestCyl(t *testing.T) {
 		PointLight(Vec{3, 8, -6}, WHITE.Mul(EV(8))),
 	)
 
-	e.Camera = Camera(1).Transl(0, 3, -3).Transf(RotX4(30 * Deg))
-	e.Camera.AA = false
-	Compare(t, e, 28, "cyl", defaultTol)
+	cam := Camera(1).Transl(0, 3, -3).Transf(RotX4(30 * Deg))
+	cam.AA = false
+	Compare(t, cam, e, 28, "cyl", defaultTol)
 }
 
 func TestMultiOr(t *testing.T) {
@@ -571,8 +565,8 @@ func TestMultiOr(t *testing.T) {
 		),
 	)
 
-	e.Camera = Camera(0.65).Transl(0, 2.2, -4.9).RotScene(0 * Deg).Transf(RotX4(-0 * Deg))
-	Compare(t, e, 29, "multi-or", defaultTol)
+	cam := Camera(0.65).Transl(0, 2.2, -4.9).RotScene(0 * Deg).Transf(RotX4(-0 * Deg))
+	Compare(t, cam, e, 29, "multi-or", defaultTol)
 }
 
 //func TestDistort(t *testing.T) {

@@ -12,11 +12,11 @@ import (
 
 // SinglePass renders a scene by evaluating each pixel once.
 // Suited if no Monte-Carlo methods (e.g. Diffuse Material) are involved.
-func SinglePass(e *br.Env, img Image) {
-	render(e, img, runtime.NumCPU())
+func SinglePass(cam *br.Cam, e *br.Env, img Image) {
+	render(cam, e, img, runtime.NumCPU())
 }
 
-func render(e *br.Env, img Image, numCPU int) {
+func render(cam *br.Cam, e *br.Env, img Image, numCPU int) {
 	H := img.Bounds().Dy()
 
 	// numCPU goroutines will each render
@@ -34,7 +34,7 @@ func render(e *br.Env, img Image, numCPU int) {
 		go func() {
 			defer wg.Done()
 			for i := range ch {
-				renderLine(eCopy, img, i)
+				renderLine(cam, eCopy, img, i)
 			}
 		}()
 	}
@@ -43,15 +43,15 @@ func render(e *br.Env, img Image, numCPU int) {
 
 // MutliPass renders a scene by evaluating each pixel a fixed number of times and averaging the results.
 // Suited for Monte-Carlo methods.
-func MultiPass(e *br.Env, img Image, passes int) {
-	multiPass(e, img, passes, runtime.NumCPU())
+func MultiPass(cam *br.Cam, e *br.Env, img Image, passes int) {
+	multiPass(cam, e, img, passes, runtime.NumCPU())
 }
 
-func multiPass(e *br.Env, img Image, passes int, numCPU int) {
+func multiPass(cam *br.Cam, e *br.Env, img Image, passes int, numCPU int) {
 	w, h := img.Bounds().Dx(), img.Bounds().Dy()
 	for i := 0; i < passes; i++ {
 		acc := MakeImage(w, h)
-		render(e, acc, numCPU)
+		render(cam, e, acc, numCPU)
 		img.Add(acc)
 	}
 	img.Mul(1 / float64(passes))
@@ -60,14 +60,14 @@ func multiPass(e *br.Env, img Image, passes int, numCPU int) {
 // RenderLoop starts an infinite loop, continuously improving the image quality.
 // Intermediate images can be queried from the peek channel.
 // Used for live previews.
-func RenderLoop(e *br.Env, w, h int, peek chan chan Image) {
+func RenderLoop(cam *br.Cam, e *br.Env, w, h int, peek chan chan Image) {
 	img := MakeImage(w, h)
 	passes := 0
 
 	onePass := func() {
 		start := time.Now()
 		acc := MakeImage(w, h)
-		render(e, acc, runtime.NumCPU())
+		render(cam, e, acc, runtime.NumCPU())
 		passes++
 		rate := float64(w*h) / time.Since(start).Seconds()
 		log.Printf("pass: %v, %.2f Mpixel/s", passes, rate/1e6)
@@ -93,14 +93,14 @@ func RenderLoop(e *br.Env, w, h int, peek chan chan Image) {
 	}
 }
 
-func renderLine(e *br.Env, img Image, i int) {
+func renderLine(cam *br.Cam, e *br.Env, img Image, i int) {
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
 
 	r := e.NewRay(br.Vec{}, br.Vec{})
 	defer e.RRay(r)
 	for j := 0; j < W; j++ {
 
-		e.Camera.RayFrom(e, i, j, W, H, r)
+		cam.RayFrom(e, i, j, W, H, r)
 
 		// accumulate ray intensity
 		c := e.ShadeAll(r, e.Recursion)
