@@ -10,6 +10,7 @@ import (
 	. "github.com/barnex/bruteray/mat"
 	"github.com/barnex/bruteray/raster"
 	. "github.com/barnex/bruteray/shape"
+	. "github.com/barnex/bruteray/transf"
 )
 
 const (

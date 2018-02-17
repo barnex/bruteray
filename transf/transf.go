@@ -1,4 +1,6 @@
-package br
+package transf
+
+import . "github.com/barnex/bruteray/br"
 
 // Transf returns a transformed version of the object.
 // TODO: also for non-csg?
