@@ -1,3 +1,4 @@
+// Package mat implements various types of materials.
 package mat
 
 import (

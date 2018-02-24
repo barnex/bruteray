@@ -1,7 +1,5 @@
+// Package serve provides a HTTP interface to an image being rendered.
 package serve
-
-// server severs an Env over HTTP,
-// so we can see it while being rendered.
 
 import (
 	"bytes"

@@ -1,3 +1,4 @@
+// Package transf provides affine transformations on objects, like rotations.
 package transf
 
 import . "github.com/barnex/bruteray/br"

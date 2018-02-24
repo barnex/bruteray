@@ -1,3 +1,4 @@
+// Package tutorial explains some ray-tracing basics.
 package main
 
 import (

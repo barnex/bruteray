@@ -1,3 +1,4 @@
+// package csg provides constructive solid geometry operations on shapes.
 package csg
 
 import (

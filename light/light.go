@@ -1,3 +1,4 @@
+// Package light implements various types of light sources.
 package light
 
 import (
