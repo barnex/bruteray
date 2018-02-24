@@ -29,13 +29,12 @@ func render(cam *Cam, e *br.Env, img Image, numCPU int) {
 
 	var wg sync.WaitGroup
 	for i := 0; i < numCPU; i++ {
-		eCopy := e.Copy() // TODO: rm
-		ctx := &br.Ctx{}
+		ctx := br.NewCtx(i)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			for i := range ch {
-				renderLine(ctx, cam, eCopy, img, i)
+				renderLine(ctx, cam, e, img, i)
 			}
 		}()
 	}
@@ -97,11 +96,11 @@ func RenderLoop(cam *Cam, e *br.Env, w, h int, peek chan chan Image) {
 func renderLine(ctx *br.Ctx, cam *Cam, e *br.Env, img Image, i int) {
 	W, H := img.Bounds().Dx(), img.Bounds().Dy()
 
-	r := e.NewRay(br.Vec{}, br.Vec{})
-	defer e.RRay(r)
+	r := ctx.GetRay(br.Vec{}, br.Vec{})
+	defer ctx.PutRay(r)
 	for j := 0; j < W; j++ {
 
-		cam.RayFrom(e, i, j, W, H, r)
+		cam.RayFrom(ctx, i, j, W, H, r)
 
 		// accumulate ray intensity
 		c := e.ShadeAll(ctx, r, e.Recursion)

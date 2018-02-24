@@ -20,14 +20,14 @@ func seed() int64 {
 }
 
 // Uniform random number.
-func random(e *Env) float64 {
-	return e.Rng.Float64()
-}
-
-// Normal random number.
-func randNorm(e *Env) float64 {
-	return e.Rng.NormFloat64()
-}
+//func random(e *Env) float64 {
+//	return e.Rng.Float64()
+//}
+//
+//// Normal random number.
+//func randNorm(e *Env) float64 {
+//	return e.Rng.NormFloat64()
+//}
 
 // Random unit vector.
 func randVec(rng *rand.Rand) Vec {
@@ -51,32 +51,32 @@ func randVecDir(rng *rand.Rand, n Vec) Vec {
 
 // Random unit vector, sampled with probability cos(angle with dir).
 // Used for diffuse inter-reflection importance sampling.
-func RandVecCos(e *Env, dir Vec) Vec {
-	v := randVecDir(&e.Rng, dir)
-	for v.Dot(dir) < e.Rng.Float64() {
-		v = randVecDir(&e.Rng, dir)
+func RandVecCos(rng *rand.Rand, dir Vec) Vec {
+	v := randVecDir(rng, dir)
+	for v.Dot(dir) < rng.Float64() {
+		v = randVecDir(rng, dir)
 	}
 	return v
 }
 
 // DiaCircle draws a point from the unit disk.
-func DiaCircle(e *Env) (x, y float64) {
-	x = 2*random(e) - 1
-	y = 2*random(e) - 1
+func DiaCircle(rng *rand.Rand) (x, y float64) {
+	x = 2*rng.Float64() - 1
+	y = 2*rng.Float64() - 1
 	for sqrt(x*x+y*y) > 1 {
-		x = 2*random(e) - 1
-		y = 2*random(e) - 1
+		x = 2*rng.Float64() - 1
+		y = 2*rng.Float64() - 1
 	}
 	return x, y
 }
 
 // DiaHex draws a point from the unit hexagon.
-func DiaHex(e *Env) (x, y float64) {
-	x = 2*random(e) - 1
-	y = 2*random(e) - 1
+func DiaHex(rng *rand.Rand) (x, y float64) {
+	x = 2*rng.Float64() - 1
+	y = 2*rng.Float64() - 1
 	for abs(y) > sqrt3/2 || abs(x+y/sqrt3) > 1 || abs(x-y/sqrt3) > 1 {
-		x = 2*random(e) - 1
-		y = 2*random(e) - 1
+		x = 2*rng.Float64() - 1
+		y = 2*rng.Float64() - 1
 	}
 	return x, y
 }

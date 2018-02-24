@@ -11,7 +11,7 @@ type Cam struct {
 	FocalLen  float64
 	Focus     float64
 	Aperture  float64
-	Diaphragm func(e *Env) (x, y float64) // TODO: func(rng)
+	Diaphragm func(rng *rand.Rand) (x, y float64)
 	transf    Matrix4
 	AA        bool
 }
@@ -29,20 +29,20 @@ func Camera(focalLen float64) *Cam {
 }
 
 // RayFrom set r to a ray for pixel i,j.
-func (c *Cam) RayFrom(e *Env, i, j int, W, H int, r *Ray) {
+func (c *Cam) RayFrom(ctx *Ctx, i, j int, W, H int, r *Ray) {
 
 	r.Start = Vec{}
 
 	if c.Aperture > 0 {
-		xs, ys := c.Diaphragm(e)
+		xs, ys := c.Diaphragm(ctx.Rng)
 		xs *= c.Aperture
 		ys *= c.Aperture
 		r.Start = Vec{xs, ys, 0}
 	}
 
 	// ray end point
-	y0 := ((-float64(i) + c.aa(&e.Rng) + float64(H)/2) / float64(H))
-	x0 := ((float64(j) + c.aa(&e.Rng) - float64(W)/2) / float64(H))
+	y0 := ((-float64(i) + c.aa(ctx.Rng) + float64(H)/2) / float64(H))
+	x0 := ((float64(j) + c.aa(ctx.Rng) - float64(W)/2) / float64(H))
 	z0 := c.FocalLen
 
 	end := Vec{x0, y0, z0}

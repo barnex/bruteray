@@ -47,15 +47,15 @@ func (s *diffuse) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	// first sum over all explicit sources
 	// (with fall-off)
 	for _, l := range e.Lights {
-		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
+		acc = acc.Add(s.lightIntensity(ctx, e, pos, norm, l))
 	}
 
 	// add one random ray to sample (only!) the indirect sources.
 	// (no fall-off, the chance of hitting an object
 	// automatically falls off correctly with distance).
 	// Choose the random ray via importance sampling.
-	sec := e.NewRay(pos.MAdd(offset, norm), RandVecCos(e, norm))
-	defer e.RRay(sec)
+	sec := ctx.GetRay(pos.MAdd(offset, norm), RandVecCos(ctx.Rng, norm))
+	defer ctx.PutRay(sec)
 	acc = acc.Add(s.refl.Mul3(e.ShadeNonLum(ctx, sec, N))) // does not include explicit lights
 
 	return acc
@@ -75,22 +75,23 @@ func (s *diffuse0) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	var acc Color
 	for _, l := range e.Lights {
-		acc = acc.Add(s.lightIntensity(e, pos, norm, l))
+		acc = acc.Add(s.lightIntensity(ctx, e, pos, norm, l))
 	}
 	return acc
 }
 
-func (s *diffuse0) lightIntensity(e *Env, pos, norm Vec, l Light) Color {
-	lpos, intens := l.Sample(e, pos)
+// TODO: Env method
+func (s *diffuse0) lightIntensity(ctx *Ctx, e *Env, pos, norm Vec, l Light) Color {
+	lpos, intens := l.Sample(ctx, pos)
 
-	secundary := e.NewRay(pos, lpos.Sub(pos).Normalized())
-	defer e.RRay(secundary)
+	secundary := ctx.GetRay(pos, lpos.Sub(pos).Normalized())
+	defer ctx.PutRay(secundary)
 
 	//t := e.IntersectAny(secundary)
 
 	lightT := lpos.Sub(pos).Len()
 
-	if e.Occludes(secundary, lightT) {
+	if e.Occludes(ctx, secundary, lightT) {
 		return Color{} // shadow
 	} else {
 		return s.refl.Mul(re(norm.Dot(secundary.Dir()))).Mul3(intens)
@@ -119,9 +120,9 @@ func (s *diffuse00) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color 
 	pos, norm := r.At(frag.T-offset), frag.Norm
 	var acc Color
 	for _, l := range e.Lights {
-		lpos, intens := l.Sample(e, pos)
-		secundary := e.NewRay(pos, lpos.Sub(pos).Normalized())
-		defer e.RRay(secundary)
+		lpos, intens := l.Sample(ctx, pos)
+		secundary := ctx.GetRay(pos, lpos.Sub(pos).Normalized())
+		defer ctx.PutRay(secundary)
 		i := s.refl.Mul(re(norm.Dot(secundary.Dir()))).Mul3(intens)
 		acc = acc.Add(i)
 	}
@@ -151,8 +152,8 @@ type reflective struct {
 
 func (s *reflective) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos, norm := r.At(frag.T-offset), frag.Norm
-	r2 := e.NewRay(pos, r.Dir().Reflect(norm))
-	defer e.RRay(r2)
+	r2 := ctx.GetRay(pos, r.Dir().Reflect(norm))
+	defer ctx.PutRay(r2)
 	return e.ShadeAll(ctx, r2, N).Mul3(s.c)
 }
 
@@ -191,8 +192,8 @@ func (s *refractive) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 
 	// Total internal reflection?
 	if sin2θt > 1 {
-		r2 := e.NewRay(posBehind, r.Dir().Reflect(frag.Norm))
-		defer e.RRay(r2)
+		r2 := ctx.GetRay(posBehind, r.Dir().Reflect(frag.Norm))
+		defer ctx.PutRay(r2)
 		return e.ShadeAll(ctx, r2, N)
 	}
 
@@ -206,13 +207,13 @@ func (s *refractive) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 
 	// transmitted ray
 	t := i.Mul(n12).MAdd((n12*cosθi - math.Sqrt(1-(sin2θt))), frag.Norm)
-	r2 := e.NewRay(posAhead, t)
-	defer e.RRay(r2)
+	r2 := ctx.GetRay(posAhead, t)
+	defer ctx.PutRay(r2)
 	cT := e.ShadeAll(ctx, r2, N).Mul(T)
 
 	// reflected ray
-	r3 := e.NewRay(posBehind, i.Reflect(n))
-	defer e.RRay(r3)
+	r3 := ctx.GetRay(posBehind, i.Reflect(n))
+	defer ctx.PutRay(r3)
 	cR := e.ShadeAll(ctx, r3, N).Mul(R)
 
 	return cR.Add(cT)

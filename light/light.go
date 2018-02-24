@@ -3,6 +3,7 @@ package light
 
 import (
 	"math"
+	"math/rand"
 
 	. "github.com/barnex/bruteray/br"
 	"github.com/barnex/bruteray/mat"
@@ -25,7 +26,7 @@ type dirLight struct {
 	noIntersection
 }
 
-func (l *dirLight) Sample(e *Env, target Vec) (Vec, Color) {
+func (l *dirLight) Sample(ctx *Ctx, target Vec) (Vec, Color) {
 	return l.pos, l.c
 }
 
@@ -40,7 +41,7 @@ type pointLight struct {
 	noIntersection
 }
 
-func (l *pointLight) Sample(e *Env, target Vec) (Vec, Color) {
+func (l *pointLight) Sample(ctx *Ctx, target Vec) (Vec, Color) {
 	return l.pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(l.pos).Len2())
 }
 
@@ -64,26 +65,26 @@ type sphereLight struct {
 	pos Vec
 }
 
-func (l *sphereLight) Sample(e *Env, target Vec) (Vec, Color) {
-	pos := l.pos.MAdd(l.r, sphereVec(e))
+func (l *sphereLight) Sample(ctx *Ctx, target Vec) (Vec, Color) {
+	pos := l.pos.MAdd(l.r, sphereVec(ctx.Rng))
 	return pos, l.c.Mul((1 / (4 * Pi)) / target.Sub(pos).Len2())
 }
 
 // Samples a vector from inside the volume of a unit sphere.
-func sphereVec(e *Env) Vec {
-	v := cubeVec(e)
+func sphereVec(rng *rand.Rand) Vec {
+	v := cubeVec(rng)
 	for v.Len2() > 1 {
-		v = cubeVec(e)
+		v = cubeVec(rng)
 	}
 	return v
 }
 
 // Samples a vector form inside a cube with edge 2.
-func cubeVec(e *Env) Vec {
+func cubeVec(rng *rand.Rand) Vec {
 	return Vec{
-		2.0*e.Rng.Float64() - 1,
-		2.0*e.Rng.Float64() - 1,
-		2.0*e.Rng.Float64() - 1,
+		2.0*rng.Float64() - 1,
+		2.0*rng.Float64() - 1,
+		2.0*rng.Float64() - 1,
 	}
 }
 
@@ -120,8 +121,8 @@ type rectLight struct {
 	dir        Vec
 }
 
-func (l *rectLight) Sample(e *Env, target Vec) (Vec, Color) {
-	rnd := cubeVec(e).Mul3(Vec{l.rx, l.ry, l.rz})
+func (l *rectLight) Sample(ctx *Ctx, target Vec) (Vec, Color) {
+	rnd := cubeVec(ctx.Rng).Mul3(Vec{l.rx, l.ry, l.rz})
 	pos := l.pos.Add(rnd)
 	delta := target.Sub(pos)
 	lamb := math.Abs(l.dir.Dot(delta.Normalized()))

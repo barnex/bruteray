@@ -3,6 +3,7 @@ package br
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"testing"
 )
 
@@ -40,20 +41,20 @@ func TestImportanceSampling(t *testing.T) {
 func re(x float64) float64 { return math.Max(x, 0) }
 
 func uniformInt(f func(Vec) float64, N int, dir Vec) float64 {
-	e := NewEnv()
+	rng := rand.New(rand.NewSource(123))
 	acc := 0.0
 	for i := 0; i < N; i++ {
-		V := randVecDir(&e.Rng, dir)
+		V := randVecDir(rng, dir)
 		acc += f(V) * dir.Dot(V) * 2 * Pi
 	}
 	return acc / float64(N)
 }
 
 func importanceInt(f func(Vec) float64, N int, dir Vec) float64 {
-	e := NewEnv()
+	rng := rand.New(rand.NewSource(123))
 	acc := 0.0
 	for i := 0; i < N; i++ {
-		V := RandVecCos(e, dir)
+		V := RandVecCos(rng, dir)
 		acc += f(V) * Pi
 	}
 	return acc / float64(N)
