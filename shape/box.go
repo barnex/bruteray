@@ -7,11 +7,11 @@ import (
 )
 
 // NBox constructs a box with given width, depth and height.
-func NBox(center Vec, w, h, d float64, m Material) *box {
+func NBox(w, h, d float64, m Material) *box {
 	rx, ry, rz := w/2, h/2, d/2
 	return &box{
-		min: center.Sub(Vec{rx, ry, rz}),
-		max: center.Add(Vec{rx, ry, rz}),
+		min: Vec{rx, ry, rz}.Mul(-1),
+		max: Vec{rx, ry, rz},
 		m:   m,
 	}
 }
@@ -19,6 +19,21 @@ func NBox(center Vec, w, h, d float64, m Material) *box {
 type box struct {
 	min, max Vec
 	m        Material
+}
+
+func (s *box) Center() Vec {
+	return (s.min.Add(s.max)).Mul(0.5)
+}
+
+func (s *box) Transl(d Vec) *box {
+	s.min.Transl(d)
+	s.max.Transl(d)
+	return s
+}
+
+func (s *box) Corner(x, y, z int) Vec {
+	which := Vec{float64(x), float64(y), float64(z)}
+	return s.Center().Add(s.max.Sub(s.Center()).Mul3(which))
 }
 
 func Box(center Vec, rx, ry, rz float64, m Material) CSGObj {

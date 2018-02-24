@@ -1,4 +1,5 @@
 // Package light implements various types of light sources.
+// They all implement br.Light.
 package light
 
 import (
@@ -47,7 +48,7 @@ func (l *pointLight) Sample(ctx *Ctx, target Vec) (Vec, Color) {
 
 // Spherical light source.
 // Throws softer shadows than an point source and is visible in specular reflections.
-func SphereLight(pos Vec, radius float64, intensity Color) Light {
+func Sphere(pos Vec, radius float64, intensity Color) Light {
 	mat := mat.Flat(intensity.Mul(1 / (4 * Pi * radius * radius)))
 	return &sphereLight{
 		//sphere: sphere{pos, radius, mat},

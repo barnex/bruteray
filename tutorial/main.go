@@ -66,7 +66,7 @@ func main() {
 		)
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
-			SphereLight(lightPos, 2, lightCol),
+			Sphere(lightPos, 2, lightCol),
 		)
 		render1(cam, e)
 	}
@@ -79,7 +79,7 @@ func main() {
 		)
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
-			SphereLight(lightPos, 2, lightCol),
+			Sphere(lightPos, 2, lightCol),
 		)
 		render2(cam, e)
 	}
@@ -93,7 +93,7 @@ func main() {
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
-			SphereLight(lightPos, 2, lightCol),
+			Sphere(lightPos, 2, lightCol),
 		)
 		render2(cam, e)
 	}
@@ -107,7 +107,7 @@ func main() {
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
-			SphereLight(lightPos, 2, lightCol),
+			Sphere(lightPos, 2, lightCol),
 		)
 		render2(cam, e)
 	}
@@ -121,7 +121,7 @@ func main() {
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
-			SphereLight(lightPos, 2, lightCol),
+			Sphere(lightPos, 2, lightCol),
 		)
 		e.SetAmbient(Flat(WHITE))
 		render2(cam, e)

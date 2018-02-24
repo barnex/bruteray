@@ -163,32 +163,6 @@ func (o *multiOr) Inside(pos Vec) bool {
 	return false
 }
 
-// Union (logical OR) of two objects, without optimizing result.
-// Best suited for a small number of simple objects.
-//func Or0(a, b CSGObj) CSGObj {
-//	return &or0{a, b}
-//}
-//
-//type or0 struct {
-//	a, b CSGObj
-//}
-//
-//func (o *or0) Hit1(r *Ray, f *[]Fragment) {}
-//
-//func (o *or0) Hit(r *Ray, f *[]Fragment) {
-//	o.a.Hit(r, f)
-//	fa := *f
-//
-//	fb := (*f)[len(fa):]
-//	o.b.Hit(r, &fb)
-//
-//	*f = append(fa, fb...)
-//}
-//
-//func (o *or0) Inside(p Vec) bool {
-//	return o.a.Inside(p) || o.b.Inside(p)
-//}
-
 // Subtraction (logical AND NOT) of two objects
 func Minus(a, b CSGObj) CSGObj {
 	return &minus{a, b}
@@ -230,13 +204,13 @@ func (o *minus) Inside(p Vec) bool {
 	return o.a.Inside(p) && !o.b.Inside(p)
 }
 
-func Cutout(a, b CSGObj) CSGObj {
+func Cutout(a CSGObj, b Insider) CSGObj {
 	return &cutout{a, b}
 }
 
 type cutout struct {
 	a CSGObj
-	b CSGObj // TODO -> Insider
+	b Insider
 }
 
 func (o *cutout) Hit1(r *Ray, f *[]Fragment) { o.HitAll(r, f) }

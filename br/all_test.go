@@ -6,7 +6,7 @@ import (
 
 	. "github.com/barnex/bruteray/br"
 	. "github.com/barnex/bruteray/csg"
-	. "github.com/barnex/bruteray/light"
+	"github.com/barnex/bruteray/light"
 	. "github.com/barnex/bruteray/mat"
 	"github.com/barnex/bruteray/raster"
 	. "github.com/barnex/bruteray/shape"
@@ -203,7 +203,7 @@ func TestDiffuse0(t *testing.T) {
 	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
 	e.Add(g, s)
 
-	l := DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
+	l := light.DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
 
 	cam := raster.Camera(1).Transl(0, 0, -5)
@@ -224,7 +224,7 @@ func TestObjOr1(t *testing.T) {
 	crux = Transf(crux, RotY4(15*Deg))
 	e.Add(g, crux)
 
-	l := DirLight(Vec{4, 2, -6}, WHITE.Mul(EV(0)))
+	l := light.DirLight(Vec{4, 2, -6}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
 
 	cam := raster.Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
@@ -242,7 +242,7 @@ func TestObjOr2(t *testing.T) {
 	or = Transf(or, RotY4(-15*Deg))
 	e.Add(g, or)
 
-	l := DirLight(Vec{8, 2, 0}, WHITE.Mul(EV(0)))
+	l := light.DirLight(Vec{8, 2, 0}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
 
 	cam := raster.Camera(1).Transl(0, 1.5, -6).Transf(RotX4(15 * Deg))
@@ -263,7 +263,7 @@ func TestPointLight(t *testing.T) {
 	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse0(WHITE))
 	e.Add(s)
 
-	e.AddLight(PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
+	e.AddLight(light.PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
 
 	cam := raster.Camera(1).Transl(0, 1, -3)
 	Compare(t, cam, e, 16, "pointlight", defaultTol)
@@ -283,7 +283,7 @@ func TestObjMinus(t *testing.T) {
 
 	e.Add(g, dome)
 
-	l := DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
+	l := light.DirLight(Vec{2, 1.5, -4}, WHITE.Mul(EV(0)))
 	e.AddLight(l)
 
 	cam := raster.Camera(1).Transl(0, 1, -3).Transf(RotX4(10 * Deg))
@@ -299,7 +299,7 @@ func TestShadowBehind(t *testing.T) {
 		Sheet(Ey, 0, Diffuse0(WHITE)),
 		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
 	)
-	e.AddLight(PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
+	e.AddLight(light.PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
 
 	cam := raster.Camera(1).Transl(0, 1, -3)
 	Compare(t, cam, e, 19, "shadowbehind", defaultTol)
@@ -318,7 +318,7 @@ func TestLuminousObject(t *testing.T) {
 		//Sphere(Vec{7, 7, -5}, 1, Flat(WHITE.EV(-2))),
 	)
 	e.AddLight(
-		SphereLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
+		light.Sphere(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 	e.Recursion = 3
@@ -339,7 +339,7 @@ func TestQuad(t *testing.T) {
 		Quad(Vec{0, 0, 0}, Vec{1, -1, 1}, 1, Diffuse0(RED)),
 	)
 	e.AddLight(
-		PointLight(Vec{3, 3, -7}, WHITE.Mul(EV(9))),
+		light.PointLight(Vec{3, 3, -7}, WHITE.Mul(EV(9))),
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 
@@ -359,7 +359,7 @@ func TestHollowAnd(t *testing.T) {
 		),
 	)
 	e.AddLight(
-		SphereLight(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
+		light.Sphere(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
 	)
 	e.SetAmbient(Flat(WHITE.Mul(EV(-5))))
 	e.Recursion = 3
@@ -396,7 +396,7 @@ func TestRectLight(t *testing.T) {
 		)
 	} else {
 		e.AddLight(
-			RectLight(Vec{0, 0, 0}, 1, 0, 1, intens), // remove for reference image
+			light.RectLight(Vec{0, 0, 0}, 1, 0, 1, intens), // remove for reference image
 		)
 	}
 	e.Recursion = 2
@@ -432,7 +432,7 @@ func TestCornellBox(t *testing.T) {
 	)
 
 	e.AddLight(
-		RectLight(Vec{0, h - 1e-4, 0}, 120/2, 0, 120/2, Color{1.0, 1.0, 0.6}.EV(18)),
+		light.RectLight(Vec{0, h - 1e-4, 0}, 120/2, 0, 120/2, Color{1.0, 1.0, 0.6}.EV(18)),
 	)
 
 	e.SetAmbient(Flat(WHITE.EV(-6)))
@@ -508,8 +508,8 @@ func TestCyl(t *testing.T) {
 		Cyl(Z, Vec{-2, 1, 2}, 2, 1, Diffuse0(BLUE)),
 	)
 	e.AddLight(
-		PointLight(Vec{-3, 5, -2}, WHITE.Mul(EV(8))),
-		PointLight(Vec{3, 8, -6}, WHITE.Mul(EV(8))),
+		light.PointLight(Vec{-3, 5, -2}, WHITE.Mul(EV(8))),
+		light.PointLight(Vec{3, 8, -6}, WHITE.Mul(EV(8))),
 	)
 
 	cam := raster.Camera(1).Transl(0, 3, -3).Transf(RotX4(30 * Deg))
@@ -534,7 +534,7 @@ func TestMultiOr(t *testing.T) {
 		c1 := Cyl(Z, Vec{pointy / 2, h1, 0}.Add(pos), w+pointy, d-off, m)
 		c2 := Cyl(Z, Vec{-pointy / 2, h1, 0}.Add(pos), w+pointy, d+off, m)
 		ceil := And(c1, c2)
-		box := NBox(pos.Add(Vec{Y: h1 / 2}), w, h1, d+2*off, m)
+		box := NBox(w, h1, d+2*off, m).Transl(pos.Add(Vec{Y: h1 / 2}))
 		return Or(box, ceil)
 	}
 
@@ -543,7 +543,7 @@ func TestMultiOr(t *testing.T) {
 		c1 := Cyl(X, Vec{0, h1, pointy / 2}.Add(pos), w+pointy, d-off, m)
 		c2 := Cyl(X, Vec{0, h1, -pointy / 2}.Add(pos), w+pointy, d+off, m)
 		ceil := And(c1, c2)
-		box := NBox(pos.Add(Vec{Y: h1 / 2}), d+2*off, h1, w, m)
+		box := NBox(d+2*off, h1, w, m).Transl(pos.Add(Vec{Y: h1 / 2}))
 		return Or(box, ceil)
 	}
 
@@ -568,6 +568,34 @@ func TestMultiOr(t *testing.T) {
 
 	cam := raster.Camera(0.65).Transl(0, 2.2, -4.9).RotScene(0 * Deg).Transf(RotX4(-0 * Deg))
 	Compare(t, cam, e, 29, "multi-or", defaultTol)
+}
+
+func TestCSG2(t *testing.T) {
+	e := NewEnv()
+
+	white := Diffuse0(WHITE.EV(-.3))
+	red := Diffuse0(RED.EV(-.6))
+	blue := Diffuse0(BLUE.EV(-.6))
+
+	floor := Sheet(Ey, 0, white)
+
+	cube := NBox(1, 1, 1, red).Transl(Vec{0, 0.5001, 0})
+	sphere := NSphere(1, blue).Transl(cube.Corner(1, 1, -1))
+
+	e.Add(
+		floor,
+		Minus(cube, sphere),
+	)
+
+	e.AddLight(
+		light.PointLight(Vec{4, 5, -2.5}, WHITE.EV(8)),
+	)
+
+	e.SetAmbient(Flat(WHITE.EV(-2)))
+	e.Recursion = 4
+
+	cam := raster.Camera(1).Transl(0, 2.1, -2.5).RotScene(30 * Deg).Transf(RotX4(30 * Deg))
+	Compare(t, cam, e, 30, "csg2", defaultTol)
 }
 
 //func TestDistort(t *testing.T) {

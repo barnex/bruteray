@@ -7,6 +7,10 @@ func Sphere(center Vec, radius float64, m Material) CSGObj {
 	return &sphere{center, radius * radius, m}
 }
 
+func NSphere(diam float64, m Material) *sphere {
+	return &sphere{Vec{}, sqr(diam / 2), m}
+}
+
 type sphere struct {
 	c  Vec
 	r2 float64
@@ -16,6 +20,11 @@ type sphere struct {
 func (s *sphere) Inside(p Vec) bool {
 	v := p.Sub(s.c)
 	return v.Len2() < s.r2
+}
+
+func (s *sphere) Transl(d Vec) *sphere {
+	s.c.Transl(d)
+	return s
 }
 
 func (s *sphere) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }

@@ -2,6 +2,7 @@
 package raster
 
 import (
+	"flag"
 	"log"
 	"runtime"
 	"sync"
@@ -10,10 +11,12 @@ import (
 	"github.com/barnex/bruteray/br"
 )
 
+var numCPU = flag.Int("cpus", runtime.NumCPU(), "Number of rendering threads")
+
 // SinglePass renders a scene by evaluating each pixel once.
 // Suited if no Monte-Carlo methods (e.g. Diffuse Material) are involved.
 func SinglePass(cam *Cam, e *br.Env, img Image) {
-	render(cam, e, img, runtime.NumCPU())
+	render(cam, e, img, *numCPU)
 }
 
 func render(cam *Cam, e *br.Env, img Image, numCPU int) {
@@ -44,7 +47,7 @@ func render(cam *Cam, e *br.Env, img Image, numCPU int) {
 // MutliPass renders a scene by evaluating each pixel a fixed number of times and averaging the results.
 // Suited for Monte-Carlo methods.
 func MultiPass(cam *Cam, e *br.Env, img Image, passes int) {
-	multiPass(cam, e, img, passes, runtime.NumCPU())
+	multiPass(cam, e, img, passes, *numCPU)
 }
 
 func multiPass(cam *Cam, e *br.Env, img Image, passes int, numCPU int) {
@@ -67,7 +70,7 @@ func RenderLoop(cam *Cam, e *br.Env, w, h int, peek chan chan Image) {
 	onePass := func() {
 		start := time.Now()
 		acc := MakeImage(w, h)
-		render(cam, e, acc, runtime.NumCPU())
+		render(cam, e, acc, *numCPU)
 		passes++
 		rate := float64(w*h) / time.Since(start).Seconds()
 		log.Printf("pass: %v, %.2f Mpixel/s", passes, rate/1e6)

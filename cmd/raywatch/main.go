@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"time"
 )
 
@@ -23,6 +24,7 @@ var (
 	flagWidth   = flag.Int("w", 960, "image width")
 	flagHeight  = flag.Int("h", 540, "image height")
 	flagBrowser = flag.String("browser", "x-www-browser", "display in this browser")
+	flagCPUs    = flag.Int("cpus", runtime.NumCPU(), "number of rendering threads")
 )
 
 var (
@@ -83,7 +85,7 @@ func build(fname string) error {
 }
 
 func goServe() {
-	cmd = exec.Command(Executable, fmt.Sprintf("-w=%v", *flagWidth), fmt.Sprintf("-h=%v", *flagHeight))
+	cmd = exec.Command(Executable, fmt.Sprintf("-w=%v", *flagWidth), fmt.Sprintf("-h=%v", *flagHeight), fmt.Sprintf("-cpus=%v", *flagCPUs))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()

@@ -42,3 +42,7 @@ func sort2(t0, t1 float64) (float64, float64) {
 	}
 	return t1, t0
 }
+
+func sqr(x float64) float64 {
+	return x * x
+}
