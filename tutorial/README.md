@@ -99,3 +99,9 @@ E.g.: we now see the spheres are also indirectly illuminated from below, by the 
 Let's place the spheres in a white room. The room now indirectly illuminates the spheres from all directions, making them look very soft. The relatively strong shadows directly underneath the spheres are referred to as "ambient occlusion". This effect emerges naturally with bi-directional path tracing when the recursion depth is sufficient (here: 6).
 
 ![fig](rt09.jpg)
+
+### Reflection
+
+Reflection is easy. When a ray hits a reflective surface, the returned color is simply the color seen by the reflected ray, multiplied by a reflectivity factor (e.g. 90% for shiny metal). The direction of the reflected ray is described here: https://en.wikipedia.org/wiki/Ray_tracing_(graphics)#Example.
+
+![fig](rt10.jpg)

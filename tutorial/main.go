@@ -127,6 +127,20 @@ func main() {
 		render2(cam, e)
 	}
 
+	{
+		e := env(
+			Reflective(WHITE.EV(-4)),
+			Diffuse(RED),
+			Diffuse(BLUE),
+		)
+		cam := raster.Camera(1).Transl(0, 0, -3)
+		cam.AA = true
+		e.AddLight(
+			SphereLight(lightPos, 2, lightCol),
+		)
+		e.SetAmbient(Flat(WHITE))
+		render2(cam, e)
+	}
 }
 
 var (
@@ -152,6 +166,7 @@ var cnt = 0
 func render1(cam *raster.Cam, e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
+	fmt.Println(name)
 	img := raster.MakeImage(600, 400)
 	raster.SinglePass(cam, e, img)
 	raster.Encode(img, name)
@@ -160,6 +175,7 @@ func render1(cam *raster.Cam, e *Env) {
 func render2(cam *raster.Cam, e *Env) {
 	cnt++
 	name := fmt.Sprintf("rt%02d.jpg", cnt)
+	fmt.Println(name)
 	img := raster.MakeImage(600, 400)
 	raster.MultiPass(cam, e, img, 300)
 	raster.Encode(img, name)
