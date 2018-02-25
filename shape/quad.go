@@ -22,7 +22,7 @@ func Quad(center Vec, a Vec, b float64, m Material) CSGObj {
 
 // a0 x² + a1 y² + a2 z² = 1
 type quad struct {
-	c Vec // unused
+	c Vec
 	a Vec
 	b float64
 	m Material

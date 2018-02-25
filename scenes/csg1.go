@@ -21,11 +21,12 @@ func main() {
 	floor := shape.Sheet(Ey, 0, white)
 
 	cube := shape.NBox(1, 1, 1, red).Transl(Dy(0.501))
-	sphere := shape.NSphere(1, blue).Transl(cube.Corner(R, R, -R))
+	//sphere := shape.NSphere(1, blue).Transl(cube.Corner(R, R, -R))
+	cyl := shape.NCyl(Z, 0.7, blue).Transl(cube.Center())
 
 	e.Add(
 		floor,
-		csg.Minus(cube, sphere),
+		csg.Minus(cube, cyl),
 	)
 
 	e.AddLight(
@@ -36,7 +37,7 @@ func main() {
 	e.Recursion = 4
 	e.Cutoff = EV(2.6)
 
-	cam := raster.Camera(1).Transl(0, 2.1, -2.5).RotScene(30 * Deg).Transf(RotX4(30 * Deg))
+	cam := raster.Camera(1).Transl(0, 1.1, -2.5).RotScene(30 * Deg).Transf(RotX4(20 * Deg))
 	//cam.Aperture = 0.04
 	cam.Focus = 4
 	cam.AA = true

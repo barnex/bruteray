@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	. "github.com/barnex/bruteray/br"
-	. "github.com/barnex/bruteray/light"
+	"github.com/barnex/bruteray/light"
 	. "github.com/barnex/bruteray/mat"
 	"github.com/barnex/bruteray/raster"
 	"github.com/barnex/bruteray/shape"
@@ -40,7 +40,7 @@ func main() {
 		)
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
-			PointLight(lightPos, lightCol),
+			light.PointLight(lightPos, lightCol),
 		)
 		render1(cam, e)
 	}
@@ -53,7 +53,7 @@ func main() {
 		)
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
-			PointLight(lightPos, lightCol),
+			light.PointLight(lightPos, lightCol),
 		)
 		render1(cam, e)
 	}
@@ -66,7 +66,7 @@ func main() {
 		)
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
-			Sphere(lightPos, 2, lightCol),
+			light.Sphere(lightPos, 2, lightCol),
 		)
 		render1(cam, e)
 	}
@@ -79,7 +79,7 @@ func main() {
 		)
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		e.AddLight(
-			Sphere(lightPos, 2, lightCol),
+			light.Sphere(lightPos, 2, lightCol),
 		)
 		render2(cam, e)
 	}
@@ -93,21 +93,7 @@ func main() {
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
-			Sphere(lightPos, 2, lightCol),
-		)
-		render2(cam, e)
-	}
-
-	{
-		e := env(
-			Diffuse(WHITE.EV(-1)),
-			Diffuse(RED),
-			Diffuse(BLUE),
-		)
-		cam := raster.Camera(1).Transl(0, 0, -3)
-		cam.AA = true
-		e.AddLight(
-			Sphere(lightPos, 2, lightCol),
+			light.Sphere(lightPos, 2, lightCol),
 		)
 		render2(cam, e)
 	}
@@ -121,7 +107,21 @@ func main() {
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
-			Sphere(lightPos, 2, lightCol),
+			light.Sphere(lightPos, 2, lightCol),
+		)
+		render2(cam, e)
+	}
+
+	{
+		e := env(
+			Diffuse(WHITE.EV(-1)),
+			Diffuse(RED),
+			Diffuse(BLUE),
+		)
+		cam := raster.Camera(1).Transl(0, 0, -3)
+		cam.AA = true
+		e.AddLight(
+			light.Sphere(lightPos, 2, lightCol),
 		)
 		e.SetAmbient(Flat(WHITE))
 		render2(cam, e)
@@ -136,7 +136,7 @@ func main() {
 		cam := raster.Camera(1).Transl(0, 0, -3)
 		cam.AA = true
 		e.AddLight(
-			SphereLight(lightPos, 2, lightCol),
+			light.Sphere(lightPos, 2, lightCol),
 		)
 		e.SetAmbient(Flat(WHITE))
 		render2(cam, e)
