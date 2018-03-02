@@ -85,7 +85,7 @@ func (c *Color) Max() float64 {
 	return max
 }
 
-// linear to sRGB gamma curve
+// linear to sRGB conversion
 // https://en.wikipedia.org/wiki/SRGB
 func srgb(c float64) float64 {
 	c = clip(c)

@@ -617,3 +617,22 @@ func TestCSG2(t *testing.T) {
 //
 //	Compare(t, e, 25, "028-waves")
 //}
+
+//func TestTexture(t *testing.T) {
+//	e := NewEnv()
+//
+//	m := Texture(MustLoad("assets/monalisa.jpg"), 100)
+//
+//	e.Add(
+//		Sheet(Ey, 0, Checkboard(1, Diffuse0(BLUE.EV(-3)), Diffuse0(WHITE))),
+//		Sphere(Vec{0, 0.5, 0}, 1, m),
+//	)
+//
+//	e.AddLight(
+//		light.Sphere(Vec{4, 5, -3}, 1, WHITE.EV(10)),
+//	)
+//
+//	cam := raster.Camera(1).Transl(0, 2, -3).Transf(RotX4(25 * Deg))
+//
+//	Compare(t, cam, e, 30, "texture", defaultTol)
+//}
