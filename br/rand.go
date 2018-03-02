@@ -30,7 +30,7 @@ func seed() int64 {
 //}
 
 // Random unit vector.
-func randVec(rng *rand.Rand) Vec {
+func RandVec(rng *rand.Rand) Vec {
 	return Vec{
 		rng.NormFloat64(),
 		rng.NormFloat64(),
@@ -42,7 +42,7 @@ func randVec(rng *rand.Rand) Vec {
 // Random unit vector from the hemisphere around n
 // (dot product with n >= 0).
 func randVecDir(rng *rand.Rand, n Vec) Vec {
-	v := randVec(rng)
+	v := RandVec(rng)
 	if v.Dot(n) < 0 {
 		v = v.Mul(-1)
 	}

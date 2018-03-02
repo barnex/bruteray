@@ -138,7 +138,7 @@ func (e *Env) withFog(ctx *Ctx, surf Fragment, N int, r *Ray) Color {
 	}
 
 	if e.IndirectFog {
-		r2 := ctx.GetRay(pos, randVec(ctx.Rng))
+		r2 := ctx.GetRay(pos, RandVec(ctx.Rng))
 		defer ctx.PutRay(r2)
 		fogc := e.Shade(ctx, r2, 1, e.objs)
 		c = c.Add(fogc)

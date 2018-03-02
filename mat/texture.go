@@ -1,6 +1,7 @@
-package br
+package mat
 
 import (
+	. "github.com/barnex/bruteray/br"
 	"math"
 	"math/rand"
 )
@@ -121,7 +122,7 @@ func makeWaveSeries(seed int, n int, K Vec) series {
 	rng := rand.New(rand.NewSource(int64(seed)))
 	terms := make([]term, n)
 	for i := range terms {
-		r := randVec(rng)
+		r := RandVec(rng)
 		r = r.Mul3(K)
 		terms[i].k = r.Mul(1 - 0.5*rng.Float64())
 	}
@@ -131,8 +132,8 @@ func makeWaveSeries(seed int, n int, K Vec) series {
 func (s *series) Eval(pos Vec) float64 {
 	v := 0.0
 	for _, t := range s.terms {
-		v += sin(t.k.Dot(pos))
+		v += math.Sin(t.k.Dot(pos))
 	}
-	v /= sqrt(float64(len(s.terms)))
+	v /= math.Sqrt(float64(len(s.terms)))
 	return v
 }
