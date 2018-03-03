@@ -12,34 +12,31 @@ import (
 	"github.com/barnex/bruteray/raster"
 )
 
-func Texture(img raster.Image, p0, px, py Vec) *texture {
-	return &texture{img, p0, px, py}
+func Texture(img raster.Image, p0, pu, pv Vec) *texture {
+	return &texture{img, p0, pu, pv}
 }
 
 type texture struct {
 	img        raster.Image
-	p0, px, py Vec
+	p0, pu, pv Vec
 }
 
 func (c *texture) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	pos := r.At(frag.T)
 
+	// UV mapping
 	p := pos.Sub(c.p0)
-	px := c.px.Sub(c.p0)
-	py := c.py.Sub(c.p0)
+	pu := c.pu.Sub(c.p0)
+	pv := c.pv.Sub(c.p0)
+	u := p.Dot(pu) / pu.Len2()
+	v := p.Dot(pv) / pv.Len2()
 
-	x := p.Dot(px) / px.Len()
-	y := p.Dot(py) / py.Len()
-
+	// pixel mapping
 	w := c.img.Bounds().Dx()
 	h := c.img.Bounds().Dy()
-
-	ix := int(x * float64(w))
-	iy := int(y * float64(h))
-
-	ix = clamp(ix, w)
-	iy = clamp(iy, h)
-	return c.img[iy][ix]
+	i := clamp(int(u*float64(w)), w)
+	j := clamp(int(v*float64(h)), h)
+	return c.img[j][i]
 }
 
 func clamp(v, max int) int {

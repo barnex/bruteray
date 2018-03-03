@@ -12,13 +12,20 @@ import (
 func main() {
 	e := NewEnv()
 
-	ml := mat.MustLoad("assets/monalisa.jpg")
-	m := mat.Texture(ml, Vec{-.4, -.5, 0}, Vec{.4, -.5, 0}, Vec{-.5, .5, 0})
+	tex := mat.MustLoad("assets/monalisa.jpg")
+	cube := shape.NBox(1, tex.Aspect(), .1, nil)
+	cube.Transl(Vec{0, 0.5, 0})
 
-	cube := shape.NBox(.8, 1, .1, m)
+	p0 := cube.Corner(-1, -1, -1)
+	pu := cube.Corner(+1, -1, -1)
+	pv := cube.Corner(-1, +1, -1) //.Add(Vec{0, -.8, 0})
+	cube.Mat = mat.Texture(tex, p0, pu, pv)
 
 	e.Add(
-		shape.Sheet(Ey, -.5, mat.Diffuse(WHITE)),
+		shape.Sheet(Ey, cube.Min[Y], mat.Diffuse(WHITE)),
+		shape.NSphere(.2, mat.ShadeShape(WHITE)).Transl(p0),
+		shape.NSphere(.2, mat.ShadeShape(RED)).Transl(pu),
+		shape.NSphere(.2, mat.ShadeShape(GREEN)).Transl(pv),
 		cube,
 	)
 
@@ -27,7 +34,7 @@ func main() {
 	)
 
 	e.SetAmbient(mat.Flat(WHITE.EV(-2)))
-	cam := raster.Camera(1).Transl(0, 1, -3).RotScene(9 * Deg).Transf(RotX4(25 * Deg))
+	cam := raster.Camera(1).Transl(0, 0.5, -3).RotScene(9 * Deg).Transf(RotX4(5 * Deg))
 	cam.AA = true
 	serve.Env(cam, e)
 }

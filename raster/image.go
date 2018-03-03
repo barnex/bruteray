@@ -27,6 +27,12 @@ func (i Image) Bounds() image.Rectangle {
 	return image.Rect(0, 0, len(i[0]), len(i))
 }
 
+func (i Image) Aspect() float64 {
+	w := float64(i.Bounds().Dx())
+	h := float64(i.Bounds().Dy())
+	return h / w
+}
+
 func (img Image) At(i, j int) color.Color {
 	return img[j][i]
 }
