@@ -12,18 +12,25 @@ import (
 	"github.com/barnex/bruteray/raster"
 )
 
-func Texture(img raster.Image, p0, pu, pv Vec) *texture {
-	return &texture{img, p0, pu, pv}
+type Texture interface {
+	At(Vec) Color
 }
 
-type texture struct {
+func NewImgTex(img raster.Image, p0, pu, pv Vec) *ImgTex {
+	return &ImgTex{img, p0, pu, pv}
+}
+
+type ImgTex struct {
 	img        raster.Image
-	p0, pu, pv Vec
+	p0, pu, pv Vec // TODO -> UVMapper
 }
 
-func (c *texture) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
-	pos := r.At(frag.T)
+// TODO: remove?
+func (c *ImgTex) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
+	return c.At(r.At(frag.T))
+}
 
+func (c *ImgTex) At(pos Vec) Color {
 	// UV mapping
 	p := pos.Sub(c.p0)
 	pu := c.pu.Sub(c.p0)

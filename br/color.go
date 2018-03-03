@@ -25,7 +25,13 @@ type Color struct {
 	R, G, B float64
 }
 
+// Shade implements Material
 func (c Color) Shade(_ *Ctx, _ *Env, _ int, _ *Ray, _ Fragment) Color {
+	return c
+}
+
+// At implements mat.Texture
+func (c Color) At(_ Vec) Color {
 	return c
 }
 

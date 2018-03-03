@@ -48,6 +48,7 @@ func (l *pointLight) Sample(ctx *Ctx, target Vec) (Vec, Color) {
 
 // Spherical light source.
 // Throws softer shadows than an point source and is visible in specular reflections.
+// TODO: nearby samples must limit their intensity to the analytical value for that limit.
 func Sphere(pos Vec, radius float64, intensity Color) Light {
 	mat := mat.Flat(intensity.Mul(1 / (4 * Pi * radius * radius)))
 	return &sphereLight{
