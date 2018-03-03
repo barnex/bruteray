@@ -6,26 +6,26 @@ import (
 	"math"
 )
 
-// NBox constructs a box with given width, depth and height.
-func NBox(w, h, d float64, m Material) *box {
+// NewBox constructs a box with given width, depth and height.
+func NewBox(w, h, d float64, m Material) *Box {
 	rx, ry, rz := w/2, h/2, d/2
-	return &box{
+	return &Box{
 		Min: Vec{rx, ry, rz}.Mul(-1),
 		Max: Vec{rx, ry, rz},
 		Mat: m,
 	}
 }
 
-type box struct {
+type Box struct {
 	Min, Max Vec
 	Mat      Material
 }
 
-func (s *box) Center() Vec {
+func (s *Box) Center() Vec {
 	return (s.Min.Add(s.Max)).Mul(0.5)
 }
 
-func (s *box) Transl(d Vec) *box {
+func (s *Box) Transl(d Vec) *Box {
 	s.Min.Transl(d)
 	s.Max.Transl(d)
 	return s
@@ -36,13 +36,14 @@ func (s *box) Transl(d Vec) *box {
 // 	Corner(-1,-1,-1) -> left bottom front
 // 	Corner( 1,-1,-1) -> right bottom front
 // 	...
-func (s *box) Corner(x, y, z int) Vec {
+func (s *Box) Corner(x, y, z int) Vec {
 	which := Vec{float64(x), float64(y), float64(z)}
 	return s.Center().Add(s.Max.Sub(s.Center()).Mul3(which))
 }
 
-func Box(center Vec, rx, ry, rz float64, m Material) CSGObj {
-	return &box{
+// TODO rm
+func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj {
+	return &Box{
 		Min: center.Sub(Vec{rx, ry, rz}),
 		Max: center.Add(Vec{rx, ry, rz}),
 		Mat: m,
@@ -50,12 +51,12 @@ func Box(center Vec, rx, ry, rz float64, m Material) CSGObj {
 }
 
 func Cube(center Vec, r float64, m Material) CSGObj {
-	return Box(center, r, r, r, m)
+	return OldBox(center, r, r, r, m)
 }
 
-func (s *box) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
+func (s *Box) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
 
-func (s *box) HitAll(r *Ray, f *[]Fragment) {
+func (s *Box) HitAll(r *Ray, f *[]Fragment) {
 	min_ := s.Min
 	max_ := s.Max
 
@@ -89,13 +90,13 @@ func (s *box) HitAll(r *Ray, f *[]Fragment) {
 
 }
 
-func (s *box) Inside(v Vec) bool {
+func (s *Box) Inside(v Vec) bool {
 	return v[X] > s.Min[X] && v[X] < s.Max[X] &&
 		v[Y] > s.Min[Y] && v[Y] < s.Max[Y] &&
 		v[Z] > s.Min[Z] && v[Z] < s.Max[Z]
 }
 
-func (s *box) Normal(p Vec) Vec {
+func (s *Box) Normal(p Vec) Vec {
 	//p.check()
 	for i := range p {
 		if approx(p[i], s.Min[i]) || approx(p[i], s.Max[i]) {

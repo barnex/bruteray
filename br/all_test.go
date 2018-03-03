@@ -186,7 +186,7 @@ func TestBox(t *testing.T) {
 	e := NewEnv()
 
 	nz := ShadeNormal(Ez)
-	b := Box(Vec{0, 0, 0}, 2, 1, 1, nz)
+	b := OldBox(Vec{0, 0, 0}, 2, 1, 1, nz)
 	b = Transf(b, RotY4(150*Deg))
 	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
 	e.Add(b, g)
@@ -216,10 +216,10 @@ func TestObjOr1(t *testing.T) {
 
 	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
 	white := Diffuse0(WHITE)
-	box := Box(Vec{}, 1, 1, 1, white)
-	bar1 := Box(Vec{}, 1.5, 0.5, 0.5, Diffuse0(RED))
-	bar2 := Box(Vec{}, 0.5, 1.5, 0.5, Diffuse0(GREEN))
-	bar3 := Box(Vec{}, 0.5, 0.5, 1.5, Diffuse0(BLUE))
+	box := OldBox(Vec{}, 1, 1, 1, white)
+	bar1 := OldBox(Vec{}, 1.5, 0.5, 0.5, Diffuse0(RED))
+	bar2 := OldBox(Vec{}, 0.5, 1.5, 0.5, Diffuse0(GREEN))
+	bar3 := OldBox(Vec{}, 0.5, 0.5, 1.5, Diffuse0(BLUE))
 	crux := Or(Or(box, bar1), Or(bar2, bar3))
 	crux = Transf(crux, RotY4(15*Deg))
 	e.Add(g, crux)
@@ -236,8 +236,8 @@ func TestObjOr2(t *testing.T) {
 	e := NewEnv()
 
 	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
-	b1 := Box(Vec{-2, 0, -.1}, 0.5, 1, 1, Diffuse0(RED))
-	b2 := Box(Vec{2, 0, -.1}, 0.5, 1, 1, Diffuse0(GREEN))
+	b1 := OldBox(Vec{-2, 0, -.1}, 0.5, 1, 1, Diffuse0(RED))
+	b2 := OldBox(Vec{2, 0, -.1}, 0.5, 1, 1, Diffuse0(GREEN))
 	or := Or(b1, b2)
 	or = Transf(or, RotY4(-15*Deg))
 	e.Add(g, or)
@@ -276,7 +276,7 @@ func TestObjMinus(t *testing.T) {
 	g := Sheet(Ey, 0, Diffuse0(WHITE.Mul(EV(-1))))
 	r := 0.8
 
-	b := Box(Vec{}, r, r, r, Diffuse0(WHITE.Mul(EV(-0))))
+	b := OldBox(Vec{}, r, r, r, Diffuse0(WHITE.Mul(EV(-0))))
 	s := NewSphere(1*2, Diffuse0(WHITE)).Transl(Vec{})
 
 	dome := Minus(b, s)
@@ -297,7 +297,7 @@ func TestShadowBehind(t *testing.T) {
 	const r = 0.8
 	e.Add(
 		Sheet(Ey, 0, Diffuse0(WHITE)),
-		Box(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
+		OldBox(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
 	)
 	e.AddLight(light.PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
 
@@ -426,8 +426,8 @@ func TestCornellBox(t *testing.T) {
 		Rect(Vec{0, h / 2, w / 2}, Ez, w/2, h/2, U, white),
 		Rect(Vec{w / 2, h / 2, 0}, Ex, U, h/2, w/2, green),
 		Rect(Vec{-w / 2, h / 2, 0}, Ex, U, h/2, w/2, red),
-		Transf(Box(Vec{120, 80, -80}, 80, 80, 80, white), RotY4(-18*Deg)),
-		Transf(Box(Vec{-50, 165, 100}, 85, 180, 70, white), RotY4(20*Deg)),
+		Transf(OldBox(Vec{120, 80, -80}, 80, 80, 80, white), RotY4(-18*Deg)),
+		Transf(OldBox(Vec{-50, 165, 100}, 85, 180, 70, white), RotY4(20*Deg)),
 	)
 
 	e.AddLight(
@@ -533,7 +533,7 @@ func TestMultiOr(t *testing.T) {
 		c1 := Cyl(Z, Vec{pointy / 2, h1, 0}.Add(pos), w+pointy, d-off, m)
 		c2 := Cyl(Z, Vec{-pointy / 2, h1, 0}.Add(pos), w+pointy, d+off, m)
 		ceil := And(c1, c2)
-		box := NBox(w, h1, d+2*off, m).Transl(pos.Add(Vec{Y: h1 / 2}))
+		box := NewBox(w, h1, d+2*off, m).Transl(pos.Add(Vec{Y: h1 / 2}))
 		return Or(box, ceil)
 	}
 
@@ -542,7 +542,7 @@ func TestMultiOr(t *testing.T) {
 		c1 := Cyl(X, Vec{0, h1, pointy / 2}.Add(pos), w+pointy, d-off, m)
 		c2 := Cyl(X, Vec{0, h1, -pointy / 2}.Add(pos), w+pointy, d+off, m)
 		ceil := And(c1, c2)
-		box := NBox(d+2*off, h1, w, m).Transl(pos.Add(Vec{Y: h1 / 2}))
+		box := NewBox(d+2*off, h1, w, m).Transl(pos.Add(Vec{Y: h1 / 2}))
 		return Or(box, ceil)
 	}
 
@@ -578,7 +578,7 @@ func TestCSG2(t *testing.T) {
 
 	floor := Sheet(Ey, 0, white)
 
-	cube := NBox(1, 1, 1, red).Transl(Vec{0, 0.5001, 0})
+	cube := NewBox(1, 1, 1, red).Transl(Vec{0, 0.5001, 0})
 	sphere := NewSphere(1, blue).Transl(cube.Corner(1, 1, -1))
 
 	e.Add(

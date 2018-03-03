@@ -13,7 +13,7 @@ func main() {
 	e := NewEnv()
 
 	tex := mat.MustLoad("assets/monalisa.jpg")
-	cube := shape.NBox(1, tex.Aspect(), .1, nil)
+	cube := shape.NewBox(1, tex.Aspect(), .1, nil)
 	cube.Transl(Vec{0, 0.5, 0})
 
 	p0 := cube.Corner(-1, -1, -1)

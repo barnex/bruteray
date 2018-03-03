@@ -13,8 +13,18 @@ import (
 	"github.com/barnex/bruteray/shape"
 )
 
+func Show(obj ...Obj) {
+	e := NewEnv()
+	e.Add(obj...)
+	example(e)
+}
+
 func Example(e *Env) {
-	pc, _, _, _ := runtime.Caller(1)
+	example(e)
+}
+
+func example(e *Env) {
+	pc, _, _, _ := runtime.Caller(2)
 	base := path.Ext(path.Base(runtime.FuncForPC(pc).Name()))[1:]
 	file := "../doc/" + base + ".jpg"
 	defer fmt.Printf(base)
