@@ -9,7 +9,7 @@ cp main.md $out
 
 for pkg in shape csg mat light transf; do
 	echo >> $out; echo >> $out
-	$cmd $pre/shape >> $out
+	$cmd $pre/$pkg >> $out
 done
 
 
