@@ -5,10 +5,13 @@ out=godoc.md
 pre=github.com/barnex/bruteray/
 cmd='godoc2ghmd -ex'
 
-$cmd $pre > $out
-echo >> $out
-echo >> $out
-$cmd $pre/shape >> $out
+cp main.md $out
+
+for pkg in shape csg mat light transf; do
+	echo >> $out; echo >> $out
+	$cmd $pre/shape >> $out
+done
+
 
 echo >> $out
 echo >> $out
