@@ -34,8 +34,8 @@ Package shape implements various shapes and objects.
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
 * [func Cube(center Vec, r float64, m Material) CSGObj](#Cube)
-* [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
-* [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
+* [func NewCylinder(dir int, center Vec, diam, h float64, m Material) CSGObj](#NewCylinder)
+* [func NewInfCylinder(dir int, diam float64, m Material) \*quad](#NewInfCylinder)
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
@@ -76,15 +76,16 @@ TODO: remove
 func Cube(center Vec, r float64, m Material) CSGObj
 ```
 
-## <a name="Cyl">func</a> [Cyl](./quad.go#L10)
+## <a name="NewCylinder">func</a> [NewCylinder](./cylinder.go#L10)
 ``` go
-func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj
+func NewCylinder(dir int, center Vec, diam, h float64, m Material) CSGObj
 ```
 Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
+TODO: Transl
 
-## <a name="NCyl">func</a> [NCyl](./cylinder.go#L5)
+## <a name="NewInfCylinder">func</a> [NewInfCylinder](./quad.go#L18)
 ``` go
-func NCyl(dir int, diam float64, m br.Material) *cyl
+func NewInfCylinder(dir int, diam float64, m Material) *quad
 ```
 
 ## <a name="OldBox">func</a> [OldBox](./box.go#L45)
@@ -93,7 +94,7 @@ func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj
 ```
 TODO rm
 
-## <a name="Quad">func</a> [Quad](./quad.go#L19)
+## <a name="Quad">func</a> [Quad](./quad.go#L6)
 ``` go
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj
 ```
@@ -251,901 +252,325 @@ func (s *Sphere) Normal(pos Vec) Vec
 func (s *Sphere) Transl(d Vec) *Sphere
 ```
 
-# shape
+# csg
 
-Package shape implements various shapes and objects.
+package csg provides constructive solid geometry operations on shapes.
 
 ## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func Cube(center Vec, r float64, m Material) CSGObj](#Cube)
-* [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
-* [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
-* [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
-* [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [type Box](#Box)
-  * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
-  * [func (s \*Box) Center() Vec](#Box.Center)
-  * [func (s \*Box) Corner(x, y, z int) Vec](#Box.Corner)
-  * [func (s \*Box) Hit1(r \*Ray, f \*[]Fragment)](#Box.Hit1)
-  * [func (s \*Box) HitAll(r \*Ray, f \*[]Fragment)](#Box.HitAll)
-  * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
-  * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
-  * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
-* [type Sheet](#Sheet)
-  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
-  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
-* [type Sphere](#Sphere)
-  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
-  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
-  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
-  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
-  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
-  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
+* [func And(a, b CSGObj) CSGObj](#And)
+* [func Cutout(a CSGObj, b Insider) CSGObj](#Cutout)
+* [func Hollow(o CSGObj) CSGObj](#Hollow)
+* [func Inverse(o CSGObj) CSGObj](#Inverse)
+* [func Minus(a, b CSGObj) CSGObj](#Minus)
+* [func MultiOr(o ...CSGObj) CSGObj](#MultiOr)
+* [func Or(a, b CSGObj) CSGObj](#Or)
+* [func SurfaceAnd(a Obj, b CSGObj) Obj](#SurfaceAnd)
 
-#### <a name="pkg-examples">Examples</a>
-* [NewBox](#example_NewBox)
-* [NewSheet](#example_NewSheet)
-* [NewSphere](#example_NewSphere)
-
-## <a name="pkg-variables">Variables</a>
+## <a name="And">func</a> [And](./csg.go#L36)
 ``` go
-var CsgAnd_ func(a, b CSGObj) CSGObj
+func And(a, b CSGObj) CSGObj
 ```
-TODO: remove
+Intersection (boolean AND) of two objects.
 
-## <a name="Cube">func</a> [Cube](./box.go#L53)
+## <a name="Cutout">func</a> [Cutout](./csg.go#L207)
 ``` go
-func Cube(center Vec, r float64, m Material) CSGObj
+func Cutout(a CSGObj, b Insider) CSGObj
 ```
 
-## <a name="Cyl">func</a> [Cyl](./quad.go#L10)
+## <a name="Hollow">func</a> [Hollow](./csg.go#L261)
 ``` go
-func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj
+func Hollow(o CSGObj) CSGObj
 ```
-Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
+Hollow turns a into a hollow surface.
+E.g.: a filled cylinder into a hollow tube.
 
-## <a name="NCyl">func</a> [NCyl](./cylinder.go#L5)
+## <a name="Inverse">func</a> [Inverse](./csg.go#L273)
 ``` go
-func NCyl(dir int, diam float64, m br.Material) *cyl
+func Inverse(o CSGObj) CSGObj
 ```
 
-## <a name="OldBox">func</a> [OldBox](./box.go#L45)
+## <a name="Minus">func</a> [Minus](./csg.go#L167)
 ``` go
-func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj
+func Minus(a, b CSGObj) CSGObj
 ```
-TODO rm
+Subtraction (logical AND NOT) of two objects
 
-## <a name="Quad">func</a> [Quad](./quad.go#L19)
+## <a name="MultiOr">func</a> [MultiOr](./csg.go#L117)
 ``` go
-func Quad(center Vec, a Vec, b float64, m Material) CSGObj
+func MultiOr(o ...CSGObj) CSGObj
 ```
 
-## <a name="Rect">func</a> [Rect](./rect.go#L9)
+## <a name="Or">func</a> [Or](./csg.go#L76)
 ``` go
-func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj
+func Or(a, b CSGObj) CSGObj
 ```
-A rectangle (i.e. finite sheet) at given position,
-with normal vector dir and half-axes rx, ry, rz.
+Union (logical OR) of two objects.
+TODO: remove in favor of MultiOr
 
-TODO: pass Vec normal, U, V
-
-## <a name="Slab">func</a> [Slab](./slab.go#L5)
+## <a name="SurfaceAnd">func</a> [SurfaceAnd](./csg.go#L233)
 ``` go
-func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
+func SurfaceAnd(a Obj, b CSGObj) Obj
 ```
+Intersection, treating A as a hollow object.
+Equivalent to, but more efficient than And(Hollow(a), b)
 
-## <a name="Box">type</a> [Box](./box.go#L19-L22)
-``` go
-type Box struct {
-    Min, Max Vec
-    Mat      Material
-}
-```
+# mat
 
-### <a name="NewBox">func</a> [NewBox](./box.go#L10)
-``` go
-func NewBox(w, h, d float64, m Material) *Box
-```
-NewBox constructs a box with given width, depth and height.
-
-#### Example:
-
-```go
-doc.Show(
-	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
-```
-
-![fig](/doc/ExampleNewBox.jpg)
-
-### <a name="Box.Center">func</a> (\*Box) [Center](./box.go#L24)
-``` go
-func (s *Box) Center() Vec
-```
-
-### <a name="Box.Corner">func</a> (\*Box) [Corner](./box.go#L39)
-``` go
-func (s *Box) Corner(x, y, z int) Vec
-```
-Corner returns one of the box's corners:
-
-	Corner( 1, 1, 1) -> right top  back
-	Corner(-1,-1,-1) -> left bottom front
-	Corner( 1,-1,-1) -> right bottom front
-	...
-
-### <a name="Box.Hit1">func</a> (\*Box) [Hit1](./box.go#L57)
-``` go
-func (s *Box) Hit1(r *Ray, f *[]Fragment)
-```
-
-### <a name="Box.HitAll">func</a> (\*Box) [HitAll](./box.go#L59)
-``` go
-func (s *Box) HitAll(r *Ray, f *[]Fragment)
-```
-
-### <a name="Box.Inside">func</a> (\*Box) [Inside](./box.go#L93)
-``` go
-func (s *Box) Inside(v Vec) bool
-```
-
-### <a name="Box.Normal">func</a> (\*Box) [Normal](./box.go#L99)
-``` go
-func (s *Box) Normal(p Vec) Vec
-```
-
-### <a name="Box.Transl">func</a> (\*Box) [Transl](./box.go#L28)
-``` go
-func (s *Box) Transl(d Vec) *Box
-```
-
-## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
-``` go
-type Sheet struct {
-    // contains filtered or unexported fields
-}
-```
-
-### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
-``` go
-func NewSheet(dir Vec, off float64, m Material) *Sheet
-```
-
-#### Example:
-
-```go
-doc.Show(
-	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
-	)
-```
-
-![fig](/doc/ExampleNewSheet.jpg)
-
-### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
-``` go
-func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
-```
-
-## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
-``` go
-type Sphere struct {
-    // contains filtered or unexported fields
-}
-```
-
-### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
-``` go
-func NewSphere(diam float64, m Material) *Sphere
-```
-
-#### Example:
-
-```go
-doc.Show(
-	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
-```
-
-![fig](/doc/ExampleNewSphere.jpg)
-
-### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
-``` go
-func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
-```
-
-### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
-``` go
-func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
-```
-
-### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
-``` go
-func (s *Sphere) Inside(p Vec) bool
-```
-
-### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
-``` go
-func (s *Sphere) Normal(pos Vec) Vec
-```
-
-### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
-``` go
-func (s *Sphere) Transl(d Vec) *Sphere
-```
-
-# shape
-
-Package shape implements various shapes and objects.
+Package mat implements various types of materials.
 
 ## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func Cube(center Vec, r float64, m Material) CSGObj](#Cube)
-* [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
-* [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
-* [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
-* [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [type Box](#Box)
-  * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
-  * [func (s \*Box) Center() Vec](#Box.Center)
-  * [func (s \*Box) Corner(x, y, z int) Vec](#Box.Corner)
-  * [func (s \*Box) Hit1(r \*Ray, f \*[]Fragment)](#Box.Hit1)
-  * [func (s \*Box) HitAll(r \*Ray, f \*[]Fragment)](#Box.HitAll)
-  * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
-  * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
-  * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
-* [type Sheet](#Sheet)
-  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
-  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
-* [type Sphere](#Sphere)
-  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
-  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
-  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
-  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
-  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
-  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
+* [func Blend(a float64, matA Material, b float64, matB Material) Material](#Blend)
+* [func Bricks(stride, width float64, a, b Material) Material](#Bricks)
+* [func Checkboard(stride float64, a, b Material) Material](#Checkboard)
+* [func Diffuse(c Texture) Material](#Diffuse)
+* [func Diffuse0(c Texture) Material](#Diffuse0)
+* [func Diffuse00(c Color) Material](#Diffuse00)
+* [func Distort(seed int, n int, K Vec, ampli float64, orig Material) Material](#Distort)
+* [func Load(name string) (raster.Image, error)](#Load)
+* [func MustLoad(name string) raster.Image](#MustLoad)
+* [func Reflective(c Color) Material](#Reflective)
+* [func Refractive(n1, n2 float64) Material](#Refractive)
+* [func ShadeNormal(dir Vec) Material](#ShadeNormal)
+* [func ShadeShape(c Color) Material](#ShadeShape)
+* [func Shiny(c Color, reflectivity float64) Material](#Shiny)
+* [func Waves(seed int, n int, K Vec, col func(float64) Material) Material](#Waves)
+* [type FlatColor](#FlatColor)
+  * [func Flat(c br.Color) \*FlatColor](#Flat)
+  * [func (s \*FlatColor) At(\_ br.Vec) br.Color](#FlatColor.At)
+  * [func (s \*FlatColor) Shade(\_ \*br.Ctx, \_ \*br.Env, \_ int, \_ \*br.Ray, \_ br.Fragment) br.Color](#FlatColor.Shade)
+* [type ImgTex](#ImgTex)
+  * [func NewImgTex(img raster.Image, p0, pu, pv Vec) \*ImgTex](#NewImgTex)
+  * [func (c \*ImgTex) At(pos Vec) Color](#ImgTex.At)
+  * [func (c \*ImgTex) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ImgTex.Shade)
+* [type ShadeDir](#ShadeDir)
+  * [func (s ShadeDir) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ShadeDir.Shade)
+* [type Texture](#Texture)
 
-#### <a name="pkg-examples">Examples</a>
-* [NewBox](#example_NewBox)
-* [NewSheet](#example_NewSheet)
-* [NewSphere](#example_NewSphere)
-
-## <a name="pkg-variables">Variables</a>
+## <a name="Blend">func</a> [Blend](./material.go#L109)
 ``` go
-var CsgAnd_ func(a, b CSGObj) CSGObj
+func Blend(a float64, matA Material, b float64, matB Material) Material
 ```
-TODO: remove
+Blend mixes two materials with certain weights. E.g.:
 
-## <a name="Cube">func</a> [Cube](./box.go#L53)
+	Blend(0.9, Diffuse(WHITE), 0.1, Reflective(WHITE))  // 90% mate + 10% reflective, like a shiny billiard ball.
+
+## <a name="Bricks">func</a> [Bricks](./procedural.go#L30)
 ``` go
-func Cube(center Vec, r float64, m Material) CSGObj
+func Bricks(stride, width float64, a, b Material) Material
 ```
 
-## <a name="Cyl">func</a> [Cyl](./quad.go#L10)
+## <a name="Checkboard">func</a> [Checkboard](./procedural.go#L9)
 ``` go
-func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj
-```
-Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
-
-## <a name="NCyl">func</a> [NCyl](./cylinder.go#L5)
-``` go
-func NCyl(dir int, diam float64, m br.Material) *cyl
+func Checkboard(stride float64, a, b Material) Material
 ```
 
-## <a name="OldBox">func</a> [OldBox](./box.go#L45)
+## <a name="Diffuse">func</a> [Diffuse](./diffuse.go#L10)
 ``` go
-func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj
+func Diffuse(c Texture) Material
 ```
-TODO rm
+A Diffuse material appears perfectly mate,
+like paper or plaster.
+See <a href="https://en.wikipedia.org/wiki/Lambertian_reflectance">https://en.wikipedia.org/wiki/Lambertian_reflectance</a>.
 
-## <a name="Quad">func</a> [Quad](./quad.go#L19)
+## <a name="Diffuse0">func</a> [Diffuse0](./diffuse.go#L46)
 ``` go
-func Quad(center Vec, a Vec, b float64, m Material) CSGObj
+func Diffuse0(c Texture) Material
 ```
+Diffuse material with direct illumination only (no interreflection).
+Intended for debugging or rapid previews. Diffuse is much more realistic.
 
-## <a name="Rect">func</a> [Rect](./rect.go#L9)
+## <a name="Diffuse00">func</a> [Diffuse00](./diffuse_noshadow.go#L9)
 ``` go
-func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj
+func Diffuse00(c Color) Material
 ```
-A rectangle (i.e. finite sheet) at given position,
-with normal vector dir and half-axes rx, ry, rz.
+Diffuse material with direct illumination only and no shadows.
+Intended for the tutorial.
 
-TODO: pass Vec normal, U, V
-
-## <a name="Slab">func</a> [Slab](./slab.go#L5)
+## <a name="Distort">func</a> [Distort](./procedural.go#L67)
 ``` go
-func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
-```
-
-## <a name="Box">type</a> [Box](./box.go#L19-L22)
-``` go
-type Box struct {
-    Min, Max Vec
-    Mat      Material
-}
+func Distort(seed int, n int, K Vec, ampli float64, orig Material) Material
 ```
 
-### <a name="NewBox">func</a> [NewBox](./box.go#L10)
+## <a name="Load">func</a> [Load](./texture.go#L67)
 ``` go
-func NewBox(w, h, d float64, m Material) *Box
-```
-NewBox constructs a box with given width, depth and height.
-
-#### Example:
-
-```go
-doc.Show(
-	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
+func Load(name string) (raster.Image, error)
 ```
 
-![fig](/doc/ExampleNewBox.jpg)
-
-### <a name="Box.Center">func</a> (\*Box) [Center](./box.go#L24)
+## <a name="MustLoad">func</a> [MustLoad](./texture.go#L59)
 ``` go
-func (s *Box) Center() Vec
+func MustLoad(name string) raster.Image
 ```
 
-### <a name="Box.Corner">func</a> (\*Box) [Corner](./box.go#L39)
+## <a name="Reflective">func</a> [Reflective](./material.go#L26)
 ``` go
-func (s *Box) Corner(x, y, z int) Vec
+func Reflective(c Color) Material
 ```
-Corner returns one of the box's corners:
+A Reflective surface. E.g.:
 
-	Corner( 1, 1, 1) -> right top  back
-	Corner(-1,-1,-1) -> left bottom front
-	Corner( 1,-1,-1) -> right bottom front
-	...
+	Reflective(WHITE)        // perfectly reflective, looks like shiny metal
+	Reflective(WHITE.EV(-1)) // 50% reflective, looks like darker metal
+	Reflective(RED)          // Reflects only red, looks like metal in transparent red candy-wrap.
 
-### <a name="Box.Hit1">func</a> (\*Box) [Hit1](./box.go#L57)
+## <a name="Refractive">func</a> [Refractive](./material.go#L45)
 ``` go
-func (s *Box) Hit1(r *Ray, f *[]Fragment)
+func Refractive(n1, n2 float64) Material
+```
+Refractive material with index of refraction n1 outside and n2 inside.
+E.g.:
+
+	Refractive(1, 1.5) // glass in air
+	Refractive(1.5, 1) // air in glass
+
+## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L134)
+``` go
+func ShadeNormal(dir Vec) Material
+```
+ShadeNormal is a debug shader that colors according to the normal vector projected on dir.
+
+## <a name="ShadeShape">func</a> [ShadeShape](./material.go#L154)
+``` go
+func ShadeShape(c Color) Material
+```
+ShadeShape is a debug material that renders the object's shape only,
+even if no lighting is present. Useful while defining a scene before
+worrying about lighting.
+
+## <a name="Shiny">func</a> [Shiny](./material.go#L115)
+``` go
+func Shiny(c Color, reflectivity float64) Material
+```
+Shiny is shorthand for Blend-ing diffuse + reflection, e.g.:
+Shiny(WHITE, 0.1) // a white billiard ball, 10% specular reflection
+
+## <a name="Waves">func</a> [Waves](./procedural.go#L94)
+``` go
+func Waves(seed int, n int, K Vec, col func(float64) Material) Material
 ```
 
-### <a name="Box.HitAll">func</a> (\*Box) [HitAll](./box.go#L59)
+## <a name="FlatColor">type</a> [FlatColor](./flat.go#L12-L14)
 ``` go
-func (s *Box) HitAll(r *Ray, f *[]Fragment)
-```
-
-### <a name="Box.Inside">func</a> (\*Box) [Inside](./box.go#L93)
-``` go
-func (s *Box) Inside(v Vec) bool
-```
-
-### <a name="Box.Normal">func</a> (\*Box) [Normal](./box.go#L99)
-``` go
-func (s *Box) Normal(p Vec) Vec
-```
-
-### <a name="Box.Transl">func</a> (\*Box) [Transl](./box.go#L28)
-``` go
-func (s *Box) Transl(d Vec) *Box
-```
-
-## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
-``` go
-type Sheet struct {
+type FlatColor struct {
     // contains filtered or unexported fields
 }
 ```
 
-### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
+### <a name="Flat">func</a> [Flat](./flat.go#L8)
 ``` go
-func NewSheet(dir Vec, off float64, m Material) *Sheet
+func Flat(c br.Color) *FlatColor
+```
+A Flat material always returns the same color.
+Useful for debugging, or for rare cases like
+a computer screen or other extended, dimly luminous surfaces.
+
+### <a name="FlatColor.At">func</a> (\*FlatColor) [At](./flat.go#L20)
+``` go
+func (s *FlatColor) At(_ br.Vec) br.Color
 ```
 
-#### Example:
-
-```go
-doc.Show(
-	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
-	)
+### <a name="FlatColor.Shade">func</a> (\*FlatColor) [Shade](./flat.go#L16)
+``` go
+func (s *FlatColor) Shade(_ *br.Ctx, _ *br.Env, _ int, _ *br.Ray, _ br.Fragment) br.Color
 ```
 
-![fig](/doc/ExampleNewSheet.jpg)
-
-### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
+## <a name="ImgTex">type</a> [ImgTex](./texture.go#L23-L26)
 ``` go
-func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
-```
-
-## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
-``` go
-type Sphere struct {
+type ImgTex struct {
     // contains filtered or unexported fields
 }
 ```
 
-### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
+### <a name="NewImgTex">func</a> [NewImgTex](./texture.go#L19)
 ``` go
-func NewSphere(diam float64, m Material) *Sphere
+func NewImgTex(img raster.Image, p0, pu, pv Vec) *ImgTex
 ```
 
-#### Example:
-
-```go
-doc.Show(
-	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
-```
-
-![fig](/doc/ExampleNewSphere.jpg)
-
-### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
+### <a name="ImgTex.At">func</a> (\*ImgTex) [At](./texture.go#L33)
 ``` go
-func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
+func (c *ImgTex) At(pos Vec) Color
 ```
 
-### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
+### <a name="ImgTex.Shade">func</a> (\*ImgTex) [Shade](./texture.go#L29)
 ``` go
-func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
+func (c *ImgTex) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
+TODO: remove?
 
-### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
+## <a name="ShadeDir">type</a> [ShadeDir](./material.go#L15)
 ``` go
-func (s *Sphere) Inside(p Vec) bool
+type ShadeDir func(dir Vec) Color
 ```
+ShadeDir returns a color based on the direction of a ray.
+Used for shading the ambient background, E.g., the sky.
 
-### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
+### <a name="ShadeDir.Shade">func</a> (ShadeDir) [Shade](./material.go#L17)
 ``` go
-func (s *Sphere) Normal(pos Vec) Vec
+func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
 
-### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
+## <a name="Texture">type</a> [Texture](./texture.go#L15-L17)
 ``` go
-func (s *Sphere) Transl(d Vec) *Sphere
+type Texture interface {
+    At(Vec) Color
+}
 ```
 
-# shape
+# light
 
-Package shape implements various shapes and objects.
+Package light implements various types of light sources.
+They all implement br.Light.
 
 ## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func Cube(center Vec, r float64, m Material) CSGObj](#Cube)
-* [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
-* [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
-* [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
-* [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [type Box](#Box)
-  * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
-  * [func (s \*Box) Center() Vec](#Box.Center)
-  * [func (s \*Box) Corner(x, y, z int) Vec](#Box.Corner)
-  * [func (s \*Box) Hit1(r \*Ray, f \*[]Fragment)](#Box.Hit1)
-  * [func (s \*Box) HitAll(r \*Ray, f \*[]Fragment)](#Box.HitAll)
-  * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
-  * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
-  * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
-* [type Sheet](#Sheet)
-  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
-  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
-* [type Sphere](#Sphere)
-  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
-  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
-  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
-  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
-  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
-  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
+* [func DirLight(pos Vec, intensity Color) Light](#DirLight)
+* [func PointLight(pos Vec, intensity Color) Light](#PointLight)
+* [func RectLight(pos Vec, rx, ry, rz float64, c Color) Light](#RectLight)
+* [func Sphere(pos Vec, radius float64, intensity Color) Light](#Sphere)
 
-#### <a name="pkg-examples">Examples</a>
-* [NewBox](#example_NewBox)
-* [NewSheet](#example_NewSheet)
-* [NewSphere](#example_NewSphere)
-
-## <a name="pkg-variables">Variables</a>
+## <a name="DirLight">func</a> [DirLight](./light.go#L20)
 ``` go
-var CsgAnd_ func(a, b CSGObj) CSGObj
+func DirLight(pos Vec, intensity Color) Light
 ```
-TODO: remove
+Directed light source without fall-off.
+Position should be far away from the scene (indicates a direction)
 
-## <a name="Cube">func</a> [Cube](./box.go#L53)
+## <a name="PointLight">func</a> [PointLight](./light.go#L35)
 ``` go
-func Cube(center Vec, r float64, m Material) CSGObj
+func PointLight(pos Vec, intensity Color) Light
 ```
+Point light source (with fall-off).
 
-## <a name="Cyl">func</a> [Cyl](./quad.go#L10)
+## <a name="RectLight">func</a> [RectLight](./light.go#L93)
 ``` go
-func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj
+func RectLight(pos Vec, rx, ry, rz float64, c Color) Light
 ```
-Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
 
-## <a name="NCyl">func</a> [NCyl](./cylinder.go#L5)
+## <a name="Sphere">func</a> [Sphere](./light.go#L52)
 ``` go
-func NCyl(dir int, diam float64, m br.Material) *cyl
+func Sphere(pos Vec, radius float64, intensity Color) Light
 ```
+Spherical light source.
+Throws softer shadows than an point source and is visible in specular reflections.
+TODO: nearby samples must limit their intensity to the analytical value for that limit.
 
-## <a name="OldBox">func</a> [OldBox](./box.go#L45)
-``` go
-func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj
-```
-TODO rm
+# transf
 
-## <a name="Quad">func</a> [Quad](./quad.go#L19)
-``` go
-func Quad(center Vec, a Vec, b float64, m Material) CSGObj
-```
-
-## <a name="Rect">func</a> [Rect](./rect.go#L9)
-``` go
-func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj
-```
-A rectangle (i.e. finite sheet) at given position,
-with normal vector dir and half-axes rx, ry, rz.
-
-TODO: pass Vec normal, U, V
-
-## <a name="Slab">func</a> [Slab](./slab.go#L5)
-``` go
-func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
-```
-
-## <a name="Box">type</a> [Box](./box.go#L19-L22)
-``` go
-type Box struct {
-    Min, Max Vec
-    Mat      Material
-}
-```
-
-### <a name="NewBox">func</a> [NewBox](./box.go#L10)
-``` go
-func NewBox(w, h, d float64, m Material) *Box
-```
-NewBox constructs a box with given width, depth and height.
-
-#### Example:
-
-```go
-doc.Show(
-	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
-```
-
-![fig](/doc/ExampleNewBox.jpg)
-
-### <a name="Box.Center">func</a> (\*Box) [Center](./box.go#L24)
-``` go
-func (s *Box) Center() Vec
-```
-
-### <a name="Box.Corner">func</a> (\*Box) [Corner](./box.go#L39)
-``` go
-func (s *Box) Corner(x, y, z int) Vec
-```
-Corner returns one of the box's corners:
-
-	Corner( 1, 1, 1) -> right top  back
-	Corner(-1,-1,-1) -> left bottom front
-	Corner( 1,-1,-1) -> right bottom front
-	...
-
-### <a name="Box.Hit1">func</a> (\*Box) [Hit1](./box.go#L57)
-``` go
-func (s *Box) Hit1(r *Ray, f *[]Fragment)
-```
-
-### <a name="Box.HitAll">func</a> (\*Box) [HitAll](./box.go#L59)
-``` go
-func (s *Box) HitAll(r *Ray, f *[]Fragment)
-```
-
-### <a name="Box.Inside">func</a> (\*Box) [Inside](./box.go#L93)
-``` go
-func (s *Box) Inside(v Vec) bool
-```
-
-### <a name="Box.Normal">func</a> (\*Box) [Normal](./box.go#L99)
-``` go
-func (s *Box) Normal(p Vec) Vec
-```
-
-### <a name="Box.Transl">func</a> (\*Box) [Transl](./box.go#L28)
-``` go
-func (s *Box) Transl(d Vec) *Box
-```
-
-## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
-``` go
-type Sheet struct {
-    // contains filtered or unexported fields
-}
-```
-
-### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
-``` go
-func NewSheet(dir Vec, off float64, m Material) *Sheet
-```
-
-#### Example:
-
-```go
-doc.Show(
-	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
-	)
-```
-
-![fig](/doc/ExampleNewSheet.jpg)
-
-### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
-``` go
-func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
-```
-
-## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
-``` go
-type Sphere struct {
-    // contains filtered or unexported fields
-}
-```
-
-### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
-``` go
-func NewSphere(diam float64, m Material) *Sphere
-```
-
-#### Example:
-
-```go
-doc.Show(
-	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
-```
-
-![fig](/doc/ExampleNewSphere.jpg)
-
-### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
-``` go
-func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
-```
-
-### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
-``` go
-func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
-```
-
-### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
-``` go
-func (s *Sphere) Inside(p Vec) bool
-```
-
-### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
-``` go
-func (s *Sphere) Normal(pos Vec) Vec
-```
-
-### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
-``` go
-func (s *Sphere) Transl(d Vec) *Sphere
-```
-
-# shape
-
-Package shape implements various shapes and objects.
+Package transf provides affine transformations on objects, like rotations.
 
 ## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func Cube(center Vec, r float64, m Material) CSGObj](#Cube)
-* [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
-* [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
-* [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
-* [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [type Box](#Box)
-  * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
-  * [func (s \*Box) Center() Vec](#Box.Center)
-  * [func (s \*Box) Corner(x, y, z int) Vec](#Box.Corner)
-  * [func (s \*Box) Hit1(r \*Ray, f \*[]Fragment)](#Box.Hit1)
-  * [func (s \*Box) HitAll(r \*Ray, f \*[]Fragment)](#Box.HitAll)
-  * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
-  * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
-  * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
-* [type Sheet](#Sheet)
-  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
-  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
-* [type Sphere](#Sphere)
-  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
-  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
-  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
-  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
-  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
-  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
+* [func Transf(o CSGObj, T \*Matrix4) CSGObj](#Transf)
+* [func TransfNonCSG(o Obj, T \*Matrix4) Obj](#TransfNonCSG)
 
-#### <a name="pkg-examples">Examples</a>
-* [NewBox](#example_NewBox)
-* [NewSheet](#example_NewSheet)
-* [NewSphere](#example_NewSphere)
-
-## <a name="pkg-variables">Variables</a>
+## <a name="Transf">func</a> [Transf](./transf.go#L8)
 ``` go
-var CsgAnd_ func(a, b CSGObj) CSGObj
+func Transf(o CSGObj, T *Matrix4) CSGObj
 ```
-TODO: remove
+Transf returns a transformed version of the object.
+TODO: also for non-csg?
 
-## <a name="Cube">func</a> [Cube](./box.go#L53)
+## <a name="TransfNonCSG">func</a> [TransfNonCSG](./transf.go#L42)
 ``` go
-func Cube(center Vec, r float64, m Material) CSGObj
+func TransfNonCSG(o Obj, T *Matrix4) Obj
 ```
-
-## <a name="Cyl">func</a> [Cyl](./quad.go#L10)
-``` go
-func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj
-```
-Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
-
-## <a name="NCyl">func</a> [NCyl](./cylinder.go#L5)
-``` go
-func NCyl(dir int, diam float64, m br.Material) *cyl
-```
-
-## <a name="OldBox">func</a> [OldBox](./box.go#L45)
-``` go
-func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj
-```
-TODO rm
-
-## <a name="Quad">func</a> [Quad](./quad.go#L19)
-``` go
-func Quad(center Vec, a Vec, b float64, m Material) CSGObj
-```
-
-## <a name="Rect">func</a> [Rect](./rect.go#L9)
-``` go
-func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj
-```
-A rectangle (i.e. finite sheet) at given position,
-with normal vector dir and half-axes rx, ry, rz.
-
-TODO: pass Vec normal, U, V
-
-## <a name="Slab">func</a> [Slab](./slab.go#L5)
-``` go
-func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
-```
-
-## <a name="Box">type</a> [Box](./box.go#L19-L22)
-``` go
-type Box struct {
-    Min, Max Vec
-    Mat      Material
-}
-```
-
-### <a name="NewBox">func</a> [NewBox](./box.go#L10)
-``` go
-func NewBox(w, h, d float64, m Material) *Box
-```
-NewBox constructs a box with given width, depth and height.
-
-#### Example:
-
-```go
-doc.Show(
-	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
-```
-
-![fig](/doc/ExampleNewBox.jpg)
-
-### <a name="Box.Center">func</a> (\*Box) [Center](./box.go#L24)
-``` go
-func (s *Box) Center() Vec
-```
-
-### <a name="Box.Corner">func</a> (\*Box) [Corner](./box.go#L39)
-``` go
-func (s *Box) Corner(x, y, z int) Vec
-```
-Corner returns one of the box's corners:
-
-	Corner( 1, 1, 1) -> right top  back
-	Corner(-1,-1,-1) -> left bottom front
-	Corner( 1,-1,-1) -> right bottom front
-	...
-
-### <a name="Box.Hit1">func</a> (\*Box) [Hit1](./box.go#L57)
-``` go
-func (s *Box) Hit1(r *Ray, f *[]Fragment)
-```
-
-### <a name="Box.HitAll">func</a> (\*Box) [HitAll](./box.go#L59)
-``` go
-func (s *Box) HitAll(r *Ray, f *[]Fragment)
-```
-
-### <a name="Box.Inside">func</a> (\*Box) [Inside](./box.go#L93)
-``` go
-func (s *Box) Inside(v Vec) bool
-```
-
-### <a name="Box.Normal">func</a> (\*Box) [Normal](./box.go#L99)
-``` go
-func (s *Box) Normal(p Vec) Vec
-```
-
-### <a name="Box.Transl">func</a> (\*Box) [Transl](./box.go#L28)
-``` go
-func (s *Box) Transl(d Vec) *Box
-```
-
-## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
-``` go
-type Sheet struct {
-    // contains filtered or unexported fields
-}
-```
-
-### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
-``` go
-func NewSheet(dir Vec, off float64, m Material) *Sheet
-```
-
-#### Example:
-
-```go
-doc.Show(
-	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
-	)
-```
-
-![fig](/doc/ExampleNewSheet.jpg)
-
-### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
-``` go
-func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
-```
-
-## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
-``` go
-type Sphere struct {
-    // contains filtered or unexported fields
-}
-```
-
-### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
-``` go
-func NewSphere(diam float64, m Material) *Sphere
-```
-
-#### Example:
-
-```go
-doc.Show(
-	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
-```
-
-![fig](/doc/ExampleNewSphere.jpg)
-
-### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
-``` go
-func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
-```
-
-### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
-``` go
-func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
-```
-
-### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
-``` go
-func (s *Sphere) Inside(p Vec) bool
-```
-
-### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
-``` go
-func (s *Sphere) Normal(pos Vec) Vec
-```
-
-### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
-``` go
-func (s *Sphere) Transl(d Vec) *Sphere
-```
+TODO: rename
 
 - - -
 Generated by a modified [godoc2ghmd](https://github.com/GandalfUK/godoc2ghmd)

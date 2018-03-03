@@ -3,19 +3,6 @@ package shape
 import "math"
 import . "github.com/barnex/bruteray/br"
 
-// TODO: remove
-var CsgAnd_ func(a, b CSGObj) CSGObj
-
-// Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
-func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj {
-	r := diam / 2
-	coeff := Vec{1, 1, 1}
-	coeff[dir] = 0
-	infCyl := &quad{center, coeff, r * r, m}
-	capped := CsgAnd_(infCyl, Slab(Unit[dir], center[dir]-h/2, center[dir]+h/2, m))
-	return capped
-}
-
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj {
 	return &quad{center, a, b, m}
 }
@@ -26,6 +13,13 @@ type quad struct {
 	a Vec
 	b float64
 	m Material
+}
+
+func NewInfCylinder(dir int, diam float64, m Material) *quad {
+	r := diam / 2
+	coeff := Vec{1, 1, 1}
+	coeff[dir] = 0
+	return &quad{Vec{}, coeff, r * r, m}
 }
 
 func (s *quad) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }

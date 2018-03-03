@@ -502,9 +502,9 @@ func TestCyl(t *testing.T) {
 
 	e.Add(
 		NewSheet(Ey, 0.0, Checkboard(1, Diffuse0(WHITE), Diffuse0(GREY))),
-		Cyl(Y, Vec{1, 0.5, 0}, 2, 0.5, Diffuse0(RED)),
-		Cyl(X, Vec{-0.8, 0.5, 0}, 1, 0.5, Diffuse0(GREEN)),
-		Cyl(Z, Vec{-2, 1, 2}, 2, 1, Diffuse0(BLUE)),
+		NewCylinder(Y, Vec{1, 0.5, 0}, 2, 0.5, Diffuse0(RED)),
+		NewCylinder(X, Vec{-0.8, 0.5, 0}, 1, 0.5, Diffuse0(GREEN)),
+		NewCylinder(Z, Vec{-2, 1, 2}, 2, 1, Diffuse0(BLUE)),
 	)
 	e.AddLight(
 		light.PointLight(Vec{-3, 5, -2}, WHITE.Mul(EV(8))),
@@ -530,8 +530,8 @@ func TestMultiOr(t *testing.T) {
 
 	chestz := func(pos Vec, w, h1, d, pointy float64, m Material) CSGObj {
 		const off = 1e-4
-		c1 := Cyl(Z, Vec{pointy / 2, h1, 0}.Add(pos), w+pointy, d-off, m)
-		c2 := Cyl(Z, Vec{-pointy / 2, h1, 0}.Add(pos), w+pointy, d+off, m)
+		c1 := NewCylinder(Z, Vec{pointy / 2, h1, 0}.Add(pos), w+pointy, d-off, m)
+		c2 := NewCylinder(Z, Vec{-pointy / 2, h1, 0}.Add(pos), w+pointy, d+off, m)
 		ceil := And(c1, c2)
 		box := NewBox(w, h1, d+2*off, m).Transl(pos.Add(Vec{Y: h1 / 2}))
 		return Or(box, ceil)
@@ -539,8 +539,8 @@ func TestMultiOr(t *testing.T) {
 
 	chestx := func(pos Vec, w, h1, d, pointy float64, m Material) CSGObj {
 		const off = 1e-4
-		c1 := Cyl(X, Vec{0, h1, pointy / 2}.Add(pos), w+pointy, d-off, m)
-		c2 := Cyl(X, Vec{0, h1, -pointy / 2}.Add(pos), w+pointy, d+off, m)
+		c1 := NewCylinder(X, Vec{0, h1, pointy / 2}.Add(pos), w+pointy, d-off, m)
+		c2 := NewCylinder(X, Vec{0, h1, -pointy / 2}.Add(pos), w+pointy, d+off, m)
 		ceil := And(c1, c2)
 		box := NewBox(d+2*off, h1, w, m).Transl(pos.Add(Vec{Y: h1 / 2}))
 		return Or(box, ceil)
