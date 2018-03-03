@@ -153,8 +153,8 @@ e := br.NewEnv()
 	raster.Standard(e)
 	
 	//Output:
-	//![fig](shots/062.jpg)
 ```
+![fig](shots/062.jpg)
 
 </details>
 
