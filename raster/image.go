@@ -60,6 +60,12 @@ func (img Image) Mul(x float64) {
 
 const jpegQual = 95
 
+func MustEncode(img Image, fname string) {
+	if err := Encode(img, fname); err != nil {
+		panic(err)
+	}
+}
+
 func Encode(img Image, fname string) error {
 	f, err := os.Create(fname)
 	if err != nil {
