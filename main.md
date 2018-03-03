@@ -11,13 +11,13 @@ Features:
 
 Sub-packages:
 
-  * br        core raytracing logic and types
-  * mat       materials and textures
-  * light     various types of light sources
-  * (shape)[https://github.com/barnex/bruteray/godoc.md#shape]     shapes and objects
-  * csg       constructive solid geometry: combine shapes
-  * transf    affine transformations on shapes
-  * raster    turns a scene into a pixel image
+    br        core raytracing logic and types
+    mat       materials and textures
+    light     various types of light sources
+    shape     shapes and objects
+    csg       constructive solid geometry: combine shapes
+    transf    affine transformations on shapes
+    raster    turns a scene into a pixel image
 
 Additional material:
 
@@ -25,8 +25,3 @@ Additional material:
 	serve           web server used by raywatch
 	scenes          source files of some scenes
 	tutorial        explains some ray-tracing basics
-
-![fig](shots/062.jpg)
-
-*/
-package bruteray

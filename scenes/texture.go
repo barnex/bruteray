@@ -23,9 +23,9 @@ func main() {
 
 	e.Add(
 		shape.Sheet(Ey, cube.Min[Y], mat.Diffuse(WHITE.EV(-2))),
-		shape.NSphere(.2, mat.ShadeShape(WHITE)).Transl(p0),
-		shape.NSphere(.2, mat.ShadeShape(RED)).Transl(pu),
-		shape.NSphere(.2, mat.ShadeShape(GREEN)).Transl(pv),
+		shape.NewSphere(.2, mat.ShadeShape(WHITE)).Transl(p0),
+		shape.NewSphere(.2, mat.ShadeShape(RED)).Transl(pu),
+		shape.NewSphere(.2, mat.ShadeShape(GREEN)).Transl(pv),
 		cube,
 	)
 

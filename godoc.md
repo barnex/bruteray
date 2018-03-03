@@ -11,13 +11,13 @@ Features:
 
 Sub-packages:
 
-  * br        core raytracing logic and types
-  * mat       materials and textures
-  * light     various types of light sources
-  * (shape)[https://github.com/barnex/bruteray/godoc.md#shape]     shapes and objects
-  * csg       constructive solid geometry: combine shapes
-  * transf    affine transformations on shapes
-  * raster    turns a scene into a pixel image
+    br        core raytracing logic and types
+    mat       materials and textures
+    light     various types of light sources
+    shape     shapes and objects
+    csg       constructive solid geometry: combine shapes
+    transf    affine transformations on shapes
+    raster    turns a scene into a pixel image
 
 Additional material:
 
@@ -26,11 +26,6 @@ Additional material:
 	scenes          source files of some scenes
 	tutorial        explains some ray-tracing basics
 
-![fig](shots/062.jpg)
-
-*/
-package bruteray
-
 
 # shape
 
@@ -43,15 +38,20 @@ Package shape implements various shapes and objects.
 * [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
 * [func NBox(w, h, d float64, m Material) \*box](#NBox)
 * [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func NSphere(diam float64, m Material) \*sphere](#NSphere)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
 * [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [func Sphere(center Vec, radius float64, m Material) CSGObj](#Sphere)
+* [type Sphere](#Sphere)
+  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
+  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
+  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
+  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
+  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
+  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
 
 #### <a name="pkg-examples">Examples</a>
-* [Sphere](#example_Sphere)
+* [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
@@ -86,11 +86,6 @@ NBox constructs a box with given width, depth and height.
 func NCyl(dir int, diam float64, m br.Material) *cyl
 ```
 
-## <a name="NSphere">func</a> [NSphere](./sphere.go#L10)
-``` go
-func NSphere(diam float64, m Material) *sphere
-```
-
 ## <a name="Quad">func</a> [Quad](./quad.go#L19)
 ``` go
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj
@@ -115,21 +110,53 @@ func Sheet(dir Vec, off float64, m Material) Obj
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
 ```
 
-## <a name="Sphere">func</a> [Sphere](./sphere.go#L6)
+## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
-func Sphere(center Vec, radius float64, m Material) CSGObj
+type Sphere struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
+``` go
+func NewSphere(diam float64, m Material) *Sphere
 ```
 
 #### Example:
 
 ```go
 e := NewEnv()
-sphere := NSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
 e.Add(sphere)
 doc.Example(e)
 ```
 
-![fig](/doc/ExampleSphere.jpg)
+![fig](/doc/ExampleNewSphere.jpg)
+
+### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
+``` go
+func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
+``` go
+func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
+``` go
+func (s *Sphere) Inside(p Vec) bool
+```
+
+### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
+``` go
+func (s *Sphere) Normal(pos Vec) Vec
+```
+
+### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
+``` go
+func (s *Sphere) Transl(d Vec) *Sphere
+```
 
 # shape
 
@@ -142,15 +169,20 @@ Package shape implements various shapes and objects.
 * [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
 * [func NBox(w, h, d float64, m Material) \*box](#NBox)
 * [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func NSphere(diam float64, m Material) \*sphere](#NSphere)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
 * [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [func Sphere(center Vec, radius float64, m Material) CSGObj](#Sphere)
+* [type Sphere](#Sphere)
+  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
+  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
+  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
+  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
+  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
+  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
 
 #### <a name="pkg-examples">Examples</a>
-* [Sphere](#example_Sphere)
+* [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
@@ -185,11 +217,6 @@ NBox constructs a box with given width, depth and height.
 func NCyl(dir int, diam float64, m br.Material) *cyl
 ```
 
-## <a name="NSphere">func</a> [NSphere](./sphere.go#L10)
-``` go
-func NSphere(diam float64, m Material) *sphere
-```
-
 ## <a name="Quad">func</a> [Quad](./quad.go#L19)
 ``` go
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj
@@ -214,21 +241,53 @@ func Sheet(dir Vec, off float64, m Material) Obj
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
 ```
 
-## <a name="Sphere">func</a> [Sphere](./sphere.go#L6)
+## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
-func Sphere(center Vec, radius float64, m Material) CSGObj
+type Sphere struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
+``` go
+func NewSphere(diam float64, m Material) *Sphere
 ```
 
 #### Example:
 
 ```go
 e := NewEnv()
-sphere := NSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
 e.Add(sphere)
 doc.Example(e)
 ```
 
-![fig](/doc/ExampleSphere.jpg)
+![fig](/doc/ExampleNewSphere.jpg)
+
+### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
+``` go
+func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
+``` go
+func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
+``` go
+func (s *Sphere) Inside(p Vec) bool
+```
+
+### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
+``` go
+func (s *Sphere) Normal(pos Vec) Vec
+```
+
+### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
+``` go
+func (s *Sphere) Transl(d Vec) *Sphere
+```
 
 # shape
 
@@ -241,15 +300,20 @@ Package shape implements various shapes and objects.
 * [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
 * [func NBox(w, h, d float64, m Material) \*box](#NBox)
 * [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func NSphere(diam float64, m Material) \*sphere](#NSphere)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
 * [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [func Sphere(center Vec, radius float64, m Material) CSGObj](#Sphere)
+* [type Sphere](#Sphere)
+  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
+  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
+  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
+  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
+  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
+  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
 
 #### <a name="pkg-examples">Examples</a>
-* [Sphere](#example_Sphere)
+* [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
@@ -284,11 +348,6 @@ NBox constructs a box with given width, depth and height.
 func NCyl(dir int, diam float64, m br.Material) *cyl
 ```
 
-## <a name="NSphere">func</a> [NSphere](./sphere.go#L10)
-``` go
-func NSphere(diam float64, m Material) *sphere
-```
-
 ## <a name="Quad">func</a> [Quad](./quad.go#L19)
 ``` go
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj
@@ -313,21 +372,53 @@ func Sheet(dir Vec, off float64, m Material) Obj
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
 ```
 
-## <a name="Sphere">func</a> [Sphere](./sphere.go#L6)
+## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
-func Sphere(center Vec, radius float64, m Material) CSGObj
+type Sphere struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
+``` go
+func NewSphere(diam float64, m Material) *Sphere
 ```
 
 #### Example:
 
 ```go
 e := NewEnv()
-sphere := NSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
 e.Add(sphere)
 doc.Example(e)
 ```
 
-![fig](/doc/ExampleSphere.jpg)
+![fig](/doc/ExampleNewSphere.jpg)
+
+### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
+``` go
+func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
+``` go
+func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
+``` go
+func (s *Sphere) Inside(p Vec) bool
+```
+
+### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
+``` go
+func (s *Sphere) Normal(pos Vec) Vec
+```
+
+### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
+``` go
+func (s *Sphere) Transl(d Vec) *Sphere
+```
 
 # shape
 
@@ -340,15 +431,20 @@ Package shape implements various shapes and objects.
 * [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
 * [func NBox(w, h, d float64, m Material) \*box](#NBox)
 * [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func NSphere(diam float64, m Material) \*sphere](#NSphere)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
 * [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [func Sphere(center Vec, radius float64, m Material) CSGObj](#Sphere)
+* [type Sphere](#Sphere)
+  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
+  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
+  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
+  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
+  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
+  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
 
 #### <a name="pkg-examples">Examples</a>
-* [Sphere](#example_Sphere)
+* [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
@@ -383,11 +479,6 @@ NBox constructs a box with given width, depth and height.
 func NCyl(dir int, diam float64, m br.Material) *cyl
 ```
 
-## <a name="NSphere">func</a> [NSphere](./sphere.go#L10)
-``` go
-func NSphere(diam float64, m Material) *sphere
-```
-
 ## <a name="Quad">func</a> [Quad](./quad.go#L19)
 ``` go
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj
@@ -412,21 +503,53 @@ func Sheet(dir Vec, off float64, m Material) Obj
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
 ```
 
-## <a name="Sphere">func</a> [Sphere](./sphere.go#L6)
+## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
-func Sphere(center Vec, radius float64, m Material) CSGObj
+type Sphere struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
+``` go
+func NewSphere(diam float64, m Material) *Sphere
 ```
 
 #### Example:
 
 ```go
 e := NewEnv()
-sphere := NSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
 e.Add(sphere)
 doc.Example(e)
 ```
 
-![fig](/doc/ExampleSphere.jpg)
+![fig](/doc/ExampleNewSphere.jpg)
+
+### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
+``` go
+func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
+``` go
+func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
+``` go
+func (s *Sphere) Inside(p Vec) bool
+```
+
+### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
+``` go
+func (s *Sphere) Normal(pos Vec) Vec
+```
+
+### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
+``` go
+func (s *Sphere) Transl(d Vec) *Sphere
+```
 
 # shape
 
@@ -439,15 +562,20 @@ Package shape implements various shapes and objects.
 * [func Cyl(dir int, center Vec, diam, h float64, m Material) CSGObj](#Cyl)
 * [func NBox(w, h, d float64, m Material) \*box](#NBox)
 * [func NCyl(dir int, diam float64, m br.Material) \*cyl](#NCyl)
-* [func NSphere(diam float64, m Material) \*sphere](#NSphere)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
 * [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
-* [func Sphere(center Vec, radius float64, m Material) CSGObj](#Sphere)
+* [type Sphere](#Sphere)
+  * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
+  * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
+  * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
+  * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
+  * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
+  * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
 
 #### <a name="pkg-examples">Examples</a>
-* [Sphere](#example_Sphere)
+* [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
@@ -482,11 +610,6 @@ NBox constructs a box with given width, depth and height.
 func NCyl(dir int, diam float64, m br.Material) *cyl
 ```
 
-## <a name="NSphere">func</a> [NSphere](./sphere.go#L10)
-``` go
-func NSphere(diam float64, m Material) *sphere
-```
-
 ## <a name="Quad">func</a> [Quad](./quad.go#L19)
 ``` go
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj
@@ -511,21 +634,53 @@ func Sheet(dir Vec, off float64, m Material) Obj
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
 ```
 
-## <a name="Sphere">func</a> [Sphere](./sphere.go#L6)
+## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
-func Sphere(center Vec, radius float64, m Material) CSGObj
+type Sphere struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSphere">func</a> [NewSphere](./sphere.go#L6)
+``` go
+func NewSphere(diam float64, m Material) *Sphere
 ```
 
 #### Example:
 
 ```go
 e := NewEnv()
-sphere := NSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
 e.Add(sphere)
 doc.Example(e)
 ```
 
-![fig](/doc/ExampleSphere.jpg)
+![fig](/doc/ExampleNewSphere.jpg)
+
+### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
+``` go
+func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
+``` go
+func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
+```
+
+### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
+``` go
+func (s *Sphere) Inside(p Vec) bool
+```
+
+### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
+``` go
+func (s *Sphere) Normal(pos Vec) Vec
+```
+
+### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
+``` go
+func (s *Sphere) Transl(d Vec) *Sphere
+```
 
 - - -
 Generated by a modified [godoc2ghmd](https://github.com/GandalfUK/godoc2ghmd)

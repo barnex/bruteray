@@ -3,33 +3,29 @@ package shape
 import "math"
 import . "github.com/barnex/bruteray/br"
 
-func Sphere(center Vec, radius float64, m Material) CSGObj {
-	return &sphere{center, radius * radius, m}
+func NewSphere(diam float64, m Material) *Sphere {
+	return &Sphere{Vec{}, sqr(diam / 2), m}
 }
 
-func NSphere(diam float64, m Material) *sphere {
-	return &sphere{Vec{}, sqr(diam / 2), m}
-}
-
-type sphere struct {
+type Sphere struct {
 	c  Vec
 	r2 float64
 	m  Material
 }
 
-func (s *sphere) Inside(p Vec) bool {
+func (s *Sphere) Inside(p Vec) bool {
 	v := p.Sub(s.c)
 	return v.Len2() < s.r2
 }
 
-func (s *sphere) Transl(d Vec) *sphere {
+func (s *Sphere) Transl(d Vec) *Sphere {
 	s.c.Transl(d)
 	return s
 }
 
-func (s *sphere) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
+func (s *Sphere) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
 
-func (s *sphere) HitAll(r *Ray, f *[]Fragment) {
+func (s *Sphere) HitAll(r *Ray, f *[]Fragment) {
 	v := r.Start.Sub(s.c)
 	d := r.Dir()
 	vd := v.Dot(d)
@@ -46,7 +42,7 @@ func (s *sphere) HitAll(r *Ray, f *[]Fragment) {
 	)
 }
 
-func (s *sphere) Normal(pos Vec) Vec {
+func (s *Sphere) Normal(pos Vec) Vec {
 	n := pos.Sub(s.c)
 	return n
 }

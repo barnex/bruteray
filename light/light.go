@@ -53,7 +53,7 @@ func Sphere(pos Vec, radius float64, intensity Color) Light {
 	mat := mat.Flat(intensity.Mul(1 / (4 * Pi * radius * radius)))
 	return &sphereLight{
 		//sphere: sphere{pos, radius, mat},
-		Obj: shape.Sphere(pos, radius, mat),
+		Obj: shape.NewSphere(radius*2, mat).Transl(pos),
 		r:   radius,
 		c:   intensity,
 		pos: pos,

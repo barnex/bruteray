@@ -25,7 +25,7 @@ func TestSphere(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sphere(Vec{0, 0, 1}, 0.25, Flat(WHITE)),
+		NewSphere(0.25*2, Flat(WHITE)).Transl(Vec{0, 0, 1}),
 	)
 
 	Compare(t, raster.Camera(0), e, 1, "sphere", defaultTol)
@@ -37,7 +37,7 @@ func TestBehindCam(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sphere(Vec{0, 0, -1}, 0.25, Flat(WHITE)),
+		NewSphere(0.25*2, Flat(WHITE)).Transl(Vec{0, 0, -1}),
 	)
 
 	Compare(t, raster.Camera(0), e, 2, "behindcam", defaultTol)
@@ -48,9 +48,9 @@ func TestNormal(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)),
-		Sphere(Vec{-0.5, 0, 2}, 0.25, ShadeNormal(Ex)),
-		Sphere(Vec{0.5, 0, 2}, 0.25, ShadeNormal(Ey)),
+		NewSphere(0.25*2, ShadeNormal(Ez)).Transl(Vec{0, 0, 2}),
+		NewSphere(0.25*2, ShadeNormal(Ex)).Transl(Vec{-0.5, 0, 2}),
+		NewSphere(0.25*2, ShadeNormal(Ey)).Transl(Vec{0.5, 0, 2}),
 	)
 
 	Compare(t, raster.Camera(0), e, 3, "normals", defaultTol)
@@ -61,7 +61,7 @@ func TestCamTransl(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sphere(Vec{0, 0, 2}, 0.25, ShadeNormal(Ez)),
+		NewSphere(0.25*2, ShadeNormal(Ez)).Transl(Vec{0, 0, 2}),
 	)
 	cam := raster.Camera(0).Transl(-0.5, -0.25, 0)
 
@@ -75,15 +75,15 @@ func TestCamRot(t *testing.T) {
 	r := 0.5
 	nz := ShadeNormal(Ez)
 	e.Add(
-		Sphere(Vec{0, 0, 0}, r, nz),
-		Sphere(Vec{0, 0, 2}, r, nz),
-		Sphere(Vec{0, 0, 4}, r, nz),
-		Sphere(Vec{2, 0, 0}, r, nz),
-		Sphere(Vec{2, 0, 2}, r, nz),
-		Sphere(Vec{2, 0, 4}, r, nz),
-		Sphere(Vec{-2, 0, 0}, r, nz),
-		Sphere(Vec{-2, 0, 2}, r, nz),
-		Sphere(Vec{-2, 0, 4}, r, nz),
+		NewSphere(r*2, nz).Transl(Vec{0, 0, 0}),
+		NewSphere(r*2, nz).Transl(Vec{0, 0, 2}),
+		NewSphere(r*2, nz).Transl(Vec{0, 0, 4}),
+		NewSphere(r*2, nz).Transl(Vec{2, 0, 0}),
+		NewSphere(r*2, nz).Transl(Vec{2, 0, 2}),
+		NewSphere(r*2, nz).Transl(Vec{2, 0, 4}),
+		NewSphere(r*2, nz).Transl(Vec{-2, 0, 0}),
+		NewSphere(r*2, nz).Transl(Vec{-2, 0, 2}),
+		NewSphere(r*2, nz).Transl(Vec{-2, 0, 4}),
 	)
 	cam := raster.Camera(1).Transl(0, 4, -4).Transf(RotX4(Pi / 5))
 
@@ -95,9 +95,9 @@ func TestObjTransf(t *testing.T) {
 	e := NewEnv()
 
 	r := 0.25
-	sx := Sphere(Vec{-0.5, 0, 2}, r, ShadeNormal(Ex))
-	sy := Sphere(Vec{0, 0, 2}, r, ShadeNormal(Ez))
-	sz := Sphere(Vec{0.5, 0, 2}, r, ShadeNormal(Ey))
+	sx := NewSphere(r*2, ShadeNormal(Ex)).Transl(Vec{-0.5, 0, 2})
+	sy := NewSphere(r*2, ShadeNormal(Ez)).Transl(Vec{0, 0, 2})
+	sz := NewSphere(r*2, ShadeNormal(Ey)).Transl(Vec{0.5, 0, 2})
 
 	rot := RotZ4(Pi / 4)
 	e.Add(Transf(sx, rot))
@@ -112,8 +112,8 @@ func TestObjAnd(t *testing.T) {
 	e := NewEnv()
 
 	r := 0.5
-	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
-	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
+	s1 := NewSphere(r*2, ShadeNormal(Ez)).Transl(Vec{-r / 2, 0, 2})
+	s2 := NewSphere(r*2, ShadeNormal(Ey)).Transl(Vec{r / 2, 0, 2})
 	s := And(s1, s2)
 	e.Add(s)
 
@@ -125,8 +125,8 @@ func TestOverlap(t *testing.T) {
 	e := NewEnv()
 
 	r := 0.5
-	s1 := Sphere(Vec{-r / 2, 0, 2}, r, ShadeNormal(Ez))
-	s2 := Sphere(Vec{r / 2, 0, 2}, r, ShadeNormal(Ey))
+	s1 := NewSphere(r*2, ShadeNormal(Ez)).Transl(Vec{-r / 2, 0, 2})
+	s2 := NewSphere(r*2, ShadeNormal(Ey)).Transl(Vec{r / 2, 0, 2})
 	e.Add(s1)
 	e.Add(s2)
 
@@ -156,7 +156,7 @@ func TestSheet(t *testing.T) {
 	s1 := Sheet(Ey, -1, Flat(GREEN))
 	s2 := Sheet(Ey, 4, Flat(BLUE))
 	s3 := Sheet(Ex, -10, Flat(WHITE))
-	s4 := Sphere(Vec{1.5, 0, 3}, 1, ShadeNormal(Ez))
+	s4 := NewSphere(1*2, ShadeNormal(Ez)).Transl(Vec{1.5, 0, 3})
 	e.Add(s1, s2, s3, s4)
 	cam := raster.Camera(1).Transl(0, 0, -1)
 
@@ -174,7 +174,7 @@ func TestRect(t *testing.T) {
 	r2 := TransfNonCSG(r1, RotZ4(-30*Deg).Mul(Transl4(Vec{1, 0, 0})))
 	r3 := SurfaceAnd(
 		Rect(Vec{0, 0, z}, Ez, 10, 10, 10, nz),
-		Sphere(Vec{0, 0, z}, 0.25, nz),
+		NewSphere(0.25*2, nz).Transl(Vec{0, 0, z}),
 	)
 	e.Add(r1, r2, r3)
 
@@ -200,7 +200,7 @@ func TestDiffuse0(t *testing.T) {
 	e := NewEnv()
 
 	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
-	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
+	s := NewSphere(1*2, Diffuse0(WHITE)).Transl(Vec{})
 	e.Add(g, s)
 
 	l := light.DirLight(Vec{1, 0.5, -4}, WHITE.Mul(EV(0)))
@@ -260,7 +260,7 @@ func TestPointLight(t *testing.T) {
 	e.Add(g, l, r, c, b)
 
 	R := 0.4
-	s := Sphere(Vec{-0.3, R, 0}, R, Diffuse0(WHITE))
+	s := NewSphere(R*2, Diffuse0(WHITE)).Transl(Vec{-0.3, R, 0})
 	e.Add(s)
 
 	e.AddLight(light.PointLight(Vec{0, 2.1, 0}, WHITE.Mul(4*Pi)))
@@ -277,7 +277,7 @@ func TestObjMinus(t *testing.T) {
 	r := 0.8
 
 	b := Box(Vec{}, r, r, r, Diffuse0(WHITE.Mul(EV(-0))))
-	s := Sphere(Vec{}, 1, Diffuse0(WHITE))
+	s := NewSphere(1*2, Diffuse0(WHITE)).Transl(Vec{})
 
 	dome := Minus(b, s)
 
@@ -310,12 +310,11 @@ func TestLuminousObject(t *testing.T) {
 	e := NewEnv()
 	e.Add(
 		Sheet(Ey, -1.0, Diffuse(WHITE.Mul(EV(-0.3)))),
-		Sphere(Vec{0, 0.5, 3}, 1.5, Shiny(RED, EV(-3))),
-		Sphere(Vec{-2, 0.1, 0}, 1.1, Shiny(BLUE.EV(-0.3), EV(-3))),
-		Sphere(Vec{2, 0, -1}, 1, Shiny(GREEN.EV(-1), EV(-3))),
-		Sphere(Vec{0, -0.2, -2}, 0.8, Shiny(WHITE, EV(-2))),
-		Sphere(Vec{4, 4, 2}, 1, Diffuse(WHITE.EV(-8))),
-		//Sphere(Vec{7, 7, -5}, 1, Flat(WHITE.EV(-2))),
+		NewSphere(1.5*2, Shiny(RED, EV(-3))).Transl(Vec{0, 0.5, 3}),
+		NewSphere(1.1*2, Shiny(BLUE.EV(-0.3), EV(-3))).Transl(Vec{-2, 0.1, 0}),
+		NewSphere(1*2, Shiny(GREEN.EV(-1), EV(-3))).Transl(Vec{2, 0, -1}),
+		NewSphere(0.8*2, Shiny(WHITE, EV(-2))).Transl(Vec{0, -0.2, -2}),
+		NewSphere(1*2, Diffuse(WHITE.EV(-8))).Transl(Vec{4, 4, 2}),
 	)
 	e.AddLight(
 		light.Sphere(Vec{3, 3, 1}, 0.1, WHITE.Mul(EV(8))),
@@ -354,7 +353,7 @@ func TestHollowAnd(t *testing.T) {
 	e.Add(
 		Sheet(Ey, -1.0, Diffuse(WHITE.Mul(EV(-0.3)))),
 		SurfaceAnd(
-			Sphere(Vec{}, 1, Shiny(RED, EV(-3))),
+			NewSphere(1*2, Shiny(RED, EV(-3))).Transl(Vec{}),
 			Slab(Ey, -0.3, 0.3, Flat(RED)),
 		),
 	)
@@ -379,13 +378,13 @@ func TestRectLight(t *testing.T) {
 	r := 0.3
 
 	e.Add(
-		Sphere(Vec{0, 2, 0}, r, Diffuse(WHITE)),
-		Sphere(Vec{1.41, 1.41, 0}, r, Diffuse(WHITE)),
-		Sphere(Vec{2, 0, 0}, r, Diffuse(WHITE)),
-		Sphere(Vec{1.41, -1.41, 0}, r, Diffuse(WHITE)),
-		Sphere(Vec{0, -2, 0}, r, Diffuse(WHITE)),
-		Sphere(Vec{-2, 2, 0}, r, Diffuse(WHITE)),
-		Sphere(Vec{-2, -2, 0}, r, Diffuse(WHITE)),
+		NewSphere(r*2, Diffuse(WHITE)).Transl(Vec{0, 2, 0}),
+		NewSphere(r*2, Diffuse(WHITE)).Transl(Vec{1.41, 1.41, 0}),
+		NewSphere(r*2, Diffuse(WHITE)).Transl(Vec{2, 0, 0}),
+		NewSphere(r*2, Diffuse(WHITE)).Transl(Vec{1.41, -1.41, 0}),
+		NewSphere(r*2, Diffuse(WHITE)).Transl(Vec{0, -2, 0}),
+		NewSphere(r*2, Diffuse(WHITE)).Transl(Vec{-2, 2, 0}),
+		NewSphere(r*2, Diffuse(WHITE)).Transl(Vec{-2, -2, 0}),
 	)
 
 	reference := false
@@ -468,7 +467,7 @@ func TestDiafragmDisk(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sphere(Vec{0, 0, 20}, 1, Flat(WHITE.EV(8))),
+		NewSphere(1*2, Flat(WHITE.EV(8))).Transl(Vec{0, 0, 20}),
 	)
 
 	cam := raster.Camera(1)
@@ -485,7 +484,7 @@ func TestDiaphragmHex(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sphere(Vec{0, 0, 20}, 1, Flat(WHITE.EV(8))),
+		NewSphere(1*2, Flat(WHITE.EV(8))).Transl(Vec{0, 0, 20}),
 	)
 	e.Recursion = 1
 
@@ -580,7 +579,7 @@ func TestCSG2(t *testing.T) {
 	floor := Sheet(Ey, 0, white)
 
 	cube := NBox(1, 1, 1, red).Transl(Vec{0, 0.5001, 0})
-	sphere := NSphere(1, blue).Transl(cube.Corner(1, 1, -1))
+	sphere := NewSphere(1, blue).Transl(cube.Corner(1, 1, -1))
 
 	e.Add(
 		floor,
