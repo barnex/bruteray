@@ -148,10 +148,10 @@ func (s *shadeNormal) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Colo
 	}
 }
 
-// ShadeShape is a debug material that renders the object's shape only,
+// DebugShape is a debug material that renders the object's shape only,
 // even if no lighting is present. Useful while defining a scene before
 // worrying about lighting.
-func ShadeShape(c Color) Material {
+func DebugShape(c Color) Material {
 	return &shadeShape{c}
 }
 

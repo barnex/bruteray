@@ -37,11 +37,12 @@ func example(e *Env) {
 	e.Add(shape.NewSheet(Ey, 0, m))
 	e.AddLight(light.Sphere(Vec{2, 2, -2}, 0.5, WHITE.EV(6)))
 	e.SetAmbient(WHITE.EV(-5))
+	e.Cutoff = EV(8)
 
 	img := raster.MakeImage(1920/3, 1080/3)
 	cam := raster.Camera(1).Transl(0, 1.2, -2.2).Transf(RotX4(18 * Deg))
 	cam.AA = true
-	raster.MultiPass(cam, e, img, 300)
+	raster.MultiPass(cam, e, img, 500)
 	e.Recursion = 3
 
 	raster.MustEncode(img, file)

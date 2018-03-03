@@ -546,9 +546,9 @@ func TestMultiOr(t *testing.T) {
 		return Or(box, ceil)
 	}
 
-	white := ShadeShape(WHITE)
-	tileB := ShadeShape(WHITE.EV(-5))
-	tileW := ShadeShape(WHITE.EV(-1))
+	white := DebugShape(WHITE)
+	tileB := DebugShape(WHITE.EV(-5))
+	tileW := DebugShape(WHITE.EV(-1))
 
 	e.Add(
 		NewSheet(Ey, 0.01, Checkboard(1, tileW, tileB)),

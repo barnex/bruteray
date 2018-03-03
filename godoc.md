@@ -322,6 +322,7 @@ Package mat implements various types of materials.
 * [func Blend(a float64, matA Material, b float64, matB Material) Material](#Blend)
 * [func Bricks(stride, width float64, a, b Material) Material](#Bricks)
 * [func Checkboard(stride float64, a, b Material) Material](#Checkboard)
+* [func DebugShape(c Color) Material](#DebugShape)
 * [func Diffuse(c Texture) Material](#Diffuse)
 * [func Diffuse0(c Texture) Material](#Diffuse0)
 * [func Diffuse00(c Color) Material](#Diffuse00)
@@ -331,7 +332,6 @@ Package mat implements various types of materials.
 * [func Reflective(c Color) Material](#Reflective)
 * [func Refractive(n1, n2 float64) Material](#Refractive)
 * [func ShadeNormal(dir Vec) Material](#ShadeNormal)
-* [func ShadeShape(c Color) Material](#ShadeShape)
 * [func Shiny(c Color, reflectivity float64) Material](#Shiny)
 * [func Waves(seed int, n int, K Vec, col func(float64) Material) Material](#Waves)
 * [type FlatColor](#FlatColor)
@@ -346,6 +346,14 @@ Package mat implements various types of materials.
   * [func (s ShadeDir) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ShadeDir.Shade)
 * [type Texture](#Texture)
 
+#### <a name="pkg-examples">Examples</a>
+* [Blend](#example_Blend)
+* [DebugShape](#example_DebugShape)
+* [Diffuse](#example_Diffuse)
+* [Flat](#example_Flat)
+* [Reflective](#example_Reflective)
+* [Refractive](#example_Refractive)
+
 ## <a name="Blend">func</a> [Blend](./material.go#L109)
 ``` go
 func Blend(a float64, matA Material, b float64, matB Material) Material
@@ -354,6 +362,17 @@ Blend mixes two materials with certain weights. E.g.:
 
 	Blend(0.9, Diffuse(WHITE), 0.1, Reflective(WHITE))  // 90% mate + 10% reflective, like a shiny billiard ball.
 
+#### Example:
+
+```go
+white := Diffuse(WHITE)
+	refl := Reflective(WHITE)
+	doc.Show(
+	    shape.NewSphere(1, Blend(0.95, white, 0.05, refl)).Transl(Vec{0, 0.5, 0}),
+	)
+```
+
+![fig](/doc/ExampleBlend.jpg)
 ## <a name="Bricks">func</a> [Bricks](./procedural.go#L30)
 ``` go
 func Bricks(stride, width float64, a, b Material) Material
@@ -364,6 +383,25 @@ func Bricks(stride, width float64, a, b Material) Material
 func Checkboard(stride float64, a, b Material) Material
 ```
 
+## <a name="DebugShape">func</a> [DebugShape](./material.go#L154)
+``` go
+func DebugShape(c Color) Material
+```
+DebugShape is a debug material that renders the object's shape only,
+even if no lighting is present. Useful while defining a scene before
+worrying about lighting.
+
+#### Example:
+
+```go
+e := NewEnv()
+	e.Add(shape.NewSheet(Ey, 0, DebugShape(WHITE)))
+	e.Add(shape.NewSphere(1, DebugShape(WHITE)).Transl(Vec{0, 0.5, 0}))
+	// Note: no light source added
+	doc.Example(e)
+```
+
+![fig](/doc/ExampleDebugShape.jpg)
 ## <a name="Diffuse">func</a> [Diffuse](./diffuse.go#L10)
 ``` go
 func Diffuse(c Texture) Material
@@ -372,6 +410,15 @@ A Diffuse material appears perfectly mate,
 like paper or plaster.
 See <a href="https://en.wikipedia.org/wiki/Lambertian_reflectance">https://en.wikipedia.org/wiki/Lambertian_reflectance</a>.
 
+#### Example:
+
+```go
+doc.Show(
+	    shape.NewSphere(1, Diffuse(WHITE)).Transl(Vec{0, 0.5, 0}),
+	)
+```
+
+![fig](/doc/ExampleDiffuse.jpg)
 ## <a name="Diffuse0">func</a> [Diffuse0](./diffuse.go#L46)
 ``` go
 func Diffuse0(c Texture) Material
@@ -411,6 +458,15 @@ A Reflective surface. E.g.:
 	Reflective(WHITE.EV(-1)) // 50% reflective, looks like darker metal
 	Reflective(RED)          // Reflects only red, looks like metal in transparent red candy-wrap.
 
+#### Example:
+
+```go
+doc.Show(
+	    shape.NewSphere(1, Reflective(WHITE.EV(-1))).Transl(Vec{0, 0.5, 0}),
+	)
+```
+
+![fig](/doc/ExampleReflective.jpg)
 ## <a name="Refractive">func</a> [Refractive](./material.go#L45)
 ``` go
 func Refractive(n1, n2 float64) Material
@@ -421,19 +477,20 @@ E.g.:
 	Refractive(1, 1.5) // glass in air
 	Refractive(1.5, 1) // air in glass
 
+#### Example:
+
+```go
+doc.Show(
+	    shape.NewSphere(1, Refractive(1, 1.5)).Transl(Vec{0, 0.5, 0}),
+	)
+```
+
+![fig](/doc/ExampleRefractive.jpg)
 ## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L134)
 ``` go
 func ShadeNormal(dir Vec) Material
 ```
 ShadeNormal is a debug shader that colors according to the normal vector projected on dir.
-
-## <a name="ShadeShape">func</a> [ShadeShape](./material.go#L154)
-``` go
-func ShadeShape(c Color) Material
-```
-ShadeShape is a debug material that renders the object's shape only,
-even if no lighting is present. Useful while defining a scene before
-worrying about lighting.
 
 ## <a name="Shiny">func</a> [Shiny](./material.go#L115)
 ``` go
@@ -461,6 +518,16 @@ func Flat(c br.Color) *FlatColor
 A Flat material always returns the same color.
 Useful for debugging, or for rare cases like
 a computer screen or other extended, dimly luminous surfaces.
+
+#### Example:
+
+```go
+doc.Show(
+	    shape.NewSphere(1, Flat(WHITE)).Transl(Vec{0, 0.5, 0}),
+	)
+```
+
+![fig](/doc/ExampleFlat.jpg)
 
 ### <a name="FlatColor.At">func</a> (\*FlatColor) [At](./flat.go#L20)
 ``` go
