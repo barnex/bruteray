@@ -2,17 +2,17 @@ package shape
 
 import . "github.com/barnex/bruteray/br"
 
-func Sheet(dir Vec, off float64, m Material) Obj {
-	return &sheet{dir: dir, off: off, m: m}
+func NewSheet(dir Vec, off float64, m Material) *Sheet {
+	return &Sheet{dir: dir, off: off, m: m}
 }
 
-type sheet struct {
+type Sheet struct {
 	dir Vec
 	off float64
 	m   Material
 }
 
-func (s *sheet) Hit1(r *Ray, f *[]Fragment) {
+func (s *Sheet) Hit1(r *Ray, f *[]Fragment) {
 	rs := r.Start.Dot(s.dir)
 	rd := r.Dir().Dot(s.dir)
 	t := (s.off - rs) / rd

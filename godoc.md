@@ -39,7 +39,6 @@ Package shape implements various shapes and objects.
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
 * [type Box](#Box)
   * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
@@ -50,6 +49,9 @@ Package shape implements various shapes and objects.
   * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
   * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
   * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
+* [type Sheet](#Sheet)
+  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
+  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
 * [type Sphere](#Sphere)
   * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
   * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
@@ -60,6 +62,7 @@ Package shape implements various shapes and objects.
 
 #### <a name="pkg-examples">Examples</a>
 * [NewBox](#example_NewBox)
+* [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
@@ -104,11 +107,6 @@ with normal vector dir and half-axes rx, ry, rz.
 
 TODO: pass Vec normal, U, V
 
-## <a name="Sheet">func</a> [Sheet](./sheet.go#L5)
-``` go
-func Sheet(dir Vec, off float64, m Material) Obj
-```
-
 ## <a name="Slab">func</a> [Slab](./slab.go#L5)
 ``` go
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
@@ -132,9 +130,8 @@ NewBox constructs a box with given width, depth and height.
 
 ```go
 doc.Show(
-NewBox(0.5, 1, 0.5, mat.Diffuse(RED)).Transl(Vec{-1.5, 0.5, 0}),
-NewBox(1, 0.5, 1, mat.Diffuse(BLUE)).Transl(Vec{1.5, 0.5, 0}),
-)
+	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewBox.jpg)
@@ -180,6 +177,33 @@ func (s *Box) Normal(p Vec) Vec
 func (s *Box) Transl(d Vec) *Box
 ```
 
+## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
+``` go
+type Sheet struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
+``` go
+func NewSheet(dir Vec, off float64, m Material) *Sheet
+```
+
+#### Example:
+
+```go
+doc.Show(
+	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
+	)
+```
+
+![fig](/doc/ExampleNewSheet.jpg)
+
+### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
+``` go
+func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
+```
+
 ## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
 type Sphere struct {
@@ -196,8 +220,8 @@ func NewSphere(diam float64, m Material) *Sphere
 
 ```go
 doc.Show(
-NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-)
+	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewSphere.jpg)
@@ -239,7 +263,6 @@ Package shape implements various shapes and objects.
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
 * [type Box](#Box)
   * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
@@ -250,6 +273,9 @@ Package shape implements various shapes and objects.
   * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
   * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
   * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
+* [type Sheet](#Sheet)
+  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
+  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
 * [type Sphere](#Sphere)
   * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
   * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
@@ -260,6 +286,7 @@ Package shape implements various shapes and objects.
 
 #### <a name="pkg-examples">Examples</a>
 * [NewBox](#example_NewBox)
+* [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
@@ -304,11 +331,6 @@ with normal vector dir and half-axes rx, ry, rz.
 
 TODO: pass Vec normal, U, V
 
-## <a name="Sheet">func</a> [Sheet](./sheet.go#L5)
-``` go
-func Sheet(dir Vec, off float64, m Material) Obj
-```
-
 ## <a name="Slab">func</a> [Slab](./slab.go#L5)
 ``` go
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
@@ -332,9 +354,8 @@ NewBox constructs a box with given width, depth and height.
 
 ```go
 doc.Show(
-NewBox(0.5, 1, 0.5, mat.Diffuse(RED)).Transl(Vec{-1.5, 0.5, 0}),
-NewBox(1, 0.5, 1, mat.Diffuse(BLUE)).Transl(Vec{1.5, 0.5, 0}),
-)
+	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewBox.jpg)
@@ -380,6 +401,33 @@ func (s *Box) Normal(p Vec) Vec
 func (s *Box) Transl(d Vec) *Box
 ```
 
+## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
+``` go
+type Sheet struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
+``` go
+func NewSheet(dir Vec, off float64, m Material) *Sheet
+```
+
+#### Example:
+
+```go
+doc.Show(
+	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
+	)
+```
+
+![fig](/doc/ExampleNewSheet.jpg)
+
+### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
+``` go
+func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
+```
+
 ## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
 type Sphere struct {
@@ -396,8 +444,8 @@ func NewSphere(diam float64, m Material) *Sphere
 
 ```go
 doc.Show(
-NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-)
+	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewSphere.jpg)
@@ -439,7 +487,6 @@ Package shape implements various shapes and objects.
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
 * [type Box](#Box)
   * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
@@ -450,6 +497,9 @@ Package shape implements various shapes and objects.
   * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
   * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
   * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
+* [type Sheet](#Sheet)
+  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
+  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
 * [type Sphere](#Sphere)
   * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
   * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
@@ -460,6 +510,7 @@ Package shape implements various shapes and objects.
 
 #### <a name="pkg-examples">Examples</a>
 * [NewBox](#example_NewBox)
+* [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
@@ -504,11 +555,6 @@ with normal vector dir and half-axes rx, ry, rz.
 
 TODO: pass Vec normal, U, V
 
-## <a name="Sheet">func</a> [Sheet](./sheet.go#L5)
-``` go
-func Sheet(dir Vec, off float64, m Material) Obj
-```
-
 ## <a name="Slab">func</a> [Slab](./slab.go#L5)
 ``` go
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
@@ -532,9 +578,8 @@ NewBox constructs a box with given width, depth and height.
 
 ```go
 doc.Show(
-NewBox(0.5, 1, 0.5, mat.Diffuse(RED)).Transl(Vec{-1.5, 0.5, 0}),
-NewBox(1, 0.5, 1, mat.Diffuse(BLUE)).Transl(Vec{1.5, 0.5, 0}),
-)
+	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewBox.jpg)
@@ -580,6 +625,33 @@ func (s *Box) Normal(p Vec) Vec
 func (s *Box) Transl(d Vec) *Box
 ```
 
+## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
+``` go
+type Sheet struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
+``` go
+func NewSheet(dir Vec, off float64, m Material) *Sheet
+```
+
+#### Example:
+
+```go
+doc.Show(
+	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
+	)
+```
+
+![fig](/doc/ExampleNewSheet.jpg)
+
+### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
+``` go
+func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
+```
+
 ## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
 type Sphere struct {
@@ -596,8 +668,8 @@ func NewSphere(diam float64, m Material) *Sphere
 
 ```go
 doc.Show(
-NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-)
+	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewSphere.jpg)
@@ -639,7 +711,6 @@ Package shape implements various shapes and objects.
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
 * [type Box](#Box)
   * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
@@ -650,6 +721,9 @@ Package shape implements various shapes and objects.
   * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
   * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
   * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
+* [type Sheet](#Sheet)
+  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
+  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
 * [type Sphere](#Sphere)
   * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
   * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
@@ -660,6 +734,7 @@ Package shape implements various shapes and objects.
 
 #### <a name="pkg-examples">Examples</a>
 * [NewBox](#example_NewBox)
+* [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
@@ -704,11 +779,6 @@ with normal vector dir and half-axes rx, ry, rz.
 
 TODO: pass Vec normal, U, V
 
-## <a name="Sheet">func</a> [Sheet](./sheet.go#L5)
-``` go
-func Sheet(dir Vec, off float64, m Material) Obj
-```
-
 ## <a name="Slab">func</a> [Slab](./slab.go#L5)
 ``` go
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
@@ -732,9 +802,8 @@ NewBox constructs a box with given width, depth and height.
 
 ```go
 doc.Show(
-NewBox(0.5, 1, 0.5, mat.Diffuse(RED)).Transl(Vec{-1.5, 0.5, 0}),
-NewBox(1, 0.5, 1, mat.Diffuse(BLUE)).Transl(Vec{1.5, 0.5, 0}),
-)
+	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewBox.jpg)
@@ -780,6 +849,33 @@ func (s *Box) Normal(p Vec) Vec
 func (s *Box) Transl(d Vec) *Box
 ```
 
+## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
+``` go
+type Sheet struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
+``` go
+func NewSheet(dir Vec, off float64, m Material) *Sheet
+```
+
+#### Example:
+
+```go
+doc.Show(
+	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
+	)
+```
+
+![fig](/doc/ExampleNewSheet.jpg)
+
+### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
+``` go
+func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
+```
+
 ## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
 type Sphere struct {
@@ -796,8 +892,8 @@ func NewSphere(diam float64, m Material) *Sphere
 
 ```go
 doc.Show(
-NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-)
+	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewSphere.jpg)
@@ -839,7 +935,6 @@ Package shape implements various shapes and objects.
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
-* [func Sheet(dir Vec, off float64, m Material) Obj](#Sheet)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
 * [type Box](#Box)
   * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
@@ -850,6 +945,9 @@ Package shape implements various shapes and objects.
   * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
   * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
   * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
+* [type Sheet](#Sheet)
+  * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
+  * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
 * [type Sphere](#Sphere)
   * [func NewSphere(diam float64, m Material) \*Sphere](#NewSphere)
   * [func (s \*Sphere) Hit1(r \*Ray, f \*[]Fragment)](#Sphere.Hit1)
@@ -860,6 +958,7 @@ Package shape implements various shapes and objects.
 
 #### <a name="pkg-examples">Examples</a>
 * [NewBox](#example_NewBox)
+* [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 
 ## <a name="pkg-variables">Variables</a>
@@ -904,11 +1003,6 @@ with normal vector dir and half-axes rx, ry, rz.
 
 TODO: pass Vec normal, U, V
 
-## <a name="Sheet">func</a> [Sheet](./sheet.go#L5)
-``` go
-func Sheet(dir Vec, off float64, m Material) Obj
-```
-
 ## <a name="Slab">func</a> [Slab](./slab.go#L5)
 ``` go
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
@@ -932,9 +1026,8 @@ NewBox constructs a box with given width, depth and height.
 
 ```go
 doc.Show(
-NewBox(0.5, 1, 0.5, mat.Diffuse(RED)).Transl(Vec{-1.5, 0.5, 0}),
-NewBox(1, 0.5, 1, mat.Diffuse(BLUE)).Transl(Vec{1.5, 0.5, 0}),
-)
+	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewBox.jpg)
@@ -980,6 +1073,33 @@ func (s *Box) Normal(p Vec) Vec
 func (s *Box) Transl(d Vec) *Box
 ```
 
+## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
+``` go
+type Sheet struct {
+    // contains filtered or unexported fields
+}
+```
+
+### <a name="NewSheet">func</a> [NewSheet](./sheet.go#L5)
+``` go
+func NewSheet(dir Vec, off float64, m Material) *Sheet
+```
+
+#### Example:
+
+```go
+doc.Show(
+	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
+	)
+```
+
+![fig](/doc/ExampleNewSheet.jpg)
+
+### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
+``` go
+func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
+```
+
 ## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
 type Sphere struct {
@@ -996,8 +1116,8 @@ func NewSphere(diam float64, m Material) *Sphere
 
 ```go
 doc.Show(
-NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-)
+	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
 ```
 
 ![fig](/doc/ExampleNewSphere.jpg)

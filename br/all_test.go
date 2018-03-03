@@ -153,9 +153,9 @@ func TestSlabIntersect(t *testing.T) {
 func TestSheet(t *testing.T) {
 	e := NewEnv()
 
-	s1 := Sheet(Ey, -1, Flat(GREEN))
-	s2 := Sheet(Ey, 4, Flat(BLUE))
-	s3 := Sheet(Ex, -10, Flat(WHITE))
+	s1 := NewSheet(Ey, -1, Flat(GREEN))
+	s2 := NewSheet(Ey, 4, Flat(BLUE))
+	s3 := NewSheet(Ex, -10, Flat(WHITE))
 	s4 := NewSphere(1*2, ShadeNormal(Ez)).Transl(Vec{1.5, 0, 3})
 	e.Add(s1, s2, s3, s4)
 	cam := raster.Camera(1).Transl(0, 0, -1)
@@ -188,7 +188,7 @@ func TestBox(t *testing.T) {
 	nz := ShadeNormal(Ez)
 	b := OldBox(Vec{0, 0, 0}, 2, 1, 1, nz)
 	b = Transf(b, RotY4(150*Deg))
-	g := Sheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
+	g := NewSheet(Ey, -1, Flat(GREEN.Mul(EV(-4))))
 	e.Add(b, g)
 
 	cam := raster.Camera(1).Transl(0, 0, -5)
@@ -199,7 +199,7 @@ func TestBox(t *testing.T) {
 func TestDiffuse0(t *testing.T) {
 	e := NewEnv()
 
-	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
+	g := NewSheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
 	s := NewSphere(1*2, Diffuse0(WHITE)).Transl(Vec{})
 	e.Add(g, s)
 
@@ -214,7 +214,7 @@ func TestDiffuse0(t *testing.T) {
 func TestObjOr1(t *testing.T) {
 	e := NewEnv()
 
-	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
+	g := NewSheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
 	white := Diffuse0(WHITE)
 	box := OldBox(Vec{}, 1, 1, 1, white)
 	bar1 := OldBox(Vec{}, 1.5, 0.5, 0.5, Diffuse0(RED))
@@ -235,7 +235,7 @@ func TestObjOr1(t *testing.T) {
 func TestObjOr2(t *testing.T) {
 	e := NewEnv()
 
-	g := Sheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
+	g := NewSheet(Ey, -1, Diffuse0(WHITE.Mul(EV(-1))))
 	b1 := OldBox(Vec{-2, 0, -.1}, 0.5, 1, 1, Diffuse0(RED))
 	b2 := OldBox(Vec{2, 0, -.1}, 0.5, 1, 1, Diffuse0(GREEN))
 	or := Or(b1, b2)
@@ -252,11 +252,11 @@ func TestObjOr2(t *testing.T) {
 func TestPointLight(t *testing.T) {
 	e := NewEnv()
 
-	g := Sheet(Ey, 0, Diffuse0(WHITE))
-	l := Sheet(Ex, -1, Diffuse0(RED))
-	r := Sheet(Ex, 1, Diffuse0(GREEN))
-	c := Sheet(Ey, 2.2, Diffuse0(WHITE))
-	b := Sheet(Ez, 1.1, Diffuse0(WHITE))
+	g := NewSheet(Ey, 0, Diffuse0(WHITE))
+	l := NewSheet(Ex, -1, Diffuse0(RED))
+	r := NewSheet(Ex, 1, Diffuse0(GREEN))
+	c := NewSheet(Ey, 2.2, Diffuse0(WHITE))
+	b := NewSheet(Ez, 1.1, Diffuse0(WHITE))
 	e.Add(g, l, r, c, b)
 
 	R := 0.4
@@ -273,7 +273,7 @@ func TestPointLight(t *testing.T) {
 func TestObjMinus(t *testing.T) {
 	e := NewEnv()
 
-	g := Sheet(Ey, 0, Diffuse0(WHITE.Mul(EV(-1))))
+	g := NewSheet(Ey, 0, Diffuse0(WHITE.Mul(EV(-1))))
 	r := 0.8
 
 	b := OldBox(Vec{}, r, r, r, Diffuse0(WHITE.Mul(EV(-0))))
@@ -296,7 +296,7 @@ func TestShadowBehind(t *testing.T) {
 	e := NewEnv()
 	const r = 0.8
 	e.Add(
-		Sheet(Ey, 0, Diffuse0(WHITE)),
+		NewSheet(Ey, 0, Diffuse0(WHITE)),
 		OldBox(Vec{0, -1, 0}, r, r, r, Diffuse0(WHITE)),
 	)
 	e.AddLight(light.PointLight(Vec{1, 4, -4}, WHITE.Mul(EV(5)).Mul(4*Pi)))
@@ -309,7 +309,7 @@ func TestShadowBehind(t *testing.T) {
 func TestLuminousObject(t *testing.T) {
 	e := NewEnv()
 	e.Add(
-		Sheet(Ey, -1.0, Diffuse(WHITE.Mul(EV(-0.3)))),
+		NewSheet(Ey, -1.0, Diffuse(WHITE.Mul(EV(-0.3)))),
 		NewSphere(1.5*2, Shiny(RED, EV(-3))).Transl(Vec{0, 0.5, 3}),
 		NewSphere(1.1*2, Shiny(BLUE.EV(-0.3), EV(-3))).Transl(Vec{-2, 0.1, 0}),
 		NewSphere(1*2, Shiny(GREEN.EV(-1), EV(-3))).Transl(Vec{2, 0, -1}),
@@ -334,7 +334,7 @@ func TestLuminousObject(t *testing.T) {
 func TestQuad(t *testing.T) {
 	e := NewEnv()
 	e.Add(
-		Sheet(Ey, -1.0, Diffuse0(WHITE.Mul(EV(-0.3)))),
+		NewSheet(Ey, -1.0, Diffuse0(WHITE.Mul(EV(-0.3)))),
 		Quad(Vec{0, 0, 0}, Vec{1, -1, 1}, 1, Diffuse0(RED)),
 	)
 	e.AddLight(
@@ -351,7 +351,7 @@ func TestHollowAnd(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sheet(Ey, -1.0, Diffuse(WHITE.Mul(EV(-0.3)))),
+		NewSheet(Ey, -1.0, Diffuse(WHITE.Mul(EV(-0.3)))),
 		SurfaceAnd(
 			NewSphere(1*2, Shiny(RED, EV(-3))).Transl(Vec{}),
 			Slab(Ey, -0.3, 0.3, Flat(RED)),
@@ -449,7 +449,7 @@ func TestDOF(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sheet(Ey, 0, Checkboard(1, Flat(WHITE), Flat(BLACK))),
+		NewSheet(Ey, 0, Checkboard(1, Flat(WHITE), Flat(BLACK))),
 	)
 
 	e.SetAmbient(Flat(WHITE.EV(-2)))
@@ -501,7 +501,7 @@ func TestCyl(t *testing.T) {
 	e := NewEnv()
 
 	e.Add(
-		Sheet(Ey, 0.0, Checkboard(1, Diffuse0(WHITE), Diffuse0(GREY))),
+		NewSheet(Ey, 0.0, Checkboard(1, Diffuse0(WHITE), Diffuse0(GREY))),
 		Cyl(Y, Vec{1, 0.5, 0}, 2, 0.5, Diffuse0(RED)),
 		Cyl(X, Vec{-0.8, 0.5, 0}, 1, 0.5, Diffuse0(GREEN)),
 		Cyl(Z, Vec{-2, 1, 2}, 2, 1, Diffuse0(BLUE)),
@@ -551,7 +551,7 @@ func TestMultiOr(t *testing.T) {
 	tileW := ShadeShape(WHITE.EV(-1))
 
 	e.Add(
-		Sheet(Ey, 0.01, Checkboard(1, tileW, tileB)),
+		NewSheet(Ey, 0.01, Checkboard(1, tileW, tileB)),
 		MultiOr(
 			chestz(Vec{}, w, h1, d, pointy, white),
 			chestz(Vec{Y: b}, w-b, h1-b, d+4, pointy, Flat(WHITE)),
@@ -576,7 +576,7 @@ func TestCSG2(t *testing.T) {
 	red := Diffuse0(RED.EV(-.6))
 	blue := Diffuse0(BLUE.EV(-.6))
 
-	floor := Sheet(Ey, 0, white)
+	floor := NewSheet(Ey, 0, white)
 
 	cube := NewBox(1, 1, 1, red).Transl(Vec{0, 0.5001, 0})
 	sphere := NewSphere(1, blue).Transl(cube.Corner(1, 1, -1))

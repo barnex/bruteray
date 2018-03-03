@@ -7,19 +7,26 @@ import (
 	. "github.com/barnex/bruteray/shape"
 )
 
+func ExampleNewBox() {
+	doc.Show(
+		NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+	)
+	//Output:
+	//ExampleNewBox
+}
+
+func ExampleNewSheet() {
+	doc.Show(
+		NewSheet(Ey, 0.1, mat.Diffuse(RED)),
+	)
+	//Output:
+	//ExampleNewSheet
+}
+
 func ExampleNewSphere() {
 	doc.Show(
 		NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
 	)
 	//Output:
 	//ExampleNewSphere
-}
-
-func ExampleNewBox() {
-	doc.Show(
-		NewBox(0.5, 1, 0.5, mat.Diffuse(RED)).Transl(Vec{-1.5, 0.5, 0}),
-		NewBox(1, 0.5, 1, mat.Diffuse(BLUE)).Transl(Vec{1.5, 0.5, 0}),
-	)
-	//Output:
-	//ExampleNewBox
 }

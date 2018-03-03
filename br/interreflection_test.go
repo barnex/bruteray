@@ -43,12 +43,12 @@ func whitebox(refl float64) *Env {
 	e := NewEnv()
 	white := Diffuse(WHITE.Mul(refl))
 	e.Add(
-		shape.Sheet(Ey, -1, white),
-		shape.Sheet(Ey, 1, white),
-		shape.Sheet(Ex, -1, white),
-		shape.Sheet(Ex, 1, white),
-		shape.Sheet(Ez, -1, white),
-		shape.Sheet(Ez, 1, white),
+		shape.NewSheet(Ey, -1, white),
+		shape.NewSheet(Ey, 1, white),
+		shape.NewSheet(Ex, -1, white),
+		shape.NewSheet(Ex, 1, white),
+		shape.NewSheet(Ez, -1, white),
+		shape.NewSheet(Ez, 1, white),
 	)
 	e.AddLight(light.PointLight(Vec{}, WHITE.Mul(EV(-3)).Mul(4*Pi)))
 	return e
