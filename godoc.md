@@ -1,11 +1,5 @@
 # bruteray
-`import "github.com/barnex/bruteray"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
 Bruteray is a ray tracer that does bi-directional path tracing.
 
 This package is for documentation only.
@@ -30,29 +24,11 @@ Additional material:
 
 ![fig](shots/062.jpg)
 
-## <a name="pkg-imports">Imported Packages</a>
-
-No packages beyond the Go standard library are imported.
-
 ## <a name="pkg-index">Index</a>
 
-#### <a name="pkg-files">Package files</a>
-[doc.go](./doc.go)
-
 # shape
-`import "github.com/barnex/bruteray/shape"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Package shape implements various shapes and objects.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
@@ -70,9 +46,6 @@ Package shape implements various shapes and objects.
 
 #### <a name="pkg-examples">Examples</a>
 * [Sphere](#example_Sphere)
-
-#### <a name="pkg-files">Package files</a>
-[box.go](./box.go) [cylinder.go](./cylinder.go) [doc.go](./doc.go) [quad.go](./quad.go) [rect.go](./rect.go) [sheet.go](./sheet.go) [slab.go](./slab.go) [sphere.go](./sphere.go) [util.go](./util.go) 
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
