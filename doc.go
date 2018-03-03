@@ -23,7 +23,7 @@ Additional material:
 	scenes          source files of some scenes
 	tutorial        explains some ray-tracing basics
 
-![fig](062.jpg)
+![fig](shots/062.jpg)
 
 */
 package bruteray
