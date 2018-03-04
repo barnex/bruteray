@@ -35,20 +35,25 @@ Package mat implements various types of materials.
   * [func (s \*FlatColor) At(\_ br.Vec) br.Color](#FlatColor.At)
   * [func (s \*FlatColor) Shade(\_ \*br.Ctx, \_ \*br.Env, \_ int, \_ \*br.Ray, \_ br.Fragment) br.Color](#FlatColor.Shade)
 * [type ImgTex](#ImgTex)
-  * [func NewImgTex(img raster.Image, p0, pu, pv Vec) \*ImgTex](#NewImgTex)
+  * [func NewImgTex(img raster.Image, mapper UVMapper) \*ImgTex](#NewImgTex)
   * [func (c \*ImgTex) At(pos Vec) Color](#ImgTex.At)
   * [func (c \*ImgTex) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ImgTex.Shade)
 * [type ShadeDir](#ShadeDir)
   * [func (s ShadeDir) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ShadeDir.Shade)
 * [type Texture](#Texture)
+* [type UVAffine](#UVAffine)
+  * [func (c \*UVAffine) Map(pos Vec) (u, v float64)](#UVAffine.Map)
+* [type UVMapper](#UVMapper)
 
 #### <a name="pkg-examples">Examples</a>
 * [Blend](#example_Blend)
+* [Checkboard](#example_Checkboard)
 * [DebugShape](#example_DebugShape)
 * [Diffuse](#example_Diffuse)
 * [Flat](#example_Flat)
 * [Reflective](#example_Reflective)
 * [Refractive](#example_Refractive)
+* [UVAffine](#example_UVAffine)
 
 #### <a name="pkg-files">Package files</a>
 [diffuse.go](./diffuse.go) [diffuse_noshadow.go](./diffuse_noshadow.go) [flat.go](./flat.go) [material.go](./material.go) [procedural.go](./procedural.go) [texture.go](./texture.go) 
@@ -66,9 +71,8 @@ Blend mixes two materials with certain weights. E.g.:
 ```go
 white := Diffuse(WHITE)
 refl := Reflective(WHITE)
-doc.Show(
-shape.NewSphere(1, Blend(0.95, white, 0.05, refl)).Transl(Vec{0, 0.5, 0}),
-)
+mat := Blend(0.95, white, 0.05, refl)
+doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleBlend.jpg)
@@ -82,6 +86,16 @@ func Bricks(stride, width float64, a, b Material) Material
 func Checkboard(stride float64, a, b Material) Material
 ```
 
+#### Example:
+
+```go
+m1 := Diffuse(WHITE)
+m2 := Reflective(WHITE.EV(-3))
+mat := Checkboard(0.1, m1, m2)
+doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
+```
+
+![fig](/doc/ExampleCheckboard.jpg)
 ## <a name="DebugShape">func</a> [DebugShape](./material.go#L154)
 ``` go
 func DebugShape(c Color) Material
@@ -112,9 +126,8 @@ See <a href="https://en.wikipedia.org/wiki/Lambertian_reflectance">https://en.wi
 #### Example:
 
 ```go
-doc.Show(
-shape.NewSphere(1, Diffuse(WHITE)).Transl(Vec{0, 0.5, 0}),
-)
+mat := Diffuse(WHITE)
+doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleDiffuse.jpg)
@@ -137,12 +150,12 @@ Intended for the tutorial.
 func Distort(seed int, n int, K Vec, ampli float64, orig Material) Material
 ```
 
-## <a name="Load">func</a> [Load](./texture.go#L67)
+## <a name="Load">func</a> [Load](./texture.go#L79)
 ``` go
 func Load(name string) (raster.Image, error)
 ```
 
-## <a name="MustLoad">func</a> [MustLoad](./texture.go#L59)
+## <a name="MustLoad">func</a> [MustLoad](./texture.go#L71)
 ``` go
 func MustLoad(name string) raster.Image
 ```
@@ -160,9 +173,8 @@ A Reflective surface. E.g.:
 #### Example:
 
 ```go
-doc.Show(
-shape.NewSphere(1, Reflective(WHITE.EV(-1))).Transl(Vec{0, 0.5, 0}),
-)
+mat := Reflective(WHITE.EV(-1))
+doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleReflective.jpg)
@@ -179,9 +191,8 @@ E.g.:
 #### Example:
 
 ```go
-doc.Show(
-shape.NewSphere(1, Refractive(1, 1.5)).Transl(Vec{0, 0.5, 0}),
-)
+mat := Refractive(1, 1.5)
+doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleRefractive.jpg)
@@ -221,9 +232,8 @@ a computer screen or other extended, dimly luminous surfaces.
 #### Example:
 
 ```go
-doc.Show(
-shape.NewSphere(1, Flat(WHITE)).Transl(Vec{0, 0.5, 0}),
-)
+mat := Flat(WHITE)
+doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleFlat.jpg)
@@ -238,24 +248,24 @@ func (s *FlatColor) At(_ br.Vec) br.Color
 func (s *FlatColor) Shade(_ *br.Ctx, _ *br.Env, _ int, _ *br.Ray, _ br.Fragment) br.Color
 ```
 
-## <a name="ImgTex">type</a> [ImgTex](./texture.go#L23-L26)
+## <a name="ImgTex">type</a> [ImgTex](./texture.go#L40-L43)
 ``` go
 type ImgTex struct {
     // contains filtered or unexported fields
 }
 ```
 
-### <a name="NewImgTex">func</a> [NewImgTex](./texture.go#L19)
+### <a name="NewImgTex">func</a> [NewImgTex](./texture.go#L36)
 ``` go
-func NewImgTex(img raster.Image, p0, pu, pv Vec) *ImgTex
+func NewImgTex(img raster.Image, mapper UVMapper) *ImgTex
 ```
 
-### <a name="ImgTex.At">func</a> (\*ImgTex) [At](./texture.go#L33)
+### <a name="ImgTex.At">func</a> (\*ImgTex) [At](./texture.go#L50)
 ``` go
 func (c *ImgTex) At(pos Vec) Color
 ```
 
-### <a name="ImgTex.Shade">func</a> (\*ImgTex) [Shade](./texture.go#L29)
+### <a name="ImgTex.Shade">func</a> (\*ImgTex) [Shade](./texture.go#L46)
 ``` go
 func (c *ImgTex) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
@@ -277,5 +287,40 @@ func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ``` go
 type Texture interface {
     At(Vec) Color
+}
+```
+
+## <a name="UVAffine">type</a> [UVAffine](./texture.go#L23-L25)
+``` go
+type UVAffine struct {
+    P0, Pu, Pv Vec
+}
+```
+
+#### Example:
+
+```go
+img := MustLoad("../assets/monalisa.jpg")
+cube := shape.NewBox(1, img.Aspect(), 0.2, nil)
+cube.Transl(Vec{0, img.Aspect() / 2, 0})
+uvmap := &UVAffine{
+P0: cube.Corner(-1, -1, 1),
+Pu: cube.Corner(1, -1, 1),
+Pv: cube.Corner(-1, 1, 1)}
+cube.Mat = Diffuse(NewImgTex(img, uvmap))
+doc.Show(cube)
+```
+
+![fig](/doc/ExampleUVAffine.jpg)
+
+### <a name="UVAffine.Map">func</a> (\*UVAffine) [Map](./texture.go#L27)
+``` go
+func (c *UVAffine) Map(pos Vec) (u, v float64)
+```
+
+## <a name="UVMapper">type</a> [UVMapper](./texture.go#L19-L21)
+``` go
+type UVMapper interface {
+    Map(pos Vec) (u, v float64)
 }
 ```

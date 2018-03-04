@@ -8,11 +8,17 @@ import (
 )
 
 func ExampleNewBox() {
-	doc.Show(
-		NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
+	box := NewBox(1, 0.5, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.25, 0})
+	doc.Show(box)
 	//Output:
 	//ExampleNewBox
+}
+
+func ExampleNewCube() {
+	cube := NewCube(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+	doc.Show(cube)
+	//Output:
+	//ExampleNewCube
 }
 
 func ExampleNewCylinder() {
@@ -20,6 +26,13 @@ func ExampleNewCylinder() {
 	doc.Show(cyl)
 	//Output:
 	//ExampleNewCylinder
+}
+
+func ExampleNewInfCylinder() {
+	cyl := NewInfCylinder(Y, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+	doc.Show(cyl)
+	//Output:
+	//ExampleNewInfCylinder
 }
 
 func ExampleNewSheet() {

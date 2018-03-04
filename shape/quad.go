@@ -22,6 +22,11 @@ func NewInfCylinder(dir int, diam float64, m Material) *quad {
 	return &quad{Vec{}, coeff, r * r, m}
 }
 
+func (s *quad) Transl(d Vec) *quad {
+	s.c.Transl(d)
+	return s
+}
+
 func (s *quad) Hit1(r *Ray, f *[]Fragment) { s.HitAll(r, f) }
 
 func (s *quad) HitAll(r *Ray, f *[]Fragment) {

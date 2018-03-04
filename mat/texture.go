@@ -16,13 +16,30 @@ type Texture interface {
 	At(Vec) Color
 }
 
-func NewImgTex(img raster.Image, p0, pu, pv Vec) *ImgTex {
-	return &ImgTex{img, p0, pu, pv}
+type UVMapper interface {
+	Map(pos Vec) (u, v float64)
+}
+
+type UVAffine struct {
+	P0, Pu, Pv Vec
+}
+
+func (c *UVAffine) Map(pos Vec) (u, v float64) {
+	p := pos.Sub(c.P0)
+	pu := c.Pu.Sub(c.P0)
+	pv := c.Pv.Sub(c.P0)
+	u = p.Dot(pu) / pu.Len2()
+	v = p.Dot(pv) / pv.Len2()
+	return u, v
+}
+
+func NewImgTex(img raster.Image, mapper UVMapper) *ImgTex {
+	return &ImgTex{img, mapper}
 }
 
 type ImgTex struct {
-	img        raster.Image
-	p0, pu, pv Vec // TODO -> UVMapper
+	img   raster.Image
+	uvmap UVMapper
 }
 
 // TODO: remove?
@@ -31,12 +48,7 @@ func (c *ImgTex) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 }
 
 func (c *ImgTex) At(pos Vec) Color {
-	// UV mapping
-	p := pos.Sub(c.p0)
-	pu := c.pu.Sub(c.p0)
-	pv := c.pv.Sub(c.p0)
-	u := p.Dot(pu) / pu.Len2()
-	v := p.Dot(pv) / pv.Len2()
+	u, v := c.uvmap.Map(pos)
 
 	// pixel mapping
 	w := c.img.Bounds().Dx()

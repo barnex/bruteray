@@ -16,6 +16,10 @@ func NewBox(w, h, d float64, m Material) *Box {
 	}
 }
 
+func NewCube(d float64, m Material) *Box {
+	return NewBox(d, d, d, m)
+}
+
 type Box struct {
 	Min, Max Vec
 	Mat      Material

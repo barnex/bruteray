@@ -31,6 +31,7 @@ Package shape implements various shapes and objects.
 * [func SurfaceAnd(a Obj, b CSGObj) Obj](#SurfaceAnd)
 * [type Box](#Box)
   * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
+  * [func NewCube(d float64, m Material) \*Box](#NewCube)
   * [func (s \*Box) Center() Vec](#Box.Center)
   * [func (s \*Box) Corner(x, y, z int) Vec](#Box.Corner)
   * [func (s \*Box) Hit1(r \*Ray, f \*[]Fragment)](#Box.Hit1)
@@ -54,7 +55,9 @@ Package shape implements various shapes and objects.
 * [Cutout](#example_Cutout)
 * [Minus](#example_Minus)
 * [NewBox](#example_NewBox)
+* [NewCube](#example_NewCube)
 * [NewCylinder](#example_NewCylinder)
+* [NewInfCylinder](#example_NewInfCylinder)
 * [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 * [Or](#example_Or)
@@ -77,7 +80,7 @@ doc.Show(And(cube, sphere))
 ```
 
 ![fig](/doc/ExampleAnd.jpg)
-## <a name="Cube">func</a> [Cube](./box.go#L53)
+## <a name="Cube">func</a> [Cube](./box.go#L57)
 ``` go
 func Cube(center Vec, r float64, m Material) CSGObj
 ```
@@ -138,7 +141,7 @@ TODO: Transl
 #### Example:
 
 ```go
-cyl := NewCylinder(Y, Vec{0, 0.5, 0}, 1, 0.5, mat.Diffuse(RED))
+cyl := NewCylinder(Y, Vec{0, 0.5, 0}, 1, 1, mat.Diffuse(RED))
 doc.Show(cyl)
 ```
 
@@ -148,7 +151,15 @@ doc.Show(cyl)
 func NewInfCylinder(dir int, diam float64, m Material) *quad
 ```
 
-## <a name="OldBox">func</a> [OldBox](./box.go#L45)
+#### Example:
+
+```go
+cyl := NewInfCylinder(Y, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+doc.Show(cyl)
+```
+
+![fig](/doc/ExampleNewInfCylinder.jpg)
+## <a name="OldBox">func</a> [OldBox](./box.go#L49)
 ``` go
 func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj
 ```
@@ -196,7 +207,7 @@ func SurfaceAnd(a Obj, b CSGObj) Obj
 Intersection, treating A as a hollow object.
 Equivalent to, but more efficient than And(Hollow(a), b)
 
-## <a name="Box">type</a> [Box](./box.go#L19-L22)
+## <a name="Box">type</a> [Box](./box.go#L23-L26)
 ``` go
 type Box struct {
     Min, Max Vec
@@ -213,19 +224,30 @@ NewBox constructs a box with given width, depth and height.
 #### Example:
 
 ```go
-doc.Show(
-NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-)
+box := NewBox(1, 0.5, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.25, 0})
+doc.Show(box)
 ```
 
-![fig](/doc/ExampleNewBox.jpg)
+![fig](/doc/ExampleNewBox.jpg)### <a name="NewCube">func</a> [NewCube](./box.go#L19)
+``` go
+func NewCube(d float64, m Material) *Box
+```
 
-### <a name="Box.Center">func</a> (\*Box) [Center](./box.go#L24)
+#### Example:
+
+```go
+cube := NewCube(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+doc.Show(cube)
+```
+
+![fig](/doc/ExampleNewCube.jpg)
+
+### <a name="Box.Center">func</a> (\*Box) [Center](./box.go#L28)
 ``` go
 func (s *Box) Center() Vec
 ```
 
-### <a name="Box.Corner">func</a> (\*Box) [Corner](./box.go#L39)
+### <a name="Box.Corner">func</a> (\*Box) [Corner](./box.go#L43)
 ``` go
 func (s *Box) Corner(x, y, z int) Vec
 ```
@@ -236,27 +258,27 @@ Corner returns one of the box's corners:
 	Corner( 1,-1,-1) -> right bottom front
 	...
 
-### <a name="Box.Hit1">func</a> (\*Box) [Hit1](./box.go#L57)
+### <a name="Box.Hit1">func</a> (\*Box) [Hit1](./box.go#L61)
 ``` go
 func (s *Box) Hit1(r *Ray, f *[]Fragment)
 ```
 
-### <a name="Box.HitAll">func</a> (\*Box) [HitAll](./box.go#L59)
+### <a name="Box.HitAll">func</a> (\*Box) [HitAll](./box.go#L63)
 ``` go
 func (s *Box) HitAll(r *Ray, f *[]Fragment)
 ```
 
-### <a name="Box.Inside">func</a> (\*Box) [Inside](./box.go#L93)
+### <a name="Box.Inside">func</a> (\*Box) [Inside](./box.go#L97)
 ``` go
 func (s *Box) Inside(v Vec) bool
 ```
 
-### <a name="Box.Normal">func</a> (\*Box) [Normal](./box.go#L99)
+### <a name="Box.Normal">func</a> (\*Box) [Normal](./box.go#L103)
 ``` go
 func (s *Box) Normal(p Vec) Vec
 ```
 
-### <a name="Box.Transl">func</a> (\*Box) [Transl](./box.go#L28)
+### <a name="Box.Transl">func</a> (\*Box) [Transl](./box.go#L32)
 ``` go
 func (s *Box) Transl(d Vec) *Box
 ```
