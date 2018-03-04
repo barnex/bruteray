@@ -71,7 +71,7 @@ shape.NewSphere(1, Blend(0.95, white, 0.05, refl)).Transl(Vec{0, 0.5, 0}),
 )
 ```
 
-![fig](/../doc/ExampleBlend.jpg)
+![fig](/doc/ExampleBlend.jpg)
 ## <a name="Bricks">func</a> [Bricks](./procedural.go#L30)
 ``` go
 func Bricks(stride, width float64, a, b Material) Material
@@ -100,7 +100,7 @@ e.Add(shape.NewSphere(1, DebugShape(WHITE)).Transl(Vec{0, 0.5, 0}))
 doc.Example(e)
 ```
 
-![fig](/../doc/ExampleDebugShape.jpg)
+![fig](/doc/ExampleDebugShape.jpg)
 ## <a name="Diffuse">func</a> [Diffuse](./diffuse.go#L10)
 ``` go
 func Diffuse(c Texture) Material
@@ -117,7 +117,7 @@ shape.NewSphere(1, Diffuse(WHITE)).Transl(Vec{0, 0.5, 0}),
 )
 ```
 
-![fig](/../doc/ExampleDiffuse.jpg)
+![fig](/doc/ExampleDiffuse.jpg)
 ## <a name="Diffuse0">func</a> [Diffuse0](./diffuse.go#L46)
 ``` go
 func Diffuse0(c Texture) Material
@@ -165,7 +165,7 @@ shape.NewSphere(1, Reflective(WHITE.EV(-1))).Transl(Vec{0, 0.5, 0}),
 )
 ```
 
-![fig](/../doc/ExampleReflective.jpg)
+![fig](/doc/ExampleReflective.jpg)
 ## <a name="Refractive">func</a> [Refractive](./material.go#L45)
 ``` go
 func Refractive(n1, n2 float64) Material
@@ -184,7 +184,7 @@ shape.NewSphere(1, Refractive(1, 1.5)).Transl(Vec{0, 0.5, 0}),
 )
 ```
 
-![fig](/../doc/ExampleRefractive.jpg)
+![fig](/doc/ExampleRefractive.jpg)
 ## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L134)
 ``` go
 func ShadeNormal(dir Vec) Material
@@ -226,7 +226,7 @@ shape.NewSphere(1, Flat(WHITE)).Transl(Vec{0, 0.5, 0}),
 )
 ```
 
-![fig](/../doc/ExampleFlat.jpg)
+![fig](/doc/ExampleFlat.jpg)
 
 ### <a name="FlatColor.At">func</a> (\*FlatColor) [At](./flat.go#L20)
 ``` go

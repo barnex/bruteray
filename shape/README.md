@@ -14,7 +14,6 @@ Package shape implements various shapes and objects.
 - [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
 * [func And(a, b CSGObj) CSGObj](#And)
 * [func Cube(center Vec, r float64, m Material) CSGObj](#Cube)
 * [func Cutout(a CSGObj, b Insider) CSGObj](#Cutout)
@@ -58,12 +57,6 @@ Package shape implements various shapes and objects.
 #### <a name="pkg-files">Package files</a>
 [box.go](./box.go) [csg.go](./csg.go) [cylinder.go](./cylinder.go) [doc.go](./doc.go) [quad.go](./quad.go) [rect.go](./rect.go) [sheet.go](./sheet.go) [slab.go](./slab.go) [sphere.go](./sphere.go) [util.go](./util.go) 
 
-## <a name="pkg-variables">Variables</a>
-``` go
-var CsgAnd_ func(a, b CSGObj) CSGObj
-```
-TODO: remove
-
 ## <a name="And">func</a> [And](./csg.go#L30)
 ``` go
 func And(a, b CSGObj) CSGObj
@@ -103,7 +96,7 @@ Subtraction (logical AND NOT) of two objects
 func MultiOr(o ...CSGObj) CSGObj
 ```
 
-## <a name="NewCylinder">func</a> [NewCylinder](./cylinder.go#L10)
+## <a name="NewCylinder">func</a> [NewCylinder](./cylinder.go#L7)
 ``` go
 func NewCylinder(dir int, center Vec, diam, h float64, m Material) CSGObj
 ```
@@ -176,7 +169,7 @@ NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
 )
 ```
 
-![fig](/../doc/ExampleNewBox.jpg)
+![fig](/doc/ExampleNewBox.jpg)
 
 ### <a name="Box.Center">func</a> (\*Box) [Center](./box.go#L24)
 ``` go
@@ -239,7 +232,7 @@ NewSheet(Ey, 0.1, mat.Diffuse(RED)),
 )
 ```
 
-![fig](/../doc/ExampleNewSheet.jpg)
+![fig](/doc/ExampleNewSheet.jpg)
 
 ### <a name="Sheet.Hit1">func</a> (\*Sheet) [Hit1](./sheet.go#L15)
 ``` go
@@ -266,7 +259,7 @@ NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
 )
 ```
 
-![fig](/../doc/ExampleNewSphere.jpg)
+![fig](/doc/ExampleNewSphere.jpg)
 
 ### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
 ``` go
