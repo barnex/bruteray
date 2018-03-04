@@ -808,6 +808,7 @@ Package shape implements various shapes and objects.
 * [Cutout](#example_Cutout)
 * [Minus](#example_Minus)
 * [NewBox](#example_NewBox)
+* [NewCylinder](#example_NewCylinder)
 * [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 * [Or](#example_Or)
@@ -888,6 +889,14 @@ func NewCylinder(dir int, center Vec, diam, h float64, m Material) CSGObj
 Cyl constructs a (capped) cylinder along a direction (X, Y, or Z).
 TODO: Transl
 
+#### Example:
+
+```go
+cyl := NewCylinder(Y, Vec{0, 0.5, 0}, 1, 0.5, mat.Diffuse(RED))
+doc.Show(cyl)
+```
+
+![fig](/doc/ExampleNewCylinder.jpg)
 ## <a name="NewInfCylinder">func</a> [NewInfCylinder](./quad.go#L18)
 ``` go
 func NewInfCylinder(dir int, diam float64, m Material) *quad
@@ -1021,9 +1030,8 @@ func NewSheet(dir Vec, off float64, m Material) *Sheet
 #### Example:
 
 ```go
-doc.Show(
-NewSheet(Ey, 0.1, mat.Diffuse(RED)),
-)
+sheet := NewSheet(Ey, 0.1, mat.Diffuse(RED))
+doc.Show(sheet)
 ```
 
 ![fig](/doc/ExampleNewSheet.jpg)
@@ -1048,9 +1056,8 @@ func NewSphere(diam float64, m Material) *Sphere
 #### Example:
 
 ```go
-doc.Show(
-NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-)
+sphere := NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+doc.Show(sphere)
 ```
 
 ![fig](/doc/ExampleNewSphere.jpg)

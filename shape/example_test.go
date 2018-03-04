@@ -15,26 +15,23 @@ func ExampleNewBox() {
 	//ExampleNewBox
 }
 
-//func ExampleNewCylinder() {
-//	doc.Show(
-//		NewCylinder(Y, Vec{0, 0.5, 0}, 1, 0.5, mat.Diffuse(RED)),
-//	)
-//	//Output:
-//	//ExampleNewCylinder
-//}
+func ExampleNewCylinder() {
+	cyl := NewCylinder(Y, Vec{0, 0.5, 0}, 1, 1, mat.Diffuse(RED))
+	doc.Show(cyl)
+	//Output:
+	//ExampleNewCylinder
+}
 
 func ExampleNewSheet() {
-	doc.Show(
-		NewSheet(Ey, 0.1, mat.Diffuse(RED)),
-	)
+	sheet := NewSheet(Ey, 0.1, mat.Diffuse(RED))
+	doc.Show(sheet)
 	//Output:
 	//ExampleNewSheet
 }
 
 func ExampleNewSphere() {
-	doc.Show(
-		NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
+	sphere := NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+	doc.Show(sphere)
 	//Output:
 	//ExampleNewSphere
 }
