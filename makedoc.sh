@@ -7,9 +7,10 @@ cmd='godoc2ghmd -ex'
 
 cp main.md $out
 
-for pkg in shape csg mat light transf; do
+for pkg in shape mat light transf; do
 	echo >> $out; echo >> $out
 	$cmd $pre/$pkg >> $out
+	$cmd $pre/$pkg | sed 's-doc/Example-../doc/Example-g' > $pkg/README.md
 done
 
 

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	. "github.com/barnex/bruteray/br"
-	. "github.com/barnex/bruteray/csg"
 	"github.com/barnex/bruteray/light"
 	. "github.com/barnex/bruteray/mat"
 	"github.com/barnex/bruteray/raster"

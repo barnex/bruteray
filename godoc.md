@@ -28,18 +28,37 @@ Additional material:
 
 
 # shape
+`import "github.com/barnex/bruteray/shape"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+* [Examples](#pkg-examples)
+
+## <a name="pkg-overview">Overview</a>
 Package shape implements various shapes and objects.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
+* [func And(a, b CSGObj) CSGObj](#And)
 * [func Cube(center Vec, r float64, m Material) CSGObj](#Cube)
+* [func Cutout(a CSGObj, b Insider) CSGObj](#Cutout)
+* [func Hollow(o CSGObj) CSGObj](#Hollow)
+* [func Inverse(o CSGObj) CSGObj](#Inverse)
+* [func Minus(a, b CSGObj) CSGObj](#Minus)
+* [func MultiOr(o ...CSGObj) CSGObj](#MultiOr)
 * [func NewCylinder(dir int, center Vec, diam, h float64, m Material) CSGObj](#NewCylinder)
 * [func NewInfCylinder(dir int, diam float64, m Material) \*quad](#NewInfCylinder)
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
+* [func Or(a, b CSGObj) CSGObj](#Or)
 * [func Quad(center Vec, a Vec, b float64, m Material) CSGObj](#Quad)
 * [func Rect(pos, dir Vec, rx, ry, rz float64, m Material) Obj](#Rect)
 * [func Slab(dir Vec, off1, off2 float64, m Material) CSGObj](#Slab)
+* [func SurfaceAnd(a Obj, b CSGObj) Obj](#SurfaceAnd)
 * [type Box](#Box)
   * [func NewBox(w, h, d float64, m Material) \*Box](#NewBox)
   * [func (s \*Box) Center() Vec](#Box.Center)
@@ -65,15 +84,52 @@ Package shape implements various shapes and objects.
 * [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 
+#### <a name="pkg-files">Package files</a>
+[box.go](./box.go) [csg.go](./csg.go) [cylinder.go](./cylinder.go) [doc.go](./doc.go) [quad.go](./quad.go) [rect.go](./rect.go) [sheet.go](./sheet.go) [slab.go](./slab.go) [sphere.go](./sphere.go) [util.go](./util.go) 
+
 ## <a name="pkg-variables">Variables</a>
 ``` go
 var CsgAnd_ func(a, b CSGObj) CSGObj
 ```
 TODO: remove
 
+## <a name="And">func</a> [And](./csg.go#L30)
+``` go
+func And(a, b CSGObj) CSGObj
+```
+Intersection (boolean AND) of two objects.
+
 ## <a name="Cube">func</a> [Cube](./box.go#L53)
 ``` go
 func Cube(center Vec, r float64, m Material) CSGObj
+```
+
+## <a name="Cutout">func</a> [Cutout](./csg.go#L201)
+``` go
+func Cutout(a CSGObj, b Insider) CSGObj
+```
+
+## <a name="Hollow">func</a> [Hollow](./csg.go#L255)
+``` go
+func Hollow(o CSGObj) CSGObj
+```
+Hollow turns a into a hollow surface.
+E.g.: a filled cylinder into a hollow tube.
+
+## <a name="Inverse">func</a> [Inverse](./csg.go#L267)
+``` go
+func Inverse(o CSGObj) CSGObj
+```
+
+## <a name="Minus">func</a> [Minus](./csg.go#L161)
+``` go
+func Minus(a, b CSGObj) CSGObj
+```
+Subtraction (logical AND NOT) of two objects
+
+## <a name="MultiOr">func</a> [MultiOr](./csg.go#L111)
+``` go
+func MultiOr(o ...CSGObj) CSGObj
 ```
 
 ## <a name="NewCylinder">func</a> [NewCylinder](./cylinder.go#L10)
@@ -94,6 +150,13 @@ func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj
 ```
 TODO rm
 
+## <a name="Or">func</a> [Or](./csg.go#L70)
+``` go
+func Or(a, b CSGObj) CSGObj
+```
+Union (logical OR) of two objects.
+TODO: remove in favor of MultiOr
+
 ## <a name="Quad">func</a> [Quad](./quad.go#L6)
 ``` go
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj
@@ -113,6 +176,13 @@ TODO: pass Vec normal, U, V
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
 ```
 
+## <a name="SurfaceAnd">func</a> [SurfaceAnd](./csg.go#L227)
+``` go
+func SurfaceAnd(a Obj, b CSGObj) Obj
+```
+Intersection, treating A as a hollow object.
+Equivalent to, but more efficient than And(Hollow(a), b)
+
 ## <a name="Box">type</a> [Box](./box.go#L19-L22)
 ``` go
 type Box struct {
@@ -131,8 +201,8 @@ NewBox constructs a box with given width, depth and height.
 
 ```go
 doc.Show(
-	    NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
+NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+)
 ```
 
 ![fig](/doc/ExampleNewBox.jpg)
@@ -194,8 +264,8 @@ func NewSheet(dir Vec, off float64, m Material) *Sheet
 
 ```go
 doc.Show(
-	    NewSheet(Ey, 0.1, mat.Diffuse(RED)),
-	)
+NewSheet(Ey, 0.1, mat.Diffuse(RED)),
+)
 ```
 
 ![fig](/doc/ExampleNewSheet.jpg)
@@ -221,8 +291,8 @@ func NewSphere(diam float64, m Material) *Sphere
 
 ```go
 doc.Show(
-	    NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
-	)
+NewSphere(1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0}),
+)
 ```
 
 ![fig](/doc/ExampleNewSphere.jpg)
@@ -252,71 +322,21 @@ func (s *Sphere) Normal(pos Vec) Vec
 func (s *Sphere) Transl(d Vec) *Sphere
 ```
 
-# csg
-
-package csg provides constructive solid geometry operations on shapes.
-
-## <a name="pkg-index">Index</a>
-* [func And(a, b CSGObj) CSGObj](#And)
-* [func Cutout(a CSGObj, b Insider) CSGObj](#Cutout)
-* [func Hollow(o CSGObj) CSGObj](#Hollow)
-* [func Inverse(o CSGObj) CSGObj](#Inverse)
-* [func Minus(a, b CSGObj) CSGObj](#Minus)
-* [func MultiOr(o ...CSGObj) CSGObj](#MultiOr)
-* [func Or(a, b CSGObj) CSGObj](#Or)
-* [func SurfaceAnd(a Obj, b CSGObj) Obj](#SurfaceAnd)
-
-## <a name="And">func</a> [And](./csg.go#L36)
-``` go
-func And(a, b CSGObj) CSGObj
-```
-Intersection (boolean AND) of two objects.
-
-## <a name="Cutout">func</a> [Cutout](./csg.go#L207)
-``` go
-func Cutout(a CSGObj, b Insider) CSGObj
-```
-
-## <a name="Hollow">func</a> [Hollow](./csg.go#L261)
-``` go
-func Hollow(o CSGObj) CSGObj
-```
-Hollow turns a into a hollow surface.
-E.g.: a filled cylinder into a hollow tube.
-
-## <a name="Inverse">func</a> [Inverse](./csg.go#L273)
-``` go
-func Inverse(o CSGObj) CSGObj
-```
-
-## <a name="Minus">func</a> [Minus](./csg.go#L167)
-``` go
-func Minus(a, b CSGObj) CSGObj
-```
-Subtraction (logical AND NOT) of two objects
-
-## <a name="MultiOr">func</a> [MultiOr](./csg.go#L117)
-``` go
-func MultiOr(o ...CSGObj) CSGObj
-```
-
-## <a name="Or">func</a> [Or](./csg.go#L76)
-``` go
-func Or(a, b CSGObj) CSGObj
-```
-Union (logical OR) of two objects.
-TODO: remove in favor of MultiOr
-
-## <a name="SurfaceAnd">func</a> [SurfaceAnd](./csg.go#L233)
-``` go
-func SurfaceAnd(a Obj, b CSGObj) Obj
-```
-Intersection, treating A as a hollow object.
-Equivalent to, but more efficient than And(Hollow(a), b)
-
 # mat
+`import "github.com/barnex/bruteray/mat"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+* [Examples](#pkg-examples)
+
+## <a name="pkg-overview">Overview</a>
 Package mat implements various types of materials.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
+- [github.com/barnex/bruteray/raster](./../raster)
 
 ## <a name="pkg-index">Index</a>
 * [func Blend(a float64, matA Material, b float64, matB Material) Material](#Blend)
@@ -354,6 +374,9 @@ Package mat implements various types of materials.
 * [Reflective](#example_Reflective)
 * [Refractive](#example_Refractive)
 
+#### <a name="pkg-files">Package files</a>
+[diffuse.go](./diffuse.go) [diffuse_noshadow.go](./diffuse_noshadow.go) [flat.go](./flat.go) [material.go](./material.go) [procedural.go](./procedural.go) [texture.go](./texture.go) 
+
 ## <a name="Blend">func</a> [Blend](./material.go#L109)
 ``` go
 func Blend(a float64, matA Material, b float64, matB Material) Material
@@ -366,10 +389,10 @@ Blend mixes two materials with certain weights. E.g.:
 
 ```go
 white := Diffuse(WHITE)
-	refl := Reflective(WHITE)
-	doc.Show(
-	    shape.NewSphere(1, Blend(0.95, white, 0.05, refl)).Transl(Vec{0, 0.5, 0}),
-	)
+refl := Reflective(WHITE)
+doc.Show(
+shape.NewSphere(1, Blend(0.95, white, 0.05, refl)).Transl(Vec{0, 0.5, 0}),
+)
 ```
 
 ![fig](/doc/ExampleBlend.jpg)
@@ -395,10 +418,10 @@ worrying about lighting.
 
 ```go
 e := NewEnv()
-	e.Add(shape.NewSheet(Ey, 0, DebugShape(WHITE)))
-	e.Add(shape.NewSphere(1, DebugShape(WHITE)).Transl(Vec{0, 0.5, 0}))
-	// Note: no light source added
-	doc.Example(e)
+e.Add(shape.NewSheet(Ey, 0, DebugShape(WHITE)))
+e.Add(shape.NewSphere(1, DebugShape(WHITE)).Transl(Vec{0, 0.5, 0}))
+// Note: no light source added
+doc.Example(e)
 ```
 
 ![fig](/doc/ExampleDebugShape.jpg)
@@ -414,8 +437,8 @@ See <a href="https://en.wikipedia.org/wiki/Lambertian_reflectance">https://en.wi
 
 ```go
 doc.Show(
-	    shape.NewSphere(1, Diffuse(WHITE)).Transl(Vec{0, 0.5, 0}),
-	)
+shape.NewSphere(1, Diffuse(WHITE)).Transl(Vec{0, 0.5, 0}),
+)
 ```
 
 ![fig](/doc/ExampleDiffuse.jpg)
@@ -462,8 +485,8 @@ A Reflective surface. E.g.:
 
 ```go
 doc.Show(
-	    shape.NewSphere(1, Reflective(WHITE.EV(-1))).Transl(Vec{0, 0.5, 0}),
-	)
+shape.NewSphere(1, Reflective(WHITE.EV(-1))).Transl(Vec{0, 0.5, 0}),
+)
 ```
 
 ![fig](/doc/ExampleReflective.jpg)
@@ -481,8 +504,8 @@ E.g.:
 
 ```go
 doc.Show(
-	    shape.NewSphere(1, Refractive(1, 1.5)).Transl(Vec{0, 0.5, 0}),
-	)
+shape.NewSphere(1, Refractive(1, 1.5)).Transl(Vec{0, 0.5, 0}),
+)
 ```
 
 ![fig](/doc/ExampleRefractive.jpg)
@@ -523,8 +546,8 @@ a computer screen or other extended, dimly luminous surfaces.
 
 ```go
 doc.Show(
-	    shape.NewSphere(1, Flat(WHITE)).Transl(Vec{0, 0.5, 0}),
-	)
+shape.NewSphere(1, Flat(WHITE)).Transl(Vec{0, 0.5, 0}),
+)
 ```
 
 ![fig](/doc/ExampleFlat.jpg)
@@ -582,15 +605,30 @@ type Texture interface {
 ```
 
 # light
+`import "github.com/barnex/bruteray/light"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 Package light implements various types of light sources.
 They all implement br.Light.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
+- [github.com/barnex/bruteray/mat](./../mat)
+- [github.com/barnex/bruteray/shape](./../shape)
 
 ## <a name="pkg-index">Index</a>
 * [func DirLight(pos Vec, intensity Color) Light](#DirLight)
 * [func PointLight(pos Vec, intensity Color) Light](#PointLight)
 * [func RectLight(pos Vec, rx, ry, rz float64, c Color) Light](#RectLight)
 * [func Sphere(pos Vec, radius float64, intensity Color) Light](#Sphere)
+
+#### <a name="pkg-files">Package files</a>
+[light.go](./light.go) 
 
 ## <a name="DirLight">func</a> [DirLight](./light.go#L20)
 ``` go
@@ -619,12 +657,25 @@ Throws softer shadows than an point source and is visible in specular reflection
 TODO: nearby samples must limit their intensity to the analytical value for that limit.
 
 # transf
+`import "github.com/barnex/bruteray/transf"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 Package transf provides affine transformations on objects, like rotations.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [func Transf(o CSGObj, T \*Matrix4) CSGObj](#Transf)
 * [func TransfNonCSG(o Obj, T \*Matrix4) Obj](#TransfNonCSG)
+
+#### <a name="pkg-files">Package files</a>
+[transf.go](./transf.go) 
 
 ## <a name="Transf">func</a> [Transf](./transf.go#L8)
 ``` go

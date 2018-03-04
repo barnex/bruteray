@@ -1,12 +1,10 @@
-// package csg provides constructive solid geometry operations on shapes.
-package csg
+package shape
 
 import (
 	"math"
 	"sync"
 
 	. "github.com/barnex/bruteray/br"
-	"github.com/barnex/bruteray/shape"
 )
 
 var (
@@ -26,10 +24,6 @@ func getFrags() *[]Fragment {
 
 func putFrags(fb *[]Fragment) {
 	fbBuf.Put(fb)
-}
-
-func init() {
-	shape.CsgAnd_ = And // TODO: remove
 }
 
 // Intersection (boolean AND) of two objects.
