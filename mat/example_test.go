@@ -7,6 +7,22 @@ import (
 	"github.com/barnex/bruteray/shape"
 )
 
+func ExampleUVCyl() {
+	img := MustLoad("../assets/earth.jpg") // cylindrical projection
+	r := 0.5
+	globe := shape.NewSphere(2*r, nil)
+	globe.Transl(Vec{0, r, 0})
+	uvmap := &UVCyl{
+		P0: globe.Center,
+		Pu: globe.Center.Add(Vec{0, 0, -r}),
+		Pv: globe.Center.Add(Vec{0, r, 0}),
+	}
+	globe.Mat = Diffuse(NewImgTex(img, uvmap))
+	doc.Show(globe)
+	//Output:
+	//ExampleUVCyl
+}
+
 func ExampleUVAffine() {
 	img := MustLoad("../assets/monalisa.jpg")
 	cube := shape.NewBox(1/img.Aspect(), 1, 0.2, nil)

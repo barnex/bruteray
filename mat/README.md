@@ -31,6 +31,8 @@ Package mat implements various types of materials.
 * [type Texture](#Texture)
 * [type UVAffine](#UVAffine)
   * [func (c \*UVAffine) Map(pos Vec) (u, v float64)](#UVAffine.Map)
+* [type UVCyl](#UVCyl)
+  * [func (c \*UVCyl) Map(pos Vec) (u, v float64)](#UVCyl.Map)
 * [type UVMapper](#UVMapper)
 
 #### <a name="pkg-examples">Examples</a>
@@ -42,6 +44,7 @@ Package mat implements various types of materials.
 * [Reflective](#example_Reflective)
 * [Refractive](#example_Refractive)
 * [UVAffine](#example_UVAffine)
+* [UVCyl](#example_UVCyl)
 
 ## <a name="Blend">func</a> [Blend](./material.go#L109)
 ``` go
@@ -275,13 +278,14 @@ type Texture interface {
 }
 ```
 
-## <a name="UVAffine">type</a> [UVAffine](./uvmapper.go#L17-L19)
+## <a name="UVAffine">type</a> [UVAffine](./uvmapper.go#L22-L24)
 ``` go
 type UVAffine struct {
     P0, Pu, Pv Vec
 }
 ```
-UVAffine maps an affine coordinate system:
+UVAffine maps an affine coordinate system.
+Most suited to map textures on plane surfaces.
 
 	P0 -> (0, 0)
 	Pu -> (1, 0)
@@ -305,12 +309,47 @@ doc.Show(cube)
 
 ![fig](/doc/ExampleUVAffine.jpg)
 
-### <a name="UVAffine.Map">func</a> (\*UVAffine) [Map](./uvmapper.go#L21)
+### <a name="UVAffine.Map">func</a> (\*UVAffine) [Map](./uvmapper.go#L26)
 ``` go
 func (c *UVAffine) Map(pos Vec) (u, v float64)
 ```
 
-## <a name="UVMapper">type</a> [UVMapper](./uvmapper.go#L8-L10)
+## <a name="UVCyl">type</a> [UVCyl](./uvmapper.go#L39-L41)
+``` go
+type UVCyl struct {
+    P0, Pu, Pv Vec
+}
+```
+UVCyl maps a cylindrical coordinate system.
+
+	P0: center
+	Pu: point on the equator
+	Pv: north pole
+
+#### Example:
+
+```go
+img := MustLoad("../assets/earth.jpg") // cylindrical projection
+r := 0.5
+globe := shape.NewSphere(2*r, nil)
+globe.Transl(Vec{0, r, 0})
+uvmap := &UVCyl{
+P0: globe.Center,
+Pu: globe.Center.Add(Vec{0, 0, -r}),
+Pv: globe.Center.Add(Vec{0, r, 0}),
+}
+globe.Mat = Diffuse(NewImgTex(img, uvmap))
+doc.Show(globe)
+```
+
+![fig](/doc/ExampleUVCyl.jpg)
+
+### <a name="UVCyl.Map">func</a> (\*UVCyl) [Map](./uvmapper.go#L43)
+``` go
+func (c *UVCyl) Map(pos Vec) (u, v float64)
+```
+
+## <a name="UVMapper">type</a> [UVMapper](./uvmapper.go#L12-L14)
 ``` go
 type UVMapper interface {
     Map(pos Vec) (u, v float64)

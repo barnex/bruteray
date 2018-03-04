@@ -37,6 +37,7 @@ Package shape implements various shapes and objects.
   * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
   * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
   * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
+  * [func (s \*Sphere) Radius() float64](#Sphere.Radius)
   * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
 
 #### <a name="pkg-examples">Examples</a>
@@ -298,6 +299,9 @@ func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
 ## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
 type Sphere struct {
+    Center Vec
+
+    Mat Material
     // contains filtered or unexported fields
 }
 ```
@@ -316,27 +320,32 @@ doc.Show(sphere)
 
 ![fig](/doc/ExampleNewSphere.jpg)
 
-### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
+### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L30)
 ``` go
 func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
 ```
 
-### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
+### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L32)
 ``` go
 func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
 ```
 
-### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
+### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L20)
 ``` go
 func (s *Sphere) Inside(p Vec) bool
 ```
 
-### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
+### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L49)
 ``` go
 func (s *Sphere) Normal(pos Vec) Vec
 ```
 
-### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
+### <a name="Sphere.Radius">func</a> (\*Sphere) [Radius](./sphere.go#L16)
+``` go
+func (s *Sphere) Radius() float64
+```
+
+### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L25)
 ``` go
 func (s *Sphere) Transl(d Vec) *Sphere
 ```

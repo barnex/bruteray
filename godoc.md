@@ -777,6 +777,7 @@ Package shape implements various shapes and objects.
   * [func (s \*Sphere) HitAll(r \*Ray, f \*[]Fragment)](#Sphere.HitAll)
   * [func (s \*Sphere) Inside(p Vec) bool](#Sphere.Inside)
   * [func (s \*Sphere) Normal(pos Vec) Vec](#Sphere.Normal)
+  * [func (s \*Sphere) Radius() float64](#Sphere.Radius)
   * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
 
 #### <a name="pkg-examples">Examples</a>
@@ -1038,6 +1039,9 @@ func (s *Sheet) Hit1(r *Ray, f *[]Fragment)
 ## <a name="Sphere">type</a> [Sphere](./sphere.go#L10-L14)
 ``` go
 type Sphere struct {
+    Center Vec
+
+    Mat Material
     // contains filtered or unexported fields
 }
 ```
@@ -1056,27 +1060,32 @@ doc.Show(sphere)
 
 ![fig](/doc/ExampleNewSphere.jpg)
 
-### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L26)
+### <a name="Sphere.Hit1">func</a> (\*Sphere) [Hit1](./sphere.go#L30)
 ``` go
 func (s *Sphere) Hit1(r *Ray, f *[]Fragment)
 ```
 
-### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L28)
+### <a name="Sphere.HitAll">func</a> (\*Sphere) [HitAll](./sphere.go#L32)
 ``` go
 func (s *Sphere) HitAll(r *Ray, f *[]Fragment)
 ```
 
-### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L16)
+### <a name="Sphere.Inside">func</a> (\*Sphere) [Inside](./sphere.go#L20)
 ``` go
 func (s *Sphere) Inside(p Vec) bool
 ```
 
-### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L45)
+### <a name="Sphere.Normal">func</a> (\*Sphere) [Normal](./sphere.go#L49)
 ``` go
 func (s *Sphere) Normal(pos Vec) Vec
 ```
 
-### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L21)
+### <a name="Sphere.Radius">func</a> (\*Sphere) [Radius](./sphere.go#L16)
+``` go
+func (s *Sphere) Radius() float64
+```
+
+### <a name="Sphere.Transl">func</a> (\*Sphere) [Transl](./sphere.go#L25)
 ``` go
 func (s *Sphere) Transl(d Vec) *Sphere
 ```
@@ -1114,6 +1123,8 @@ Package mat implements various types of materials.
 * [type Texture](#Texture)
 * [type UVAffine](#UVAffine)
   * [func (c \*UVAffine) Map(pos Vec) (u, v float64)](#UVAffine.Map)
+* [type UVCyl](#UVCyl)
+  * [func (c \*UVCyl) Map(pos Vec) (u, v float64)](#UVCyl.Map)
 * [type UVMapper](#UVMapper)
 
 #### <a name="pkg-examples">Examples</a>
@@ -1125,6 +1136,7 @@ Package mat implements various types of materials.
 * [Reflective](#example_Reflective)
 * [Refractive](#example_Refractive)
 * [UVAffine](#example_UVAffine)
+* [UVCyl](#example_UVCyl)
 
 ## <a name="Blend">func</a> [Blend](./material.go#L109)
 ``` go
@@ -1358,13 +1370,14 @@ type Texture interface {
 }
 ```
 
-## <a name="UVAffine">type</a> [UVAffine](./uvmapper.go#L17-L19)
+## <a name="UVAffine">type</a> [UVAffine](./uvmapper.go#L22-L24)
 ``` go
 type UVAffine struct {
     P0, Pu, Pv Vec
 }
 ```
-UVAffine maps an affine coordinate system:
+UVAffine maps an affine coordinate system.
+Most suited to map textures on plane surfaces.
 
 	P0 -> (0, 0)
 	Pu -> (1, 0)
@@ -1388,12 +1401,47 @@ doc.Show(cube)
 
 ![fig](/doc/ExampleUVAffine.jpg)
 
-### <a name="UVAffine.Map">func</a> (\*UVAffine) [Map](./uvmapper.go#L21)
+### <a name="UVAffine.Map">func</a> (\*UVAffine) [Map](./uvmapper.go#L26)
 ``` go
 func (c *UVAffine) Map(pos Vec) (u, v float64)
 ```
 
-## <a name="UVMapper">type</a> [UVMapper](./uvmapper.go#L8-L10)
+## <a name="UVCyl">type</a> [UVCyl](./uvmapper.go#L39-L41)
+``` go
+type UVCyl struct {
+    P0, Pu, Pv Vec
+}
+```
+UVCyl maps a cylindrical coordinate system.
+
+	P0: center
+	Pu: point on the equator
+	Pv: north pole
+
+#### Example:
+
+```go
+img := MustLoad("../assets/earth.jpg") // cylindrical projection
+r := 0.5
+globe := shape.NewSphere(2*r, nil)
+globe.Transl(Vec{0, r, 0})
+uvmap := &UVCyl{
+P0: globe.Center,
+Pu: globe.Center.Add(Vec{0, 0, -r}),
+Pv: globe.Center.Add(Vec{0, r, 0}),
+}
+globe.Mat = Diffuse(NewImgTex(img, uvmap))
+doc.Show(globe)
+```
+
+![fig](/doc/ExampleUVCyl.jpg)
+
+### <a name="UVCyl.Map">func</a> (\*UVCyl) [Map](./uvmapper.go#L43)
+``` go
+func (c *UVCyl) Map(pos Vec) (u, v float64)
+```
+
+## <a name="UVMapper">type</a> [UVMapper](./uvmapper.go#L12-L14)
 ``` go
 type UVMapper interface {
     Map(pos Vec) (u, v float64)
