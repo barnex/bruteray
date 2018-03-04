@@ -16,23 +16,6 @@ type Texture interface {
 	At(Vec) Color
 }
 
-type UVMapper interface {
-	Map(pos Vec) (u, v float64)
-}
-
-type UVAffine struct {
-	P0, Pu, Pv Vec
-}
-
-func (c *UVAffine) Map(pos Vec) (u, v float64) {
-	p := pos.Sub(c.P0)
-	pu := c.Pu.Sub(c.P0)
-	pv := c.Pv.Sub(c.P0)
-	u = p.Dot(pu) / pu.Len2()
-	v = p.Dot(pv) / pv.Len2()
-	return u, v
-}
-
 func NewImgTex(img raster.Image, mapper UVMapper) *ImgTex {
 	return &ImgTex{img, mapper}
 }

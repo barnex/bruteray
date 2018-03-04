@@ -1,17 +1,6 @@
 # br
-`import "github.com/barnex/bruteray/br"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Bruteray is a ray tracer that does bi-directional path tracing.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-No packages beyond the Go standard library are imported.
 
 ## <a name="pkg-index">Index</a>
 * [Constants](#pkg-constants)
@@ -95,9 +84,6 @@ No packages beyond the Go standard library are imported.
 #### <a name="pkg-examples">Examples</a>
 * [Matrix4.Inv](#example_Matrix4_Inv)
 * [Matrix4.Mul](#example_Matrix4_Mul)
-
-#### <a name="pkg-files">Package files</a>
-[color.go](./color.go) [ctx.go](./ctx.go) [doc.go](./doc.go) [env.go](./env.go) [fragment.go](./fragment.go) [light.go](./light.go) [material.go](./material.go) [matrix.go](./matrix.go) [obj.go](./obj.go) [pool.go](./pool.go) [rand.go](./rand.go) [ray.go](./ray.go) [util.go](./util.go) [vec.go](./vec.go) 
 
 ## <a name="pkg-constants">Constants</a>
 ``` go

@@ -9,8 +9,8 @@ import (
 
 func ExampleUVAffine() {
 	img := MustLoad("../assets/monalisa.jpg")
-	cube := shape.NewBox(1, img.Aspect(), 0.2, nil)
-	cube.Transl(Vec{0, img.Aspect() / 2, 0})
+	cube := shape.NewBox(1/img.Aspect(), 1, 0.2, nil)
+	cube.Transl(Vec{0, 0.5, 0})
 	uvmap := &UVAffine{
 		P0: cube.Corner(-1, -1, 1),
 		Pu: cube.Corner(1, -1, 1),
