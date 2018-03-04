@@ -42,7 +42,7 @@ func example(e *Env) {
 	img := raster.MakeImage(1920/3, 1080/3)
 	cam := raster.Camera(1).Transl(0, 1.2, -2.2).Transf(RotX4(18 * Deg))
 	cam.AA = true
-	raster.MultiPass(cam, e, img, 500)
+	raster.MultiPass(cam, e, img, 300)
 	e.Recursion = 3
 
 	raster.MustEncode(img, file)

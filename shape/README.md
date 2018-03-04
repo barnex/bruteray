@@ -50,9 +50,13 @@ Package shape implements various shapes and objects.
   * [func (s \*Sphere) Transl(d Vec) \*Sphere](#Sphere.Transl)
 
 #### <a name="pkg-examples">Examples</a>
+* [And](#example_And)
+* [Cutout](#example_Cutout)
+* [Minus](#example_Minus)
 * [NewBox](#example_NewBox)
 * [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
+* [Or](#example_Or)
 
 #### <a name="pkg-files">Package files</a>
 [box.go](./box.go) [csg.go](./csg.go) [cylinder.go](./cylinder.go) [doc.go](./doc.go) [quad.go](./quad.go) [rect.go](./rect.go) [sheet.go](./sheet.go) [slab.go](./slab.go) [sphere.go](./sphere.go) [util.go](./util.go) 
@@ -63,6 +67,15 @@ func And(a, b CSGObj) CSGObj
 ```
 Intersection (boolean AND) of two objects.
 
+#### Example:
+
+```go
+cube := NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1.5, mat.Diffuse(BLUE)).Transl(cube.Corner(1, 1, -1))
+doc.Show(And(cube, sphere))
+```
+
+![fig](/doc/ExampleAnd.jpg)
 ## <a name="Cube">func</a> [Cube](./box.go#L53)
 ``` go
 func Cube(center Vec, r float64, m Material) CSGObj
@@ -73,6 +86,15 @@ func Cube(center Vec, r float64, m Material) CSGObj
 func Cutout(a CSGObj, b Insider) CSGObj
 ```
 
+#### Example:
+
+```go
+cube := NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1.5, mat.Diffuse(BLUE)).Transl(cube.Corner(1, 1, -1))
+doc.Show(Cutout(cube, sphere))
+```
+
+![fig](/doc/ExampleCutout.jpg)
 ## <a name="Hollow">func</a> [Hollow](./csg.go#L255)
 ``` go
 func Hollow(o CSGObj) CSGObj
@@ -91,6 +113,15 @@ func Minus(a, b CSGObj) CSGObj
 ```
 Subtraction (logical AND NOT) of two objects
 
+#### Example:
+
+```go
+cube := NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1.5, mat.Diffuse(BLUE)).Transl(cube.Corner(1, 1, -1))
+doc.Show(Minus(cube, sphere))
+```
+
+![fig](/doc/ExampleMinus.jpg)
 ## <a name="MultiOr">func</a> [MultiOr](./csg.go#L111)
 ``` go
 func MultiOr(o ...CSGObj) CSGObj
@@ -121,6 +152,15 @@ func Or(a, b CSGObj) CSGObj
 Union (logical OR) of two objects.
 TODO: remove in favor of MultiOr
 
+#### Example:
+
+```go
+cube := NewBox(1, 1, 1, mat.Diffuse(RED)).Transl(Vec{0, 0.5, 0})
+sphere := NewSphere(1.0, mat.Diffuse(BLUE)).Transl(cube.Corner(1, 1, -1))
+doc.Show(Or(cube, sphere))
+```
+
+![fig](/doc/ExampleOr.jpg)
 ## <a name="Quad">func</a> [Quad](./quad.go#L6)
 ``` go
 func Quad(center Vec, a Vec, b float64, m Material) CSGObj
