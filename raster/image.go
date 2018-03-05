@@ -37,6 +37,24 @@ func (img Image) At(i, j int) color.Color {
 	return img[j][i]
 }
 
+func (img Image) AtUV(u, v float64) br.Color {
+	w := img.Bounds().Dx()
+	h := img.Bounds().Dy()
+	i := clamp(int(u*float64(w)), w)
+	j := clamp(int(v*float64(h)), h)
+	return img[j][i]
+}
+
+func clamp(v, max int) int {
+	if v < 0 {
+		return 0
+	}
+	if v >= max {
+		return max - 1
+	}
+	return v
+}
+
 func (i Image) ColorModel() color.Model {
 	return nil
 }

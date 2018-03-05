@@ -1,18 +1,6 @@
 # mat
-`import "github.com/barnex/bruteray/mat"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Package mat implements various types of materials.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
-- [github.com/barnex/bruteray/raster](./../raster)
 
 ## <a name="pkg-index">Index</a>
 * [func Blend(a float64, matA Material, b float64, matB Material) Material](#Blend)
@@ -60,10 +48,7 @@ Package mat implements various types of materials.
 * [UVAffine](#example_UVAffine)
 * [UVCyl](#example_UVCyl)
 
-#### <a name="pkg-files">Package files</a>
-[diffuse.go](./diffuse.go) [diffuse_noshadow.go](./diffuse_noshadow.go) [flat.go](./flat.go) [material.go](./material.go) [procedural.go](./procedural.go) [texture.go](./texture.go) [uvmapper.go](./uvmapper.go) 
-
-## <a name="Blend">func</a> [Blend](./material.go#L119)
+## <a name="Blend">func</a> [Blend](./material.go#L100)
 ``` go
 func Blend(a float64, matA Material, b float64, matB Material) Material
 ```
@@ -101,7 +86,7 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleCheckboard.jpg)
-## <a name="DebugShape">func</a> [DebugShape](./material.go#L164)
+## <a name="DebugShape">func</a> [DebugShape](./material.go#L145)
 ``` go
 func DebugShape(c Color) Material
 ```
@@ -165,7 +150,7 @@ func Load(name string) (raster.Image, error)
 func MustLoad(name string) raster.Image
 ```
 
-## <a name="Reflective">func</a> [Reflective](./material.go#L36)
+## <a name="Reflective">func</a> [Reflective](./material.go#L17)
 ``` go
 func Reflective(c Color) Material
 ```
@@ -183,7 +168,7 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleReflective.jpg)
-## <a name="Refractive">func</a> [Refractive](./material.go#L55)
+## <a name="Refractive">func</a> [Refractive](./material.go#L36)
 ``` go
 func Refractive(n1, n2 float64) Material
 ```
@@ -201,13 +186,13 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleRefractive.jpg)
-## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L144)
+## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L125)
 ``` go
 func ShadeNormal(dir Vec) Material
 ```
 ShadeNormal is a debug shader that colors according to the normal vector projected on dir.
 
-## <a name="Shiny">func</a> [Shiny](./material.go#L125)
+## <a name="Shiny">func</a> [Shiny](./material.go#L106)
 ``` go
 func Shiny(c Color, reflectivity float64) Material
 ```
@@ -256,7 +241,7 @@ func (s *FlatColor) Shade(_ *br.Ctx, _ *br.Env, _ int, _ *br.Ray, _ br.Fragment)
 ## <a name="Image">type</a> [Image](./texture.go#L19-L21)
 ``` go
 type Image interface {
-    At(u, v float64) Color
+    AtUV(u, v float64) Color
 }
 ```
 
@@ -283,19 +268,19 @@ func (c *ImgTex) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
 TODO: remove?
 
-## <a name="ShadeDir">type</a> [ShadeDir](./material.go#L15)
+## <a name="ShadeDir">type</a> [ShadeDir](./skydome.go#L7)
 ``` go
 type ShadeDir func(dir Vec) Color
 ```
 ShadeDir returns a color based on the direction of a ray.
 Used for shading the ambient background, E.g., the sky.
 
-### <a name="Skybox">func</a> [Skybox](./material.go#L22)
+### <a name="Skybox">func</a> [Skybox](./skydome.go#L13)
 ``` go
 func Skybox(tex Image) ShadeDir
 ```
 
-### <a name="ShadeDir.Shade">func</a> (ShadeDir) [Shade](./material.go#L17)
+### <a name="ShadeDir.Shade">func</a> (ShadeDir) [Shade](./skydome.go#L9)
 ``` go
 func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```

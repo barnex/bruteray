@@ -11,7 +11,7 @@ type Env struct {
 	objs        []Obj    // non-source objects
 	Lights      []Light  // light sources
 	all         []Obj    // objs + lights
-	Ambient     Fragment // Shades the background at infinity, when no object is hit
+	Ambient     Material // Shades the background at infinity, when no object is hit
 	Recursion   int      // Maximum allowed recursion depth. // TODO: rm?
 	Fog         float64  // Fog distance
 	IndirectFog bool     // Include fog interreflection
@@ -24,7 +24,7 @@ type Env struct {
 // to which objects can be added later.
 func NewEnv() *Env {
 	return &Env{
-		Ambient:   Fragment{T: inf, Material: BLACK},
+		Ambient:   BLACK,
 		Recursion: DefaultRec,
 		Cutoff:    math.Inf(1),
 	}
@@ -53,11 +53,6 @@ func (e *Env) AddInvisibleLight(l ...Light) {
 	e.Lights = append(e.Lights, l...)
 }
 
-// Sets the background color.
-func (e *Env) SetAmbient(m Material) {
-	e.Ambient = Fragment{T: inf, Material: m}
-}
-
 // Calculate intensity seen by ray,
 // caused by all objects including lights.
 // Used by specular surfaces
@@ -81,10 +76,10 @@ func (e *Env) Shade(ctx *Ctx, r *Ray, N int, who []Obj) Color {
 		return Color{}
 	}
 
-	var surf Fragment
+	var surf Fragment // TODO: probably leaks
 
 	surf.T = inf
-	surf.Material = e.Ambient.Material
+	surf.Material = e.Ambient
 
 	hit := ctx.GetFrags()
 	defer ctx.PutFrags(hit)
@@ -112,6 +107,10 @@ func (e *Env) Shade(ctx *Ctx, r *Ray, N int, who []Obj) Color {
 	} else {
 		return surf.Shade(ctx, e, N-1, r)
 	}
+}
+
+func (e *Env) SetAmbient(m Material) {
+	e.Ambient = m
 }
 
 func (e *Env) withFog(ctx *Ctx, surf Fragment, N int, r *Ray) Color {

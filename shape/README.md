@@ -1,17 +1,6 @@
 # shape
-`import "github.com/barnex/bruteray/shape"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Package shape implements various shapes and objects.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [func And(a, b CSGObj) CSGObj](#And)
@@ -62,9 +51,6 @@ Package shape implements various shapes and objects.
 * [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 * [Or](#example_Or)
-
-#### <a name="pkg-files">Package files</a>
-[box.go](./box.go) [csg.go](./csg.go) [cylinder.go](./cylinder.go) [doc.go](./doc.go) [quad.go](./quad.go) [rect.go](./rect.go) [sheet.go](./sheet.go) [slab.go](./slab.go) [sphere.go](./sphere.go) [util.go](./util.go) 
 
 ## <a name="And">func</a> [And](./csg.go#L30)
 ``` go

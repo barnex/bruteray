@@ -28,19 +28,8 @@ Additional material:
 
 
 # br
-`import "github.com/barnex/bruteray/br"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Bruteray is a ray tracer that does bi-directional path tracing.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-No packages beyond the Go standard library are imported.
 
 ## <a name="pkg-index">Index</a>
 * [Constants](#pkg-constants)
@@ -124,9 +113,6 @@ No packages beyond the Go standard library are imported.
 #### <a name="pkg-examples">Examples</a>
 * [Matrix4.Inv](#example_Matrix4_Inv)
 * [Matrix4.Mul](#example_Matrix4_Mul)
-
-#### <a name="pkg-files">Package files</a>
-[color.go](./color.go) [ctx.go](./ctx.go) [doc.go](./doc.go) [env.go](./env.go) [fragment.go](./fragment.go) [light.go](./light.go) [material.go](./material.go) [matrix.go](./matrix.go) [obj.go](./obj.go) [pool.go](./pool.go) [rand.go](./rand.go) [ray.go](./ray.go) [util.go](./util.go) [vec.go](./vec.go) 
 
 ## <a name="pkg-constants">Constants</a>
 ``` go
@@ -329,7 +315,7 @@ PutRay recycles Rays returned by GetRay.
 type Env struct {
     Lights []Light // light sources
 
-    Ambient     Fragment // Shades the background at infinity, when no object is hit
+    Ambient     Material // Shades the background at infinity, when no object is hit
     Recursion   int      // Maximum allowed recursion depth. // TODO: rm?
     Fog         float64  // Fog distance
     IndirectFog bool     // Include fog interreflection
@@ -368,7 +354,7 @@ func (e *Env) AddLight(l ...Light)
 ```
 Adds a light source to the scene.
 
-### <a name="Env.Occludes">func</a> (\*Env) [Occludes](./env.go#L178)
+### <a name="Env.Occludes">func</a> (\*Env) [Occludes](./env.go#L177)
 ``` go
 func (e *Env) Occludes(ctx *Ctx, r *Ray, endpoint float64) bool
 ```
@@ -376,20 +362,19 @@ Occludes returns true when an object intersects r
 between t=0 and t=endpoint.
 This means a light source at endpoint casts a shadow at the ray start point.
 
-### <a name="Env.SetAmbient">func</a> (\*Env) [SetAmbient](./env.go#L57)
+### <a name="Env.SetAmbient">func</a> (\*Env) [SetAmbient](./env.go#L112)
 ``` go
 func (e *Env) SetAmbient(m Material)
 ```
-Sets the background color.
 
-### <a name="Env.Shade">func</a> (\*Env) [Shade](./env.go#L79)
+### <a name="Env.Shade">func</a> (\*Env) [Shade](./env.go#L74)
 ``` go
 func (e *Env) Shade(ctx *Ctx, r *Ray, N int, who []Obj) Color
 ```
 Calculate intensity seen by ray, with maximum recursion depth N.
 who = objs, lights, or all.
 
-### <a name="Env.ShadeAll">func</a> (\*Env) [ShadeAll](./env.go#L65)
+### <a name="Env.ShadeAll">func</a> (\*Env) [ShadeAll](./env.go#L60)
 ``` go
 func (e *Env) ShadeAll(ctx *Ctx, r *Ray, N int) Color
 ```
@@ -398,7 +383,7 @@ caused by all objects including lights.
 Used by specular surfaces
 who make no distinction between light sources and regular objects.
 
-### <a name="Env.ShadeNonLum">func</a> (\*Env) [ShadeNonLum](./env.go#L73)
+### <a name="Env.ShadeNonLum">func</a> (\*Env) [ShadeNonLum](./env.go#L68)
 ``` go
 func (e *Env) ShadeNonLum(ctx *Ctx, r *Ray, N int) Color
 ```
@@ -753,19 +738,8 @@ func (a Vec4) Dot(b Vec4) float64
 ```
 
 # shape
-`import "github.com/barnex/bruteray/shape"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Package shape implements various shapes and objects.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [func And(a, b CSGObj) CSGObj](#And)
@@ -816,9 +790,6 @@ Package shape implements various shapes and objects.
 * [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 * [Or](#example_Or)
-
-#### <a name="pkg-files">Package files</a>
-[box.go](./box.go) [csg.go](./csg.go) [cylinder.go](./cylinder.go) [doc.go](./doc.go) [quad.go](./quad.go) [rect.go](./rect.go) [sheet.go](./sheet.go) [slab.go](./slab.go) [sphere.go](./sphere.go) [util.go](./util.go) 
 
 ## <a name="And">func</a> [And](./csg.go#L30)
 ``` go
@@ -1119,20 +1090,8 @@ func (s *Sphere) Transl(d Vec) *Sphere
 ```
 
 # mat
-`import "github.com/barnex/bruteray/mat"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Package mat implements various types of materials.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
-- [github.com/barnex/bruteray/raster](./../raster)
 
 ## <a name="pkg-index">Index</a>
 * [func Blend(a float64, matA Material, b float64, matB Material) Material](#Blend)
@@ -1180,10 +1139,7 @@ Package mat implements various types of materials.
 * [UVAffine](#example_UVAffine)
 * [UVCyl](#example_UVCyl)
 
-#### <a name="pkg-files">Package files</a>
-[diffuse.go](./diffuse.go) [diffuse_noshadow.go](./diffuse_noshadow.go) [flat.go](./flat.go) [material.go](./material.go) [procedural.go](./procedural.go) [texture.go](./texture.go) [uvmapper.go](./uvmapper.go) 
-
-## <a name="Blend">func</a> [Blend](./material.go#L119)
+## <a name="Blend">func</a> [Blend](./material.go#L100)
 ``` go
 func Blend(a float64, matA Material, b float64, matB Material) Material
 ```
@@ -1221,7 +1177,7 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleCheckboard.jpg)
-## <a name="DebugShape">func</a> [DebugShape](./material.go#L164)
+## <a name="DebugShape">func</a> [DebugShape](./material.go#L145)
 ``` go
 func DebugShape(c Color) Material
 ```
@@ -1285,7 +1241,7 @@ func Load(name string) (raster.Image, error)
 func MustLoad(name string) raster.Image
 ```
 
-## <a name="Reflective">func</a> [Reflective](./material.go#L36)
+## <a name="Reflective">func</a> [Reflective](./material.go#L17)
 ``` go
 func Reflective(c Color) Material
 ```
@@ -1303,7 +1259,7 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleReflective.jpg)
-## <a name="Refractive">func</a> [Refractive](./material.go#L55)
+## <a name="Refractive">func</a> [Refractive](./material.go#L36)
 ``` go
 func Refractive(n1, n2 float64) Material
 ```
@@ -1321,13 +1277,13 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleRefractive.jpg)
-## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L144)
+## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L125)
 ``` go
 func ShadeNormal(dir Vec) Material
 ```
 ShadeNormal is a debug shader that colors according to the normal vector projected on dir.
 
-## <a name="Shiny">func</a> [Shiny](./material.go#L125)
+## <a name="Shiny">func</a> [Shiny](./material.go#L106)
 ``` go
 func Shiny(c Color, reflectivity float64) Material
 ```
@@ -1376,7 +1332,7 @@ func (s *FlatColor) Shade(_ *br.Ctx, _ *br.Env, _ int, _ *br.Ray, _ br.Fragment)
 ## <a name="Image">type</a> [Image](./texture.go#L19-L21)
 ``` go
 type Image interface {
-    At(u, v float64) Color
+    AtUV(u, v float64) Color
 }
 ```
 
@@ -1403,19 +1359,19 @@ func (c *ImgTex) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
 TODO: remove?
 
-## <a name="ShadeDir">type</a> [ShadeDir](./material.go#L15)
+## <a name="ShadeDir">type</a> [ShadeDir](./skydome.go#L7)
 ``` go
 type ShadeDir func(dir Vec) Color
 ```
 ShadeDir returns a color based on the direction of a ray.
 Used for shading the ambient background, E.g., the sky.
 
-### <a name="Skybox">func</a> [Skybox](./material.go#L22)
+### <a name="Skybox">func</a> [Skybox](./skydome.go#L13)
 ``` go
 func Skybox(tex Image) ShadeDir
 ```
 
-### <a name="ShadeDir.Shade">func</a> (ShadeDir) [Shade](./material.go#L17)
+### <a name="ShadeDir.Shade">func</a> (ShadeDir) [Shade](./skydome.go#L9)
 ``` go
 func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
@@ -1510,30 +1466,15 @@ onto 2D coordinates (u,v) suitable for indexing a texture.
 (u,v) coordinates typically lie within the range [0, 1].
 
 # light
-`import "github.com/barnex/bruteray/light"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
 Package light implements various types of light sources.
 They all implement br.Light.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
-- [github.com/barnex/bruteray/mat](./../mat)
-- [github.com/barnex/bruteray/shape](./../shape)
 
 ## <a name="pkg-index">Index</a>
 * [func DirLight(pos Vec, intensity Color) Light](#DirLight)
 * [func PointLight(pos Vec, intensity Color) Light](#PointLight)
 * [func RectLight(pos Vec, rx, ry, rz float64, c Color) Light](#RectLight)
 * [func Sphere(pos Vec, radius float64, intensity Color) Light](#Sphere)
-
-#### <a name="pkg-files">Package files</a>
-[light.go](./light.go) 
 
 ## <a name="DirLight">func</a> [DirLight](./light.go#L20)
 ``` go
@@ -1562,25 +1503,12 @@ Throws softer shadows than an point source and is visible in specular reflection
 TODO: nearby samples must limit their intensity to the analytical value for that limit.
 
 # transf
-`import "github.com/barnex/bruteray/transf"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
 Package transf provides affine transformations on objects, like rotations.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [func Transf(o CSGObj, T \*Matrix4) CSGObj](#Transf)
 * [func TransfNonCSG(o Obj, T \*Matrix4) Obj](#TransfNonCSG)
-
-#### <a name="pkg-files">Package files</a>
-[transf.go](./transf.go) 
 
 ## <a name="Transf">func</a> [Transf](./transf.go#L8)
 ``` go

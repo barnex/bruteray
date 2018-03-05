@@ -17,7 +17,7 @@ type Texture3D interface {
 }
 
 type Image interface {
-	At(u, v float64) Color
+	AtUV(u, v float64) Color
 }
 
 func NewImgTex(img raster.Image, mapper UVMapper) *ImgTex {

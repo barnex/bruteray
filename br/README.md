@@ -1,17 +1,6 @@
 # br
-`import "github.com/barnex/bruteray/br"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Bruteray is a ray tracer that does bi-directional path tracing.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-No packages beyond the Go standard library are imported.
 
 ## <a name="pkg-index">Index</a>
 * [Constants](#pkg-constants)
@@ -95,9 +84,6 @@ No packages beyond the Go standard library are imported.
 #### <a name="pkg-examples">Examples</a>
 * [Matrix4.Inv](#example_Matrix4_Inv)
 * [Matrix4.Mul](#example_Matrix4_Mul)
-
-#### <a name="pkg-files">Package files</a>
-[color.go](./color.go) [ctx.go](./ctx.go) [doc.go](./doc.go) [env.go](./env.go) [fragment.go](./fragment.go) [light.go](./light.go) [material.go](./material.go) [matrix.go](./matrix.go) [obj.go](./obj.go) [pool.go](./pool.go) [rand.go](./rand.go) [ray.go](./ray.go) [util.go](./util.go) [vec.go](./vec.go) 
 
 ## <a name="pkg-constants">Constants</a>
 ``` go
@@ -300,7 +286,7 @@ PutRay recycles Rays returned by GetRay.
 type Env struct {
     Lights []Light // light sources
 
-    Ambient     Fragment // Shades the background at infinity, when no object is hit
+    Ambient     Material // Shades the background at infinity, when no object is hit
     Recursion   int      // Maximum allowed recursion depth. // TODO: rm?
     Fog         float64  // Fog distance
     IndirectFog bool     // Include fog interreflection
@@ -339,7 +325,7 @@ func (e *Env) AddLight(l ...Light)
 ```
 Adds a light source to the scene.
 
-### <a name="Env.Occludes">func</a> (\*Env) [Occludes](./env.go#L178)
+### <a name="Env.Occludes">func</a> (\*Env) [Occludes](./env.go#L177)
 ``` go
 func (e *Env) Occludes(ctx *Ctx, r *Ray, endpoint float64) bool
 ```
@@ -347,20 +333,19 @@ Occludes returns true when an object intersects r
 between t=0 and t=endpoint.
 This means a light source at endpoint casts a shadow at the ray start point.
 
-### <a name="Env.SetAmbient">func</a> (\*Env) [SetAmbient](./env.go#L57)
+### <a name="Env.SetAmbient">func</a> (\*Env) [SetAmbient](./env.go#L112)
 ``` go
 func (e *Env) SetAmbient(m Material)
 ```
-Sets the background color.
 
-### <a name="Env.Shade">func</a> (\*Env) [Shade](./env.go#L79)
+### <a name="Env.Shade">func</a> (\*Env) [Shade](./env.go#L74)
 ``` go
 func (e *Env) Shade(ctx *Ctx, r *Ray, N int, who []Obj) Color
 ```
 Calculate intensity seen by ray, with maximum recursion depth N.
 who = objs, lights, or all.
 
-### <a name="Env.ShadeAll">func</a> (\*Env) [ShadeAll](./env.go#L65)
+### <a name="Env.ShadeAll">func</a> (\*Env) [ShadeAll](./env.go#L60)
 ``` go
 func (e *Env) ShadeAll(ctx *Ctx, r *Ray, N int) Color
 ```
@@ -369,7 +354,7 @@ caused by all objects including lights.
 Used by specular surfaces
 who make no distinction between light sources and regular objects.
 
-### <a name="Env.ShadeNonLum">func</a> (\*Env) [ShadeNonLum](./env.go#L73)
+### <a name="Env.ShadeNonLum">func</a> (\*Env) [ShadeNonLum](./env.go#L68)
 ``` go
 func (e *Env) ShadeNonLum(ctx *Ctx, r *Ray, N int) Color
 ```
