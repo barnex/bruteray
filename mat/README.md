@@ -1,6 +1,18 @@
 # mat
+`import "github.com/barnex/bruteray/mat"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+* [Examples](#pkg-examples)
+
+## <a name="pkg-overview">Overview</a>
 Package mat implements various types of materials.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
+- [github.com/barnex/bruteray/raster](./../raster)
 
 ## <a name="pkg-index">Index</a>
 * [func Blend(a float64, matA Material, b float64, matB Material) Material](#Blend)
@@ -45,6 +57,9 @@ Package mat implements various types of materials.
 * [Refractive](#example_Refractive)
 * [UVAffine](#example_UVAffine)
 * [UVCyl](#example_UVCyl)
+
+#### <a name="pkg-files">Package files</a>
+[diffuse.go](./diffuse.go) [diffuse_noshadow.go](./diffuse_noshadow.go) [flat.go](./flat.go) [material.go](./material.go) [procedural.go](./procedural.go) [texture.go](./texture.go) [uvmapper.go](./uvmapper.go) 
 
 ## <a name="Blend">func</a> [Blend](./material.go#L109)
 ``` go
@@ -333,10 +348,11 @@ img := MustLoad("../assets/earth.jpg") // cylindrical projection
 r := 0.5
 globe := shape.NewSphere(2*r, nil)
 globe.Transl(Vec{0, r, 0})
+th := -30 * Deg
 uvmap := &UVCyl{
-P0: globe.Center,
-Pu: globe.Center.Add(Vec{0, 0, -r}),
-Pv: globe.Center.Add(Vec{0, r, 0}),
+P0: Vec{0, 0, 0},
+Pu: Vec{math.Sin(th), 0, -math.Cos(th)},
+Pv: Vec{0, 2 * r, 0},
 }
 globe.Mat = Diffuse(NewImgTex(img, uvmap))
 doc.Show(globe)

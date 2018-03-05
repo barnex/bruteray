@@ -28,8 +28,19 @@ Additional material:
 
 
 # br
+`import "github.com/barnex/bruteray/br"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+* [Examples](#pkg-examples)
+
+## <a name="pkg-overview">Overview</a>
 Bruteray is a ray tracer that does bi-directional path tracing.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+No packages beyond the Go standard library are imported.
 
 ## <a name="pkg-index">Index</a>
 * [Constants](#pkg-constants)
@@ -113,6 +124,9 @@ Bruteray is a ray tracer that does bi-directional path tracing.
 #### <a name="pkg-examples">Examples</a>
 * [Matrix4.Inv](#example_Matrix4_Inv)
 * [Matrix4.Mul](#example_Matrix4_Mul)
+
+#### <a name="pkg-files">Package files</a>
+[color.go](./color.go) [ctx.go](./ctx.go) [doc.go](./doc.go) [env.go](./env.go) [fragment.go](./fragment.go) [light.go](./light.go) [material.go](./material.go) [matrix.go](./matrix.go) [obj.go](./obj.go) [pool.go](./pool.go) [rand.go](./rand.go) [ray.go](./ray.go) [util.go](./util.go) [vec.go](./vec.go) 
 
 ## <a name="pkg-constants">Constants</a>
 ``` go
@@ -739,8 +753,19 @@ func (a Vec4) Dot(b Vec4) float64
 ```
 
 # shape
+`import "github.com/barnex/bruteray/shape"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+* [Examples](#pkg-examples)
+
+## <a name="pkg-overview">Overview</a>
 Package shape implements various shapes and objects.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [func And(a, b CSGObj) CSGObj](#And)
@@ -791,6 +816,9 @@ Package shape implements various shapes and objects.
 * [NewSheet](#example_NewSheet)
 * [NewSphere](#example_NewSphere)
 * [Or](#example_Or)
+
+#### <a name="pkg-files">Package files</a>
+[box.go](./box.go) [csg.go](./csg.go) [cylinder.go](./cylinder.go) [doc.go](./doc.go) [quad.go](./quad.go) [rect.go](./rect.go) [sheet.go](./sheet.go) [slab.go](./slab.go) [sphere.go](./sphere.go) [util.go](./util.go) 
 
 ## <a name="And">func</a> [And](./csg.go#L30)
 ``` go
@@ -1091,8 +1119,20 @@ func (s *Sphere) Transl(d Vec) *Sphere
 ```
 
 # mat
+`import "github.com/barnex/bruteray/mat"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+* [Examples](#pkg-examples)
+
+## <a name="pkg-overview">Overview</a>
 Package mat implements various types of materials.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
+- [github.com/barnex/bruteray/raster](./../raster)
 
 ## <a name="pkg-index">Index</a>
 * [func Blend(a float64, matA Material, b float64, matB Material) Material](#Blend)
@@ -1137,6 +1177,9 @@ Package mat implements various types of materials.
 * [Refractive](#example_Refractive)
 * [UVAffine](#example_UVAffine)
 * [UVCyl](#example_UVCyl)
+
+#### <a name="pkg-files">Package files</a>
+[diffuse.go](./diffuse.go) [diffuse_noshadow.go](./diffuse_noshadow.go) [flat.go](./flat.go) [material.go](./material.go) [procedural.go](./procedural.go) [texture.go](./texture.go) [uvmapper.go](./uvmapper.go) 
 
 ## <a name="Blend">func</a> [Blend](./material.go#L109)
 ``` go
@@ -1425,10 +1468,11 @@ img := MustLoad("../assets/earth.jpg") // cylindrical projection
 r := 0.5
 globe := shape.NewSphere(2*r, nil)
 globe.Transl(Vec{0, r, 0})
+th := -30 * Deg
 uvmap := &UVCyl{
-P0: globe.Center,
-Pu: globe.Center.Add(Vec{0, 0, -r}),
-Pv: globe.Center.Add(Vec{0, r, 0}),
+P0: Vec{0, 0, 0},
+Pu: Vec{math.Sin(th), 0, -math.Cos(th)},
+Pv: Vec{0, 2 * r, 0},
 }
 globe.Mat = Diffuse(NewImgTex(img, uvmap))
 doc.Show(globe)
@@ -1452,15 +1496,30 @@ onto 2D coordinates (u,v) suitable for indexing a texture.
 (u,v) coordinates typically lie within the range [0, 1].
 
 # light
+`import "github.com/barnex/bruteray/light"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 Package light implements various types of light sources.
 They all implement br.Light.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
+- [github.com/barnex/bruteray/mat](./../mat)
+- [github.com/barnex/bruteray/shape](./../shape)
 
 ## <a name="pkg-index">Index</a>
 * [func DirLight(pos Vec, intensity Color) Light](#DirLight)
 * [func PointLight(pos Vec, intensity Color) Light](#PointLight)
 * [func RectLight(pos Vec, rx, ry, rz float64, c Color) Light](#RectLight)
 * [func Sphere(pos Vec, radius float64, intensity Color) Light](#Sphere)
+
+#### <a name="pkg-files">Package files</a>
+[light.go](./light.go) 
 
 ## <a name="DirLight">func</a> [DirLight](./light.go#L20)
 ``` go
@@ -1489,12 +1548,25 @@ Throws softer shadows than an point source and is visible in specular reflection
 TODO: nearby samples must limit their intensity to the analytical value for that limit.
 
 # transf
+`import "github.com/barnex/bruteray/transf"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 Package transf provides affine transformations on objects, like rotations.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [func Transf(o CSGObj, T \*Matrix4) CSGObj](#Transf)
 * [func TransfNonCSG(o Obj, T \*Matrix4) Obj](#TransfNonCSG)
+
+#### <a name="pkg-files">Package files</a>
+[transf.go](./transf.go) 
 
 ## <a name="Transf">func</a> [Transf](./transf.go#L8)
 ``` go
