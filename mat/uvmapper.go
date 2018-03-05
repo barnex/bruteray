@@ -43,13 +43,13 @@ type UVCyl struct {
 func (c *UVCyl) Map(pos Vec) (u, v float64) {
 	p := pos.Sub(c.P0)
 	pv := c.Pv.Sub(c.P0)
-	v = 0.5*(p.Dot(pv)/pv.Len2()) + 0.5
+	v = (p.Dot(pv) / pv.Len2())
 
-	pu := c.Pu.Sub(c.P0)
+	pu := c.Pu.Sub(c.P0).Normalized()
 
-	pw := pu.Cross(pv)
-	x := p.Dot(pu) / pu.Len2()
-	y := p.Dot(pw) / pw.Len2()
+	pw := pu.Cross(pv).Normalized()
+	x := p.Dot(pu)
+	y := p.Dot(pw)
 	u = 0.5 + (math.Atan2(y, x))/(2*math.Pi)
 	return u, v
 }

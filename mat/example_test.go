@@ -1,6 +1,8 @@
 package mat_test
 
 import (
+	"math"
+
 	. "github.com/barnex/bruteray/br"
 	"github.com/barnex/bruteray/doc"
 	. "github.com/barnex/bruteray/mat"
@@ -12,10 +14,11 @@ func ExampleUVCyl() {
 	r := 0.5
 	globe := shape.NewSphere(2*r, nil)
 	globe.Transl(Vec{0, r, 0})
+	th := -30 * Deg
 	uvmap := &UVCyl{
-		P0: globe.Center,
-		Pu: globe.Center.Add(Vec{0, 0, -r}),
-		Pv: globe.Center.Add(Vec{0, r, 0}),
+		P0: Vec{0, 0, 0},
+		Pu: Vec{math.Sin(th), 0, -math.Cos(th)},
+		Pv: Vec{0, 2 * r, 0},
 	}
 	globe.Mat = Diffuse(NewImgTex(img, uvmap))
 	doc.Show(globe)
