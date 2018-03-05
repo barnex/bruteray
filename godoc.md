@@ -1139,8 +1139,8 @@ Package mat implements various types of materials.
 * [func Bricks(stride, width float64, a, b Material) Material](#Bricks)
 * [func Checkboard(stride float64, a, b Material) Material](#Checkboard)
 * [func DebugShape(c Color) Material](#DebugShape)
-* [func Diffuse(c Texture) Material](#Diffuse)
-* [func Diffuse0(c Texture) Material](#Diffuse0)
+* [func Diffuse(c Texture3D) Material](#Diffuse)
+* [func Diffuse0(c Texture3D) Material](#Diffuse0)
 * [func Diffuse00(c Color) Material](#Diffuse00)
 * [func Distort(seed int, n int, K Vec, ampli float64, orig Material) Material](#Distort)
 * [func Load(name string) (raster.Image, error)](#Load)
@@ -1154,13 +1154,15 @@ Package mat implements various types of materials.
   * [func Flat(c br.Color) \*FlatColor](#Flat)
   * [func (s \*FlatColor) At(\_ br.Vec) br.Color](#FlatColor.At)
   * [func (s \*FlatColor) Shade(\_ \*br.Ctx, \_ \*br.Env, \_ int, \_ \*br.Ray, \_ br.Fragment) br.Color](#FlatColor.Shade)
+* [type Image](#Image)
 * [type ImgTex](#ImgTex)
   * [func NewImgTex(img raster.Image, mapper UVMapper) \*ImgTex](#NewImgTex)
   * [func (c \*ImgTex) At(pos Vec) Color](#ImgTex.At)
   * [func (c \*ImgTex) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ImgTex.Shade)
 * [type ShadeDir](#ShadeDir)
+  * [func Skybox(tex Image) ShadeDir](#Skybox)
   * [func (s ShadeDir) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ShadeDir.Shade)
-* [type Texture](#Texture)
+* [type Texture3D](#Texture3D)
 * [type UVAffine](#UVAffine)
   * [func (c \*UVAffine) Map(pos Vec) (u, v float64)](#UVAffine.Map)
 * [type UVCyl](#UVCyl)
@@ -1181,7 +1183,7 @@ Package mat implements various types of materials.
 #### <a name="pkg-files">Package files</a>
 [diffuse.go](./diffuse.go) [diffuse_noshadow.go](./diffuse_noshadow.go) [flat.go](./flat.go) [material.go](./material.go) [procedural.go](./procedural.go) [texture.go](./texture.go) [uvmapper.go](./uvmapper.go) 
 
-## <a name="Blend">func</a> [Blend](./material.go#L109)
+## <a name="Blend">func</a> [Blend](./material.go#L119)
 ``` go
 func Blend(a float64, matA Material, b float64, matB Material) Material
 ```
@@ -1219,7 +1221,7 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleCheckboard.jpg)
-## <a name="DebugShape">func</a> [DebugShape](./material.go#L154)
+## <a name="DebugShape">func</a> [DebugShape](./material.go#L164)
 ``` go
 func DebugShape(c Color) Material
 ```
@@ -1240,7 +1242,7 @@ doc.Example(e)
 ![fig](/doc/ExampleDebugShape.jpg)
 ## <a name="Diffuse">func</a> [Diffuse](./diffuse.go#L10)
 ``` go
-func Diffuse(c Texture) Material
+func Diffuse(c Texture3D) Material
 ```
 A Diffuse material appears perfectly mate,
 like paper or plaster.
@@ -1256,7 +1258,7 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ![fig](/doc/ExampleDiffuse.jpg)
 ## <a name="Diffuse0">func</a> [Diffuse0](./diffuse.go#L46)
 ``` go
-func Diffuse0(c Texture) Material
+func Diffuse0(c Texture3D) Material
 ```
 Diffuse material with direct illumination only (no interreflection).
 Intended for debugging or rapid previews. Diffuse is much more realistic.
@@ -1273,17 +1275,17 @@ Intended for the tutorial.
 func Distort(seed int, n int, K Vec, ampli float64, orig Material) Material
 ```
 
-## <a name="Load">func</a> [Load](./texture.go#L62)
+## <a name="Load">func</a> [Load](./texture.go#L66)
 ``` go
 func Load(name string) (raster.Image, error)
 ```
 
-## <a name="MustLoad">func</a> [MustLoad](./texture.go#L54)
+## <a name="MustLoad">func</a> [MustLoad](./texture.go#L58)
 ``` go
 func MustLoad(name string) raster.Image
 ```
 
-## <a name="Reflective">func</a> [Reflective](./material.go#L26)
+## <a name="Reflective">func</a> [Reflective](./material.go#L36)
 ``` go
 func Reflective(c Color) Material
 ```
@@ -1301,7 +1303,7 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleReflective.jpg)
-## <a name="Refractive">func</a> [Refractive](./material.go#L45)
+## <a name="Refractive">func</a> [Refractive](./material.go#L55)
 ``` go
 func Refractive(n1, n2 float64) Material
 ```
@@ -1319,13 +1321,13 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleRefractive.jpg)
-## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L134)
+## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L144)
 ``` go
 func ShadeNormal(dir Vec) Material
 ```
 ShadeNormal is a debug shader that colors according to the normal vector projected on dir.
 
-## <a name="Shiny">func</a> [Shiny](./material.go#L115)
+## <a name="Shiny">func</a> [Shiny](./material.go#L125)
 ``` go
 func Shiny(c Color, reflectivity float64) Material
 ```
@@ -1371,24 +1373,31 @@ func (s *FlatColor) At(_ br.Vec) br.Color
 func (s *FlatColor) Shade(_ *br.Ctx, _ *br.Env, _ int, _ *br.Ray, _ br.Fragment) br.Color
 ```
 
-## <a name="ImgTex">type</a> [ImgTex](./texture.go#L23-L26)
+## <a name="Image">type</a> [Image](./texture.go#L19-L21)
+``` go
+type Image interface {
+    At(u, v float64) Color
+}
+```
+
+## <a name="ImgTex">type</a> [ImgTex](./texture.go#L27-L30)
 ``` go
 type ImgTex struct {
     // contains filtered or unexported fields
 }
 ```
 
-### <a name="NewImgTex">func</a> [NewImgTex](./texture.go#L19)
+### <a name="NewImgTex">func</a> [NewImgTex](./texture.go#L23)
 ``` go
 func NewImgTex(img raster.Image, mapper UVMapper) *ImgTex
 ```
 
-### <a name="ImgTex.At">func</a> (\*ImgTex) [At](./texture.go#L33)
+### <a name="ImgTex.At">func</a> (\*ImgTex) [At](./texture.go#L37)
 ``` go
 func (c *ImgTex) At(pos Vec) Color
 ```
 
-### <a name="ImgTex.Shade">func</a> (\*ImgTex) [Shade](./texture.go#L29)
+### <a name="ImgTex.Shade">func</a> (\*ImgTex) [Shade](./texture.go#L33)
 ``` go
 func (c *ImgTex) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
@@ -1401,14 +1410,19 @@ type ShadeDir func(dir Vec) Color
 ShadeDir returns a color based on the direction of a ray.
 Used for shading the ambient background, E.g., the sky.
 
+### <a name="Skybox">func</a> [Skybox](./material.go#L22)
+``` go
+func Skybox(tex Image) ShadeDir
+```
+
 ### <a name="ShadeDir.Shade">func</a> (ShadeDir) [Shade](./material.go#L17)
 ``` go
 func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
 
-## <a name="Texture">type</a> [Texture](./texture.go#L15-L17)
+## <a name="Texture3D">type</a> [Texture3D](./texture.go#L15-L17)
 ``` go
-type Texture interface {
+type Texture3D interface {
     At(Vec) Color
 }
 ```

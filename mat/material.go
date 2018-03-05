@@ -19,6 +19,16 @@ func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	return s(pos)
 }
 
+func Skybox(tex Image) ShadeDir {
+	return ShadeDir(
+		func(dir Vec) Color {
+			dir = dir.Normalized()
+			u := 0.5*dir[X] + 0.5
+			v := 0.5*dir[Z] + 0.5
+			return tex.At(u, v)
+		})
+}
+
 // A Reflective surface. E.g.:
 // 	Reflective(WHITE)        // perfectly reflective, looks like shiny metal
 // 	Reflective(WHITE.EV(-1)) // 50% reflective, looks like darker metal

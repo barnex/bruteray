@@ -12,8 +12,12 @@ import (
 	"github.com/barnex/bruteray/raster"
 )
 
-type Texture interface {
+type Texture3D interface {
 	At(Vec) Color
+}
+
+type Image interface {
+	At(u, v float64) Color
 }
 
 func NewImgTex(img raster.Image, mapper UVMapper) *ImgTex {

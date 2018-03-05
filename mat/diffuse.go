@@ -7,7 +7,7 @@ import (
 // A Diffuse material appears perfectly mate,
 // like paper or plaster.
 // See https://en.wikipedia.org/wiki/Lambertian_reflectance.
-func Diffuse(c Texture) Material {
+func Diffuse(c Texture3D) Material {
 	return &diffuse{diffuse0{c}}
 }
 
@@ -43,12 +43,12 @@ func (s *diffuse) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 
 // Diffuse material with direct illumination only (no interreflection).
 // Intended for debugging or rapid previews. Diffuse is much more realistic.
-func Diffuse0(c Texture) Material {
+func Diffuse0(c Texture3D) Material {
 	return &diffuse0{c}
 }
 
 type diffuse0 struct {
-	refl Texture
+	refl Texture3D
 }
 
 func (s *diffuse0) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
