@@ -1,6 +1,10 @@
 package mat
 
-import . "github.com/barnex/bruteray/br"
+import (
+	"math"
+
+	. "github.com/barnex/bruteray/br"
+)
 
 // ShadeDir returns a color based on the direction of a ray.
 // Used for shading the ambient background, E.g., the sky.
@@ -10,12 +14,19 @@ func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
 	return s(r.Dir())
 }
 
-func Skybox(tex Image) ShadeDir {
+// SkyDome maps a fisheye image on the sky.
+func SkyDome(tex Image, rot float64) ShadeDir {
 	return ShadeDir(
 		func(dir Vec) Color {
 			dir = dir.Normalized()
-			u := 0.5 + dir[X]*0.5
-			v := 0.5 + dir[Z]*0.5
+			r := math.Sqrt(dir[Z]*dir[Z] + dir[X]*dir[X])
+			r = math.Asin(r) / (math.Pi / 2)
+			//dir = dir.Mul(r)
+			th := math.Atan2(dir[Z], dir[X]) + rot
+			x := r * math.Cos(th)
+			y := r * math.Sin(th)
+			u := 0.5 + x*0.5
+			v := 0.5 + y*0.5
 			return tex.AtUV(u, v)
 		})
 }
