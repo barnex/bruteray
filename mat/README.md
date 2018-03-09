@@ -1,6 +1,18 @@
 # mat
+`import "github.com/barnex/bruteray/mat"`
 
+* [Overview](#pkg-overview)
+* [Imported Packages](#pkg-imports)
+* [Index](#pkg-index)
+* [Examples](#pkg-examples)
+
+## <a name="pkg-overview">Overview</a>
 Package mat implements various types of materials.
+
+## <a name="pkg-imports">Imported Packages</a>
+
+- [github.com/barnex/bruteray/br](./../br)
+- [github.com/barnex/bruteray/raster](./../raster)
 
 ## <a name="pkg-index">Index</a>
 * [func Blend(a float64, matA Material, b float64, matB Material) Material](#Blend)
@@ -28,7 +40,8 @@ Package mat implements various types of materials.
   * [func (c \*ImgTex) At(pos Vec) Color](#ImgTex.At)
   * [func (c \*ImgTex) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ImgTex.Shade)
 * [type ShadeDir](#ShadeDir)
-  * [func Skybox(tex Image) ShadeDir](#Skybox)
+  * [func SkyCyl(tex Image, rot float64) ShadeDir](#SkyCyl)
+  * [func SkyDome(tex Image, rot float64) ShadeDir](#SkyDome)
   * [func (s ShadeDir) Shade(ctx \*Ctx, e \*Env, N int, r \*Ray, frag Fragment) Color](#ShadeDir.Shade)
 * [type Texture3D](#Texture3D)
 * [type UVAffine](#UVAffine)
@@ -47,6 +60,9 @@ Package mat implements various types of materials.
 * [Refractive](#example_Refractive)
 * [UVAffine](#example_UVAffine)
 * [UVCyl](#example_UVCyl)
+
+#### <a name="pkg-files">Package files</a>
+[diffuse.go](./diffuse.go) [diffuse_noshadow.go](./diffuse_noshadow.go) [flat.go](./flat.go) [material.go](./material.go) [procedural.go](./procedural.go) [skydome.go](./skydome.go) [texture.go](./texture.go) [uvmapper.go](./uvmapper.go) 
 
 ## <a name="Blend">func</a> [Blend](./material.go#L100)
 ``` go
@@ -268,19 +284,27 @@ func (c *ImgTex) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```
 TODO: remove?
 
-## <a name="ShadeDir">type</a> [ShadeDir](./skydome.go#L7)
+## <a name="ShadeDir">type</a> [ShadeDir](./skydome.go#L11)
 ``` go
 type ShadeDir func(dir Vec) Color
 ```
 ShadeDir returns a color based on the direction of a ray.
 Used for shading the ambient background, E.g., the sky.
 
-### <a name="Skybox">func</a> [Skybox](./skydome.go#L13)
+### <a name="SkyCyl">func</a> [SkyCyl](./skydome.go#L36)
 ``` go
-func Skybox(tex Image) ShadeDir
+func SkyCyl(tex Image, rot float64) ShadeDir
 ```
+SkyCyl maps a cylindrical projection on the sky.
+Suitable for images taken with Android's photo sphere.
 
-### <a name="ShadeDir.Shade">func</a> (ShadeDir) [Shade](./skydome.go#L9)
+### <a name="SkyDome">func</a> [SkyDome](./skydome.go#L18)
+``` go
+func SkyDome(tex Image, rot float64) ShadeDir
+```
+SkyDome maps a fisheye image on the sky.
+
+### <a name="ShadeDir.Shade">func</a> (ShadeDir) [Shade](./skydome.go#L13)
 ``` go
 func (s ShadeDir) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 ```

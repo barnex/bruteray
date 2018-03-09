@@ -1,9 +1,14 @@
-// +build ignore
-
 package main
 
-import . "github.com/barnex/bruteray"
-import "github.com/barnex/bruteray/serve"
+import (
+	. "github.com/barnex/bruteray/br"
+	"github.com/barnex/bruteray/light"
+	. "github.com/barnex/bruteray/mat"
+	"github.com/barnex/bruteray/raster"
+	"github.com/barnex/bruteray/serve"
+	. "github.com/barnex/bruteray/shape"
+	. "github.com/barnex/bruteray/transf"
+)
 
 func main() {
 	e := NewEnv()
@@ -12,16 +17,16 @@ func main() {
 
 	glass := Refractive(1, 1.38)
 	//glass := Diffuse(WHITE)
-	plastic := Shiny(WHITE.EV(-7), EV(-6))
+	plastic := Shiny(WHITE.EV(-7), EV(-5))
 
 	const r = 75
 	lens := And(
-		Sphere(Vec{0, +0.8 * r, 0}, r, glass),
-		Sphere(Vec{0, -0.8 * r, 0}, r, glass),
+		NewSphere(2*r, glass).Transl(Vec{0, +0.8 * r, 0}),
+		NewSphere(2*r, glass).Transl(Vec{0, -0.8 * r, 0}),
 	)
 	handle := Or(Minus(
-		CapCyl(Vec{}, 45, 8, plastic),
-		CapCyl(Vec{}, 40, 20, plastic),
+		NewCylinder(Y, Vec{}, 45*2, 8, plastic),
+		NewCylinder(Y, Vec{}, 40*2, 20, plastic),
 	),
 		And(
 			Quad(Vec{}, Vec{1, 1, 0}, 25, plastic),
@@ -30,27 +35,38 @@ func main() {
 	)
 	mag := Transf(Or(lens, handle), RotX4(-20*Deg).Mul(RotY4(35*Deg)).Mul(Transl4(Vec{5, 40, -30})))
 
+	img := MustLoad("principia.png")
+	p0 := Vec{-100, 0, -100}
+	pu := Vec{100, 0, -100}
+	pv := Vec{-100, 0, 100}
+	//img.Mul(EV(-3))
+	tex := NewImgTex(img, &UVAffine{p0, pu, pv})
 	e.Add(
-		Rect(Vec{0, 0, 0}, Ey, 100, U, 100, Checkboard(10, Diffuse(WHITE.EV(-.3)), Diffuse(WHITE.EV(-5)))),
-		Sheet(Ey, -10, Diffuse(WHITE.EV(-.6))),
+		Rect(Vec{0, 0, 0}, Ey, 100, U, 100, Diffuse(tex)),
+		NewSheet(Ey, -10, Diffuse(WHITE.EV(-.6))),
 		mag,
 	)
 
 	e.AddLight(
-		RectLight(Vec{850, 300, -300}, 180, 800, 0, WHITE.EV(20.6)),
-		RectLight(Vec{400, 300, -300}, 180, 800, 0, WHITE.EV(20.6)),
+		light.RectLight(Vec{850, 300, -300}, 180, 800, 0, WHITE.EV(20.3)),
+		light.RectLight(Vec{400, 300, -300}, 180, 800, 0, WHITE.EV(20.3)),
 	)
 
-	e.SetAmbient(Flat(WHITE.EV(-3)))
+	//e.SetAmbient(Flat(WHITE.EV(-3)))
+	pano := MustLoad("pano2.jpg")
+	pano.Mul(EV(.3))
+	e.SetAmbient(SkyCyl(pano, 0))
 
 	focalLen := 1.0
-	e.Camera = Camera(focalLen).Transl(0, 150, -150).Transf(RotX4(50 * Deg))
-	e.Camera.AA = true
-	e.Recursion = 5
+
+	cam := raster.Camera(focalLen).Transl(0, 150, -150).Transf(RotX4(50 * Deg))
+	cam.AA = true
+
+	e.Recursion = 7
 	e.Cutoff = EV(40)
 
 	//e.Camera.Focus = 30
 	//e.Camera.Aperture = .2
 
-	serve.Env(e)
+	serve.Env(cam, e)
 }
