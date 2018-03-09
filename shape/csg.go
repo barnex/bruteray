@@ -65,6 +65,20 @@ func (o *and) Inside(p Vec) bool {
 	return o.a.Inside(p) && o.b.Inside(p)
 }
 
+func Group(o ...Obj) Obj {
+	return &group{o}
+}
+
+type group struct {
+	list []Obj
+}
+
+func (s *group) Hit1(r *Ray, f *[]Fragment) {
+	for _, o := range s.list {
+		o.Hit1(r, f)
+	}
+}
+
 // Union (logical OR) of two objects.
 // TODO: remove in favor of MultiOr
 func Or(a, b CSGObj) CSGObj {

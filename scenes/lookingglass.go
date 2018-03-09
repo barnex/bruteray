@@ -33,7 +33,9 @@ func main() {
 			Slab(Ez, -120, -45, plastic),
 		),
 	)
-	mag := Transf(Or(lens, handle), RotX4(-20*Deg).Mul(RotY4(35*Deg)).Mul(Transl4(Vec{5, 40, -30})))
+	mag := Or(lens, handle)
+	//bmag := BoundBox(mag, Vec{-50, -10, -20}, Vec{50, 120, 20})
+	tmag := Transf(mag, RotX4(-20*Deg).Mul(RotY4(35*Deg)).Mul(Transl4(Vec{5, 40, -29})))
 
 	img := MustLoad("principia.png")
 	p0 := Vec{-100, 0, -100}
@@ -44,8 +46,10 @@ func main() {
 	e.Add(
 		Rect(Vec{0, 0, 0}, Ey, 100, U, 100, Diffuse(tex)),
 		NewSheet(Ey, -10, Diffuse(WHITE.EV(-.6))),
-		mag,
+		//NewSheet(Ey, -10, Checkboard(5, BLACK, WHITE)),
+		tmag,
 	)
+	_ = tmag
 
 	e.AddLight(
 		light.RectLight(Vec{850, 300, -300}, 180, 800, 0, WHITE.EV(20.3)),
@@ -53,9 +57,10 @@ func main() {
 	)
 
 	//e.SetAmbient(Flat(WHITE.EV(-3)))
-	pano := MustLoad("pano2.jpg")
-	pano.Mul(EV(.3))
-	e.SetAmbient(SkyCyl(pano, 0))
+	//pano := MustLoad("pano2.jpg")
+	//pano.Mul(EV(.3))
+	//e.SetAmbient(SkyCyl(pano, 0))
+	e.SetAmbient(WHITE.EV(-.6))
 
 	focalLen := 1.0
 
@@ -65,8 +70,8 @@ func main() {
 	e.Recursion = 7
 	e.Cutoff = EV(40)
 
-	//e.Camera.Focus = 30
-	//e.Camera.Aperture = .2
+	cam.Focus = 210
+	cam.Aperture = 1.5
 
 	serve.Env(cam, e)
 }

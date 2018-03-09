@@ -1,22 +1,12 @@
 # shape
-`import "github.com/barnex/bruteray/shape"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Package shape implements various shapes and objects.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
 
 ## <a name="pkg-index">Index</a>
 * [func And(a, b CSGObj) CSGObj](#And)
 * [func Cube(center Vec, r float64, m Material) CSGObj](#Cube)
 * [func Cutout(a CSGObj, b Insider) CSGObj](#Cutout)
+* [func Group(o ...Obj) Obj](#Group)
 * [func Hollow(o CSGObj) CSGObj](#Hollow)
 * [func Inverse(o CSGObj) CSGObj](#Inverse)
 * [func Minus(a, b CSGObj) CSGObj](#Minus)
@@ -63,9 +53,6 @@ Package shape implements various shapes and objects.
 * [NewSphere](#example_NewSphere)
 * [Or](#example_Or)
 
-#### <a name="pkg-files">Package files</a>
-[box.go](./box.go) [csg.go](./csg.go) [cylinder.go](./cylinder.go) [doc.go](./doc.go) [quad.go](./quad.go) [rect.go](./rect.go) [sheet.go](./sheet.go) [slab.go](./slab.go) [sphere.go](./sphere.go) [util.go](./util.go) 
-
 ## <a name="And">func</a> [And](./csg.go#L30)
 ``` go
 func And(a, b CSGObj) CSGObj
@@ -86,7 +73,7 @@ doc.Show(And(cube, sphere))
 func Cube(center Vec, r float64, m Material) CSGObj
 ```
 
-## <a name="Cutout">func</a> [Cutout](./csg.go#L201)
+## <a name="Cutout">func</a> [Cutout](./csg.go#L215)
 ``` go
 func Cutout(a CSGObj, b Insider) CSGObj
 ```
@@ -100,19 +87,24 @@ doc.Show(Cutout(cube, sphere))
 ```
 
 ![fig](/doc/ExampleCutout.jpg)
-## <a name="Hollow">func</a> [Hollow](./csg.go#L255)
+## <a name="Group">func</a> [Group](./csg.go#L68)
+``` go
+func Group(o ...Obj) Obj
+```
+
+## <a name="Hollow">func</a> [Hollow](./csg.go#L269)
 ``` go
 func Hollow(o CSGObj) CSGObj
 ```
 Hollow turns a into a hollow surface.
 E.g.: a filled cylinder into a hollow tube.
 
-## <a name="Inverse">func</a> [Inverse](./csg.go#L267)
+## <a name="Inverse">func</a> [Inverse](./csg.go#L281)
 ``` go
 func Inverse(o CSGObj) CSGObj
 ```
 
-## <a name="Minus">func</a> [Minus](./csg.go#L161)
+## <a name="Minus">func</a> [Minus](./csg.go#L175)
 ``` go
 func Minus(a, b CSGObj) CSGObj
 ```
@@ -127,7 +119,7 @@ doc.Show(Minus(cube, sphere))
 ```
 
 ![fig](/doc/ExampleMinus.jpg)
-## <a name="MultiOr">func</a> [MultiOr](./csg.go#L111)
+## <a name="MultiOr">func</a> [MultiOr](./csg.go#L125)
 ``` go
 func MultiOr(o ...CSGObj) CSGObj
 ```
@@ -166,7 +158,7 @@ func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj
 ```
 TODO rm
 
-## <a name="Or">func</a> [Or](./csg.go#L70)
+## <a name="Or">func</a> [Or](./csg.go#L84)
 ``` go
 func Or(a, b CSGObj) CSGObj
 ```
@@ -201,7 +193,7 @@ TODO: pass Vec normal, U, V
 func Slab(dir Vec, off1, off2 float64, m Material) CSGObj
 ```
 
-## <a name="SurfaceAnd">func</a> [SurfaceAnd](./csg.go#L227)
+## <a name="SurfaceAnd">func</a> [SurfaceAnd](./csg.go#L241)
 ``` go
 func SurfaceAnd(a Obj, b CSGObj) Obj
 ```

@@ -14,16 +14,10 @@ Features:
 A few scenes rendered by bruteray:
 
 ![fig](shots/063.jpg) 
-![fig](shots/058.jpg) 
-![fig](shots/052.jpg) 
-![fig](shots/055.jpg) 
-![fig](shots/054.jpg) 
-![fig](shots/053.jpg) 
-![fig](shots/032.jpg) 
-![fig](shots/039.jpg) 
-![fig](shots/045.jpg) 
-![fig](shots/047.jpg)
-
+![fig](shots/gothic.jpg) 
+![fig](shots/check.jpg) 
+![fig](shots/principia.jpg) 
+![fig](shots/cementary.jpg) 
 
 ## Cornell box
 

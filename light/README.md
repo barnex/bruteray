@@ -1,28 +1,13 @@
 # light
-`import "github.com/barnex/bruteray/light"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
 Package light implements various types of light sources.
 They all implement br.Light.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-- [github.com/barnex/bruteray/br](./../br)
-- [github.com/barnex/bruteray/mat](./../mat)
-- [github.com/barnex/bruteray/shape](./../shape)
 
 ## <a name="pkg-index">Index</a>
 * [func DirLight(pos Vec, intensity Color) Light](#DirLight)
 * [func PointLight(pos Vec, intensity Color) Light](#PointLight)
 * [func RectLight(pos Vec, rx, ry, rz float64, c Color) Light](#RectLight)
 * [func Sphere(pos Vec, radius float64, intensity Color) Light](#Sphere)
-
-#### <a name="pkg-files">Package files</a>
-[light.go](./light.go) 
 
 ## <a name="DirLight">func</a> [DirLight](./light.go#L20)
 ``` go

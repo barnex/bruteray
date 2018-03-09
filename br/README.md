@@ -1,17 +1,6 @@
 # br
-`import "github.com/barnex/bruteray/br"`
 
-* [Overview](#pkg-overview)
-* [Imported Packages](#pkg-imports)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-
-## <a name="pkg-overview">Overview</a>
 Bruteray is a ray tracer that does bi-directional path tracing.
-
-## <a name="pkg-imports">Imported Packages</a>
-
-No packages beyond the Go standard library are imported.
 
 ## <a name="pkg-index">Index</a>
 * [Constants](#pkg-constants)
@@ -64,6 +53,7 @@ No packages beyond the Go standard library are imported.
   * [func (T \*Matrix4) TransfDir(v Vec) Vec](#Matrix4.TransfDir)
   * [func (T \*Matrix4) TransfPoint(v Vec) Vec](#Matrix4.TransfPoint)
 * [type Obj](#Obj)
+  * [func BoundBox(orig Obj, min, max Vec) Obj](#BoundBox)
 * [type Pool](#Pool)
   * [func (p \*Pool) Get() interface{}](#Pool.Get)
   * [func (p \*Pool) Put(v interface{})](#Pool.Put)
@@ -95,9 +85,6 @@ No packages beyond the Go standard library are imported.
 #### <a name="pkg-examples">Examples</a>
 * [Matrix4.Inv](#example_Matrix4_Inv)
 * [Matrix4.Mul](#example_Matrix4_Mul)
-
-#### <a name="pkg-files">Package files</a>
-[color.go](./color.go) [ctx.go](./ctx.go) [doc.go](./doc.go) [env.go](./env.go) [fragment.go](./fragment.go) [light.go](./light.go) [material.go](./material.go) [matrix.go](./matrix.go) [obj.go](./obj.go) [pool.go](./pool.go) [rand.go](./rand.go) [ray.go](./ray.go) [util.go](./util.go) [vec.go](./vec.go) 
 
 ## <a name="pkg-constants">Constants</a>
 ``` go
@@ -564,6 +551,11 @@ type Obj interface {
 ```
 Obj is an object that can be rendered as part of a scene.
 E.g., a red sphere, a blue cube, ...
+
+### <a name="BoundBox">func</a> [BoundBox](./bbox.go#L3)
+``` go
+func BoundBox(orig Obj, min, max Vec) Obj
+```
 
 ## <a name="Pool">type</a> [Pool](./pool.go#L3-L6)
 ``` go
