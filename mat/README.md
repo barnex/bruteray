@@ -13,6 +13,7 @@ Package mat implements various types of materials.
 * [func Distort(seed int, n int, K Vec, ampli float64, orig Material) Material](#Distort)
 * [func Load(name string) (raster.Image, error)](#Load)
 * [func MustLoad(name string) raster.Image](#MustLoad)
+* [func ReflectFresnel(n float64, transmitted Material) Material](#ReflectFresnel)
 * [func Reflective(c Color) Material](#Reflective)
 * [func Refractive(n1, n2 float64) Material](#Refractive)
 * [func ShadeNormal(dir Vec) Material](#ShadeNormal)
@@ -44,12 +45,13 @@ Package mat implements various types of materials.
 * [DebugShape](#example_DebugShape)
 * [Diffuse](#example_Diffuse)
 * [Flat](#example_Flat)
+* [ReflectFresnel](#example_ReflectFresnel)
 * [Reflective](#example_Reflective)
 * [Refractive](#example_Refractive)
 * [UVAffine](#example_UVAffine)
 * [UVCyl](#example_UVCyl)
 
-## <a name="Blend">func</a> [Blend](./material.go#L37)
+## <a name="Blend">func</a> [Blend](./material.go#L18)
 ``` go
 func Blend(a float64, matA Material, b float64, matB Material) Material
 ```
@@ -87,7 +89,7 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleCheckboard.jpg)
-## <a name="DebugShape">func</a> [DebugShape](./material.go#L82)
+## <a name="DebugShape">func</a> [DebugShape](./material.go#L63)
 ``` go
 func DebugShape(c Color) Material
 ```
@@ -151,7 +153,29 @@ func Load(name string) (raster.Image, error)
 func MustLoad(name string) raster.Image
 ```
 
-## <a name="Reflective">func</a> [Reflective](./material.go#L16)
+## <a name="ReflectFresnel">func</a> [ReflectFresnel](./reflective.go#L33)
+``` go
+func ReflectFresnel(n float64, transmitted Material) Material
+```
+ReflectFresnel is a transparent material with index of refraction n,
+on top of material transmitted. E.g. a wet or varnished material.
+This looks similar to simple reflection,
+but reflection is stronger under grazing incidence.
+E.g.:
+
+	ReflectFresnel(1.33, BLACK)           // a thin film of water on a black surface
+	ReflectFresnel(1.33, Diffuse(WHITE))  // milk
+	ReflectFresnel(20, BLACK)             // metal
+
+#### Example:
+
+```go
+mat := ReflectFresnel(1.5, BLACK)
+doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
+```
+
+![fig](/doc/ExampleReflectFresnel.jpg)
+## <a name="Reflective">func</a> [Reflective](./reflective.go#L10)
 ``` go
 func Reflective(c Color) Material
 ```
@@ -187,13 +211,13 @@ doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
 ```
 
 ![fig](/doc/ExampleRefractive.jpg)
-## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L62)
+## <a name="ShadeNormal">func</a> [ShadeNormal](./material.go#L43)
 ``` go
 func ShadeNormal(dir Vec) Material
 ```
 ShadeNormal is a debug shader that colors according to the normal vector projected on dir.
 
-## <a name="Shiny">func</a> [Shiny](./material.go#L43)
+## <a name="Shiny">func</a> [Shiny](./material.go#L24)
 ``` go
 func Shiny(c Color, reflectivity float64) Material
 ```

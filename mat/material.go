@@ -9,25 +9,6 @@ import (
 
 const offset = 1e-6 // TODO: Ray.Offset
 
-// A Reflective surface. E.g.:
-// 	Reflective(WHITE)        // perfectly reflective, looks like shiny metal
-// 	Reflective(WHITE.EV(-1)) // 50% reflective, looks like darker metal
-// 	Reflective(RED)          // Reflects only red, looks like metal in transparent red candy-wrap.
-func Reflective(c Color) Material {
-	return &reflective{c}
-}
-
-type reflective struct {
-	c Color
-}
-
-func (s *reflective) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color {
-	pos, norm := r.At(frag.T-offset), frag.Norm
-	r2 := ctx.GetRay(pos, r.Dir().Reflect(norm))
-	defer ctx.PutRay(r2)
-	return e.ShadeAll(ctx, r2, N).Mul3(s.c)
-}
-
 func sqr(x float64) float64 {
 	return x * x
 }

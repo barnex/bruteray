@@ -70,6 +70,13 @@ func ExampleRefractive() {
 	//ExampleRefractive
 }
 
+func ExampleReflectFresnel() {
+	mat := ReflectFresnel(1.5, BLACK)
+	doc.Show(shape.NewSphere(1, mat).Transl(Vec{0, 0.5, 0}))
+	//Output:
+	//ExampleReflectFresnel
+}
+
 func ExampleCheckboard() {
 	m1 := Diffuse(WHITE)
 	m2 := Reflective(WHITE.EV(-3))
