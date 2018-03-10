@@ -68,12 +68,15 @@ func (img Image) Add(img2 Image) {
 	}
 }
 
-func (img Image) Mul(x float64) {
+// Mul multiplies colors in the image by x, in place (!).
+// Returns img for easy chaining.
+func (img Image) Mul(x float64) Image {
 	for i := range img {
 		for j := range img[i] {
 			img[i][j] = img[i][j].Mul(x)
 		}
 	}
+	return img
 }
 
 const jpegQual = 95

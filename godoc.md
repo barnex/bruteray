@@ -757,7 +757,7 @@ Package shape implements various shapes and objects.
 * [func Minus(a, b CSGObj) CSGObj](#Minus)
 * [func MultiOr(o ...CSGObj) CSGObj](#MultiOr)
 * [func NewCylinder(dir int, center Vec, diam, h float64, m Material) CSGObj](#NewCylinder)
-* [func NewFunction(min, max Vec, m Material, f func() float64) \*function](#NewFunction)
+* [func NewFunction(min, max float64, m Material, f Func) \*function](#NewFunction)
 * [func NewInfCylinder(dir int, diam float64, m Material) \*quad](#NewInfCylinder)
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
 * [func Or(a, b CSGObj) CSGObj](#Or)
@@ -775,6 +775,7 @@ Package shape implements various shapes and objects.
   * [func (s \*Box) Inside(v Vec) bool](#Box.Inside)
   * [func (s \*Box) Normal(p Vec) Vec](#Box.Normal)
   * [func (s \*Box) Transl(d Vec) \*Box](#Box.Transl)
+* [type Func](#Func)
 * [type Sheet](#Sheet)
   * [func NewSheet(dir Vec, off float64, m Material) \*Sheet](#NewSheet)
   * [func (s \*Sheet) Hit1(r \*Ray, f \*[]Fragment)](#Sheet.Hit1)
@@ -885,9 +886,9 @@ doc.Show(cyl)
 ```
 
 ![fig](/doc/ExampleNewCylinder.jpg)
-## <a name="NewFunction">func</a> [NewFunction](./brute.go#L7)
+## <a name="NewFunction">func</a> [NewFunction](./brute.go#L9)
 ``` go
-func NewFunction(min, max Vec, m Material, f func() float64) *function
+func NewFunction(min, max float64, m Material, f Func) *function
 ```
 
 ## <a name="NewInfCylinder">func</a> [NewInfCylinder](./quad.go#L18)
@@ -1025,6 +1026,11 @@ func (s *Box) Normal(p Vec) Vec
 ### <a name="Box.Transl">func</a> (\*Box) [Transl](./box.go#L32)
 ``` go
 func (s *Box) Transl(d Vec) *Box
+```
+
+## <a name="Func">type</a> [Func](./brute.go#L24)
+``` go
+type Func func(Vec) float64
 ```
 
 ## <a name="Sheet">type</a> [Sheet](./sheet.go#L9-L13)
