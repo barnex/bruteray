@@ -757,6 +757,7 @@ Package shape implements various shapes and objects.
 * [func Minus(a, b CSGObj) CSGObj](#Minus)
 * [func MultiOr(o ...CSGObj) CSGObj](#MultiOr)
 * [func NewCylinder(dir int, center Vec, diam, h float64, m Material) CSGObj](#NewCylinder)
+* [func NewFunction(min, max Vec, m Material, f func() float64) \*function](#NewFunction)
 * [func NewInfCylinder(dir int, diam float64, m Material) \*quad](#NewInfCylinder)
 * [func OldBox(center Vec, rx, ry, rz float64, m Material) CSGObj](#OldBox)
 * [func Or(a, b CSGObj) CSGObj](#Or)
@@ -884,6 +885,11 @@ doc.Show(cyl)
 ```
 
 ![fig](/doc/ExampleNewCylinder.jpg)
+## <a name="NewFunction">func</a> [NewFunction](./brute.go#L7)
+``` go
+func NewFunction(min, max Vec, m Material, f func() float64) *function
+```
+
 ## <a name="NewInfCylinder">func</a> [NewInfCylinder](./quad.go#L18)
 ``` go
 func NewInfCylinder(dir int, diam float64, m Material) *quad
