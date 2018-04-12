@@ -28,7 +28,7 @@ func (s *refractive) Shade(ctx *Ctx, e *Env, N int, r *Ray, frag Fragment) Color
 	// if we are exiting rather than entering the refractive material,
 	// swap refractive indices.
 	n1, n2 := s.n1, s.n2
-	if !frag.Object.(CSGObj).Inside(posAhead) { // TODO: avoid cast?
+	if !frag.Object.(Insider).Inside(posAhead) { // TODO: avoid cast?
 		n1, n2 = n2, n1
 	}
 	n12 := n1 / n2

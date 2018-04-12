@@ -33,6 +33,10 @@ func (s *function) Hit1(r *Ray, f *[]Fragment) {
 	*f = append(*f, Fragment{T: t, Norm: n, Material: s.Mat})
 }
 
+func (s *function) Inside(p Vec) bool {
+	return s.f(p) < 0
+}
+
 func (s *function) bisect(r *Ray, min, max float64) float64 {
 
 	const tol = 1e-9

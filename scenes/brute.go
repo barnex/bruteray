@@ -1,3 +1,5 @@
+// +build ignore
+
 package main
 
 import (
@@ -40,8 +42,8 @@ func main() {
 		//NewSheet(Ey, 0, Checkboard(1, BLACK, WHITE)),
 	)
 
-	e.SetAmbient(SkyDome(MustLoad("../assets/sky14d.jpg").Mul(EV(2)), 0))
-	cam := raster.Camera(1).Transl(4, 4, -20).RotScene(9 * Deg).Transf(RotX4(20 * Deg))
+	e.SetAmbient(SkyDome(MustLoad("../assets/sky14d.jpg").Mul(EV(1)), 340*Deg))
+	cam := raster.Camera(1).Transl(4, 4, -20).RotScene(19 * Deg).Transf(RotX4(20 * Deg))
 	cam.AA = true
 	cam.Aperture = 0.14
 	cam.Focus = 22
