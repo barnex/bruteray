@@ -17,7 +17,7 @@ func main() {
 
 	//glass := Refractive(1, 1.38)
 
-	img := MustLoad("sslide1.jpg").Mul(1.8)
+	img := MustLoad("sslide0.jpg").Mul(1.8)
 	p0 := Vec{-150, 0, -100}
 	pu := Vec{150, 0, -100}
 	pv := Vec{-150, 0, 100}
@@ -26,8 +26,7 @@ func main() {
 		Rect(Vec{0, 10, 0}, Ey, 150, U, 100, Diffuse(tex)),
 		NewSheet(Ey, -0, Checkboard(30, Diffuse(WHITE.EV(-.6)), Diffuse(WHITE.EV(-1)))),
 
-		NewSphere(120, ReflectFresnel(3, BLACK)).Transl(Vec{-40, 60, 140}),
-		NewSphere(100, Refractive(1, 1.5)).Transl(Vec{120, 0, -120}),
+		NewSphere(120, ReflectFresnel(3, BLACK)).Transl(Vec{-40, 60, 140}), NewSphere(100, Refractive(1, 1.5)).Transl(Vec{120, 0, -120}),
 
 		NewSphere(60, Diffuse(Color{.2, .2, .8})).Transl(Vec{-230, 30, 100}),
 		NewSphere(60, Shiny(Color{.2, .8, .2}, 0.1)).Transl(Vec{-190, 30, 0}),
@@ -55,8 +54,8 @@ func main() {
 	e.Recursion = 5
 	e.Cutoff = EV(2)
 
-	cam.Focus = 280
-	cam.Aperture = 15
+	cam.Focus = 300
+	cam.Aperture = 8
 	cam.Diaphragm = DiaHex
 
 	serve.Env(cam, e)
