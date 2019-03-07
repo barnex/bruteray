@@ -11,89 +11,69 @@ import (
 	"github.com/barnex/bruteray/shape"
 )
 
+var (
+	Width   = 1920
+	Height  = 1080
+	MaxIter = 500
+)
+
 func main() {
 
-	cam := raster.Camera(1).Transl(0, 0, -3)
+	cam := raster.Camera(1).Transl(0, 0.5, -3).Transf(RotX4(12 * Deg))
+	floor := WHITE.EV(-1.3)
+	red := RED.EV(-.3)
+	blue := BLUE.EV(-.3)
+	amb := Flat(WHITE.EV(-1))
 
-	//flat
 	{
 		e := env(
-			Flat(WHITE.EV(-1)),
-			Flat(RED),
-			Flat(BLUE),
+			Flat(floor),
+			Flat(red),
+			Flat(blue),
 		)
-		e.SetAmbient(Flat(WHITE))
-		render1(cam, e)
+		e.SetAmbient(amb)
+		render(cam, e, 1, "01-flat.jpg")
 	}
-
-	// light
 	{
 		e := env(
-			Diffuse00(WHITE.EV(-1)),
+			Diffuse00(floor),
 			Diffuse00(RED),
-			Diffuse00(BLUE),
+			Diffuse00(blue),
 		)
 		e.AddLight(
 			light.PointLight(lightPos, lightCol),
 		)
-		e.SetAmbient(Flat(WHITE))
-		render1(cam, e)
+		e.SetAmbient(amb)
+		render(cam, e, 1, "02-light.jpg")
 	}
 
-	// shadow
 	{
 		e := env(
-			Diffuse0(WHITE.EV(-1)),
-			Diffuse0(RED),
-			Diffuse0(BLUE),
+			Diffuse0(floor),
+			Diffuse0(red),
+			Diffuse0(blue),
 		)
 		e.AddLight(
 			light.PointLight(lightPos, lightCol),
 		)
-		e.SetAmbient(Flat(WHITE))
-		render1(cam, e)
+		e.SetAmbient(amb)
+		render(cam, e, 1, "03-shadow.jpg")
 	}
 
 	{
 		e := env(
 			Diffuse0(WHITE.EV(-1)),
-			Diffuse0(RED),
-			Diffuse0(BLUE),
+			Diffuse0(red),
+			Diffuse0(blue),
 		)
 		e.AddLight(
 			light.Sphere(lightPos, 2, lightCol),
 		)
-		e.SetAmbient(Flat(WHITE))
-		render1(cam, e)
-	}
-
-	{
-		e := env(
-			Diffuse0(WHITE.EV(-1)),
-			Diffuse0(RED),
-			Diffuse0(BLUE),
-		)
-		e.AddLight(
-			light.Sphere(lightPos, 2, lightCol),
-		)
-		e.SetAmbient(Flat(WHITE))
-		render2(cam, e, 2)
-	}
-
-	// soft shadow
-	{
-		e := env(
-			Diffuse0(WHITE.EV(-1)),
-			Diffuse0(RED),
-			Diffuse0(BLUE),
-		)
+		e.SetAmbient(amb)
 		cam.AA = true
-		e.AddLight(
-			light.Sphere(lightPos, 2, lightCol),
-		)
-		e.SetAmbient(Flat(WHITE))
-		for _, n := range []int{1, 2, 3, 10} {
-			render2(cam, e, n)
+		for _, iter := range []int{1, 4, 16, 64, 256} {
+			name := fmt.Sprintf("04-softshadow-%v.jpg", iter)
+			render(cam, e, iter, name)
 		}
 	}
 
@@ -101,31 +81,56 @@ func main() {
 	{
 		e := env(
 			Diffuse(WHITE.EV(-1)),
-			Diffuse(RED),
-			Diffuse(BLUE),
+			Diffuse(red),
+			Diffuse(blue),
 		)
 		cam.AA = true
 		e.AddLight(
 			light.Sphere(lightPos, 2, lightCol),
 		)
-		e.SetAmbient(Flat(WHITE))
-		e.Recursion = 1
-		render2(cam, e, 10)
+		e.SetAmbient(amb)
+		for _, rec := range []int{1, 2, 3, 4} {
+			name := fmt.Sprintf("05-indirect-%v.jpg", rec)
+			e.Recursion = rec
+			render(cam, e, MaxIter, name)
+		}
 	}
-
+	// reflection
 	{
 		e := env(
-			Shiny(WHITE.EV(-1), .1),
-			Shiny(RED, .1),
-			Shiny(BLUE, .1),
+			Reflective(WHITE.EV(-3)),
+			Diffuse(red),
+			Diffuse(blue),
 		)
 		cam.AA = true
 		e.AddLight(
 			light.Sphere(lightPos, 2, lightCol),
 		)
-		e.SetAmbient(Flat(WHITE))
-		render2(cam, e, 10)
+		e.SetAmbient(amb)
+		render(cam, e, MaxIter, "07-reflect.jpg")
 	}
+	//// reflection2
+	//{
+
+	//	shapes = []func(Material) Obj{
+	//		func(m Material) Obj { return shape.NewSheet(Ey, -1.0, m) },
+	//		func(m Material) Obj { return shape.NewSphere(2.0, m).Transl(Vec{-1.1, 0, 1}) },
+	//		func(m Material) Obj { return shape.NewSphere(2.0, m).Transl(Vec{1.1, 0, 1}) },
+	//	}
+
+	//	e := env(
+	//		Checkboard(.8, Diffuse(WHITE.EV(-.6)), WHITE.EV(-.9)),
+	//		Reflective(WHITE.EV(-1.2)),
+	//		Reflective(WHITE.EV(-1.2)),
+	//	)
+	//	sky := MustLoad("../assets/sky1.jpg").Mul(2)
+	//	e.SetAmbient(SkyDome(sky, -90*Deg))
+	//	cam.AA = true
+	//	e.AddLight(
+	//	//light.Sphere(lightPos, 2, lightCol),
+	//	)
+	//	render(cam, e, MaxIter, "08-reflect.jpg")
+	//}
 }
 
 var (
@@ -146,22 +151,9 @@ func env(m ...Material) *Env {
 	return e
 }
 
-var cnt = 0
-
-func render1(cam *raster.Cam, e *Env) {
-	cnt++
-	name := fmt.Sprintf("rt%02d.jpg", cnt)
+func render(cam *raster.Cam, e *Env, passes int, name string) {
 	fmt.Println(name)
-	img := raster.MakeImage(1920, 1080)
-	raster.SinglePass(cam, e, img)
-	raster.Encode(img, name)
-}
-
-func render2(cam *raster.Cam, e *Env, passes int) {
-	cnt++
-	name := fmt.Sprintf("rt%02d.jpg", cnt)
-	fmt.Println(name)
-	img := raster.MakeImage(1920, 1080)
+	img := raster.MakeImage(Width, Height)
 	raster.MultiPass(cam, e, img, passes)
 	raster.Encode(img, name)
 }
