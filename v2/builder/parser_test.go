@@ -10,7 +10,7 @@ import (
 
 func TestBunny(t *testing.T) {
 	scene := NewSceneBuilder()
-	f := PlyFile(material.Normal2(), "../assets/bunny_res4.ply")
+	f := PlyFile(material.Normal2(), "../../assets/bunny_res4.ply")
 	scene.Add(f)
 	scene.Camera.Translate(Vec{.0, .11, -.3})
 	scene.Camera.FocalLen = 1

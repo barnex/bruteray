@@ -10,7 +10,7 @@ import (
 
 func TestBunnyMesh(t *testing.T) {
 	scene := NewSceneBuilder()
-	scene.Add(PlyFile(material.Normal(), "../assets/bunny_res4.ply"))
+	scene.Add(PlyFile(material.Normal(), "../../assets/bunny_res4.ply"))
 	scene.Camera.Translate(Vec{.0, .11, -.3})
 	scene.Camera.FocalLen = 1
 	test.OnePass(t, scene.Build(), test.DefaultTolerance)
@@ -26,7 +26,7 @@ func TestBunnyMesh(t *testing.T) {
 func TestShadingNormals(t *testing.T) {
 	t.Skip("TODO")
 	scene := NewSceneBuilder()
-	model := PlyFile(material.Normal(), "../assets/teapot.ply")
+	model := PlyFile(material.Normal(), "../../assets/teapot.ply")
 	ScaleToSize(model, 1)
 	Pitch(model, model.Bounds().Center(), -90*Deg)
 	scene.Add(model)
