@@ -27,6 +27,7 @@ func NewCtx(seed int64) *Ctx {
 
 // Ray returns a new Ray, allocated from a pool.
 // PutRay should be called to recycle the Ray.
+// TODO: rename NewRay
 func (c *Ctx) Ray() *Ray {
 	r := c.rays.get().(*Ray)
 	*r = Ray{Len: Inf}

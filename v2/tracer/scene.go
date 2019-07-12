@@ -49,6 +49,10 @@ func (s *Scene) lightField(who []Object, ctx *Ctx, r *Ray, recDepth int) Color {
 	if front.Material == nil {
 		return Color{}
 	}
+
+	// Scale surface normal to unit length now that we are sure we are going to use it
+	front.Normal = front.Normal.Normalized()
+
 	// Hack: if local coordinates are not set, use absolute.
 	//if front.Local == O {
 	//	front.Local = r.At(front.T)
