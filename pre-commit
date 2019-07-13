@@ -1,5 +1,5 @@
 #./makedoc.sh
 if (git ls-files --others --exclude-standard | grep .) then echo "untracked files"; exit 1; fi
-if (gofmt -w -l */*.go | grep \.go) then echo "formatted files"; exit 1; fi
-go test ./...
+#if (gofmt -w -l */*.go | grep \.go) then echo "formatted files"; exit 1; fi
+go test ./v2/...
 
