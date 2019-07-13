@@ -8,16 +8,21 @@ import (
 	. "github.com/barnex/bruteray/v2/util"
 )
 
+func Refractive(n float64)Material{
+	return Refractive2(1, n)
+}
+
 // Refractive material with index of refraction n1 outside and n2 inside.
 // E.g.:
-// 	Refractive(1, 1.5) // glass in air
-// 	Refractive(1.5, 1) // air in glass
-func Refractive(n1, n2 float64) Material {
+// 	Refractive2(1, 1.5) // glass in air
+// 	Refractive2(1.5, 1) // air in glass
+func Refractive2(n1, n2 float64) Material {
 	return &refractive{n1, n2}
 }
 
+
 type refractive struct {
-	n1, n2 float64 // relative index of refraction
+	n1, n2 float64 // relative index of refraction outside and inside
 }
 
 // https://en.wikipedia.org/wiki/Fresnel_equations
