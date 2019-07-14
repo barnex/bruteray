@@ -17,5 +17,5 @@ type flat struct {
 func Flat(t texture.Texture) Material { return &flat{t} }
 
 func (m *flat) Eval(_ *Ctx, _ *Scene, r *Ray, recDepth int, h HitCoords) Color {
-	return m.texture.At(r.At(h.T))
+	return m.texture.At(h.Local)
 }
