@@ -7,11 +7,14 @@ import (
 )
 
 var (
-	Black = Color{0, 0, 0}
-	White = Color{1, 1, 1}
-	Red   = Color{1, 0, 0}
-	Green = Color{0, 1, 0}
-	Blue  = Color{0, 0, 1}
+	Black   = Color{0, 0, 0}
+	White   = Color{1, 1, 1}
+	Red     = Color{1, 0, 0}
+	Yellow  = Color{1, 1, 0}
+	Green   = Color{0, 1, 0}
+	Cyan    = Color{0, 1, 1}
+	Blue    = Color{0, 0, 1}
+	Magenta = Color{1, 0, 1}
 )
 
 // Color represents either a reflectivity or intensity.

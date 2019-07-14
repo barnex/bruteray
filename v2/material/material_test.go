@@ -36,23 +36,26 @@ func TestNormal(t *testing.T) {
 }
 
 func TestRefractive(t *testing.T) {
-	t.Skip("TODO")
+	//t.Skip("TODO")
 	scene := NewSceneBuilder()
-	//mat := Refractive(1.5)
-	mat := Normal()
+	mat := Refractive(1.5)
+	//mat := Reflective(color.White)
+	//mat := Normal()
 
-	sph := NewSphere(mat, 1)
+	sph := NewSphere(mat, 2)
 	sph.Translate(Vec{0, 1, 2})
 	scene.Add(sph)
 
 	{
-	tex := texture.Map(texture.Checkers(1,1, color.White, color.Blue), texture.UVProject{})
-	floor := NewSheet(Flat(tex), O, Ex, Ez)
-	scene.Add(floor)
+		tex := texture.Map(texture.Checkers(1, 1, color.White, color.Blue), texture.UVProject{})
+		floor := NewSheet(Flat(tex), O, Ex, Ez)
+		scene.Add(floor)
 	}
+
+	scene.Add(&Ambient{color.Yellow.EV(-2)})
 
 	built := scene.Build()
 	built.Camera.FocalLen = 1
-	built.Camera.Translate(Vec{0,1,-1})
-	test.NPass(t, built, 1, 3, test.DefaultTolerance)
+	built.Camera.Translate(Vec{0, 1.2, -1})
+	test.NPass(t, built, 5, 1, test.DefaultTolerance)
 }
