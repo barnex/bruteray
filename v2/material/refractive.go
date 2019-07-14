@@ -58,7 +58,7 @@ func (s *refractive) Eval(ctx *Ctx, e *Scene, r *Ray, recDepth int, h HitCoords)
 	Rs := Sqr((n1*cosθt - n2*cosθi) / (n1*cosθt + n2*cosθi))
 	R := 0.5 * (Rp + Rs)
 	T := 1 - R
-	_=T
+	_ = T
 
 	// transmitted ray
 	t := i.Mul(n12).MAdd((n12*cosθi - math.Sqrt(1-(sin2θt))), n)

@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	white = Mate(Color{0.708, 0.743, 0.767})
-	green = Mate(Color{0.115, 0.441, 0.101})
-	red   = Mate(Color{0.651, 0.059, 0.061})
+	white = Matte(Color{0.708, 0.743, 0.767})
+	green = Matte(Color{0.115, 0.441, 0.101})
+	red   = Matte(Color{0.651, 0.059, 0.061})
 )
 
 const (
@@ -31,7 +31,7 @@ func main() {
 	floorCenter := Vec{0.25, 0, 0.25}
 	{
 		box := Tree(box())
-		col := ReflectFresnel(4.0, Mate(White.EV(-4)))
+		col := ReflectFresnel(4.0, Matte(White.EV(-4)))
 		dragon := PlyFile(col, "../../assets/dragon_res1.ply")
 		Yaw(dragon, dragon.Bounds().Center(), 150*Deg)
 		Scale(dragon, dragon.Bounds().Center(), 2.2)
@@ -65,7 +65,7 @@ func main() {
 	{
 		box := Tree(box())
 
-		bcol := ReflectFresnel(1.6, Mate(White.EV(-1.6)))
+		bcol := ReflectFresnel(1.6, Matte(White.EV(-1.6)))
 		bunny := PlyFile(bcol, "../../assets/bunny_res1.ply")
 		Yaw(bunny, bunny.Bounds().Center(), 180*Deg)
 		Scale(bunny, bunny.Bounds().Center(), 2.2)
@@ -100,7 +100,7 @@ func main() {
 	{
 		tree := Tree(box())
 
-		col := Mate(White.EV(-.6))
+		col := Matte(White.EV(-.6))
 		skull := PlyFile(col, "../../assets/damaliscus.ply")
 		Scale(skull, skull.Bounds().Center(), 0.0010)
 		Yaw(skull, skull.Bounds().Center(), 70*Deg)
@@ -115,7 +115,7 @@ func main() {
 	{
 		box := Tree(box())
 
-		bcol := ReflectFresnel(1.6, Mate(White.EV(-1.0)))
+		bcol := ReflectFresnel(1.6, Matte(White.EV(-1.0)))
 		teapot := PlyFile(bcol, "../../assets/teapot.ply")
 		Scale(teapot, teapot.Bounds().Center(), 0.027)
 		Pitch(teapot, teapot.Bounds().Center(), -90*Deg)
@@ -131,7 +131,7 @@ func main() {
 	sky := &builder.Ambient{Color{0.5, 0.5, 0.8}.EV(-1)}
 	Add(sky)
 
-	floor := Sheet(Mate(White.EV(-2)), Vec{}, Ex, Ez)
+	floor := Sheet(Matte(White.EV(-2)), Vec{}, Ex, Ez)
 	Translate(floor, Vec{0, -d, 0})
 	Add(floor)
 

@@ -21,7 +21,7 @@ func TestRectangleLight(t *testing.T) {
 	scene.Camera.FocalLen = 1.35
 	scene.Camera.Translate(Vec{.278, .3, -1.0})
 
-	white := material.Mate(Color{1, 1, 1}.EV(-1))
+	white := material.Matte(Color{1, 1, 1}.EV(-1))
 	//white := tracer.Normal2()
 	s := .500
 	L := .250

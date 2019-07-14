@@ -36,7 +36,7 @@ func Blend(a float64, matA Material, b float64, matB Material) Material {
 // Shiny is shorthand for Blend-ing diffuse + reflection, e.g.:
 // Shiny(WHITE, 0.1) // a white billiard ball, 10% specular reflection
 func Shiny(c Color, reflectivity float64) Material {
-	return Blend(1-reflectivity, Mate(c), reflectivity, Reflective(Color{1, 1, 1}))
+	return Blend(1-reflectivity, Matte(c), reflectivity, Reflective(Color{1, 1, 1}))
 }
 
 type blend struct {

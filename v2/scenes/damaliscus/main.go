@@ -20,9 +20,9 @@ func main() {
 	Add(light)
 
 	x, y, z := .550, .549, .560
-	white := Mate(Color{0.708, 0.743, 0.767}.EV(-1))
-	green := Mate(Color{0.115, 0.441, 0.101}.EV(-1))
-	red := Mate(Color{0.651, 0.059, 0.061}.EV(-1))
+	white := Matte(Color{0.708, 0.743, 0.767}.EV(-1))
+	green := Matte(Color{0.115, 0.441, 0.101}.EV(-1))
+	red := Matte(Color{0.651, 0.059, 0.061}.EV(-1))
 	floor := Rectangle(white, Vec{0, 0, 0}, Vec{x, 0, 0}, Vec{0, 0, z})
 	Add(
 		floor,
@@ -32,7 +32,7 @@ func main() {
 		Rectangle(green, Vec{x, 0, 0}, Vec{x, 0, z}, Vec{x, y, 0}),
 	)
 
-	bcol := Mate(White.EV(-.6))
+	bcol := Matte(White.EV(-.6))
 	bunny := PlyFile(bcol, "../../assets/damaliscus.ply")
 	Scale(bunny, bunny.Bounds().Center(), 0.0010)
 	bbb := bunny.Bounds()

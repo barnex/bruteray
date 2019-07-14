@@ -15,11 +15,11 @@ func TestPoint(t *testing.T) {
 	scene := NewSceneBuilder()
 	{
 		s := builder.NewSheetXZ()
-		s.Texture = material.Mate(color.White)
+		s.Texture = material.Matte(color.White)
 		scene.Add(s)
 	}
 	{
-		s := builder.NewSphere(material.Mate(color.White), 2)
+		s := builder.NewSphere(material.Matte(color.White), 2)
 		s.Translate(Vec{0, 1, 0})
 		scene.Add(s)
 	}

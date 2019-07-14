@@ -88,7 +88,7 @@ var (
 
 	Blend          = material.Blend
 	Flat           = material.Flat
-	Mate           = material.Mate
+	Matte          = material.Matte
 	Normal         = material.Normal()
 	Normal2        = material.Normal2()
 	Grid           = material.Grid()

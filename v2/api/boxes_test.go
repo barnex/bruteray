@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	white = Mate(Color{0.708, 0.743, 0.767})
-	green = Mate(Color{0.115, 0.441, 0.101})
-	red   = Mate(Color{0.651, 0.059, 0.061})
+	white = Matte(Color{0.708, 0.743, 0.767})
+	green = Matte(Color{0.115, 0.441, 0.101})
+	red   = Matte(Color{0.651, 0.059, 0.061})
 )
 
 const (
@@ -87,7 +87,7 @@ func TestBoxes(t *testing.T) {
 	sky := &builder.Ambient{Color{0.5, 0.5, 0.8}.EV(-1)}
 	Add(sky)
 
-	floor := Sheet(Mate(White.EV(-2)), Vec{}, Ex, Ez)
+	floor := Sheet(Matte(White.EV(-2)), Vec{}, Ex, Ez)
 	Translate(floor, Vec{0, -d, 0})
 	Add(floor)
 

@@ -9,18 +9,18 @@ import (
 	. "github.com/barnex/bruteray/v2/tracer"
 )
 
-type mate struct {
+type matte struct {
 	texture texture.Texture
 }
 
 // Mate constructs a material with Lambertian ("diffuse") reflectance.
 // E.g.: plaster, paper, rubber.
 // See https://en.wikipedia.org/wiki/Lambertian_reflectance.
-func Mate(t texture.Texture) Material {
-	return &mate{t}
+func Matte(t texture.Texture) Material {
+	return &matte{t}
 }
 
-func (m *mate) Eval(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color {
+func (m *matte) Eval(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color {
 	var acc Color
 
 	normal := h.Normal.Towards(r.Dir)

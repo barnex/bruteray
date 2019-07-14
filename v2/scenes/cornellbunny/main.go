@@ -20,9 +20,9 @@ func main() {
 	Add(light)
 
 	x, y, z := .550, .549, .560
-	white := Mate(Color{0.708, 0.743, 0.767})
-	green := Mate(Color{0.115, 0.441, 0.101})
-	red := Mate(Color{0.651, 0.059, 0.061})
+	white := Matte(Color{0.708, 0.743, 0.767})
+	green := Matte(Color{0.115, 0.441, 0.101})
+	red := Matte(Color{0.651, 0.059, 0.061})
 	floor := Rectangle(white, Vec{0, 0, 0}, Vec{x, 0, 0}, Vec{0, 0, z})
 	Add(
 		floor,
@@ -33,7 +33,7 @@ func main() {
 	)
 
 	//bcol := Shiny(White.EV(-2), 0.3)
-	bcol := ReflectFresnel(1.6, Mate(White.EV(-1.3)))
+	bcol := ReflectFresnel(1.6, Matte(White.EV(-1.3)))
 	bunny := PlyFile(bcol, "../../assets/bunny_res1.ply")
 	Yaw(bunny, bunny.Bounds().Center(), 180*Deg)
 	Scale(bunny, bunny.Bounds().Center(), 2.2)

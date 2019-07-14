@@ -25,7 +25,7 @@ func main() {
 		0, 0,
 	)
 	mat := Blend(
-		0.9, Mate(texture.Map(tex, texture.UVProject{})),
+		0.9, Matte(texture.Map(tex, texture.UVProject{})),
 		0.1, Reflective(White),
 	)
 	strip := Parametric(mat, 256, 16, func(u, v float64) Vec {
@@ -42,7 +42,7 @@ func main() {
 	TranslateTo(strip, strip.Bounds().CenterBottom(), Vec{0, -.02, 0})
 	Add(strip)
 
-	white := Mate(Color{1, 0.9, 0.8}.EV(-.1))
+	white := Matte(Color{1, 0.9, 0.8}.EV(-.1))
 	floor := Sheet(white, Vec{}, Ex, Ez)
 	Add(floor)
 
