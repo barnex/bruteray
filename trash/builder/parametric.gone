@@ -1,0 +1,45 @@
+package builder
+
+/*
+ numU: 3, numV: 2
+ vertices: 6 = 2*3
+ faces: 4 = 2*(2*1)
+ u: [0.0: 1.0]
+ v: [0.0: 1.0]
+  [0,0]***********[1,0]*************[2,0]
+    *  *            *   *             *
+    *      *        *       *         *
+    *         *     *          *      *
+    *            *  *              *  *
+  [0,1]***********[1,1]*************[2,1]
+*/
+func NewParametric(m Material, numU, numV int, f func(u, v float64) Vec) *Mesh {
+
+	vertices := make([]Vertex, numU*numV)
+	faces := make([]Face, 2*(numU-1)*(numV-1))
+
+	I := func(iu, iv int) int {
+		return iu*numV + iv
+	}
+	V := func(iu, iv int) *Vertex {
+		return &vertices[I(iu, iv)]
+	}
+
+	maxU := float64(numU - 1)
+	maxV := float64(numV - 1)
+	for iu := 0; iu < numU; iu++ {
+		u := float64(iu) / maxU
+		for iv := 0; iv < numV; iv++ {
+			v := float64(iv) / maxV
+			p := f(u, v)
+
+			vertices[I(iu, iv)] = Vertex{Pos: p, U: u, V: v} // normals?
+			if iu < numU-1 && iv < numV-1 {
+				faces[2*(iu*(numV-1)+iv)+0] = Face{V(iu, iv), V(iu+1, iv), V(iu+1, iv+1)}
+				faces[2*(iu*(numV-1)+iv)+1] = Face{V(iu, iv), V(iu+1, iv+1), V(iu, iv+1)}
+			}
+		}
+	}
+
+	return &Mesh{Texture: m, vertices: vertices, faces: faces}
+}

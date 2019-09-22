@@ -1,0 +1,20 @@
+package builder
+
+func NewRectangleWithVertices(m Material, o, a, b Vec) Builder {
+	c := a.Add(b.Sub(o))
+	return NewMesh(m, []Vec{o, a, c, b}, [][3]int{{0, 1, 3}, {2, 3, 1}})
+}
+
+func NewRectangleZ(m Material, width, height float64) Builder {
+	return NewRectangleWithVertices(m,
+		Vec{-width / 2, -height / 2, 0},
+		Vec{+width / 2, -height / 2, 0},
+		Vec{-width / 2, +height / 2, 0})
+}
+
+func NewRectangle(m Material, width, height float64) Builder {
+	return NewRectangleWithVertices(m,
+		Vec{-width / 2, 0, -height / 2},
+		Vec{+width / 2, 0, -height / 2},
+		Vec{-width / 2, 0, +height / 2})
+}

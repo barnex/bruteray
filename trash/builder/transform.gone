@@ -1,0 +1,96 @@
+package builder
+
+//func TranslateTo(x Transformable, src, dst Vec) {
+//	Translate(x, dst.Sub(src))
+//}
+//
+//func Scale(x Transformable, factor float64) {
+//	ScaleAround(x, x.Bounds().Center(), factor)
+//}
+//
+//func ScaleAround(x Transformable, origin Vec, f float64) {
+//	m := geom.Matrix{
+//		{f, 0, 0},
+//		{0, f, 0},
+//		{0, 0, f},
+//	}
+//	Linear(x, origin, m)
+//}
+//
+//func ScaleToSize(s Transformable, size float64) {
+//	bounds := s.Bounds()
+//	bs := bounds.Max.Sub(bounds.Min)
+//	max := util.Max3(bs[0], bs[1], bs[2])
+//	ScaleAround(s, bounds.Center(), size/max)
+//}
+//
+//func Scale3(s Transformable, origin Vec, x, y, z float64) {
+//	m := geom.Matrix{
+//		{x, 0, 0},
+//		{0, y, 0},
+//		{0, 0, z},
+//	}
+//	Linear(s, origin, m)
+//}
+//
+//func Roll(x Transformable, angle float64) {
+//	RollAround(x, x.Bounds().Center(), angle)
+//}
+//
+//func RollAround(x Transformable, origin Vec, angle float64) {
+//	c := util.Cos(angle)
+//	s := util.Sin(angle)
+//	m := geom.Matrix{
+//		{c, s, 0},
+//		{-s, c, 0},
+//		{0, 0, 1},
+//	}
+//	Linear(x, origin, m)
+//}
+//
+//func Yaw(x Transformable, angle float64) {
+//	YawAround(x, x.Bounds().Center(), angle)
+//}
+//
+//func YawAround(x Transformable, origin Vec, angle float64) {
+//	c := util.Cos(angle)
+//	s := util.Sin(angle)
+//	m := geom.Matrix{
+//		{c, 0, s},
+//		{0, 1, 0},
+//		{-s, 0, c},
+//	}
+//	Linear(x, origin, m)
+//}
+//
+//func Pitch(x Transformable, angle float64) {
+//	PitchAround(x, x.Bounds().Center(), angle)
+//}
+//
+//func PitchAround(x Transformable, origin Vec, angle float64) {
+//	c := util.Cos(angle)
+//	s := util.Sin(angle)
+//	m := geom.Matrix{
+//		{1, 0, 0},
+//		{0, c, s},
+//		{0, -s, c},
+//	}
+//	Linear(x, origin, m)
+//}
+//
+////TODO: unified YawPitchRoll
+////TODO: use Transform type rather than raw matrices
+//
+//// Linear performs a general linear transformation.
+//func Linear(x Transformable, origin Vec, m geom.Matrix) {
+//	x.Transform(func(p Vec) Vec {
+//		return m.MulVec(p.Sub(origin)).Add(origin)
+//	})
+//}
+//
+//func Translate(x Transformable, delta Vec) {
+//	x.Transform(func(p Vec) Vec {
+//		return p.Add(delta)
+//	})
+//}
+//

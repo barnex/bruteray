@@ -1,0 +1,40 @@
+Media: just objects with translucent material, stored separately?
++Material.Filter?
+
+color: RGBA ([4]float32) -> easy opacity?
+
+package color -> colors, colorf, ...?
+
+Pass ...Transform to objects, cameras, lights
+
+mv lights under objects
+objects/transform
+
+go list -f '{{ join .Deps  "\n"}}'
+
+CheckHitRecord: enable Local test, fix all local coords
+
+Always texture map to [0,1]^2. Transform the texture.
+You can always do the equivalent of vertex -> UV mapping.
+
+Unit test and exemplify entire API, bottom up
+	* unit test bounding by visualizing box. Some are wrong (e.g. Transformed). 
+
+
+Split package camera. Camera interface but concrete wrapper remains. Camera.Impl = EnvMap.
+
+performance
+	* AABB2
+	* Tree division: use SAH
+	* stratified / low discrepancy
+
+
+tracer/
+	materials/
+	cameras/
+	objects/
+		lights/
+	textures/
+	
+api/
+

@@ -1,0 +1,43 @@
+package builder
+
+import (
+	"github.com/barnex/bruteray/cameras"
+	"github.com/barnex/bruteray/tracer"
+)
+
+type SceneBuilder struct {
+	Camera   cameras.Projective // TODO: rm
+	Builders []Builder
+}
+
+// TODO: rename Scene
+func NewSceneBuilder() *SceneBuilder {
+	s := &SceneBuilder{
+		Camera: *cameras.NewProjective(Vec{0, 0, 0}),
+	}
+	return s
+}
+
+func (b *SceneBuilder) Add(c ...Builder) {
+	b.Builders = append(b.Builders, c...)
+}
+
+func (b *SceneBuilder) Build() *tracer.Scene {
+	s := new(tracer.Scene)
+	s.Camera = &b.Camera
+
+	for _, b := range b.Builders {
+		switch b := b.(type) {
+		case tracer.Light:
+			s.AddLight(b)
+		case *Tree:
+			for _, ch := range b.Lights {
+				s.AddLight(ch)
+			}
+			s.AddObject(b)
+		default:
+			s.AddObject(b)
+		}
+	}
+	return s
+}

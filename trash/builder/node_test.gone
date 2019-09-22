@@ -1,0 +1,19 @@
+package builder
+
+// TODO: test occlusion, test respect ray Len, benchmark.
+//func TestNode(t *testing.T) {
+//	scene := NewSceneBuilder()
+//	//scene.Camera.FocalLen = 1
+//
+//	sph1 := NewSphere(material.Normal(), 1)
+//	Translate(sph1, Vec{-1, 0, 4})
+//
+//	sph2 := NewSphere(material.Normal(), 1)
+//	Translate(sph2, Vec{+1, 0, 4})
+//
+//	scene.Add(NewTree(sph1, sph2))
+//
+//	scene.Camera.FocalLen = 1
+//	built := scene.Build()
+//	test.OnePass(t, built, test.DefaultTolerance)
+//}

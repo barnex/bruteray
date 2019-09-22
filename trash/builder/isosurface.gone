@@ -1,0 +1,194 @@
+package builder
+
+import (
+	"github.com/barnex/bruteray/texture"
+)
+
+func NewIsoSurface(mat Material, dx, dy, dz float64, heightMap texture.Texture) Builder {
+	return &isoSurface{
+		bounds: BoundingBox{
+			Min: Vec{0, 0, 0},
+			Max: Vec{dx, dy, dz},
+		},
+		Tol:    1. / (1024 * 1024),
+		mat:    mat,
+		hmap:   heightMap,
+		invU:   1 / dx,
+		invV:   1 / dy,
+		height: dz,
+	}
+}
+
+type isoSurface struct {
+	bounds     BoundingBox
+	invU, invV float64
+	height     float64
+	Tol        float64
+	mat        Material
+	hmap       texture.Texture
+}
+
+func (s *isoSurface) Bounds() BoundingBox {
+	return s.bounds
+}
+
+func (s *isoSurface) Inside(p Vec) bool {
+	return s.bounds.Inside(p) && p[2] < s.heightAt(p)
+}
+
+func (s *isoSurface) Intersect(ctx *Ctx, r *Ray) HitRecord {
+	t1, t2 := intersectAABB2(&s.bounds, r)
+
+	// not intersecting bounding box: early return
+	if t2 <= 0 {
+		return HitRecord{}
+	}
+
+	// brute-force intersection with height map
+	t := s.bisect(r, t1, t2)
+	if t == 0 {
+		return HitRecord{}
+	}
+	p := r.At(t)
+	uv := s.localUV(p)
+	n := s.normalAtUV(uv)
+
+	return HitRecord{T: t, Normal: n, Material: s.mat, Local: Vec{uv[0], uv[1]}}
+}
+
+func (f *isoSurface) isoValueAt(p Vec) float64 {
+	return p[Z] - (f.heightAt(p))
+}
+
+func (f *isoSurface) heightAt(p Vec) float64 {
+	return f.heightAtUV(f.localUV(p))
+}
+
+func (f *isoSurface) heightAtUV(uv Vec2) float64 {
+	return f.height * f.hmap.At(Vec{uv[0], uv[1]}).Gray()
+}
+
+func (f *isoSurface) partialAt(p Vec) Vec2 {
+	return f.partialAtUV(f.localUV(p))
+}
+
+func (f *isoSurface) partialAtUV(uv Vec2) Vec2 {
+	u, v := uv[0], uv[1]
+	const delta = 1. / 4096. // TODO: use pixel pitch
+	partialU := (1 / delta) * (f.heightAtUV(Vec2{u + delta/2, v}) - f.heightAtUV(Vec2{u - delta/2, v}))
+	partialV := (1 / delta) * (f.heightAtUV(Vec2{u, v + delta/2}) - f.heightAtUV(Vec2{u, v - delta/2}))
+	return Vec2{partialU, partialV}
+}
+
+// TODO: precompute and store
+func (f *isoSurface) normalAtUV(uv Vec2) Vec {
+	diff := f.partialAtUV(uv)
+	return Vec{-diff[0], -diff[1], 1}
+}
+
+func (f *isoSurface) localUV(p Vec) Vec2 {
+	//uvw := f.UV[0].MAdd(p[X]*f.invU, f.UV[1]).MAdd(p[Y]*f.invV, f.UV[2])
+	uvw := O.MAdd(p[X]*f.invU, Ex).MAdd(p[Y]*f.invV, Ey) // TODO: simplify, remove
+	return Vec2{uvw[0], uvw[1]}
+}
+
+func (f *isoSurface) bisect(r *Ray, min, max float64) float64 {
+	// no zero crossing
+	if f.isoValueAt(r.At(min))*f.isoValueAt(r.At(max)) > 0 {
+		return min
+	}
+
+	in, out := max, min
+	if f.isoValueAt(r.At(in)) < 0 {
+		in, out = out, in
+	}
+
+	tol := f.Tol
+	for (out - in) > tol {
+		mid := (in + out) / 2
+		if f.isoValueAt(r.At(mid)) > 0 {
+			in = mid
+		} else {
+			out = mid
+		}
+	}
+	return out
+}
+
+// brute-force normal by bisecting slightly shifted rays.
+// direction now consistent
+//func (s *isoSurface) normal(r *Ray, t0, min, max float64) Vec {
+//	c := r.At(t0)
+//
+//	const bumpDiff = 1e-5
+//
+//	ra := *r
+//	ra.Start = ra.Start.Add(Ex.Mul(bumpDiff))
+//	ta := s.bisect(&ra, min, max)
+//	a := ra.At(ta)
+//
+//	rb := *r
+//	rb.Start = rb.Start.Add(Ey.Mul(bumpDiff))
+//	tb := s.bisect(&rb, min, max)
+//	b := rb.At(tb)
+//
+//	//rc := *r
+//	//rc.Start = ra.Start.Add(Ez.Mul(bumpDiff))
+//	//ta := s.bisect(&ra, min, max)
+//	//a := ra.At(ta)
+//
+//	return TriangleNormal(c, a, b)
+//}
+
+//// find both intersection points with an arbitrary convex shape
+//// t2 == 0 means no intersection
+//func intersect2(b Object, ctx *Ctx, r *Ray) (t1, t2 float64) {
+//	// (0) No intersection: t1 <= 0
+//	//             -----------
+//	//             |         |
+//	//             |         1  *-------->
+//	//             |         |
+//	//             -----------
+//	// (1) Ray crosses through: t1 > 0, t2 > 0
+//	//             -----------
+//	//             |         |
+//	//        *----1---------2----->
+//	//             |         |
+//	//             -----------
+//	//
+//	// (2) Ray starts inside: t1 < 0, t2 > 0
+//	//             -----------
+//	//             |         |
+//	//             1----*----2----->
+//	//             |         |
+//	//             -----------
+//
+//	t1 = b.Intersect(ctx, r).T
+//
+//	// case (0): No intersection
+//	if t1 <= 0 {
+//		return 0, 0
+//	}
+//
+//	// There is at least one intersection point.
+//	// Start a second ray just beyond that point
+//	// to look for the next one.
+//	r2 := ctx.Ray()
+//	defer ctx.PutRay(r2)
+//	*r2 = *r
+//	r2.Start = r.At(t1 + marchOffset)
+//	t2_ := b.Intersect(ctx, r2).T
+//
+//	// Ray crosses
+//	if t2_ > 0 {
+//		t2 = t2_ + t1 + marchOffset
+//		return t1, t2
+//	}
+//
+//	*r2 = *r
+//	r2.Dir = r2.Dir.Mul(-1)
+//	t2_ = b.Intersect(ctx, r2).T
+//	t2 = -t2_
+//
+//	return t2, t1
+//}

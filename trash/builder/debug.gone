@@ -1,0 +1,23 @@
+package objects
+
+func ShowBounds(b Builder) Builder {
+	enclosure := &visibleBounds{
+		bounds: b.Bounds(),
+		m:      &transparent{Color{0.5, 0.5, 1}},
+	}
+	return NewTree(b, enclosure)
+}
+
+type visibleBounds struct {
+	hollowSurface
+	bounds BoundingBox
+	m      Material
+}
+
+func (a *visibleBounds) Init()               {}
+func (a *visibleBounds) Bounds() BoundingBox { return a.bounds }
+
+func (a *visibleBounds) Intersect(ctx *Ctx, r *Ray) HitRecord {
+	t := intersectAABB(&a.bounds, r)
+	return HitRecord{T: t, Material: a.m}
+}

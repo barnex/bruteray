@@ -1,0 +1,80 @@
+package builder
+
+import (
+	"fmt"
+	"math"
+)
+
+//func NewCuboid(m Material, width, height, depth float64) *Tree {
+//	c := CuboidFaces(m, O, Ex.Mul(width), Ey.Mul(height), Ez.Mul(depth))
+//	Translate(c, Vec{-width / 2, -height / 2, -depth / 2})
+//	return c
+//}
+//
+//// TODO: wrong if o != O
+//func CuboidFaces(m Material, o, a, b, c Vec) *Tree {
+//	faces := []Builder{
+//		NewRectangleWithVertices(m, o, a, b),
+//		NewRectangleWithVertices(m, o.Add(c), a.Add(c), b.Add(c)),
+//		NewRectangleWithVertices(m, o, b, c),
+//		NewRectangleWithVertices(m, o.Add(a), b.Add(a), c.Add(a)),
+//		NewRectangleWithVertices(m, o, c, a),
+//		NewRectangleWithVertices(m, o.Add(b), c.Add(b), a.Add(b)),
+//	}
+//	t := NewTree(faces...)
+//	t.NoDivide = true
+//	return t
+//}
+
+func NewBox(m Material, width, height, depth float64) Builder {
+	return NewBoxWithOrigin(m, O, width, height, depth)
+}
+
+func NewBoxWithOrigin(m Material, origin Vec, width, height, depth float64) Builder {
+	min := Vec{-width / 2, -height / 2, -depth / 2}.Add(origin)
+	max := Vec{width / 2, height / 2, depth / 2}.Add(origin)
+	return &box{
+		bounds: BoundingBox{Min: min, Max: max},
+		m:      m,
+	}
+}
+
+type box struct {
+	bounds BoundingBox
+	m      Material
+}
+
+func (s *box) Bounds() BoundingBox {
+	return s.bounds
+}
+
+func (b *box) Intersect(ctx *Ctx, r *Ray) HitRecord {
+	t := intersectAABB(&b.bounds, r)
+	if t <= 0 {
+		return HitRecord{}
+	}
+	return HitRecord{T: t, Normal: b.Normal(r.At(t)), Material: b.m}
+}
+
+func (b *box) Normal(p Vec) Vec {
+	s := &b.bounds
+	for i := range p {
+		if approx(p[i], s.Min[i]) || approx(p[i], s.Max[i]) {
+			return unit[i]
+		}
+	}
+	panic(fmt.Sprint("box.normal", p, s.Min, s.Max))
+}
+
+func (b *box) Inside(v Vec) bool {
+	s := &b.bounds
+	return v[X] > s.Min[X] && v[X] < s.Max[X] &&
+		v[Y] > s.Min[Y] && v[Y] < s.Max[Y] &&
+		v[Z] > s.Min[Z] && v[Z] < s.Max[Z]
+}
+
+func approx(a, b float64) bool {
+	return math.Abs(a-b) < 1e-6
+}
+
+var unit = [3]Vec{Ex, Ey, Ez}

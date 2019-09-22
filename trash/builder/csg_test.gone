@@ -1,0 +1,20 @@
+package builder
+
+import (
+	"testing"
+
+	"github.com/barnex/bruteray/material"
+	"github.com/barnex/bruteray/test"
+)
+
+func TestAnd(t *testing.T) {
+	scene := NewSceneBuilder()
+
+	s1 := NewSphere(material.Normal(), Vec{-.1, 0.0}, 1)
+	s2 := NewSphere(material.Normal(), Vec{+.1, 0.0}, 1)
+	scene.Add(And(s1, s2))
+
+	scene.Camera.FocalLen = 1
+	scene.Camera.Translate(Vec{0, 0, -1.5})
+	test.OnePass(t, scene.Build(), test.DefaultTolerance)
+}

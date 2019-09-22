@@ -1,0 +1,66 @@
+package builder
+
+import (
+	"github.com/barnex/bruteray/tracer/geom"
+	"github.com/barnex/bruteray/tracer/util"
+)
+
+type boundingBoxf struct {
+	Min, Max [3]float32
+}
+
+func boundingBoxToF(b BoundingBox) boundingBoxf {
+	return boundingBoxf{
+		Min: vecf(&b.Min),
+		Max: vecf(&b.Max),
+	}
+}
+
+func vecf(a *geom.Vec) [3]float32 {
+	return [3]float32{
+		float32(a[0]),
+		float32(a[1]),
+		float32(a[2]),
+	}
+}
+
+func intersectAABBf(s *boundingBoxf, r *Ray) float64 {
+	idirx := 1 / r.Dir[X]
+	idiry := 1 / r.Dir[Y]
+	idirz := 1 / r.Dir[Z]
+
+	startx := r.Start[X]
+	starty := r.Start[Y]
+	startz := r.Start[Z]
+
+	minx := float64(s.Min[X])
+	miny := float64(s.Min[Y])
+	minz := float64(s.Min[Z])
+	maxx := float64(s.Max[X])
+	maxy := float64(s.Max[Y])
+	maxz := float64(s.Max[Z])
+
+	tminx := (minx - startx) * idirx
+	tmaxx := (maxx - startx) * idirx
+	tminy := (miny - starty) * idiry
+	tmaxy := (maxy - starty) * idiry
+	tminz := (minz - startz) * idirz
+	tmaxz := (maxz - startz) * idirz
+
+	txen := util.Min(tminx, tmaxx)
+	txex := util.Max(tminx, tmaxx)
+	tyen := util.Min(tminy, tmaxy)
+	tyex := util.Max(tminy, tmaxy)
+	tzen := util.Min(tminz, tmaxz)
+	tzex := util.Max(tminz, tmaxz)
+	ten := max3(txen, tyen, tzen)
+	tex := min3(txex, tyex, tzex)
+
+	if ten > tex {
+		return 0
+	}
+	if ten < 0 {
+		return tex
+	}
+	return ten
+}

@@ -1,0 +1,24 @@
+package builder
+
+import (
+	"github.com/barnex/bruteray/tracer/geom"
+	"github.com/barnex/bruteray/tracer"
+	"github.com/barnex/bruteray/color"
+)
+
+type Ctx = tracer.Ctx
+type HitRecord = tracer.HitRecord
+type Material = tracer.Material
+type Ray = tracer.Ray
+type Color = color.Color
+
+type Vec = geom.Vec
+type Vec2 = geom.Vec2
+
+const (
+	X   = 0
+	Y   = 1
+	Z   = 2
+	Pi  = geom.Pi
+	Deg = geom.Deg
+)

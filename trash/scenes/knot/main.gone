@@ -1,0 +1,83 @@
+package main
+
+import (
+	"math"
+
+	. "github.com/barnex/bruteray/api"
+	"github.com/barnex/bruteray/builder"
+	"github.com/barnex/bruteray/light"
+	"github.com/barnex/bruteray/material"
+	"github.com/barnex/bruteray/texture"
+)
+
+func main() {
+
+	Recursion = 5
+	NumPass = 200
+
+	Camera.Translate(Vec{0, 9, -9})
+	Camera.Pitch(-40 * Deg)
+	Camera.FocalLen = 1
+	Camera.Focus = 12
+	Camera.Aperture = 0.2
+
+	Postprocess.Bloom.Gaussian.Radius = 0.05
+	Postprocess.Bloom.Gaussian.Amplitude = 0.03
+	Postprocess.Bloom.Gaussian.Threshold = 5
+
+	{
+		l := light.NewRectangleLight(Color{1, 1, 0.80}.EV(5.0), Vec{}, Ex.Mul(40), Ez.Mul(30))
+		Translate(l, Vec{0, 28, 30})
+		Add(l)
+	}
+	{
+		l := light.NewRectangleLight(Color{0.80, 1, 1}.EV(5.0), Vec{}, Ex.Mul(40), Ez.Mul(30))
+		Translate(l, Vec{-70, 28, 0})
+		Add(l)
+	}
+
+	{
+		beige := Color{.96, .96, .86}
+		checkers := texture.Checkers(60, 4, beige.EV(-.3), Gray(0.99))
+		mat := material.Blend(0.9, Matte(checkers), 0.1, Reflective(White))
+
+		// Parametric description of a knot by cjpyn<https://cjpyn.bitbucket.io>.
+		surf := Parametric(mat, 256, 64, func(u, v float64) Vec {
+			u *= 4 * Pi
+			v *= 2 * Pi
+			e_r := Vec{cos(u), sin(u), 0}
+			e_t := Vec{sin(u), -cos(u), 0}
+			e_z := Vec{0, 0, 1}
+			u32 := (3. / 2.) * u
+			cosu32 := cos(u32)
+			sinu32 := sin(u32)
+			c := e_r.Mul(2+cosu32).MAdd(sinu32, e_z)
+			n_z := e_r.Mul(-(2 + cosu32)).MAdd((3./2.)*sinu32, e_t).Normalized()
+			b_z := e_r.Mul((9./4.)*sinu32*cosu32).MAdd((3./2.)*cosu32*(2+cosu32), e_t).MAdd(sqr(((3./2.)*sinu32))+sqr(2+cosu32), e_z).Normalized()
+			return c.MAdd(cos(v)/2, n_z).MAdd(sin(v)/2, b_z)
+		})
+		Pitch(surf, 90*Deg)
+		Yaw(surf, -10*Deg)
+		Scale(surf, 1.2)
+		TranslateTo(surf, surf.Bounds().CenterBottom(), Vec{0, -.02, 0})
+		Add(surf)
+	}
+
+	{
+		tex := texture.Grid(0.03, 0.5, 0.5, Gray(0.95), Color{0.1, 0.1, 0.2})
+		floor := Sheet(Matte(tex), Vec{}, Ex, Ez)
+		Add(floor)
+	}
+
+	{
+		Add(builder.Ambient(White.EV(-5)))
+	}
+
+	Render()
+}
+
+var sin = math.Sin
+var cos = math.Cos
+var sqrt = math.Sqrt
+
+func sqr(x float64) float64 { return x * x }

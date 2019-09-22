@@ -1,0 +1,50 @@
+package main
+
+import (
+	. "github.com/barnex/bruteray/api"
+	"github.com/barnex/bruteray/light"
+)
+
+func main() {
+	Camera.FocalLen = 1.35
+	Camera.Translate(Vec{.278, .273, -.800})
+	Recursion = 4
+	NumPass = 300
+	Postprocess.Bloom.Gaussian.Radius = 0.01
+	Postprocess.Bloom.Gaussian.Amplitude = 0.0005
+	Postprocess.Bloom.Gaussian.Threshold = 0.5
+
+	light := light.NewRectangleLight(
+		Color{18.4, 15.6, 8.0}.EV(1.8),
+		Vec{.213, .548, .227}, Vec{.343, .548, .227}, Vec{.213, .548, .332},
+	)
+	Add(light)
+
+	x, y, z := .550, .549, .560
+	white := Matte(Color{0.708, 0.743, 0.767}.EV(-1))
+	green := Matte(Color{0.115, 0.441, 0.101}.EV(-1))
+	red := Matte(Color{0.651, 0.059, 0.061}.EV(-1))
+	floor := RectangleWithVertices(white, Vec{0, 0, 0}, Vec{x, 0, 0}, Vec{0, 0, z})
+	Add(
+		floor,
+		RectangleWithVertices(white, Vec{0, y, 0}, Vec{x, y, 0}, Vec{0, y, z}),
+		RectangleWithVertices(white, Vec{0, 0, z}, Vec{x, 0, z}, Vec{0, y, z}),
+		RectangleWithVertices(red, Vec{0, 0, 0}, Vec{0, 0, z}, Vec{0, y, 0}),
+		RectangleWithVertices(green, Vec{x, 0, 0}, Vec{x, 0, z}, Vec{x, y, 0}),
+	)
+
+	bcol := Matte(White.EV(-.6))
+	bunny := PlyFile(bcol, "../../assets/damaliscus.ply")
+	Scale(bunny, 0.0010)
+	Yaw(bunny, 70*Deg)
+	bbb := bunny.Bounds()
+	bunnyC := bbb.Center()
+	floorC := floor.Frame[1].Add(floor.Frame[2]).Mul(0.5)
+	Translate(bunny, floorC.Sub(bunnyC))
+
+	//bunnyC[Y] = bbb.Min[Y]
+	Translate(bunny, Vec{0.075, 0.23, 0.05})
+	Add(bunny)
+
+	Render()
+}

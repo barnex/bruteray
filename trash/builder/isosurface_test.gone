@@ -1,0 +1,46 @@
+package builder
+
+//func TestIsoSurface(t *testing.T) {
+//	t.Skip("TODO")
+//	scene := NewSceneBuilder()
+//
+//	//box := NewCuboid(nil, 1, 0.2, 1)
+//	//geom.Translate(box, Vec{-0.5, -0.1, -0.5})
+//	fn := func(p Vec) float64 {
+//		return (p[Y]*p[X] - 0.05)
+//	}
+//	mat := material.Normal()
+//	surf := NewIsoSurface(mat, 1, 0.2, 1, fn)
+//
+//	scene.Camera.Translate(Vec{0.5, 0.7, -1.0})
+//	scene.Camera.Pitch(-20 * Deg)
+//	scene.Camera.FocalLen = 1.3
+//	scene.Add(surf)
+//	_ = surf
+//	scene.Add(NewCuboid(material.Transparent(color.Color{.8, .8, 1}, false), 1, 0.2, 1))
+//	scene.Add(Ambient(color.White))
+//	test.OnePass(t, scene.Build(), 0.001)
+//}
+
+//func TestIsoSurface_Intersect(t *testing.T) {
+//	ctx := NewCtx(0)
+//	s := NewSphere(nil, 1)
+//	s.Init()
+//
+//	cases := []struct {
+//		ray    *Ray
+//		t1, t2 float64
+//	}{
+//		{ray(Vec{+2, 0, 0}, Vec{-1, 0, 0}), 1.5, 2.5},
+//		{ray(Vec{-2, 0, 0}, Vec{+1, 0, 0}), 1.5, 2.5},
+//		{ray(Vec{+0, 0, 0}, Vec{+1, 0, 0}), -0.5, 0.5},
+//		{ray(Vec{+2, 0, 0}, Vec{+1, 0, 0}), 0.0, 0.0},
+//	}
+//
+//	for i, c := range cases {
+//		got1, got2 := intersect2(s, ctx, c.ray)
+//		if !(got1 == c.t1 && got2 == c.t2) {
+//			t.Errorf("case %v: %v: got: %v,%v, want: %v,%v", i, c.ray, got1, got2, c.t1, c.t2)
+//		}
+//	}
+//}

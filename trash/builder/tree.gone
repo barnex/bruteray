@@ -1,0 +1,264 @@
+package builder
+
+import (
+	"sort"
+
+	"github.com/barnex/bruteray/tracer/util"
+)
+
+const maxFacePerLeaf = 7
+
+type Tree struct {
+	hollowSurface                //TODO
+	NoDivide      bool           // TODO: maxChildPerNode
+	Children      []Builder      // TODO: unexport
+	Lights        []lightBuilder // TODO: unexport
+	root          node
+}
+
+func NewTree(o ...Builder) *Tree {
+	t := &Tree{}
+	for _, o := range o {
+		t.add(o)
+	}
+	t.init()
+	return t
+}
+
+func (t *Tree) init() {
+	if t.NoDivide {
+		t.root = makeLeaf(t.Children)
+	} else {
+		t.root = buildTree(t.Children)
+	}
+}
+
+func (n *Tree) add(ch ...Builder) {
+	for _, ch := range ch {
+		switch ch := ch.(type) {
+		case lightBuilder:
+			n.Lights = append(n.Lights, ch)
+		case *Tree:
+			n.Lights = append(n.Lights, ch.Lights...)
+			n.Children = append(n.Children, ch)
+			ch.Lights = nil // hack so we don't transform lights twice
+		default:
+			n.Children = append(n.Children, ch)
+		}
+	}
+}
+
+//
+type lightBuilder interface {
+	Builder
+	Sample(ctx *Ctx, target Vec) (pos Vec, intens Color) // Light
+}
+
+func (n *Tree) Bounds() BoundingBox {
+	var h []Vec
+	for _, c := range n.Children {
+		cbb := c.Bounds()
+		h = append(h, cbb.Min, cbb.Max)
+	}
+	return BoundingBoxFromHull(h)
+}
+
+func buildTree(ch []Builder) node {
+	if len(ch) <= maxFacePerLeaf {
+		return makeLeaf(ch)
+	}
+
+	bb := makeBoundingBox(ch)
+	bbSize := bb.Max.Sub(bb.Min)
+	splitDir := argMax(bbSize)
+	// TODO: this is rudimentary and slow
+	sort.Slice(ch, func(i, j int) bool {
+		bi := ch[i].Bounds()
+		bj := ch[j].Bounds()
+		return bi.Min[splitDir]+bi.Max[splitDir] < bj.Min[splitDir]+bj.Max[splitDir]
+	})
+	N := len(ch)
+	left := ch[:N/2]
+	right := ch[N/2:]
+	return node{
+		children:    &[2]node{buildTree(left), buildTree(right)},
+		boundingBox: boundingBoxToF(bb),
+	}
+}
+
+func makeLeaf(ch []Builder) node {
+	return node{
+		leafs:       ch,
+		boundingBox: boundingBoxToF(makeBoundingBox(ch)),
+	}
+}
+
+func (t *Tree) Intersect(ctx *Ctx, r *Ray) HitRecord {
+	if intersectAABBf(&t.root.boundingBox, r) <= 0 { // TODO: and ray Len
+		return HitRecord{}
+	}
+	return t.root.Intersect(ctx, r)
+}
+
+func argMax(v Vec) int {
+	I := 0
+	max := v[0]
+	for i, v := range v {
+		if v > max {
+			max = v
+			I = i
+		}
+	}
+	return I
+}
+
+type node struct {
+	boundingBox boundingBoxf
+	// TODO: keep the 2 child bounding boxes here
+	children *[2]node
+	leafs    []Builder
+}
+
+// TODO: ray len
+func (n *node) Intersect(ctx *Ctx, r *Ray) HitRecord {
+
+	front := HitRecord{T: 9e99}
+	if n.children == nil {
+		for _, o := range n.leafs {
+			frag := o.Intersect(ctx, r)
+			if frag.T > 0 && frag.T < front.T {
+				front = frag
+			}
+		}
+		return front
+	}
+
+	ch0, ch1 := &(n.children[0]), &(n.children[1])
+	t0 := intersectAABBf(&ch0.boundingBox, r)
+	t1 := intersectAABBf(&ch1.boundingBox, r)
+
+	//if t1 < t0 {
+	//	ch0, ch1 = ch1, ch0
+	//	t0, t1 = t1, t0
+	//}
+
+	if t0 > 0 {
+		frag := ch0.Intersect(ctx, r)
+		if frag.T > 0 { //&& frag.T < front.T {
+			front = frag
+		}
+	}
+	if t1 > 0 { //&& !(t1 > front.T+0*Tiny) {
+		frag := ch1.Intersect(ctx, r)
+		if frag.T > 0 && frag.T < front.T {
+			front = frag
+		}
+	}
+
+	if front.T == 9e99 {
+		front.T = 0
+	}
+	return front
+}
+
+func intersectAABB(s *BoundingBox, r *Ray) float64 {
+	idirx := 1 / r.Dir[X]
+	idiry := 1 / r.Dir[Y]
+	idirz := 1 / r.Dir[Z]
+
+	startx := r.Start[X]
+	starty := r.Start[Y]
+	startz := r.Start[Z]
+
+	tminx := (s.Min[X] - startx) * idirx
+	tmaxx := (s.Max[X] - startx) * idirx
+
+	tminy := (s.Min[Y] - starty) * idiry
+	tmaxy := (s.Max[Y] - starty) * idiry
+
+	tminz := (s.Min[Z] - startz) * idirz
+	tmaxz := (s.Max[Z] - startz) * idirz
+
+	txen := util.Min(tminx, tmaxx)
+	txex := util.Max(tminx, tmaxx)
+	tyen := util.Min(tminy, tmaxy)
+	tyex := util.Max(tminy, tmaxy)
+	tzen := util.Min(tminz, tmaxz)
+	tzex := util.Max(tminz, tmaxz)
+	ten := max3(txen, tyen, tzen)
+	tex := min3(txex, tyex, tzex)
+
+	if ten > tex {
+		return 0
+	}
+	if ten < 0 {
+		return tex
+	}
+	return ten
+}
+
+
+func intersectAABB2(s *BoundingBox, r *Ray) (float64, float64) {
+	invdirx := 1 / r.Dir[X]
+	invdiry := 1 / r.Dir[Y]
+	invdirz := 1 / r.Dir[Z]
+
+	startx := r.Start[X]
+	starty := r.Start[Y]
+	startz := r.Start[Z]
+
+	tminx := (s.Min[X] - startx) * invdirx
+	tminy := (s.Min[Y] - starty) * invdiry
+	tminz := (s.Min[Z] - startz) * invdirz
+
+	tmaxx := (s.Max[X] - startx) * invdirx
+	tmaxy := (s.Max[Y] - starty) * invdiry
+	tmaxz := (s.Max[Z] - startz) * invdirz
+
+	txen := util.Min(tminx, tmaxx)
+	txex := util.Max(tminx, tmaxx)
+	tyen := util.Min(tminy, tmaxy)
+	tyex := util.Max(tminy, tmaxy)
+	tzen := util.Min(tminz, tmaxz)
+	tzex := util.Max(tminz, tmaxz)
+	ten := max3(txen, tyen, tzen)
+	tex := min3(txex, tyex, tzex)
+
+	if ten > tex {
+		return 0, 0
+	}
+	return ten, tex
+}
+
+func max3(x, y, z float64) float64 {
+	max := x
+	if y > max {
+		max = y
+	}
+	if z > max {
+		max = z
+	}
+	return max
+}
+
+func min3(x, y, z float64) float64 {
+	min := x
+	if y < min {
+		min = y
+	}
+	if z < min {
+		min = z
+	}
+	return min
+}
+
+// makeBoundingBox constructs the minimal axis-aligned bounding box
+// that countains all points in hull.
+func makeBoundingBox(children []Builder) BoundingBox {
+	var hull []Vec
+	for _, c := range children {
+		cbb := c.Bounds()
+		hull = append(hull, cbb.Min, cbb.Max)
+	}
+	return BoundingBoxFromHull(hull)
+}

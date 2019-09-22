@@ -1,0 +1,70 @@
+package builder
+
+import "github.com/barnex/bruteray/tracer/util"
+
+func And(a, b Builder) Builder {
+	return &and{a, b}
+}
+
+type and struct {
+	a, b Builder
+}
+
+/*
+		  *===============
+	*==============
+*/
+func (o *and) Intersect(r *Ray) HitRecord {
+	// TODO: this is only correct for two convex shapes
+	// need to march forward.
+	f := o.a.Intersect(r)
+	if f.T > 0 && o.b.Inside(r.At(f.T)) {
+		return f
+	}
+	f = o.b.Intersect(r)
+	if f.T > 0 && o.a.Inside(r.At(f.T)) {
+		return f
+	}
+	return HitRecord{}
+}
+
+func (o *and) Bounds() BoundingBox {
+	a := o.a.Bounds()
+	b := o.b.Bounds()
+	return BoundingBox{
+		Min: Vec{
+			util.Max(a.Min[0], b.Min[0]),
+			util.Max(a.Min[1], b.Min[1]),
+			util.Max(a.Min[2], b.Min[2]),
+		},
+		Max: Vec{
+			util.Min(a.Max[0], b.Max[0]),
+			util.Min(a.Max[1], b.Max[1]),
+			util.Min(a.Max[2], b.Max[2]),
+		},
+	}
+}
+
+func (o *and) Inside(p Vec) bool {
+	return o.a.Inside(p) && o.b.Inside(p)
+}
+
+type not struct {
+	orig Builder
+}
+
+func Not(b Builder) Builder {
+	return &not{b}
+}
+
+func (b *not) Intersect(r *Ray) HitRecord {
+	return b.orig.Intersect(r)
+}
+
+func (b *not) Bounds() BoundingBox {
+	return infBox
+}
+
+func (b *not) Inside(p Vec) bool {
+	return !b.orig.Inside(p)
+}

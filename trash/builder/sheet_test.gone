@@ -1,0 +1,37 @@
+package builder
+
+//func TestSheet(t *testing.T) {
+//	scene := NewSceneBuilder()
+//
+//	{
+//		s := NewSheet(material.Normal(), O, Ez, Ex)
+//		Translate(s, Vec{0, -1, 0})
+//		scene.Add(s)
+//	}
+//	{
+//		s := NewSheet(material.Normal(), O, Ez, Ex)
+//		Translate(s, Vec{0, 1, 0})
+//		scene.Add(s)
+//	}
+//	{
+//		s := NewSheet(material.Normal(), O, Ey, Ez)
+//		Translate(s, Vec{-1, 0, 0})
+//		scene.Add(s)
+//	}
+//	{
+//		s := NewSheet(material.Normal(), O, Ey, Ez)
+//		Translate(s, Vec{1, 0, 0})
+//		scene.Add(s)
+//	}
+//	{
+//		s := NewSheet(material.Normal(), O, Ex, Ey)
+//		Translate(s, Vec{0, 0, -1})
+//		scene.Add(s)
+//	}
+//
+//	scene.Camera.FocalLen = 1
+//	scene.Camera.Translate(Vec{.01, .01, -0.1})
+//	built := scene.Build()
+//	test.OnePass(t, built, test.DefaultTolerance)
+//}
+//

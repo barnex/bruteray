@@ -1,0 +1,312 @@
+package main
+
+import (
+	"math"
+
+	. "github.com/barnex/bruteray/api"
+)
+
+func main() {
+
+	// settings
+	{
+		Recursion = 5
+		NumPass = 200
+		//Debug = true
+		//Camera.Handedness = -1
+		Camera.Translate(Vec{0.50, 1.05, -2.40})
+		//Camera.Translate(Vec{0, 1.20, -9.00})
+		Camera.Pitch(-14 * Deg)
+		Camera.Yaw(15 * Deg)
+		Camera.FocalLen = 1.02
+		//Camera.Focus = 12
+		//Camera.Aperture = 0.2
+
+		Postprocess.Bloom.Gaussian.Radius = 0.02
+		Postprocess.Bloom.Gaussian.Amplitude = 0.05
+		Postprocess.Bloom.Gaussian.Threshold = 2.5
+	}
+
+	// textures
+	bricks1H := LoadHeightMap("../../../../assets/tiles5_H_1024.png")
+	bricks1D := MustLoad("../../../../assets/tiles5_D_1024.png")
+	bricks2H := LoadHeightMap("../../../../assets/bricks2H.png")
+	bricks2D := Color{0.9, 0.87, 0.85}
+	tiles3H := LoadHeightMap("../../../../assets/tiles4_H_1024.png")
+	tiles3D := MustLoad("../../../../assets/tiles4_D_1024.png")
+
+	// ambient
+	{
+		Add(FisheyeSky("../../../../assets/sky1.jpg"))
+		//Add(Ambient(White.EV(-4)))
+	}
+
+	w := 16.
+	d := 16.
+
+	// floor
+	{
+		bumpH := 0.005
+		mat := Matte(tiles3D)
+		floor_ := IsoSurface(mat, w, d, bumpH, tiles3H)
+		floor_.UV[1] = Vec{w * 0.4, 0}
+		floor_.UV[2] = Vec{0, d * 0.4}
+		floor := Transformed(floor_)
+
+		PitchAround(floor, O, -90*Deg)
+		TranslateTo(floor, floor.Bounds().Center(), O)
+		Add(floor)
+	}
+
+	// Fountain
+	{
+
+		length := 1.5
+		height := 0.45
+		thickn := 0.15
+
+		tree := Tree()
+		// floor
+		{
+			blue1 := Color{.6, .8, 1.}
+			gray1 := Color{.2, .2, .2}
+			tex := Grid(0.006, 12, 12, blue1, gray1)
+			mat := Matte(tex)
+			floor := RectangleWithVertices(mat, O, Ez, Ex)
+			TranslateTo(floor, floor.Bounds().Center(), Vec{0, 0.01, 0})
+			ScaleToSize(floor, length)
+			tree.Add(floor)
+		}
+
+		brick := Matte(bricks1D)
+		stone := Matte(Gray(0.6))
+
+		// side walls
+		outerwidth := length + thickn
+		wall := Tree()
+
+		bumpH := 0.008
+		wall_ := IsoSurface(brick, length, height, bumpH, bricks1H)
+		numTiles := 2.
+		wall_.UV[1] = Vec{numTiles, 0}
+		wall_.UV[2] = Vec{0, numTiles * height / length}
+
+		wall1 := Transformed(wall_)
+		YawAround(wall1, O, 180*Deg)
+		TranslateTo(wall1, wall1.Frame.Origin(), Vec{length / 2, 0, -thickn / 2})
+		wall.Add(wall1)
+
+		wall2 := Transformed(wall_)
+		TranslateTo(wall2, wall2.Frame.Origin(), Vec{-length / 2, 0, thickn / 2})
+		wall.Add(wall2)
+
+		overhang := 0.03
+		gap := 0.003
+		top1 := Transformable(Box(stone, length/3-gap, overhang, thickn+overhang))
+		TranslateTo(top1, top1.Bounds().CenterBottom(), Vec{0, height, 0})
+		wall.Add(top1, Translated(top1, Vec{-length / 3, 0, 0}))
+		wall.Add(top1, Translated(top1, Vec{+length / 3, 0, 0}))
+
+		tree.Add(Translated(wall, Vec{0, 0, -outerwidth / 2}))
+		tree.Add(Translated(wall, Vec{0, 0, +outerwidth / 2}))
+
+		wall3 := Transformed(wall)
+		Yaw(wall3, 90*Deg)
+		tree.Add(Translated(wall3, Vec{+outerwidth / 2, 0, 0}))
+		tree.Add(Translated(wall3, Vec{-outerwidth / 2, 0, 0}))
+
+		// corner stones
+		mat := Matte(White.EV(-.3))
+		cornerw := thickn + 0.05
+		cornerh := height + overhang + 0.05
+		corner := Cuboid(mat, cornerw, cornerh, cornerw)
+
+		TranslateTo(corner, corner.Bounds().CenterBottom(), O)
+		cornerd := length/2 + cornerw/2
+		tree.Add(Translated(corner, Vec{+cornerd, 0, +cornerd}))
+		tree.Add(Translated(corner, Vec{-cornerd, 0, +cornerd}))
+		tree.Add(Translated(corner, Vec{-cornerd, 0, -cornerd}))
+		tree.Add(Translated(corner, Vec{+cornerd, 0, -cornerd}))
+
+		coverw := cornerw + 0.02
+		coverh := 0.02
+		cover := Cuboid(stone, coverw, coverh, coverw)
+		TranslateTo(cover, cover.Bounds().CenterBottom(), corner.Bounds().CenterTop())
+		tree.Add(Translated(cover, Vec{+cornerd, 0, +cornerd}))
+		tree.Add(Translated(cover, Vec{-cornerd, 0, +cornerd}))
+		tree.Add(Translated(cover, Vec{-cornerd, 0, -cornerd}))
+		tree.Add(Translated(cover, Vec{+cornerd, 0, -cornerd}))
+
+		// statue
+		piedw := 0.45
+		piedh := 0.6
+		pied := Cuboid(stone, piedw, piedh, piedw)
+		TranslateTo(pied, pied.Bounds().CenterBottom(), O)
+		tree.Add(pied)
+
+		mat2 := Shiny(White.EV(-.2), 0.95)
+		dragon := PlyFile(mat2, "../../../../assets/dragon_res1.ply")
+		ScaleToSize(dragon, piedw*1.6)
+		Yaw(dragon, 180*Deg)
+		TranslateTo(dragon, dragon.Bounds().CenterBottom(), pied.Bounds().CenterTop())
+		tree.Add(dragon)
+
+		Add(tree)
+
+		// water
+		{
+			mat := Refractive(1.33)
+			//mat := Normal()
+			surf := Parametric(mat, 128, 128, func(u, v float64) Vec {
+				x := v - 0.5
+				z := u - 0.5
+				sinc := func(x float64) float64 {
+					if x == 0 {
+						return x
+					}
+					return math.Sin(x) / x
+				}
+				drop := func(cx, cy, ampl, freq float64) float64 {
+					x := x - cx
+					z := z - cy
+					r := math.Sqrt(x*x + z*z)
+					return ampl * sinc(2.0*Pi*freq*r) * math.Sqrt(r)
+				}
+				_ = drop
+				y :=
+					0.1*math.Sin(x*21) +
+						0.3*math.Sin(z*23+8)*math.Sin(z*13+2) +
+						drop(0.1, 0.13, 10, 25) +
+						drop(-0.15, 0.11, 13, 22) +
+						drop(0.19, 0.21, 11, 17)
+				y *= 0.005
+				return Vec{x, y, z}
+			})
+			ScaleToSize(surf, length)
+			TranslateTo(surf, surf.Bounds().CenterBottom(), O)
+			Translate(surf, Vec{0, 0.37, 0})
+			Add(surf)
+		}
+	}
+
+	// arcs
+	{
+		height := 1.8
+		width := 2.0
+		innerW := width * 0.8
+		numArcs := 5.
+		totalW := numArcs * width
+		pillarW := 0.3
+		//wallD := 0.0
+
+		mat := Matte(White.EV(-.3))
+
+		a := Arc(mat, width, innerW, 0.2)
+		pillar := Transformable(Cylinder(mat, pillarW, height))
+		Pitch(pillar, 90*Deg)
+		Translate(pillar, Vec{0, height, 0})
+
+		group := Tree()
+		for i := 0.; i < numArcs; i++ {
+			dx := (i - (numArcs-1)/2) * width
+			group.Add(Translated(a, Vec{dx, height, 0}))
+			pill := Translated(pillar, Vec{-dx - width/2, -height / 2, 0})
+			group.Add(pill)
+			top := BoxWithOrigin(mat, pill.Bounds().CenterTop(), 0.4, 0.05, 0.4)
+			group.Add(top)
+			bot := BoxWithOrigin(mat, pill.Bounds().CenterBottom(), 0.38, 0.05, 0.38)
+			group.Add(bot)
+		}
+
+		g1 := Translated(group, Vec{0, 0, totalW / 2})
+
+		g2 := Transformable(group)
+		Yaw(g2, 180*Deg)
+		Translate(g2, Vec{0, 0, -totalW / 2})
+
+		g3 := Transformable(group)
+		Yaw(g3, -90*Deg)
+		Translate(g3, Vec{totalW / 2, 0, 0})
+		g4 := Transformable(group)
+		Yaw(g4, 90*Deg)
+		Translate(g4, Vec{-totalW / 2, 0, 0})
+
+		Add(Tree(g1, g2, g3, g4))
+
+		totalH := height * 1.5
+		{
+			w := w * 0.9
+			bump := 0.05
+			totalH := height*1.5 + 0.3
+			//o := Vec{-w / 2, 0, -wallD}
+			//wall := RectangleWithVertices(mat, o, o.Add(Vec{0, totalH, 0}), o.Add(Vec{w}))
+			mat := Matte(bricks2D)
+			wall := IsoSurface(mat, w, totalH, bump, bricks2H)
+			wall.UV[1] = Vec{w * 1.0, 0}
+			wall.UV[2] = Vec{0, totalH * 1.0}
+
+			w1 := Transformable(wall)
+			YawAround(w1, O, 180*Deg)
+			Translate(w1, Vec{w / 2, 0, w / 2})
+			Add(w1)
+
+			w2 := Transformable(wall)
+			YawAround(w2, O, -90*Deg)
+			Translate(w2, Vec{-w / 2, 0, w / 2})
+			Add(w2)
+			//w3 := Transformable(wall)
+			//Yaw(w3, 90*Deg)
+			//Translate(w3, Vec{-w / 2, 0, 0})
+			//w4 := Transformable(wall)
+			//Yaw(w4, -90*Deg)
+			//Translate(w4, Vec{w / 2, 0, 0})
+			//Add(w1, w2, w3, w4)
+		}
+
+		{
+			//o := Vec{-w/2, 0, -wallD}
+			ceilD := 2.8
+			d := 1.2
+			ceil := Rectangle(mat, w, ceilD)
+			Translate(ceil, Vec{0, totalH, 0})
+			c1 := Translated(ceil, Vec{0, 0, w/2 - ceilD + d})
+			c2 := Translated(ceil, Vec{0, 0, -(w/2 - ceilD + d)})
+			c3 := Transformable(ceil)
+			Yaw(c3, 90*Deg)
+			Translate(c3, Vec{-(w/2 - ceilD + d), 0, 0})
+			c4 := Transformable(ceil)
+			Yaw(c4, -90*Deg)
+			Translate(c4, Vec{w/2 - ceilD + d, 0, 0})
+			Add(c1, c2, c3, c4)
+		}
+
+	}
+
+	{
+
+		l1 := RectangleLight(White.EV(4.0), O, Ex.Mul(5), Ez.Mul(5)) // TODO: fix Light Scale
+		TranslateTo(l1, l1.Bounds().Center(), Vec{4.0, 8, -3.0})
+		Add(l1)
+
+		//l2 := RectangleLight(White.EV(1.3), O, Ex.Mul(5), Ez.Mul(5)) // TODO: fix Light Scale
+		//Translate(l2, Vec{-2, 5, 2})
+		//Add(l2)
+	}
+
+	Render()
+}
+
+func Arc(mat Material, w, a, d float64) Builder {
+	h := w / 2
+
+	box := BoxWithOrigin(mat, Vec{0, h / 2, 0}, w, h, d)
+	cyl := Cylinder(mat, a, d*2)
+	arc := And(box, Not(cyl))
+	return arc
+}
+
+var sin = math.Sin
+var cos = math.Cos
+var sqrt = math.Sqrt
+
+func sqr(x float64) float64 { return x * x }

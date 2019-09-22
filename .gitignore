@@ -1,6 +1,2 @@
 *.swp
-bruteray
-out.jpg
-cover.out
-out/
-core
+.vscode

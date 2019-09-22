@@ -1,0 +1,33 @@
+package builder
+
+import (
+	"math"
+)
+
+func NewSheet(m Material, height float64) Builder {
+	return &sheet{mat: m, height: height}
+}
+
+type sheet struct {
+	hollowSurface
+	height float64
+	mat    Material
+}
+
+func (s *sheet) Bounds() BoundingBox {
+	return infBox
+}
+
+func (s *sheet) Intersect(c *Ctx, r *Ray) HitRecord {
+	normal := Ey
+	origin := Vec{0, s.height, 0}
+	rs := r.Start.Sub(origin).Dot(normal)
+	rd := r.Dir.Dot(normal)
+	t := -rs / rd
+	p := r.At(t)
+	return HitRecord{T: t, Normal: normal, Material: s.mat, Local: Vec{p[0], p[2], 0}}
+}
+
+var infBox = BoundingBox{Min: Vec{-inf, -inf, -inf}, Max: Vec{inf, inf, inf}}
+
+var inf = math.Inf(1)

@@ -1,0 +1,76 @@
+package builder
+
+import (
+	"github.com/barnex/bruteray/tracer/geom"
+)
+
+func Transformed(orig Builder, t *geom.AffineTransform) Builder {
+	return &transformed{
+		forward: *t,
+		inverse: *t.Inverse(),
+		orig:    orig,
+	}
+}
+
+type transformed struct {
+	forward geom.AffineTransform
+	inverse geom.AffineTransform
+	orig    Builder
+}
+
+func (o *transformed) Bounds() BoundingBox {
+	h := o.orig.Bounds().Hull()
+	for i := range h {
+		h[i] = o.forward.TransformPoint(h[i])
+	}
+	return BoundingBoxFromHull(h)
+}
+
+func (o *transformed) Intersect(ctx *Ctx, r *Ray) HitRecord {
+	// inverse transform ray
+	r2 := ctx.Ray()
+	defer ctx.PutRay(r2)
+	*r2 = *r // TODO: ctx.Ray(orig)
+	r2.Start = o.inverse.TransformPoint(r.Start)
+	r2.Dir = o.inverse.TransformDir(r.Dir)
+
+	// intersect original with inverse transformed ray
+	h := o.orig.Intersect(ctx, r2)
+
+	// forward transform normal
+	h.Normal = o.forward.TransformDir(h.Normal)
+	return h
+}
+
+func (o *transformed) Inside(p Vec) bool {
+	return o.orig.Inside(o.inverse.TransformPoint(p))
+}
+
+//func Translated(orig Builder, delta Vec) Builder {
+//	return &translated{delta, orig}
+//}
+//
+//type translated struct {
+//	delta Vec
+//	orig  Builder
+//}
+//
+//func (o *translated) Bounds() BoundingBox {
+//	bb := o.orig.Bounds()
+//	bb.Min = bb.Min.Add(o.delta)
+//	bb.Max = bb.Max.Add(o.delta)
+//	return bb
+//}
+//
+//func (o *translated) Intersect(ctx *Ctx, r *Ray) HitRecord {
+//	r2 := ctx.Ray()
+//	defer ctx.PutRay(r2)
+//	*r2 = *r
+//	r2.Start = r2.Start.Sub(o.delta)
+//	return o.orig.Intersect(ctx, r2)
+//}
+//
+//func (o *translated) Inside(p Vec) bool {
+//	return o.orig.Inside(p.Sub(o.delta))
+//}
+//

@@ -1,0 +1,15 @@
+package builder
+
+//func TestCylinder(t *testing.T) {
+//	scene := NewSceneBuilder()
+//	scene.Camera.Translate(Vec{0, 3, -4})
+//	scene.Camera.Pitch(-25 * Deg)
+//	s := Transformed(NewCylinder(material.Normal(), 2, 1.5))
+//	Pitch(s, 90*Deg)
+//	Translate(s, Vec{0, 1.1, 0})
+//	scene.Add(s)
+//	scene.Add(ShowBounds(s))
+//	scene.Add(NewSheetXZ(material.Grid()))
+//	scene.Camera.FocalLen = 1
+//	test.OnePass(t, scene.Build(), test.DefaultTolerance)
+//}

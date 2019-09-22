@@ -1,0 +1,5 @@
+package builder
+
+func NewTriangle(m Material, a, b, c Vec) Builder {
+	return NewMesh(m, []Vec{a, b, c}, [][3]int{{0, 1, 2}})
+}

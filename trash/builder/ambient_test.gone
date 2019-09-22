@@ -1,0 +1,20 @@
+package builder
+
+//func TestAmbient(t *testing.T) {
+//	scene := NewSceneBuilder()
+//
+//	scene.Add(NewSheet(material.Reflective(color.Gray(0.1)), 0))
+//
+//	// TODO: texture.MustLoad("name", texture.Nearest)
+//	tex := texture.MapFisheye(texture.MustLoad("../../assets/sky1.jpg"))
+//	amb := Ambient(tex)
+//	Yaw(amb, 20*geom.Deg)
+//	Translate(amb, geom.Vec{1, 2, 3}) // no-op
+//	scene.Add(amb)
+//
+//	scene.Camera.FocalLen = 0.7
+//	scene.Camera.Translate(Vec{0, 1, -1})
+//	scene.Camera.Pitch(20 * Deg)
+//
+//	test.NPass(t, scene.Build(), 2, 1, test.DefaultTolerance)
+//}

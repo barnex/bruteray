@@ -1,0 +1,58 @@
+package objects
+
+//import (
+//	"math"
+//
+//	. "github.com/barnex/bruteray/tracer/types"
+//)
+//
+//func Sphere(m Material, origin Vec, diam float64) Interface {
+//	r := diam / 2
+//	return &sphere{
+//		origin: origin,
+//		mat:    m,
+//		r2:     r * r,
+//	}
+//}
+//
+//type sphere struct {
+//	origin Vec
+//	r2     float64 // radius squared
+//	mat    Material
+//}
+//
+//func (s *Sphere) Bounds() BoundingBox {
+//	r := math.Sqrt(s.r2)
+//	return BoundingBox{
+//		Min: Vec{-r, -r, -r}.Add(s.origin),
+//		Max: Vec{r, r, r}.Add(s.origin),
+//	}
+//}
+//
+//func (s *Sphere) Intersect(ctx *Ctx, r *Ray) (f HitRecord) {
+//	v := r.Start.Sub(s.origin)
+//	d := r.Dir
+//	vd := v.Dot(d)
+//	D := vd*vd - (v.Len2() - s.r2)
+//	if D < 0 {
+//		return HitRecord{}
+//	}
+//	sqrtD := math.Sqrt(D)
+//	t1 := (-vd - sqrtD)
+//	t2 := (-vd + sqrtD)
+//	//t := frontSolution(t1, t2, r.Len)
+//	t := t1
+//	if t < 0 {
+//		t = t2
+//	}
+//	if t > 0 {
+//		n := r.At(t).Sub(s.origin)
+//		return HitRecord{T: t, Normal: n, Material: s.mat, Local: r.At(t).Sub(s.origin)}
+//	}
+//	return HitRecord{}
+//}
+//
+//func (s *Sphere) Inside(p Vec) bool {
+//	return p.Sub(s.origin).Len2() < s.r2
+//}
+//

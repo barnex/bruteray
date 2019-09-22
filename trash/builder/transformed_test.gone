@@ -1,0 +1,44 @@
+package builder
+
+/*
+import (
+	"testing"
+
+	"github.com/barnex/bruteray/material"
+	"github.com/barnex/bruteray/test"
+)
+
+func TestTransformed(t *testing.T) {
+	scene := NewSceneBuilder()
+	scene.Camera.Translate(Vec{0, 1, -2})
+	scene.Camera.Pitch(-20 * Deg)
+
+	scene.Add(NewSheetXZ(material.Grid()))
+
+	s_ := NewTriangle(material.Normal(), O, Ex, Ey)
+	s := Transformed(s_)
+	RollAround(s, O, 10*Deg) // TODO: why in wrong direction??
+	Translate(s, Vec{0.0, 0.001, 0})
+	scene.Add(s)
+
+	test.OnePass(t, scene.Build(), test.DefaultTolerance)
+}
+
+func TestTransformedBounds(t *testing.T) {
+	scene := NewSceneBuilder()
+	scene.Camera.Translate(Vec{0, 1, -2})
+	scene.Camera.Pitch(-20 * Deg)
+
+	scene.Add(NewSheetXZ(material.Grid()))
+
+	s_ := NewTriangle(material.Normal(), O, Ex, Ey)
+	s := Transformed(s_)
+	// s := s_ // for golden data
+	RollAround(s, O, 10*Deg)
+	Translate(s, Vec{0.0, 0.001, 0})
+	scene.Add(s)
+	scene.Add(ShowBounds(s))
+
+	test.OnePass(t, scene.Build(), 1e-2)
+}
+*/
