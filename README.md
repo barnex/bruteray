@@ -1,4 +1,5 @@
 # Bruteray
+[![GoDoc](https://godoc.org/github.com/barnex/bruteray/api?status.svg)](https://godoc.org/github.com/barnex/bruteray/api)
 
 ![fig](mascot.jpg) 
 
