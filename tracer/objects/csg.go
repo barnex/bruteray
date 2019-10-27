@@ -33,7 +33,9 @@ func andMarch(a, b Interface, r *Ray) HitRecord {
 
 	tOff := 0.0
 	h := a.Intersect(r)
-	for h.T > 0 {
+	ttl := 100 // hack: time-to-life neede in case a ray hits parallel to a surface and takes forever to escape
+	for h.T > 0 && ttl != 0 {
+		ttl--
 		if b.Inside(r.At(h.T)) {
 			h.T += tOff
 			return h
@@ -83,11 +85,12 @@ type restrict struct {
 }
 
 func (o *restrict) Intersect(r *Ray) HitRecord {
-	h := o.orig.Intersect(r)
-	if !o.inside.Inside(r.At(h.T)) {
-		return HitRecord{}
-	}
-	return h
+	//h := o.orig.Intersect(r)
+	//if !o.inside.Inside(r.At(h.T)) {
+	//	return HitRecord{}
+	//}
+	//return h
+	return andMarch(o.orig, o.inside, r)
 }
 
 func (o *restrict) Bounds() BoundingBox {
