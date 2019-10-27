@@ -19,8 +19,7 @@ func Tree(objects ...Interface) Interface {
 }
 
 type tree struct {
-	hollowSurface //TODO
-	root          node
+	root node
 }
 
 type node struct {
@@ -62,6 +61,27 @@ func (t *tree) Intersect(r *Ray) HitRecord {
 		return HitRecord{}
 	}
 	return t.root.Intersect(r)
+}
+
+func (t *tree) Inside(p Vec) bool {
+	return t.root.Inside(p)
+}
+
+func (t *node) Inside(p Vec) bool {
+	if t.children != nil {
+		if t.children[0].Inside(p) {
+			return true
+		}
+		if t.children[1].Inside(p) {
+			return true
+		}
+	}
+	for _, l := range t.leafs {
+		if l.Inside(p) {
+			return true
+		}
+	}
+	return false
 }
 
 func (n *node) Intersect(r *Ray) HitRecord {

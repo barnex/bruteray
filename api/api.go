@@ -15,6 +15,7 @@ import (
 	"github.com/barnex/bruteray/tracer/lights"
 	"github.com/barnex/bruteray/tracer/materials"
 	"github.com/barnex/bruteray/tracer/media"
+	"github.com/barnex/bruteray/tracer/objects"
 )
 
 var (
@@ -30,7 +31,7 @@ var (
 )
 
 type (
-	Camera   = tracer.Camera
+	Camera   = cameras.Transformed
 	Color    = color.Color
 	Light    = tracer.Light
 	Material = tracer.Material
@@ -42,8 +43,8 @@ var (
 	//Translated            = objects.Translated
 	//Sheet                 = objects.Sheet
 	//	Transformable         = objects.Transformed
-	//	And = objects.And
-	//	Not = objects.Not
+	And = objects.And
+	Not = objects.Not
 
 	Black   = color.Black
 	Blue    = color.Blue
@@ -57,6 +58,8 @@ var (
 
 	RectangleLight = lights.RectangleLight
 	PointLight     = lights.PointLight
+	DiskLight      = lights.DiskLight
+	SunLight       = lights.SunLight
 
 	Matte       = materials.Matte
 	Reflective  = materials.Reflective
@@ -96,8 +99,12 @@ var (
 //	Grid = texture.Grid
 )
 
-func Projective(fov float64, pos Vec, yaw, pitch, roll float64) Camera {
-	return cameras.NewProjective(fov, pos).YawPitchRoll(yaw, pitch, roll)
+func Projective(fov float64, pos Vec, yaw, pitch float64) *Camera {
+	return cameras.NewProjective(fov, pos, yaw, pitch)
+}
+
+func EnvironmentMap(pos Vec) *Camera {
+	return cameras.EnvironmentMap(pos)
 }
 
 func V(x, y, z float64) Vec {

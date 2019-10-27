@@ -1,12 +1,15 @@
 # Bruteray
 
-Bruteray is a hobby ray tracer. It employs bi-directional path tracing, a physically accurate method that produces realistic images.
+![fig](mascot.jpg) 
 
-Features:
+Bruteray is physics-based ray tracer written in Go.
 
-  * Indirect lighting (global illuminiation)
-  * Volumetric lighting
-  * Refraction
+
+## Features:
+
+  * Physically accurate lighting (incl. global illuminiation)
+  * Volumetric effects
+  * Reflections and refraction
   * Depth of field
 
 ## Gallery
@@ -28,3 +31,9 @@ The [Cornell box](https://en.wikipedia.org/wiki/Cornell_box) is a standard scene
 
 ![fig](shots/044.jpg)
 
+
+----
+The Go gopher was designed by Renee French. (http://reneefrench.blogspot.com/) The gopher 3D model was made by Takuya Ueda (https://twitter.com/tenntenn). Licensed under the Creative Commons 3.0 Attributions license.
+<a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.ja">
+    <img alt="Creative Commons licensing" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/88x31.png" />
+</a>

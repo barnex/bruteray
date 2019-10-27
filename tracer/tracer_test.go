@@ -19,7 +19,7 @@ func TestTracer(t *testing.T) {
 			Sheet(Checkers(White, Cyan), -0.2),
 			Sphere(Checkers(White, Green), 1, Vec{1, 0, -1}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0, 2}),
+		cameras.NewProjective(90*Deg, Vec{0, 0, 2}, 0, 0),
 		8,
 		test.DefaultTolerance,
 	)

@@ -16,6 +16,17 @@ func ExampleMatrix_Mul() {
 	// [[ 0.0  1.0  0.0] [-1.0  0.0  0.0] [ 0.0  0.0  1.0]]
 }
 
+func ExampleMatrix_Mul_2() {
+	R := Matrix{{0, 1, 0}, {-1, 0, 0}, {0, 0, 1}}
+	F := Matrix{{-1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
+	fmt.Printf("% 4.1f\n", R.Mul(&F))
+	fmt.Printf("% 4.1f\n", F.Mul(&R))
+
+	//Output:
+	// [[ 0.0 -1.0  0.0] [-1.0  0.0  0.0] [ 0.0  0.0  1.0]]
+	// [[ 0.0  1.0  0.0] [ 1.0  0.0  0.0] [ 0.0  0.0  1.0]]
+}
+
 func ExampleMatrix_MulVec() {
 	theta := 30 * math.Pi / 180
 	c := math.Cos(theta)
@@ -36,8 +47,16 @@ func ExampleMatrix_Inverse() {
 	m := Matrix{{1, 2, 3}, {3, -1, 2}, {2, 3, -1}}
 	inv := m.Inverse()
 	check := inv.Mul(&m)
+
+	for i := range check {
+		for j, v := range check[i] {
+			if math.Abs(v) < 1e-9 {
+				check[i][j] = 0
+			}
+		}
+	}
 	fmt.Printf("% 4.3f", check)
 
 	//Output:
-	// [[ 1.000  0.000 -0.000] [-0.000  1.000  0.000] [-0.000 -0.000  1.000]]
+	// [[ 1.000  0.000  0.000] [ 0.000  1.000  0.000] [ 0.000  0.000  1.000]]
 }

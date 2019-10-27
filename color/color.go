@@ -44,9 +44,9 @@ func (c Color) AtUV(u, v float64) Color {
 // Implements color.Color.
 // Converts from float64 linear space to 16-bit srgb.
 func (c Color) RGBA() (r, g, b, a uint32) {
-	r = uint32(srgb(c.R) * 0xffff)
-	g = uint32(srgb(c.G) * 0xffff)
-	b = uint32(srgb(c.B) * 0xffff)
+	r = uint32(LinearToSRGB(c.R) * 0xffff)
+	g = uint32(LinearToSRGB(c.G) * 0xffff)
+	b = uint32(LinearToSRGB(c.B) * 0xffff)
 
 	return r, g, b, 0xffff
 }
@@ -105,7 +105,7 @@ func (c Color) Gray() float64 {
 
 // linear to sRGB conversion
 // https://en.wikipedia.org/wiki/SRGB
-func srgb(c float64) float64 {
+func LinearToSRGB(c float64) float64 {
 	c = clip(c)
 	if c <= 0.0031308 {
 		return 12.92 * c

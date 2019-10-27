@@ -15,6 +15,7 @@ func focalLenToFOV(l float64) float64 {
 }
 
 func TestTransform(t *testing.T) {
+	t.Skip("TODO")
 	radius := 0.10
 	test.OnePass(t,
 		NewScene(
@@ -24,7 +25,36 @@ func TestTransform(t *testing.T) {
 			test.Sphere(test.Flat(color.Green), radius, Vec{0, 1, 0}),
 			test.Sphere(test.Flat(color.Blue), radius, Vec{0, 0, 1}),
 		),
-		NewProjective(focalLenToFOV(1), Vec{0, 0, 5}).YawPitchRoll(-0.4, 0.2, 0.5),
+		Translate(
+			YawPitchRoll(
+				Projective(focalLenToFOV(1)),
+				-0.4, 0.2, 0.5,
+			),
+			Vec{0, 0, 5},
+		),
+		test.DefaultTolerance,
+	)
+}
+
+// Render a scene similar to TestProjective_Handedness:
+// Red sphere at x=+1, green at y=+1, blue at z=+1.
+//
+// The camera is at (0,0,0) and should see all three spheres:
+//   - the sphere at x=+1 should be to the right of image's center (right-handed space)
+//   - the sphere at y=+1 should be stretched out along the top (heavily distorted)
+//   - the sphere at z=+1 is behind the camera and thus should be at the image's edges
+func TestEnvironmentMap(t *testing.T) {
+	radius := 0.5
+	test.NPassSize(t,
+		NewScene(
+			[]Light{},
+			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
+			test.Sphere(test.Flat(color.Green), radius, Vec{0, 1, 0}),
+			test.Sphere(test.Flat(color.Blue), radius, Vec{0, 0, 1}),
+		),
+		EnvironmentMap(Vec{0, 0.0, 0}),
+		1, 1,
+		400, 400,
 		test.DefaultTolerance,
 	)
 }
@@ -60,7 +90,7 @@ func TestProjective_Handedness(t *testing.T) {
 			test.Sphere(test.Flat(color.Green), radius, Vec{0, 1, 0}),
 			test.Sphere(test.Flat(color.Blue), radius, Vec{0, 0, 1}),
 		),
-		NewProjective(focalLenToFOV(1), Vec{0, 1, 5}),
+		NewProjective(focalLenToFOV(1), Vec{0, 1, 5}, 0, 0),
 		test.DefaultTolerance,
 	)
 }
@@ -87,7 +117,7 @@ func TestProjective_FOV(t *testing.T) {
 			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
 			test.Sphere(test.Flat(color.Red), radius, Vec{-1, 0, 0}),
 		),
-		NewProjective(focalLenToFOV(2), Vec{0, 0, 4}),
+		NewProjective(focalLenToFOV(2), Vec{0, 0, 4}, 0, 0),
 		test.DefaultTolerance,
 	)
 }

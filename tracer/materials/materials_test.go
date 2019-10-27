@@ -28,7 +28,7 @@ func TestMatte_Shadow(t *testing.T) {
 			test.Sphere(Matte(color.White), 1, Vec{0, 0, 0}),
 			test.Sphere(Matte(color.White), 1, Vec{2, 2, 0}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0.5, 3}),
+		cameras.NewProjective(90*Deg, Vec{0, 0.5, 3}, 0, 0),
 		8,
 		test.DefaultTolerance,
 	)
@@ -44,7 +44,7 @@ func TestReflective(t *testing.T) {
 			test.Sphere(Reflective(color.Color{1, 1, 1}), 1, Vec{1, 0, 0.5}),
 			test.Sphere(test.Checkers2, 2, Vec{-2, 0.5, 1}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0.5, 1.8}).YawPitchRoll(0, -10*Deg, 0),
+		cameras.NewProjective(90*Deg, Vec{0, 0.5, 1.8}, 0, -10*Deg, ),
 		8, // isometric fov
 		3, // recDepth
 		1, // nPass
@@ -70,7 +70,7 @@ func TestRefractive(t *testing.T) {
 			test.Sphere(Refractive(2.00), 1, Vec{+2, 0, 0}), // looks wrong
 			test.Sphere(Refractive(10.0), 1, Vec{+3, 0, 0}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0.3, 3.5}).YawPitchRoll(0, -10*Deg, 0),
+		cameras.NewProjective(90*Deg, Vec{0, 0.3, 3.5}, 0, -10*Deg, ),
 		8, // isometric fov
 		9, // recDepth
 		1, // nPass
@@ -87,7 +87,7 @@ func TestTransparent(t *testing.T) {
 			test.Sphere(Transparent(color.Color{0, 1, 0}, false), 1, Vec{0, 0.9, 0}),
 			test.Sheet(Matte(color.White), 0), // floor
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2.5}),
+		cameras.NewProjective(90*Deg, Vec{0, 1, 2.5}, 0, 0),
 		6,   // isometric fov
 		3,   // recDepth
 		1,   // nPass

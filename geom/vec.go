@@ -88,6 +88,31 @@ func (a Vec) Cross(b Vec) Vec {
 	return Vec{x, y, z}
 }
 
+// MakeBasis constructs an orthonormal basis.
+// I.e. returns y and z so that x, y, and z are
+// mutually orthogonal.
+func MakeBasis(x Vec) (y, z Vec) {
+	x.Normalize()
+
+	//y = x
+	//y[argMin(y)] = 1
+	//y.Normalize()
+	panic("todo")
+
+}
+
+func argMin(v Vec) int {
+	a := 0
+	min := math.Abs(v[a])
+	for i := range v {
+		if math.Abs(v[i]) < min {
+			min = math.Abs(v[i])
+			a = i
+		}
+	}
+	return a
+}
+
 // IsNaN returns true if at least one componet is NaN.
 func (a Vec) IsNaN() bool {
 	return math.IsNaN(a[0]) || math.IsNaN(a[1]) || math.IsNaN(a[2])

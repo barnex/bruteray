@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -11,15 +12,31 @@ import (
 	"path"
 	"time"
 
+	imagef "github.com/barnex/bruteray/image"
+	"github.com/barnex/bruteray/image/ppm"
 	"github.com/barnex/bruteray/sampler"
+)
+
+var (
+	flagHTTP = flag.String("http", "", "HTTP port")
 )
 
 func Render(spec Spec) {
 	flag.Parse()
-	initDefaults(&spec)
+	spec.InitDefaults()
 
+	switch {
+	default:
+		renderLocal(spec)
+	case *flagHTTP != "":
+		fmt.Println("Serving", *flagHTTP)
+		check(Serve(*flagHTTP, spec))
+	}
+}
+
+func renderLocal(spec Spec) {
 	//print("rendering:", *flagO, Width, "x", Height, ",", NumPass, "passes, ", Recursion, "recursion depth...")
-	s := sampler.NewAdaptive(spec.imageFunc(), spec.Width, spec.Height, true)
+	s := sampler.NewAdaptive(spec.ImageFunc(), spec.Width, spec.Height, true)
 
 	passBeforeSave := 0
 	i := 0
@@ -41,11 +58,16 @@ func Render(spec Spec) {
 		printTime("sampling image")
 	}
 
+	check(savePPM(noExt(*flagO)+".ppm", s.StoredImage()))
+
 	print("DONE\n")
 }
 
 func save(img image.Image, suffix string) error {
-	fname := *flagO
+	return savef(img, *flagO, suffix)
+}
+
+func savef(img image.Image, fname, suffix string) error {
 	ext := path.Ext(fname)
 
 	var b bytes.Buffer
@@ -62,7 +84,7 @@ func save(img image.Image, suffix string) error {
 		return err
 	}
 
-	fname = fname[:len(fname)-len(ext)] + suffix + ext
+	fname = noExt(fname) + suffix + ext
 	f, err := os.Create(fname)
 	if err != nil {
 		return err
@@ -77,4 +99,20 @@ var start = time.Now()
 func printTime(msg string) {
 	print(msg, ":", time.Since(start).Round(time.Millisecond))
 	start = time.Now()
+}
+
+func noExt(fname string) string {
+	ext := path.Ext(fname)
+	return fname[:len(fname)-len(ext)]
+}
+
+func savePPM(fname string, img imagef.Image) error {
+	f, err := os.Create(fname)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	defer w.Flush()
+	return ppm.EncodeAscii16(w, img)
 }

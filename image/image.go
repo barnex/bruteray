@@ -20,12 +20,20 @@ func MakeImage(w, h int) Image {
 
 // Bounds implements image.Image
 func (i Image) Bounds() image.Rectangle {
+	if len(i) == 0 {
+		return image.Rect(0, 0, 0, 0)
+	}
 	return image.Rect(0, 0, len(i[0]), len(i))
 }
 
 // At implements image.Image
 func (img Image) At(i, j int) color.Color {
 	return img[j][i]
+}
+
+func (img Image) RGBAAt(i, j int) (r, g, b, a uint32) {
+	panic("yes")
+	return img[j][i].RGBA()
 }
 
 // ColorModel implements image.Image

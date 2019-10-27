@@ -9,7 +9,7 @@ func (m *Matrix) Mul(b *Matrix) Matrix {
 	for i := range c {
 		for j := range c[i] {
 			for k := range b {
-				c[i][j] += m[i][k] * b[k][j]
+				c[i][j] += b[i][k] * m[k][j]
 			}
 		}
 	}

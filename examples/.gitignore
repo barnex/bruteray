@@ -1,5 +1,11 @@
 *.jpg
+*.ppm
 *-sampling.jpg
 abstract-parametrics
 celtic-cemetary
 moebius
+gopher3d
+gopher-obj
+gopher-cornell
+lucy
+x

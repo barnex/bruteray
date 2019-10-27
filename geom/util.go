@@ -32,6 +32,8 @@ var Ez = Vec{0, 0, 1}
 // O is shorthand for the zero vector [0 0 0].
 var O = Vec{0, 0, 0}
 
+var Inf = math.Inf(1)
+
 // TriangleNormal returns the normal vector of the triangle
 // with vertices a, b, c.
 func TriangleNormal(a, b, c Vec) Vec {

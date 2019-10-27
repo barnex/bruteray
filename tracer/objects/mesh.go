@@ -1,9 +1,11 @@
 package objects
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/barnex/bruteray/geom"
+	"github.com/barnex/bruteray/tracer/objects/obj"
 	"github.com/barnex/bruteray/tracer/objects/ply"
 	. "github.com/barnex/bruteray/tracer/types"
 	"github.com/barnex/bruteray/util"
@@ -101,8 +103,8 @@ func RectangleWithVertices(m Material, o, a, b Vec) Interface {
 func Rectangle(m Material, width, depth float64, center Vec) Interface {
 	return RectangleWithVertices(m,
 		Vec{-width / 2, 0, -depth / 2}.Add(center),
-		Vec{+width / 2, 0, -depth / 2}.Add(center),
 		Vec{-width / 2, 0, +depth / 2}.Add(center),
+		Vec{+width / 2, 0, -depth / 2}.Add(center),
 	)
 }
 
@@ -125,6 +127,10 @@ func Quadrilateral(m Material, a, b, c, d Vec) Interface {
 		[][3]int{{0, 1, 3}, {2, 3, 1}},
 		[]Vec2{{0, 0}, {1, 0}, {1, 1}, {0, 1}},
 	)
+}
+
+func Disk(m Material, diam float64, center Vec) Interface {
+	return Restrict(Rectangle(m, diam, diam, center), Cylinder(nil, diam, 8*Tiny, center))
 }
 
 // Parametric constructs a mesh approximating the parametric surface defined by
@@ -165,14 +171,54 @@ func Parametric(m Material, numU, numV int, f func(u, v float64) Vec) Interface 
 	return mesh(m, faces)
 }
 
-// TODO: withUVmapping
+// PlyFile reads a mesh from a file in Standord PLY format.
+// Optional affine transformations are applied to the vertices (left-to-right).
+// TODO: .gz
 func PlyFile(m Material, file string, transf ...*geom.AffineTransform) Interface {
 	v, f, err := ply.ParseFile(file)
 	if err != nil {
 		log.Fatal(err)
 	}
-	applyTransform(geom.Compose(transf), v)
+	if len(transf) != 0 {
+		applyTransform(geom.ComposeLR(transf...), v)
+	}
 	return Mesh(m, v, f)
+}
+
+func ObjFile(m map[string]Material, file string, transf ...*geom.AffineTransform) Interface {
+	o, err := obj.ParseFile(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(transf) != 0 {
+		applyTransform(geom.ComposeLR(transf...), o.Vertices)
+	}
+
+	objects := make([]Interface, 0, len(m))
+	for mat, faces := range o.Faces {
+		m, ok := m[mat]
+		if !ok {
+			log.Fatalf("material not defined: %q", mat)
+		}
+		objects = append(objects, plyObj(m, o.Vertices, faces))
+	}
+	return Tree(objects...)
+}
+
+func plyObj(m Material, v []Vec, f [][]int32) Interface {
+	var f2 [][3]int
+	for _, f := range f {
+		switch len(f) {
+		default:
+			panic(fmt.Sprintf("want 3 or 4 vertices, got %v", len(f)))
+		case 3:
+			f2 = append(f2, [3]int{int(f[0]), int(f[1]), int(f[2])})
+		case 4:
+			f2 = append(f2, [3]int{int(f[0]), int(f[1]), int(f[2])})
+			f2 = append(f2, [3]int{int(f[2]), int(f[3]), int(f[0])})
+		}
+	}
+	return Mesh(m, v, f2)
 }
 
 func applyTransform(t *geom.AffineTransform, v []Vec) {
@@ -325,14 +371,15 @@ func (f *face) Vertex(i int) *vertex {
 
 func (f *face) Normal() Vec {
 	return geom.TriangleNormal(f.Vertex(0).Pos, f.Vertex(1).Pos, f.Vertex(2).Pos)
+	// TODO: .Mul(-1) should not be needed
 }
 
 func calcNormals(f []face) {
-	for _, f := range f {
-		for i := range f {
-			f.Vertex(i).Normal = Vec{}
-		}
-	}
+	//for _, f := range f {
+	//	for i := range f {
+	//		f.Vertex(i).Normal = Vec{}
+	//	}
+	//}
 
 	for _, f := range f {
 		n := f.Normal()

@@ -14,7 +14,7 @@ type Spec struct {
 	Lights  []Light
 	Objects []Object
 	Media   []Medium
-	Camera  Camera
+	Camera  tracer.Camera
 
 	Recursion int
 	NumPass   int
@@ -27,7 +27,8 @@ type Spec struct {
 	DebugIsometricDir int
 }
 
-func (s *Spec) imageFunc() tracer.ImageFunc {
+// TODO: this should honour DebugNormals, etc, not InitDefaults
+func (s *Spec) ImageFunc() tracer.ImageFunc {
 	objs := make([]tracer.Object, len(s.Objects))
 	for i := range objs {
 		objs[i] = s.Objects[i]
@@ -36,7 +37,7 @@ func (s *Spec) imageFunc() tracer.ImageFunc {
 	return scene.ImageFunc(s.Camera, s.Recursion)
 }
 
-func initDefaults(s *Spec) {
+func (s *Spec) InitDefaults() {
 	if s.Recursion == 0 {
 		s.Recursion = 1
 	}
@@ -44,7 +45,7 @@ func initDefaults(s *Spec) {
 		s.NumPass = 1
 	}
 	if s.Camera == nil {
-		s.Camera = Projective(90*Deg, Vec{0, 1, 0}, 0, 0, 0)
+		s.Camera = Projective(90*Deg, Vec{0, 1, 0}, 0, 0)
 	}
 	if s.Width == 0 && s.Height == 0 {
 		s.Width = defaultImageWidth
@@ -57,9 +58,12 @@ func initDefaults(s *Spec) {
 		s.Height = (s.Width * defaultImageHeight) / defaultImageWidth
 	}
 	if s.DebugNormals {
-		for i, o := range s.Objects {
-			s.Objects[i] = o.WithMaterial(test.Normal)
+		orig := s.Objects
+		s.Objects = make([]Object, len(orig))
+		for i := range s.Objects {
+			s.Objects[i] = orig[i].WithMaterial(test.Normal)
 		}
+		s.Media = nil
 	}
 	if s.DebugIsometricFOV != 0 {
 		s.Camera = cameras.NewIsometric(s.DebugIsometricDir, s.DebugIsometricFOV)

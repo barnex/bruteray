@@ -8,7 +8,7 @@ import (
 	. "github.com/barnex/bruteray/color"
 )
 
-var Check = true
+//var Check = true
 
 // Scene is the ray tracer's central data type.
 // A Scene stores a collection of objects and lights,
@@ -164,14 +164,14 @@ var blackMat Material = (*black)(nil)
 // TODO: likewise for lights: per object: cache an occluding object for early return on shadows
 func intersectFrontmost(objs []Object, r *Ray) HitRecord {
 	front := HitRecord{T: math.Inf(1), Normal: r.Dir, Material: blackMat}
-	if Check {
-		CheckRay(r)
-	}
+	//if Check {
+	//	CheckRay(r)
+	//}
 	for _, o := range objs {
 		hit := o.Intersect(r)
-		if Check {
-			CheckHit(o, r, &hit) // DEBUG
-		}
+		//if Check {
+		//	CheckHit(o, r, &hit) // DEBUG
+		//}
 		if hit.T > 0 && !(hit.T > front.T) { // handles inf correctly
 			front = hit
 		}

@@ -54,6 +54,7 @@ func ExampleTriangleNormal() {
 	//[0 0 1]
 }
 
+
 func BenchmarkVec_Add_Accumulate(b *testing.B) {
 	var a Vec
 	v := Vec{1, 2, 3}

@@ -21,14 +21,15 @@ func main() {
 		//DebugIsometricDir: Y,
 
 		Recursion: 2,
-		NumPass:   500,
+		NumPass:   800,
+		Width: 300,
+		Height: 200,
 		// Postprocess.Bloom.Gaussian.Radius = 0.008
 		// Postprocess.Bloom.Gaussian.Amplitude = 0.5
 		// Postprocess.Bloom.Gaussian.Threshold = 0.9
 
 		Lights: []Light{
-			//RectangleLight(C(1, 0.9, 0.9).EV(9), 1, 1, V(4, 10, -3)),
-			PointLight(C(1, 0.7, 0.65).EV(9), V(11.3, 2.3, -10)),
+			SunLight(C(1, .95, .9).EV(-1), 0.53*Deg, -28*Deg, 9*Deg),
 		},
 
 		Media: []Medium{
@@ -43,7 +44,7 @@ func main() {
 			Tree(
 				cross1.Translate(V(-2, 0, 0.1)),
 				cross1.Translate(V(0, 0, -0.2)),
-				cross1.Rotate(Ez, -7*Deg).WithCenterBottom(V(2, -0.1, 0)),
+				cross1.Rotate(Ez, -6*Deg).WithCenterBottom(V(2, -0.1, 0)),
 
 				cross1.Translate(V(-2, 0, -1.1)),
 				cross1.Rotate(Ez, 5*Deg).WithCenterBottom(V(0.3, -0.1, -1.2)),
@@ -62,7 +63,7 @@ func main() {
 		//	media.ExpFog(0.15, White),
 		//},
 
-		Camera: Projective(100*Deg, Vec{0.3, 1.0, 2.15}, 0, -1*Deg, 0),
+		Camera: Projective(100*Deg, Vec{0.3, 1.0, 2.15}, 0, -1*Deg, ),
 	})
 }
 

@@ -12,11 +12,15 @@ import (
 // Multiple transformed instances of the same object may be made,
 // they efficiently share underlying state.
 //
-// TODO: if object is already an instance of *transformed,
-// combine both transforms into one.
-//
-// TODO: arguments: first transform, then object
+// If the original object is already a transformed instance,
+// then the resulting chain of transforms is optimized into a single,
+// equivalent transform. Thus, one may call
+//  Transformed(Transformed(...))
+// without negative performance implications.
 func Transformed(object Interface, t *geom.AffineTransform) Interface {
+	if object, ok := object.(*transformed); ok {
+		return Transformed(object.orig, object.forward.Before(t))
+	}
 	return &transformed{
 		bounds:  transformBounds(object.Bounds(), t),
 		forward: *t,

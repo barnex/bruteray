@@ -30,6 +30,14 @@ func (c *Ctx) Sample2() (u, v float64) {
 	return c.Rng.Float64(), c.Rng.Float64()
 }
 
+func (c *Ctx) SampleDisk() (u, v float64) {
+	u, v = c.Sample2()
+	for u*u+v*v > 1 {
+		u, v = c.Sample2()
+	}
+	return u, v
+}
+
 // Ray returns a new Ray, allocated from a pool.
 // PutRay should be called to recycle the Ray.
 // TODO: rename NewRay

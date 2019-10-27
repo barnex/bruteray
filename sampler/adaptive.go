@@ -24,7 +24,7 @@ type Adaptive struct {
 	sumSq       Image
 	n           ImageGray // TODO: int
 	totalPasses int
-	antiAlias   bool
+	AntiAlias   bool
 
 	PixelCount, RayCount int
 	WallTime             time.Duration
@@ -36,11 +36,19 @@ func NewAdaptive(f tracer.ImageFunc, w, h int, antiAlias bool) *Adaptive {
 		sum:       imagef.MakeImage(w, h),
 		sumSq:     imagef.MakeImage(w, h),
 		n:         imagef.MakeImageGray(w, h),
-		antiAlias: antiAlias,
+		AntiAlias: antiAlias,
 	}
 }
 
 func (s *Adaptive) Sample(nPass int) {
+	s.SampleNumCPU(runtime.NumCPU(), nPass)
+}
+
+func (s *Adaptive) SampleNumCPU(nCPU, nPass int) {
+	s.SampleNumCPUWithCancel(nCPU, nPass, make(chan struct{}))
+}
+
+func (s *Adaptive) SampleNumCPUWithCancel(nCPU, nPass int, cancel chan struct{}) {
 	w, h := s.Bounds().Dx(), s.Bounds().Dy()
 	numPix := w * h
 	budget := numPix * nPass
@@ -55,8 +63,6 @@ func (s *Adaptive) Sample(nPass int) {
 	}
 	close(ch)
 
-	// render lines and passes in parallel
-	nCPU := runtime.NumCPU()
 	ctx := make([]*tracer.Ctx, nCPU)
 	var wg sync.WaitGroup
 	start := time.Now()
@@ -66,6 +72,11 @@ func (s *Adaptive) Sample(nPass int) {
 		go func(i int) {
 			defer wg.Done()
 			for iy := range ch {
+				select {
+				case <-cancel:
+					return
+				default:
+				}
 				s.SampleLine(ctx[i], iy, w, h, budget, total)
 			}
 		}(i)
@@ -122,7 +133,7 @@ func (s *Adaptive) samplePixel(ctx *tracer.Ctx, ix, iy, w, h int, n int) {
 	for pass := 0; pass < n; pass++ {
 		x := xi
 		y := yi
-		if s.antiAlias {
+		if s.AntiAlias {
 			x += pixs * (ctx.Rng.Float64() - 0.5)
 			y += pixs * (ctx.Rng.Float64() - 0.5)
 		}

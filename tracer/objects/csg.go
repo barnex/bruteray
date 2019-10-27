@@ -51,8 +51,10 @@ func setStart(r *Ray, start Vec) {
 }
 
 func (o *and) Bounds() BoundingBox {
-	a := o.a.Bounds()
-	b := o.b.Bounds()
+	return intersectBounds(o.a.Bounds(), o.b.Bounds())
+}
+
+func intersectBounds(a, b BoundingBox) BoundingBox {
 	return BoundingBox{
 		Min: Vec{
 			util.Max(a.Min[0], b.Min[0]),
@@ -69,6 +71,31 @@ func (o *and) Bounds() BoundingBox {
 
 func (o *and) Inside(p Vec) bool {
 	return o.a.Inside(p) && o.b.Inside(p)
+}
+
+func Restrict(a, b Interface) Interface {
+	return &restrict{a, b}
+}
+
+type restrict struct {
+	orig   Interface
+	inside Interface
+}
+
+func (o *restrict) Intersect(r *Ray) HitRecord {
+	h := o.orig.Intersect(r)
+	if !o.inside.Inside(r.At(h.T)) {
+		return HitRecord{}
+	}
+	return h
+}
+
+func (o *restrict) Bounds() BoundingBox {
+	return intersectBounds(o.orig.Bounds(), o.inside.Bounds())
+}
+
+func (o *restrict) Inside(p Vec) bool {
+	return o.orig.Inside(p) && o.inside.Inside(p)
 }
 
 type not struct {

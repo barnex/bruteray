@@ -27,7 +27,7 @@ func TestExpFog(t *testing.T) {
 			Sphere(Checkers(White, Green), 1, Vec{-1, 0, -5}),
 			Sheet(Checkers(White, Cyan), -0.2),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}).YawPitchRoll(0, -10*Deg, 0),
+		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -10*Deg),
 		DefaultTolerance,
 	)
 }
@@ -47,7 +47,7 @@ func TestExpFog_Height(t *testing.T) {
 			Sphere(Checkers(White, Green), 3, Vec{-3, 1.5, -2}),
 			Sheet(Checkers(White, Cyan), 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}).YawPitchRoll(0, -10*Deg, 0),
+		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -10*Deg),
 		DefaultTolerance,
 	)
 }
@@ -67,7 +67,7 @@ func TestExpFog_Height2(t *testing.T) {
 			Sphere(Checkers(White, Green), 3, Vec{-3, 1.5, -2}),
 			Sheet(Checkers(White, Cyan), 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}).YawPitchRoll(0, 10*Deg, 0),
+		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, 10*Deg),
 		DefaultTolerance,
 	)
 }
@@ -90,7 +90,7 @@ func TestFog(t *testing.T) {
 			Sphere(w, 1, Vec{-1, 0, -5}),
 			Sheet(w, -0.2),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}).YawPitchRoll(0, -10*Deg, 0),
+		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -10*Deg),
 		1,
 		1000,
 		DefaultTolerance,
@@ -116,7 +116,7 @@ func TestFog_Height(t *testing.T) {
 			//Sphere(w, 3, Vec{-3, 1.5, -2}),
 			//Sheet(w, 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 2, 2}).YawPitchRoll(0, -30*Deg, 0),
+		cameras.NewProjective(90*Deg, Vec{0, 2, 2}, 0, -30*Deg),
 		1,
 		10,
 		DefaultTolerance,
@@ -141,7 +141,7 @@ func TestFog_Height2(t *testing.T) {
 			Sphere(Checkers(White, Green), 3, Vec{-3, 1.5, -2}),
 			Sheet(Checkers(White, Cyan), 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}).YawPitchRoll(0, 10*Deg, 0),
+		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, 10*Deg),
 		1,
 		1000,
 		DefaultTolerance,

@@ -1,0 +1,26 @@
+# Blender v2.72 (sub 0) OBJ File: 'gopher.blend'
+# Parts removed
+# www.blender.org
+mtllib gopher.mtl
+o Body_Sphere.002
+v 0.0 0.1 0.2
+v 1.0 1.1 1.2
+v 2.0 2.1 2.2
+usemtl Body
+s 1
+f 1 2 3
+f 2 3 4 5
+o Tail_Sphere.015
+v 3.0 3.1 3.2
+v 4.0 4.1 4.2
+usemtl SkinColor
+s 1
+f 2 3 4 5
+f 3 4 5 6
+o Foot_R.001_Sphere.014
+v 5.0 5.1 5.2
+v 5.0 5.1 5.2
+usemtl SkinColor
+s 1
+f 4 5 6
+l 5 6

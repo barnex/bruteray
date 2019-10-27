@@ -1,9 +1,8 @@
 package materials
 
 import (
-	. "github.com/barnex/bruteray/color"
 	"github.com/barnex/bruteray/texture"
-	. "github.com/barnex/bruteray/tracer"
+	. "github.com/barnex/bruteray/tracer/types"
 )
 
 type flat struct {

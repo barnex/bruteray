@@ -22,12 +22,25 @@ type AffineTransform struct {
 	B Vec
 }
 
-func Compose(t []*AffineTransform) *AffineTransform {
-	comp := Scale(O, 1)
+// ComposeLR composes affine transformations left-to-right.
+// I.e., the leftmost argument is applied first.
+func ComposeLR(t ...*AffineTransform) *AffineTransform {
+	comp := UnitTransform()
 	for _, t := range t {
-		comp = comp.After(t)
+		comp = comp.Before(t)
 	}
 	return comp
+}
+
+func UnitTransform() *AffineTransform {
+	return &AffineTransform{
+		A: UnitMatrix(),
+		B: O,
+	}
+}
+
+func UnitMatrix() Matrix {
+	return Matrix{Ex, Ey, Ez}
 }
 
 // Scale returns a transform that scales by factor s,
@@ -146,8 +159,13 @@ func (t *AffineTransform) Inverse() *AffineTransform {
 	}
 }
 
-// Compose returns a composite Transform that applies t first, followed by s.
-func (t *AffineTransform) Compose(s *AffineTransform) *AffineTransform {
+// After returns a composite transform that applies s first, followed by t.
+func (t *AffineTransform) After(s *AffineTransform) *AffineTransform {
+	return s.Before(t)
+}
+
+// Before returns a composite transform that applies t first, followed by s.
+func (t *AffineTransform) Before(s *AffineTransform) *AffineTransform {
 	// y = TAx+Tb
 	// z = SAy+Sb
 	//   = SA(TAx+Tb)+Sb
@@ -158,14 +176,10 @@ func (t *AffineTransform) Compose(s *AffineTransform) *AffineTransform {
 	}
 }
 
-func (t *AffineTransform) After(s *AffineTransform) *AffineTransform {
-	return s.Compose(t)
-}
-
 // WithOrigin returns a translated version of t so that o is the new origin
 // (fixed point). E.g.:
 // 	Rotate(Vec{}, Ez, θ).WithOrigin(Vec{1,2,0})
 // rotates around [1, 2, 0] rather than [0, 0, 0]
 func (t *AffineTransform) WithOrigin(o Vec) *AffineTransform {
-	return Translate(o.Mul(-1)).Compose(t).Compose(Translate(o))
+	return ComposeLR(Translate(o.Mul(-1)), t, Translate(o))
 }

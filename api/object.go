@@ -33,6 +33,10 @@ func PlyFile(m Material, file string, transf ...*geom.AffineTransform) Object {
 	return Object{objects.PlyFile(m, file, transf...)}
 }
 
+func ObjFile(m map[string]Material, file string, transf ...*geom.AffineTransform) Object {
+	return Object{objects.ObjFile(m, file, transf...)}
+}
+
 func RectangleWithVertices(m Material, o, a, b Vec) Object {
 	return Object{objects.RectangleWithVertices(m, o, a, b)}
 }
@@ -84,10 +88,19 @@ func (o Object) Translate(delta Vec) Object {
 	return o.Transform(geom.Translate(delta))
 }
 
+func (o Object) Scale(s float64) Object {
+	return o.Transform(geom.Scale(o.Center(), s))
+}
+
 func (o Object) Transform(tr *geom.AffineTransform) Object {
 	return Object{objects.Transformed(o.Interface, tr)}
 }
 
 func (o Object) WithMaterial(m Material) Object {
 	return Object{objects.WithMaterial(m, o.Interface)}
+}
+
+func (o Object) ScaleToSize(maxSize float64) Object {
+	s := o.Bounds().Size()[0]
+	return o.Scale(maxSize / s)
 }

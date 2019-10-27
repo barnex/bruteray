@@ -9,10 +9,7 @@ import (
 	"github.com/barnex/bruteray/tracer"
 )
 
-// Uniform returns a uniformly sampled image,
-// averaging nPass samples per pixel.
-// Multi-pass images are anti-aliased.
-func Uniform(f tracer.ImageFunc, nPass, w, h int) Image {
+func UniformWithCancel(f tracer.ImageFunc, nPass, w, h int, cancel chan struct{}) Image {
 	img := imagef.MakeImage(w, h)
 
 	// channel with work items: line numbers to render
@@ -32,11 +29,23 @@ func Uniform(f tracer.ImageFunc, nPass, w, h int) Image {
 		go func() {
 			defer wg.Done()
 			for iy := range ch {
-				addLine(ctx, img, f, iy)
+				select {
+				case <-cancel:
+					return
+				default:
+					addLine(ctx, img, f, iy)
+				}
+				runtime.Gosched()
 			}
 		}()
 	}
 	wg.Wait()
+
+	select {
+	case <-cancel:
+		return nil
+	default:
+	}
 
 	// normalize final image
 	normalize := 1 / float64(nPass)
@@ -46,6 +55,13 @@ func Uniform(f tracer.ImageFunc, nPass, w, h int) Image {
 		}
 	}
 	return img
+}
+
+// Uniform returns a uniformly sampled image,
+// averaging nPass samples per pixel.
+// Multi-pass images are anti-aliased.
+func Uniform(f tracer.ImageFunc, nPass, w, h int) Image {
+	return UniformWithCancel(f, nPass, w, h, make(chan struct{}))
 }
 
 func addLine(ctx *tracer.Ctx, img Image, f tracer.ImageFunc, iy int) {

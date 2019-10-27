@@ -31,6 +31,7 @@ var (
 	Ex                = geom.Ex
 	Ey                = geom.Ey
 	Ez                = geom.Ez
+	Inf               = geom.Inf
 )
 
 const (
