@@ -31,7 +31,7 @@ type Spec struct {
 func (s *Spec) ImageFunc() tracer.ImageFunc {
 	objs := make([]tracer.Object, len(s.Objects))
 	for i := range objs {
-		objs[i] = s.Objects[i]
+		objs[i] = s.Objects[i].Interface
 	}
 	scene := tracer.NewSceneWithMedia(s.Media, s.Lights, objs...)
 	return scene.ImageFunc(s.Camera, s.Recursion)

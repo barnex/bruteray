@@ -70,6 +70,7 @@ type state struct {
 	lastMouseX, lastMouseY float32
 	freeLooking            bool
 	renderDirty            bool
+	paused                 bool
 
 	// background image refinement
 	bakery         chan imagef.Image
@@ -108,7 +109,7 @@ func (s *state) run() {
 
 		// (2) there's no user events queued and we are not dragging the mouse:
 		// start baking high-res image
-		if !s.isBaking && !s.freeLooking && !s.renderDirty {
+		if !s.isBaking && !s.freeLooking && !s.renderDirty && !s.paused {
 			s.goBakeAndSend()
 		}
 
@@ -337,14 +338,20 @@ func (s *state) handleKeyEvent(e key.Event) {
 
 	if e.Direction == key.DirPress {
 		switch e.Code {
-		case key.CodeLeftArrow:
-			s.handleMoveCam(Vec{1, 0, 0}) // ?
-		case key.CodeRightArrow:
+		case key.CodeLeftArrow, key.CodeS:
 			s.handleMoveCam(Vec{-1, 0, 0}) // ?
-		case key.CodeUpArrow:
-			s.handleMoveCam(Vec{0, 0, 1})
-		case key.CodeDownArrow:
+		case key.CodeRightArrow, key.CodeF:
+			s.handleMoveCam(Vec{1, 0, 0}) // ?
+		case key.CodeUpArrow, key.CodeE:
 			s.handleMoveCam(Vec{0, 0, -1})
+		case key.CodeDownArrow, key.CodeD:
+			s.handleMoveCam(Vec{0, 0, 1})
+		case key.CodeSpacebar:
+			s.handleMoveCam(Vec{0, 1, 0})
+		case key.CodeZ:
+			s.handleMoveCam(Vec{0, -1, 0})
+		case key.CodeP:
+			s.paused = !s.paused
 		case key.CodeN:
 			s.handleToggleNormals()
 		}
@@ -411,6 +418,14 @@ func (s *state) handleLook(dx, dy float32) {
 	const sens = 0.005
 	s.view.CamYaw += float64(dx) * sens
 	s.view.CamPitch += float64(dy) * sens
+
+	// clamp camera pitch to +/- 90Deg so that we can't see the world upside down
+	if s.view.CamPitch < -Pi/2 {
+		s.view.CamPitch = -Pi / 2
+	}
+	if s.view.CamPitch > Pi/2 {
+		s.view.CamPitch = Pi / 2
+	}
 	s.renderDirty = true
 }
 

@@ -82,6 +82,7 @@ func (s *Adaptive) SampleNumCPUWithCancel(nCPU, nPass int, cancel chan struct{})
 		}(i)
 	}
 	wg.Wait()
+
 	s.WallTime += time.Since(start)
 	for _, c := range ctx {
 		s.PixelCount += c.PixelCount

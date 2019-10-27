@@ -104,3 +104,11 @@ func (o Object) ScaleToSize(maxSize float64) Object {
 	s := o.Bounds().Size()[0]
 	return o.Scale(maxSize / s)
 }
+
+func (o Object) Restrict(bounds Object) Object {
+	return Object{objects.Restrict(o.Interface, bounds.Interface)}
+}
+
+func (o Object) And(b Object) Object {
+	return Object{objects.And(o.Interface, b.Interface)}
+}

@@ -2,10 +2,3 @@
 set -e
 if (git ls-files --others --exclude-standard | grep .) then echo "untracked files"; exit 1; fi
 go test -short ./...
-
-(cd examples &&
-for f in *.go; do
-	echo build " " $f
-	go build -o /tmp/example $f
-done
-)
