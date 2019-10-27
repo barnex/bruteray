@@ -6,7 +6,7 @@ import (
 )
 
 type Object struct {
-	objects.Interface
+	Interface objects.Interface
 }
 
 func Backdrop(m Material) Object {
@@ -52,7 +52,7 @@ func Sphere(m Material, diam float64, center Vec) Object {
 func Tree(children ...Object) Object {
 	ch := make([]objects.Interface, len(children))
 	for i := range children {
-		ch[i] = children[i]
+		ch[i] = children[i].Interface
 	}
 	return Object{objects.Tree(ch...)}
 }
@@ -65,8 +65,20 @@ func Difference(a, b Object) Object {
 	return Object{objects.Difference(a.Interface, b.Interface)}
 }
 
+func (o Object) Bounds() objects.BoundingBox {
+	return o.Interface.Bounds()
+}
+
 func (o Object) Center() Vec {
 	return o.Bounds().Center()
+}
+
+func (o Object) CenterBack() Vec {
+	return o.Bounds().CenterBack()
+}
+
+func (o Object) CenterFront() Vec {
+	return o.Bounds().CenterFront()
 }
 
 func (o Object) WithCenter(pos Vec) Object {
@@ -111,4 +123,16 @@ func (o Object) Restrict(bounds Object) Object {
 
 func (o Object) And(b Object) Object {
 	return Object{objects.And(o.Interface, b.Interface)}
+}
+
+func (o Object) Or(b Object) Object {
+	return Object{objects.Or(o.Interface, b.Interface)}
+}
+
+func (o Object) AndNot(b Object) Object {
+	return Object{objects.And(o.Interface, objects.Not(b.Interface))}
+}
+
+func (o Object) Remove(b Object) Object {
+	return Object{objects.Restrict(o.Interface, objects.Not(b.Interface))}
 }

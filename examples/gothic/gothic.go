@@ -6,23 +6,31 @@ func main() {
 	wall := Matte(White.Mul(0.6))
 	mainW := 8.0
 	mainH := 4.0
+	mainD := 12.0
 
-	cyl := Cylinder(wall, mainW, mainH, O).WithCenterBottom(O).Restrict(
-				Box(nil, mainW, mainH+1, mainW, O).WithCenterBottom(V(0, -.1, 0)).Translate(V(0, 0, mainW/2)),
-			)
-	dome := Sphere(wall, mainW, V(0, mainH, 0)).Restrict(Box(nil, mainW, mainW/2, mainW, V(0,mainW/2+mainH/2,mainW/2)))
 
+	central := Box(wall, mainW, mainH+mainW/2, mainD, O).WithCenterBottom(O)
+
+	dome := Cylinder(wall, mainW, mainH, O).WithCenterBottom(O).Or(
+		Sphere(wall, mainW, V(0, mainH, 0)),
+	).Translate(V(0, 0, -mainW))
 
 	Render(Spec{
-		Recursion: 2,
+		Recursion: 3,
 		Objects: []Object{
-			cyl,
-			dome,
-			Rectangle(wall, 100, 100, O),
+
+			central.Or(dome).Remove(Box(nil, 2,4,2, dome.CenterBack())),
+
+			Rectangle(wall, 100, 100, V(0, .01, 0)),
 			Backdrop(Flat(C(0.8, 0.8, 1.0).EV(-.6))),
 		},
 		Lights: []Light{
-			SunLight(White, 5*Deg, -50*Deg, 50*Deg),
+			SunLight(White.EV(2), 5*Deg, -18*Deg, 18*Deg),
+			PointLight(White.EV(4), dome.Center()),
+		},
+
+		Media: []Medium{
+			//Fog(0.02, mainH*2),
 		},
 	})
 }

@@ -15,10 +15,6 @@ type and struct {
 	a, b Interface
 }
 
-/*
-		  *===============
-	*==============
-*/
 func (o *and) Intersect(r *Ray) HitRecord {
 	a := andMarch(o.a, o.b, r)
 	b := andMarch(o.b, o.a, r)
@@ -75,6 +71,64 @@ func (o *and) Inside(p Vec) bool {
 	return o.a.Inside(p) && o.b.Inside(p)
 }
 
+func Or(a, b Interface) Interface {
+	return &or{a, b}
+}
+
+type or struct {
+	a, b Interface
+}
+
+func (o *or) Intersect(r *Ray) HitRecord {
+	a := orMarch(o.a, o.b, r)
+	b := orMarch(o.b, o.a, r)
+	return tracer.Frontmost(&a, &b)
+}
+
+func (o *or) Inside(p Vec) bool {
+	return o.a.Inside(p) || o.b.Inside(p)
+}
+
+func (o *or) Bounds() BoundingBox {
+	a := o.a.Bounds()
+	b := o.b.Bounds()
+	return BoundingBox{
+		Min: Vec{
+			util.Min(a.Min[0], b.Min[0]),
+			util.Min(a.Min[1], b.Min[1]),
+			util.Min(a.Min[2], b.Min[2]),
+		},
+		Max: Vec{
+			util.Max(a.Max[0], b.Max[0]),
+			util.Max(a.Max[1], b.Max[1]),
+			util.Max(a.Max[2], b.Max[2]),
+		},
+	}
+}
+
+// March along the ray until we find an intersection with a that is not inside b.
+// TODO: we could pass a maxT beyond which we can stop searching.
+func orMarch(a, b Interface, r *Ray) HitRecord {
+	backup := r.Start
+	defer setStart(r, backup)
+
+	tOff := 0.0
+	h := a.Intersect(r)
+	ttl := 100 // hack: time-to-life neede in case a ray hits parallel to a surface and takes forever to escape
+	for h.T > 0 && ttl != 0 {
+		ttl--
+		if !b.Inside(r.At(h.T)) {
+			h.T += tOff
+			return h
+		}
+		deltaT := h.T + Tiny
+		tOff += deltaT
+		r.Start = r.At(deltaT)
+		h = a.Intersect(r)
+	}
+	return HitRecord{}
+}
+
 func Restrict(a, b Interface) Interface {
 	return &restrict{a, b}
 }
@@ -85,11 +139,6 @@ type restrict struct {
 }
 
 func (o *restrict) Intersect(r *Ray) HitRecord {
-	//h := o.orig.Intersect(r)
-	//if !o.inside.Inside(r.At(h.T)) {
-	//	return HitRecord{}
-	//}
-	//return h
 	return andMarch(o.orig, o.inside, r)
 }
 

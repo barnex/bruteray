@@ -190,11 +190,12 @@ func (s *state) cancelBaking() {
 		resp, err := http.Get("http://" + s.addr + "/cancel")
 		if err != nil {
 			fmt.Println(err)
-		}
+		}else{
 		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusOK {
 			fmt.Printf("status %v: %s\n", resp.StatusCode, readBody(resp.Body))
 		}
+	}
 	}
 	s.bakeResolution = 0
 }

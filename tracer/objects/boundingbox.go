@@ -78,6 +78,18 @@ func (b BoundingBox) CenterTop() Vec {
 	return c
 }
 
+func (b BoundingBox) CenterBack() Vec {
+	c := safeAverage(b.Min, b.Max)
+	c[Z] = b.Min[Z]
+	return c
+}
+
+func (b BoundingBox) CenterFront() Vec {
+	c := safeAverage(b.Min, b.Max)
+	c[Z] = b.Max[Z]
+	return c
+}
+
 // average of a and b, but return 0 for inf - inf.
 func safeAverage(a, b Vec) Vec {
 	avg := a.Add(b).Mul(0.5)
