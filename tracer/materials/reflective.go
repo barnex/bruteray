@@ -21,13 +21,13 @@ type reflective struct {
 	c Color
 }
 
-func (m *reflective) Eval(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color {
+func (m *reflective) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	pos := r.At(h.T - Tiny)
 	r2 := ctx.Ray()
+	defer ctx.PutRay(r2)
 	r2.Start = pos
 	r2.Dir = reflect(r.Dir, h.Normal)
-	defer ctx.PutRay(r2)
-	return s.Eval(ctx, r2, recDepth).Mul3(m.c)
+	return s.Eval(ctx, r2).Mul3(m.c)
 }
 
 // ReflectFresnel is a transparent material with index of refraction n,
@@ -47,16 +47,16 @@ type reflectFresnel struct {
 	trans Material
 }
 
-func (s *reflectFresnel) Eval(ctx *Ctx, e *Scene, r *Ray, recDepth int, h HitCoords) Color {
+func (s *reflectFresnel) Eval(ctx *Ctx, e *Scene, r *Ray, h HitCoords) Color {
 	pos, norm := r.At(h.T-Tiny), h.Normal
 	r2 := ctx.Ray()
 	r2.Start = pos
 	r2.Dir = reflect(r.Dir, norm)
-	defer ctx.PutRay(r2)
 	R := fresnelReflection(1, s.n, math.Abs(norm.Dot(r.Dir)))
 	T := 1 - R
-	trans := s.trans.Eval(ctx, e, r, recDepth, h)
-	refl := e.Eval(ctx, r2, recDepth)
+	trans := s.trans.Eval(ctx, e, r, h)
+	refl := e.Eval(ctx, r2)
+	ctx.PutRay(r2)
 	return refl.Mul(R).MAdd(T, trans)
 }
 

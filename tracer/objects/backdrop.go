@@ -25,9 +25,13 @@ type backdrop struct {
 func (o *backdrop) Intersect(r *Ray) HitRecord {
 	// although the surface is truly at infinity, we return a large finite T
 	// to avoid complications like inf != inf.
-	return HitRecord{T: 1e99, Material: o.mat, Local: r.Dir}
+	return HitRecord{T: 1e99, Material: o.mat, Local: r.Dir, Normal: r.Dir}
 }
 
 func (o *backdrop) Bounds() BoundingBox {
 	return infBox
 }
+
+// hack. allows spec to idendify and remove backdrop
+// when showing debugNormals
+func(o*backdrop)IsBackdrop(){}

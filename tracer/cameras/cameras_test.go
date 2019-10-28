@@ -19,6 +19,7 @@ func TestTransform(t *testing.T) {
 	radius := 0.10
 	test.OnePass(t,
 		NewScene(
+			1,
 			[]Light{},
 			test.Sphere(test.Flat(color.White), radius, Vec{0, 0, 0}),
 			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
@@ -47,13 +48,14 @@ func TestEnvironmentMap(t *testing.T) {
 	radius := 0.5
 	test.NPassSize(t,
 		NewScene(
+			1,
 			[]Light{},
 			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
 			test.Sphere(test.Flat(color.Green), radius, Vec{0, 1, 0}),
 			test.Sphere(test.Flat(color.Blue), radius, Vec{0, 0, 1}),
 		),
 		EnvironmentMap(Vec{0, 0.0, 0}),
-		1, 1,
+		1,
 		400, 400,
 		test.DefaultTolerance,
 	)
@@ -66,6 +68,7 @@ func TestIsometric(t *testing.T) {
 	radius := 0.10
 	test.OnePass(t,
 		NewScene(
+			1,
 			[]Light{},
 			test.Sphere(test.Flat(color.White), radius, Vec{0, 0, 0}),
 			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
@@ -84,6 +87,7 @@ func TestProjective_Handedness(t *testing.T) {
 	const radius = 0.10
 	test.OnePass(t,
 		NewScene(
+			1,
 			[]Light{},
 			test.Sphere(test.Flat(color.White), radius, Vec{0, 0, 0}),
 			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
@@ -112,6 +116,7 @@ func TestProjective_FOV(t *testing.T) {
 	const radius = 0.10
 	test.OnePass(t,
 		NewScene(
+			1,
 			[]Light{},
 			test.Sphere(test.Flat(color.White), radius, Vec{0, 0, 0}),
 			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),

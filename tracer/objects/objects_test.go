@@ -18,6 +18,7 @@ var fov = 90 * Deg // legacy field-of-view
 func TestAnd(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1, 1.0, 1}),
 			},
@@ -36,6 +37,7 @@ func TestAnd(t *testing.T) {
 func TestAnd_Bounds(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			3,
 			[]Light{},
 			WithBounds(
 				And(
@@ -54,6 +56,7 @@ func TestAnd_Bounds(t *testing.T) {
 func TestAndNot(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1.0, 1.2, 1.0}),
 			},
@@ -72,6 +75,7 @@ func TestAndNot(t *testing.T) {
 func TestAndNot_Box(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{0.0, 1.2, 1}),
 			},
@@ -95,6 +99,7 @@ func TestAndNot_Box(t *testing.T) {
 func BenchmarkAndNot(b *testing.B) {
 	test.Benchmark(b,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1.0, 1.2, 1.0}),
 			},
@@ -114,6 +119,7 @@ func BenchmarkAndNot(b *testing.B) {
 func TestAndNot_Bounds(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			3,
 			[]Light{},
 			WithBounds(
 				And(
@@ -132,6 +138,7 @@ func TestAndNot_Bounds(t *testing.T) {
 func TestAndNot_Hollow(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1.0, 1.5, 3.0}),
 			},
@@ -150,6 +157,7 @@ func TestAndNot_Hollow(t *testing.T) {
 func TestBackdrop(t *testing.T) {
 	test.OnePass(t,
 		NewScene(
+			1,
 			[]Light{},
 			Backdrop(test.Checkers(test.Flat(color.White), test.Flat(color.Blue))),
 		),
@@ -162,6 +170,7 @@ func TestBackdrop(t *testing.T) {
 func TestBox(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{2, 2, 2}),
 			},
@@ -178,6 +187,7 @@ func TestBox(t *testing.T) {
 func TestCylinder(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{0, 1.5, 1}),
 			},
@@ -195,6 +205,7 @@ func TestCylinder(t *testing.T) {
 func TestCylinder_Bounds(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			5,
 			[]Light{},
 			WithBounds(Cylinder(test.Normal, 1, 0.5, Vec{0, 0, 0})),
 			WithBounds(Cylinder(test.Normal, 1.5, 2, Vec{1, 0.25, -1})),
@@ -209,6 +220,7 @@ func TestCylinder_Bounds(t *testing.T) {
 func TestDisk_Bounds(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			3,
 			[]Light{},
 			WithBounds(Disk(test.Normal, 1, Vec{-1, 0, 0})),
 			WithBounds(Disk(test.Normal, 2, Vec{2, 2, -1})),
@@ -223,6 +235,7 @@ func TestDisk_Bounds(t *testing.T) {
 func TestDisk_Shadow(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1, 2, -1}),
 			},
@@ -264,6 +277,7 @@ func TestDisk_Shadow(t *testing.T) {
 func TestIsoSurface_Const(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{3, 2, 2.}),
 			},
@@ -291,6 +305,7 @@ func TestIsoSurface_Discontinuous(t *testing.T) {
 	t.Skip("TODO")
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{3, 2, 2.}),
 			},
@@ -314,6 +329,7 @@ func TestIsoSurface_Sinc(t *testing.T) {
 	//defer disableChecks()()
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{3, 2, 2.}),
 			},
@@ -335,6 +351,7 @@ func TestMesh_Bunny(t *testing.T) {
 	t.Skip("TODO: mesh has holes, NaNs")
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{2, 3, 4}),
 			},
@@ -351,6 +368,7 @@ func TestMesh_Bunny(t *testing.T) {
 func TestMesh_Teapot(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{2, 3, 4}),
 			},
@@ -367,6 +385,7 @@ func TestMesh_Teapot(t *testing.T) {
 func BenchmarkMesh_Teapot(b *testing.B) {
 	test.Benchmark(b,
 		NewScene(
+			1,
 			[]Light{},
 			PlyFile(test.Normal, "../../assets/teapot.ply",
 				geom.Scale(O, 0.25), geom.Rotate(O, Ex, -90*Deg), geom.Rotate(O, Ey, -20*Deg)),
@@ -379,6 +398,7 @@ func BenchmarkMesh_Teapot(b *testing.B) {
 func TestSphere(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1, 2, 0}),
 			},
@@ -396,6 +416,7 @@ func TestSphere(t *testing.T) {
 func TestSphere_Bounds(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			5,
 			[]Light{},
 			WithBounds(Sphere(test.Normal, 1, Vec{0, 0, 0})),
 			WithBounds(Sphere(test.Normal, 1.5, Vec{1, 0.25, -1})),
@@ -430,6 +451,7 @@ func TestTransformed_Cylinder(t *testing.T) {
 	cyl := Cylinder(test.Checkers1, 0.5, 1, Vec{0, 0, 0})
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1, 2, 0}),
 			},
@@ -457,6 +479,7 @@ func TestTransformed_Rotate(t *testing.T) {
 	tcyl := Transformed(cyl, geom.Translate(Vec{-1, 0, 0}))
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{},
 			test.Sphere(test.Yellow, 0.2, Vec{1, 0, 0}), // center of rotation
 			cyl,
@@ -502,6 +525,7 @@ func TestTransformed_Bounds_Cylinder(t *testing.T) {
 	cyl := Cylinder(test.Normal, 0.5, 1, Vec{0, 0, 0})
 	test.QuadView(t,
 		NewScene(
+			5,
 			[]Light{},
 			WithBounds(Transformed(cyl, geom.Scale(O, 0.5))),
 			WithBounds(Transformed(cyl, geom.Translate(Vec{2, 0, -2}))),
@@ -526,6 +550,7 @@ func BenchmarkTransformed_Cylinder(b *testing.B) {
 	cyl := Cylinder(test.Checkers1, 0.5, 1, Vec{0, 0, 0})
 	test.Benchmark(b,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1, 2, 0}),
 			},
@@ -569,6 +594,7 @@ func BenchmarkTransformed_Optimize(b *testing.B) {
 
 	test.Benchmark(b,
 		NewScene(
+			1,
 			[]Light{},
 			WithBounds(t5),
 		),
@@ -582,6 +608,7 @@ func BenchmarkTransformed_Optimize(b *testing.B) {
 func TestTree(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{},
 			Tree(randomSpheres(300, 0.3)...),
 		),
@@ -594,6 +621,7 @@ func TestTree(t *testing.T) {
 func TestTree_Bounds(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			5,
 			[]Light{},
 			WithBounds(Tree(randomSpheres(300, 0.3)...)),
 		),
@@ -606,6 +634,7 @@ func TestTree_Bounds(t *testing.T) {
 func BenchmarkTree10(b *testing.B) {
 	test.Benchmark(b,
 		NewScene(
+			1,
 			[]Light{},
 			Tree(randomSpheres(10, 0.1)...),
 		),
@@ -616,7 +645,7 @@ func BenchmarkTree10(b *testing.B) {
 
 func BenchmarkTree100(b *testing.B) {
 	test.Benchmark(b,
-		NewScene([]Light{},
+		NewScene(1,[]Light{},
 			Tree(randomSpheres(100, 0.1)...),
 		),
 		cameras.NewProjective(fov, Vec{0, 0, 2.5}, 0, 0),
@@ -627,6 +656,7 @@ func BenchmarkTree100(b *testing.B) {
 func BenchmarkTree1000(b *testing.B) {
 	test.Benchmark(b,
 		NewScene(
+			1,
 			[]Light{},
 			Tree(randomSpheres(1000, 0.1)...),
 		),
@@ -673,6 +703,7 @@ func randomSpheres(N int, r float64) []Interface {
 func TestTriangle(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1, 2, 3}),
 			},
@@ -690,6 +721,7 @@ func TestTriangle(t *testing.T) {
 func TestParametric_Cylinder(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{0, 1, 0}),
 			},
@@ -713,6 +745,7 @@ func TestParametric_Cylinder(t *testing.T) {
 func TestParametric_Torus(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{1, 2, 0}),
 			},
@@ -740,6 +773,7 @@ func TestQuadrilateral(t *testing.T) {
 	// Therefore, we do not test UV mapping until it has been improved.
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				test.PointLight(Vec{-1, 2, 1}),
 			},

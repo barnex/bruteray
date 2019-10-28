@@ -55,6 +55,7 @@ func (s *Adaptive) SampleNumCPUWithCancel(nCPU, nPass int, cancel chan struct{})
 	s.totalPasses += nPass
 	total := s.TotalVariance()
 	fmt.Println("pass", s.totalPasses, "var/pix:", total/float64(numPix))
+	fmt.Println(s.Stats())
 
 	// channel with work items: line numbers to render
 	ch := make(chan int, numPix)
@@ -68,7 +69,7 @@ func (s *Adaptive) SampleNumCPUWithCancel(nCPU, nPass int, cancel chan struct{})
 	start := time.Now()
 	for i := 0; i < nCPU; i++ {
 		wg.Add(1)
-		ctx[i] = tracer.NewCtx(time.Now().UnixNano() + int64(i))
+		ctx[i] = tracer.NewCtx()
 		go func(i int) {
 			defer wg.Done()
 			for iy := range ch {
@@ -85,8 +86,8 @@ func (s *Adaptive) SampleNumCPUWithCancel(nCPU, nPass int, cancel chan struct{})
 
 	s.WallTime += time.Since(start)
 	for _, c := range ctx {
-		s.PixelCount += c.PixelCount
-		s.RayCount += c.RayCount
+		s.PixelCount += c.Stats.NumPixels
+		s.RayCount += c.Stats.NumRays
 	}
 }
 
@@ -118,7 +119,8 @@ func (s *Adaptive) SampleLine(ctx *tracer.Ctx, iy, w, h, budget int, totalVarian
 			if N <= 0 || N > 1000 || math.IsNaN(N) {
 				n = 1
 			}
-			n = util.Dither(ctx.Rng, N)
+			//n = util.Dither(ctx.RngTODORemove, N)
+			n = int(N) //??
 		}
 		if n > 100 {
 			n = 100
@@ -128,15 +130,17 @@ func (s *Adaptive) SampleLine(ctx *tracer.Ctx, iy, w, h, budget int, totalVarian
 }
 
 func (s *Adaptive) samplePixel(ctx *tracer.Ctx, ix, iy, w, h int, n int) {
-	ctx.PixelCount++
+	ctx.Stats.NumPixels++
 	xi, yi := IndexToCam(w, h, float64(ix), float64(iy))
-	pixs := imagef.PixelSize(w, h)
+	//pixs := imagef.PixelSize(w, h)
 	for pass := 0; pass < n; pass++ {
+		//ctx.NextPixel() // yes
 		x := xi
 		y := yi
-		if s.AntiAlias {
-			x += pixs * (ctx.Rng.Float64() - 0.5)
-			y += pixs * (ctx.Rng.Float64() - 0.5)
+		if s.AntiAlias { // TODO !!!!
+			//u, v := ctx.Generate2()
+			//x += pixs * (u - 0.5)
+			//y += pixs * (v - 0.5)
 		}
 
 		c := s.f(ctx, x, y)

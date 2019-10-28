@@ -23,6 +23,12 @@ type expFog struct {
 
 // TODO: not correct when camera is in fog
 func (m *expFog) Filter(ctx *Ctx, s *Scene, r *Ray, tMax float64, orig Color) Color {
+	// We only apply fog to the primary ray (coming directly from the camera).
+	// This avoid extremely costly multiple scatterings that don't contribute much.
+	// This causes, a.o., fog to cast no shadow, a reasonable approximation for low-density fog.
+	if !ctx.IsInitial() {
+		return orig
+	}
 	ten, tex := intersectHalfSpace(m.height, r)
 	start, end := intersectIntervals(0, tMax, ten, tex)
 	len := end - start

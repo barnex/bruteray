@@ -10,6 +10,7 @@ import (
 
 type ImageGray [][]float64
 
+// TODO: remove
 func MakeImageGray(w, h int) ImageGray {
 	list := make([]float64, w*h)
 	img := make(ImageGray, h)

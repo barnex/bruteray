@@ -1,11 +1,7 @@
-Media: just objects with translucent material, stored separately?
-+Material.Filter?
-
-color: RGBA ([4]float32) -> easy opacity?
-
+Transform:
+  * check if object is Transformer, Translator
+  
 package color -> colors, colorf, ...?
-
-Pass ...Transform to objects, cameras, lights
 
 mv lights under objects
 objects/transform

@@ -67,6 +67,7 @@ func (p *parser) parseLine(l string) {
 	case "#":
 	case "o":
 	case "vn":
+	case "vt":
 	case "s":
 	case "l":
 	case "g":
@@ -93,7 +94,7 @@ func (p *parser) parseF(l []string) {
 	}
 	// TODO: texture indices are ignored
 	f := make([]int32, len(l))
-	for i,w := range l {
+	for i, w := range l {
 
 		words := strings.Split(w, "/")
 		idx := int32(p.parseInt(words[0]))

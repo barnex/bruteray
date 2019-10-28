@@ -4,15 +4,17 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"errors"
+	"io"
 	"log"
 	"net/http"
-	"runtime"
 	"sync"
 
 	imagef "github.com/barnex/bruteray/image"
 	"github.com/barnex/bruteray/sampler"
 	//. "github.com/barnex/bruteray/tracer/types"
 )
+
+//TODO: cancel bakery only, not preview
 
 func Serve(addr string, spec Spec) error {
 	s := newServer(addr, spec)
@@ -26,7 +28,7 @@ type server struct {
 
 	mu        sync.Mutex
 	cancel    chan struct{}
-	smplr     *sampler.Adaptive
+	smplr     *sampler.Sampler
 	smplrView View // View currently being rendred by smplr
 	smplrNum  int
 }
@@ -41,18 +43,30 @@ func newServer(addr string, spec Spec) *server {
 			Handler: mux,
 		},
 	}
-	s.handle("/gob", s.handleGOB)
+	s.handle("/preview", s.handlePreview)
+	s.handle("/bake", s.handleBake)
 	s.handle("/cancel", s.handleCancel)
 	return s
 
 }
 
-func (s *server) handleGOB(w http.ResponseWriter, r *http.Request) error {
+func (s *server) handlePreview(w http.ResponseWriter, r *http.Request) error {
+	// (1) Read view settings from request body (JSON)
+	v, err := decodeView(r.Body)
+	if err != nil {
+		return err
+	}
+
+	img := s.renderPreview(v)
+	return gob.NewEncoder(w).Encode(img)
+}
+
+func (s *server) handleBake(w http.ResponseWriter, r *http.Request) error {
 	defer r.Body.Close()
 
 	// (1) Read view settings from request body (JSON)
-	var v View
-	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
+	v, err := decodeView(r.Body)
+	if err != nil {
 		return err
 	}
 
@@ -66,8 +80,21 @@ func (s *server) handleGOB(w http.ResponseWriter, r *http.Request) error {
 	return gob.NewEncoder(w).Encode(img)
 }
 
-func (s *server) renderView(v View) (imagef.Image, error) {
+func decodeView(r io.ReadCloser) (View, error) {
+	var v View
+	err := json.NewDecoder(r).Decode(&v)
+	r.Close()
+	return v, err
+}
 
+func (s *server) renderPreview(v View) imagef.Image {
+	spec := v.ApplyTo(s.spec)
+	nPass := 1
+	img := sampler.Uniform(spec.ImageFunc(), nPass, v.Width, v.Height, v.AntiAlias)
+	return img
+}
+
+func (s *server) renderView(v View) (imagef.Image, error) {
 	cancel, err := s.prepareBakery(v)
 	if err != nil {
 		return nil, err
@@ -79,10 +106,8 @@ func (s *server) renderView(v View) (imagef.Image, error) {
 		s.smplrNum++
 	}()
 
-	nCPU := runtime.NumCPU()
-
-	s.smplr.SampleNumCPUWithCancel(nCPU, s.smplrNum, cancel)
-	img := s.smplr.StoredImage()
+	s.smplr.SampleWithCancel(s.smplrNum, cancel)
+	img := s.smplr.Image()
 
 	if img == nil {
 		return nil, errors.New("baking cancelled")
@@ -101,7 +126,7 @@ func (s *server) prepareBakery(v View) (chan struct{}, error) {
 
 	if s.smplr == nil || s.smplrView != v {
 		spec := v.ApplyTo(s.spec)
-		s.smplr = sampler.NewAdaptive(spec.ImageFunc(), v.Width, v.Height, v.AntiAlias)
+		s.smplr = sampler.New(spec.ImageFunc(), v.Width, v.Height, v.AntiAlias)
 		s.smplrView = v
 		s.smplrNum = 1
 	}
@@ -113,7 +138,7 @@ func (s *server) handleCancel(w http.ResponseWriter, r *http.Request) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.cancel == nil {
-		return errors.New("already canceled")
+		return nil // already done
 	}
 	close(s.cancel)
 	s.cancel = nil

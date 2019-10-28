@@ -70,7 +70,7 @@ type Material interface {
 	// and terminate recursion.
 	//
 	//TODO: rename: Shade?
-	Eval(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color
+	Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color
 }
 
 // HitCoords record where a Ray intersected an Object.

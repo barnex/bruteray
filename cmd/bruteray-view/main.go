@@ -12,6 +12,7 @@ import (
 	"image/draw"
 	"io"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"os"
 	"path"
@@ -68,14 +69,15 @@ type state struct {
 	// modified by user events (fast)
 	mouseDown              mouse.Button
 	lastMouseX, lastMouseY float32
-	freeLooking            bool
+	preview                bool
 	renderDirty            bool
 	paused                 bool
 
 	// background image refinement
 	bakery         chan imagef.Image
 	bakeResolution int
-	isBaking       bool
+	isBaking       bool // we're busy baking, don't start another one
+	wantBake       bool // false if we don't want the bake result anymore
 
 	lastImg imagef.Image
 
@@ -109,7 +111,7 @@ func (s *state) run() {
 
 		// (2) there's no user events queued and we are not dragging the mouse:
 		// start baking high-res image
-		if !s.isBaking && !s.freeLooking && !s.renderDirty && !s.paused {
+		if !s.isBaking && !s.preview && !s.renderDirty && !s.paused {
 			s.goBakeAndSend()
 		}
 
@@ -127,17 +129,13 @@ func (s *state) run() {
 	}
 }
 
-func (s *state) handleAllInteractive() {
-}
-
 // ---- Rendering ----
 
 func (s *state) repaintIfNeeded() {
 	if s.renderDirty {
 		s.cancelBaking()
 
-		img := s.renderFreeLooking()
-		fmt.Println("run: lastImg:", s.lastImg.Bounds())
+		img := s.renderPreview()
 
 		if img.Bounds() != image.ZR {
 			s.lastImg = img
@@ -147,36 +145,29 @@ func (s *state) repaintIfNeeded() {
 	}
 
 	if s.windowDirty {
-		fmt.Println("run: repaint")
 		s.repaint()
 	}
 }
 
-func (s *state) renderFreeLooking() imagef.Image {
-	defer trace()()
-
-	//spec := s.modSpec
-	//w := s.winSize.X / maxDownScale
-	//h := s.winSize.Y / maxDownScale
-	//return sampler.Uniform(spec.ImageFunc(), 1, w, h)
+func (s *state) renderPreview() imagef.Image {
+	//defer trace()()
 
 	downscaled := s.view // copy
 	downscaled.Width /= maxDownScale
 	downscaled.Height /= maxDownScale
-	img, err := s.fetchHTTP(downscaled)
+	img, err := s.fetchHTTP("preview", downscaled)
 	if err != nil {
 		logErr(err)
-		//return imagef.MakeImage(32, 32) // dummy
-		return nil
+		time.Sleep(100 * time.Millisecond) // back off to avoid 100% CPU usage during server rebuilds
+		return dummyImage()
 	}
 	return img
 }
 
 func (s *state) handleBakery(img imagef.Image) {
-	defer trace()()
-	fmt.Println("run: <-bakery:", img.Bounds())
+	//defer trace()()
 
-	if img.Bounds() != image.ZR && s.isBaking && !s.renderDirty && !s.freeLooking {
+	if img.Bounds() != image.ZR && s.isBaking && !s.renderDirty && !s.preview && s.wantBake {
 		s.lastImg = img
 		s.windowDirty = true
 	}
@@ -185,23 +176,25 @@ func (s *state) handleBakery(img imagef.Image) {
 }
 
 func (s *state) cancelBaking() {
-	defer trace()()
+	//defer trace()()
+	s.wantBake = false
 	if s.isBaking {
 		resp, err := http.Get("http://" + s.addr + "/cancel")
 		if err != nil {
 			fmt.Println(err)
-		}else{
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			fmt.Printf("status %v: %s\n", resp.StatusCode, readBody(resp.Body))
+		} else {
+			defer resp.Body.Close()
+			if resp.StatusCode != http.StatusOK {
+				fmt.Printf("status %v: %s\n", resp.StatusCode, readBody(resp.Body))
+			}
 		}
-	}
 	}
 	s.bakeResolution = 0
 }
 
 func (s *state) goBakeAndSend() {
 	s.isBaking = true
+	s.wantBake = true
 
 	div := maxDownScale
 	for i := 0; i < s.bakeResolution; i++ {
@@ -218,9 +211,10 @@ func (s *state) goBakeAndSend() {
 	v.AntiAlias = (div == 1) // AA only at full resolution
 
 	go func() {
-		img, err := s.fetchHTTP(v)
+		img, err := s.fetchHTTP("bake", v)
 		if err != nil {
 			logErr(err)
+			time.Sleep(100 * time.Millisecond) // back off to avoid 100% CPU use during server rebuild
 			s.bakery <- nil
 		} else {
 			s.bakery <- img
@@ -228,12 +222,12 @@ func (s *state) goBakeAndSend() {
 	}()
 }
 
-func (s *state) fetchHTTP(v api.View) (imagef.Image, error) {
+func (s *state) fetchHTTP(prefix string, v api.View) (imagef.Image, error) {
 	var body bytes.Buffer
 	if err := json.NewEncoder(&body).Encode(v); err != nil {
 		panic(err) // BUG
 	}
-	url := "http://" + s.addr + "/gob"
+	url := "http://" + s.addr + "/" + prefix
 	req, err := http.NewRequest("GET", url, &body)
 	if err != nil {
 		panic(err) // BUG
@@ -270,36 +264,6 @@ func readBody(r io.Reader) string {
 	return string(bytes)
 }
 
-//func (s *state) goBakeAndSendLocal() {
-//	s.isBaking = true
-//	s.cancelBakingCh = make(chan struct{})
-//
-//	div := maxDownScale
-//	for i := 0; i < s.bakeResolution; i++ {
-//		div /= 2
-//		if div <= 1 {
-//			div = 1
-//			break
-//		}
-//	}
-//
-//	w := s.winSize.X / div
-//	h := s.winSize.Y / div
-//
-//	if div == 1 {
-//		if s.sampler == nil {
-//			s.sampler = sampler.NewAdaptive(s.modSpec.ImageFunc(), w, h, true)
-//		}
-//		go func() {
-//			s.sampler.SampleNumCPUWithCancel(runtime.NumCPU(), s.bakeResolution, s.cancelBakingCh)
-//			s.bakery <- s.sampler.StoredImage()
-//		}()
-//	} else {
-//		s.sampler = nil
-//		go func() { s.bakery <- sampler.UniformWithCancel(s.modSpec.ImageFunc(), 1, w, h, s.cancelBakingCh) }()
-//	}
-//}
-
 // ---- Event Handling ----
 
 type event interface{}
@@ -335,55 +299,126 @@ func (s *state) handleEvent(e event) {
 }
 
 func (s *state) handleKeyEvent(e key.Event) {
-	fmt.Printf("%v, %#v\n", e, e)
+	//fmt.Printf("%v, %#v\n", e, e)
 
+	shift := (e.Modifiers&key.ModShift != 0)
 	if e.Direction == key.DirPress {
 		switch e.Code {
+
 		case key.CodeLeftArrow, key.CodeS:
-			s.handleMoveCam(Vec{-1, 0, 0}) // ?
+			s.moveCam(Vec{-1, 0, 0}) // ?
 		case key.CodeRightArrow, key.CodeF:
-			s.handleMoveCam(Vec{1, 0, 0}) // ?
+			s.moveCam(Vec{1, 0, 0}) // ?
 		case key.CodeUpArrow, key.CodeE:
-			s.handleMoveCam(Vec{0, 0, -1})
+			if shift {
+				s.moveCam(Vec{0, 1, 0})
+			} else {
+				s.moveCam(Vec{0, 0, -1})
+			}
 		case key.CodeDownArrow, key.CodeD:
-			s.handleMoveCam(Vec{0, 0, 1})
+			if shift {
+				s.moveCam(Vec{0, -1, 0})
+			} else {
+				s.moveCam(Vec{0, 0, 1})
+			}
 		case key.CodeSpacebar:
-			s.handleMoveCam(Vec{0, 1, 0})
+			s.moveCam(Vec{0, 1, 0})
+
+		case key.CodeX:
+			s.toggleIsometric(X)
+		case key.CodeY:
+			s.toggleIsometric(Y)
 		case key.CodeZ:
-			s.handleMoveCam(Vec{0, -1, 0})
+			s.toggleIsometric(Z)
+
 		case key.CodeP:
 			s.paused = !s.paused
 		case key.CodeN:
-			s.handleToggleNormals()
+			s.toggleNormals()
 		}
 	}
 }
 
 func (s *state) handleMouseEvent(e mouse.Event) {
+	//fmt.Printf("%v, %#v\n", e, e)
 	if e.Direction == mouse.DirPress {
 		s.mouseDown = e.Button
-		s.freeLooking = (e.Button == mouse.ButtonLeft)
-		//fmt.Println("free looking:", s.freeLooking)
+		s.preview = (e.Button == mouse.ButtonLeft)
 	}
 	if e.Direction == mouse.DirRelease {
 		s.mouseDown = 0
 		if e.Button == mouse.ButtonLeft {
-			s.freeLooking = false
+			s.preview = false
 		}
-		//fmt.Println("free looking:", s.freeLooking)
 	}
 	if s.mouseDown == mouse.ButtonLeft {
 		dx := e.X - s.lastMouseX
 		dy := e.Y - s.lastMouseY
-		s.handleLook(dx, dy)
+		s.rotateCamera(dx, dy)
 	}
 
 	s.lastMouseX = e.X
 	s.lastMouseY = e.Y
+
+	shift := (e.Modifiers&key.ModShift != 0)
+	//ctrl := (e.Modifiers&key.ModControl != 0)
+
+	if !s.view.DebugIsometric { // projective camera view
+		switch {
+		case e.Button == mouse.ButtonWheelUp && shift:
+			s.moveCam(Vec{0, 1, 0})
+		case e.Button == mouse.ButtonWheelUp:
+			s.moveCam(Vec{0, 0, -1})
+		case e.Button == mouse.ButtonWheelDown && shift:
+			s.moveCam(Vec{0, -1, 0})
+		case e.Button == mouse.ButtonWheelDown:
+			s.moveCam(Vec{0, 0, 1})
+		case e.Button == mouse.ButtonWheelLeft:
+			s.moveCam(Vec{-1, 0, 0})
+		case e.Button == mouse.ButtonWheelRight:
+			s.moveCam(Vec{1, 0, 0})
+		}
+	} else { // isometric view
+		switch {
+		case e.Button == mouse.ButtonWheelUp:
+			s.isometricZoom(1 / math.Sqrt2)
+		case e.Button == mouse.ButtonWheelDown:
+			s.isometricZoom(math.Sqrt2)
+		}
+	}
 }
 
-func (s *state) handleToggleNormals() {
-	s.view.DebugNormals = !s.view.DebugNormals
+func (s *state) isometricZoom(factor float64) {
+	v := &s.view
+	if v.DebugIsometricFOV == 0 {
+		v.DebugIsometricFOV = 8
+	}
+	v.DebugIsometricFOV *= factor
+	s.renderDirty = true
+}
+
+func (s *state) toggleNormals() {
+	v := &s.view
+	v.DebugNormals++
+	if v.DebugNormals > api.SpecMaxDebugNormals {
+		v.DebugNormals = 0
+	}
+	s.renderDirty = true
+}
+
+func (s *state) toggleIsometric(dir int) {
+	v := &s.view
+
+	if v.DebugIsometricDir == dir {
+		v.DebugIsometric = !v.DebugIsometric
+	} else {
+		v.DebugIsometric = true
+	}
+	v.DebugIsometricDir = dir
+	if v.DebugIsometricFOV == 0 {
+		v.DebugIsometricFOV = 8
+	}
+
 	s.renderDirty = true
 }
 
@@ -414,23 +449,24 @@ func (s *state) handlePaintEvent(e paint.Event) {
 	s.windowDirty = true
 }
 
-func (s *state) handleLook(dx, dy float32) {
+func (s *state) rotateCamera(dx, dy float32) {
 	//defer trace(dx, dy)()
+	v := &s.view
 	const sens = 0.005
-	s.view.CamYaw += float64(dx) * sens
-	s.view.CamPitch += float64(dy) * sens
+	v.CamYaw += float64(dx) * sens
+	v.CamPitch += float64(dy) * sens
 
 	// clamp camera pitch to +/- 90Deg so that we can't see the world upside down
-	if s.view.CamPitch < -Pi/2 {
-		s.view.CamPitch = -Pi / 2
+	if v.CamPitch < -Pi/2 {
+		v.CamPitch = -Pi / 2
 	}
-	if s.view.CamPitch > Pi/2 {
-		s.view.CamPitch = Pi / 2
+	if v.CamPitch > Pi/2 {
+		v.CamPitch = Pi / 2
 	}
 	s.renderDirty = true
 }
 
-func (s *state) handleMoveCam(dir Vec) {
+func (s *state) moveCam(dir Vec) {
 	//defer trace(dir)()
 
 	v := &s.view
@@ -443,7 +479,7 @@ func (s *state) handleMoveCam(dir Vec) {
 // copy s.img to screen
 func (s *state) repaint() {
 	//fmt.Println("state:repaint")
-	defer trace()()
+	//defer trace()()
 	if s.winBuf == nil {
 		s.initWinBufs()
 	}
@@ -458,7 +494,7 @@ func (s *state) repaint() {
 }
 
 func (s *state) initWinBufs() {
-	defer trace()()
+	//defer trace()()
 	s.winBuf = s.newBuffer(s.winSize)
 	s.winTex = s.newTexture(s.winSize)
 }
@@ -528,8 +564,6 @@ func trace(args ...interface{}) func() {
 		fmt.Println(cnt, " << ", time.Since(start).Round(100*time.Microsecond))
 	}
 }
-
-func nop() {}
 
 func logErr(err error) {
 	fmt.Fprintln(os.Stderr, err)

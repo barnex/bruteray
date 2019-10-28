@@ -3,7 +3,7 @@
 
 ![fig](mascot.jpg) 
 
-Bruteray is physics-based ray tracer written in Go.
+Bruteray is physics-based ray tracer in Go.
 
 
 ## Features:
@@ -17,6 +17,9 @@ Bruteray is physics-based ray tracer written in Go.
 
 A few scenes rendered by bruteray:
 
+![Newell teapot ray-traced in Go](shots/2024-teapot.jpg) 
+![Stanford Lucy ray-traced in Go with volumetric scattering](shots/2025-teapot.jpg) 
+![Stanford Dragon ray-traced in Go](shots/2026-pool.jpg) 
 ![fig](shots/063.jpg) 
 ![fig](shots/principia.jpg) 
 ![fig](shots/bouy.jpg) 

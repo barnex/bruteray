@@ -1,8 +1,11 @@
 package api
 
 import (
+	"github.com/barnex/bruteray/color"
+	"github.com/barnex/bruteray/post"
 	"github.com/barnex/bruteray/tracer"
 	"github.com/barnex/bruteray/tracer/cameras"
+	"github.com/barnex/bruteray/tracer/materials"
 	"github.com/barnex/bruteray/tracer/test"
 )
 
@@ -22,21 +25,29 @@ type Spec struct {
 	Width  int
 	Height int
 
-	DebugNormals      bool
+	DebugNormals      int
 	DebugIsometricFOV float64
 	DebugIsometricDir int
+
+	PostProcess post.Params
 }
+
+const SpecMaxDebugNormals = 2
 
 // TODO: this should honour DebugNormals, etc, not InitDefaults
 func (s *Spec) ImageFunc() tracer.ImageFunc {
+	return s.Scene().ImageFunc(s.Camera)
+}
+
+func (s *Spec) Scene() *tracer.Scene {
 	objs := make([]tracer.Object, len(s.Objects))
 	for i := range objs {
 		objs[i] = s.Objects[i].Interface
 	}
-	scene := tracer.NewSceneWithMedia(s.Media, s.Lights, objs...)
-	return scene.ImageFunc(s.Camera, s.Recursion)
+	return tracer.NewSceneWithMedia(s.Recursion, s.Media, s.Lights, objs...)
 }
 
+// TODO: remove!!!! aargh
 func (s *Spec) InitDefaults() {
 	if s.Recursion == 0 {
 		s.Recursion = 1
@@ -57,13 +68,15 @@ func (s *Spec) InitDefaults() {
 	if s.Height == 0 {
 		s.Height = (s.Width * defaultImageHeight) / defaultImageWidth
 	}
-	if s.DebugNormals {
-		orig := s.Objects
-		s.Objects = make([]Object, len(orig))
-		for i := range s.Objects {
-			s.Objects[i] = orig[i].WithMaterial(test.Normal)
-		}
-		s.Media = nil
+	if s.DebugNormals == 1 {
+		s.applyMaterial(test.Normal)
+	}
+	if s.DebugNormals == 2 {
+		s.applyMaterial(materials.Blend(
+			0.3, test.Normal2,
+			0.7, materials.Transparent(color.Color{1, 1, 1}, true),
+		))
+		s.Recursion = 20
 	}
 	if s.DebugIsometricFOV != 0 {
 		s.Camera = cameras.NewIsometric(s.DebugIsometricDir, s.DebugIsometricFOV)
@@ -71,6 +84,19 @@ func (s *Spec) InitDefaults() {
 	if s.Recursion == 0 {
 		s.Recursion = defaultRecursion
 	}
+}
+
+func (s *Spec) applyMaterial(m tracer.Material) {
+	orig := s.Objects
+	s.Objects = make([]Object, 0, len(orig))
+	for _, o := range orig {
+		if _, ok := o.Interface.(interface{ IsBackdrop() }); ok {
+			s.Objects = append(s.Objects, o.WithMaterial(Flat(Black)))
+		} else {
+			s.Objects = append(s.Objects, o.WithMaterial(m))
+		}
+	}
+	s.Media = nil
 }
 
 const (

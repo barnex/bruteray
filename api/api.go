@@ -40,9 +40,6 @@ type (
 )
 
 var (
-	//Translated            = objects.Translated
-	//Sheet                 = objects.Sheet
-	//	Transformable         = objects.Transformed
 	And = objects.And
 	Not = objects.Not
 
@@ -73,34 +70,18 @@ var (
 	ExpFog = media.ExpFog
 	Fog    = media.Fog
 
-	//
-	//	Scale       = builder.Scale
-	//	ScaleAround = builder.ScaleAround
-	//	ScaleToSize = builder.ScaleToSize
-	//	Translate   = builder.Translate
-	//	TranslateTo = builder.TranslateTo
-	//	Pitch       = builder.Pitch
-	//	PitchAround = builder.PitchAround
-	//	Roll        = builder.Roll
-	//	RollAround  = builder.RollAround
-	//	Yaw         = builder.Yaw
-	//	YawAround   = builder.YawAround
-	//
 	Ex = geom.Ex
 	Ey = geom.Ey
 	Ez = geom.Ez
 	O  = geom.O
-
-//
-//	MustLoad      = texture.MustLoad
-//	LoadHeightMap = texture.HeightMap
-//	Checkers      = texture.Checkers
-//
-//	Grid = texture.Grid
 )
 
 func Projective(fov float64, pos Vec, yaw, pitch float64) *Camera {
 	return cameras.NewProjective(fov, pos, yaw, pitch)
+}
+
+func ProjectiveAperture(fov, aperture, focus float64, pos Vec, yaw, pitch float64) *Camera {
+	return cameras.NewProjectiveAperture(fov, aperture, focus, pos, yaw, pitch)
 }
 
 func EnvironmentMap(pos Vec) *Camera {
@@ -115,11 +96,6 @@ func C(r, g, b float64) Color {
 	return Color{R: r, G: g, B: b}
 }
 
-//
-//func FisheyeSky(file string) builder.Builder {
-//	return builder.Ambient(texture.MapFisheye(texture.MustLoad(file)))
-//}
-//
 const (
 	Pi  = math.Pi
 	Deg = geom.Deg

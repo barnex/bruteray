@@ -14,10 +14,10 @@ type twoSided struct {
 	front, back Material
 }
 
-func (m *twoSided) Eval(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color {
+func (m *twoSided) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	if r.Dir.Dot(h.Normal) > 0 {
-		return m.front.Eval(ctx, s, r, recDepth, h)
+		return m.front.Eval(ctx, s, r, h)
 	} else {
-		return m.back.Eval(ctx, s, r, recDepth, h)
+		return m.back.Eval(ctx, s, r, h)
 	}
 }

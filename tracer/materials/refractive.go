@@ -25,7 +25,7 @@ type refractive struct {
 }
 
 // https://en.wikipedia.org/wiki/Fresnel_equations
-func (s *refractive) Eval(ctx *Ctx, e *Scene, r *Ray, recDepth int, h HitCoords) Color {
+func (s *refractive) Eval(ctx *Ctx, e *Scene, r *Ray,  h HitCoords) Color {
 
 	n := h.Normal.Normalized()
 	i := r.Dir.Normalized() // incident direction
@@ -48,7 +48,7 @@ func (s *refractive) Eval(ctx *Ctx, e *Scene, r *Ray, recDepth int, h HitCoords)
 		r2.Start = r.At(h.T - Tiny) // start at same side of surface
 		r2.Dir = reflect(r.Dir, h.Normal)
 		defer ctx.PutRay(r2)
-		return e.Eval(ctx, r2, recDepth)
+		return e.Eval(ctx, r2, )
 	}
 
 	cosθt := math.Sqrt(1 - sin2θt)
@@ -66,14 +66,14 @@ func (s *refractive) Eval(ctx *Ctx, e *Scene, r *Ray, recDepth int, h HitCoords)
 	r2.Start = r.At(h.T + Tiny) // start at other side of surface
 	r2.Dir = t
 	defer ctx.PutRay(r2)
-	cT := e.Eval(ctx, r2, recDepth).Mul(T)
+	cT := e.Eval(ctx, r2, ).Mul(T)
 
 	// reflected ray
 	r3 := ctx.Ray()
 	r3.Start = r.At(h.T - Tiny) // same side of surface
 	r3.Dir = reflect(i, n)
 	defer ctx.PutRay(r3)
-	cR := e.Eval(ctx, r3, recDepth).Mul(R)
+	cR := e.Eval(ctx, r3, ).Mul(R)
 
 	return cR.Add(cT)
 }

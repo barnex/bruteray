@@ -7,13 +7,16 @@ import (
 // TODO: embed in spec
 // TODO: rename spec.Camera -> spec.CameraType
 type View struct {
-	Width        int
-	Height       int
-	AntiAlias    bool
-	CamPos       Vec
-	CamYaw       float64
-	CamPitch     float64
-	DebugNormals bool
+	Width             int
+	Height            int
+	AntiAlias         bool
+	CamPos            Vec
+	CamYaw            float64
+	CamPitch          float64
+	DebugNormals      int
+	DebugIsometric    bool
+	DebugIsometricFOV float64
+	DebugIsometricDir int
 }
 
 func (v *View) ApplyTo(s Spec) Spec {
@@ -22,6 +25,16 @@ func (v *View) ApplyTo(s Spec) Spec {
 	s.Camera = cameras.YawPitchRoll(s.Camera, v.CamYaw, v.CamPitch, 0)
 	s.Camera = cameras.Translate(s.Camera, v.CamPos)
 	s.DebugNormals = v.DebugNormals
+
+	if v.DebugIsometric {
+		s.DebugIsometricFOV = v.DebugIsometricFOV
+		s.DebugIsometricDir = v.DebugIsometricDir
+	} else {
+
+		s.DebugIsometricFOV = 0
+		s.DebugIsometricDir = 0
+	}
+
 	s.InitDefaults() // aaargh
 	return s
 }

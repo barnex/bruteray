@@ -2,6 +2,7 @@ package sampler
 
 import (
 	"math"
+	"math/rand"
 	"testing"
 
 	colorf "github.com/barnex/bruteray/color"
@@ -10,11 +11,11 @@ import (
 
 func TestStratifierVariance(t *testing.T) {
 	f := func(ctx *tracer.Ctx, x, y float64) colorf.Color {
-		c := float64(ctx.Rng.NormFloat64()) + 2
+		c := float64(rand.NormFloat64()) + 2
 		return colorf.Color{c, c, c}
 	}
 
-	ctx := tracer.NewCtx(1)
+	ctx := tracer.NewCtx()
 	s := NewAdaptive(f, 1, 1, false)
 	s.samplePixel(ctx, 0, 0, 1, 1, 100000)
 	v := s.variance3(0, 0)

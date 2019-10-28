@@ -23,14 +23,14 @@ func main() {
 		"NoseTop":      Shiny(C(1, 0.5, 0.5), 0.02),
 		"Material":     Shiny(Gray(0.5), 0.1),
 		"Material.001": Shiny(Gray(0.0), 0.1),
-	}, "../../../../../assets/gopher.obj")
+	}, "/home/arne/assets/gopher.obj")
 	Render(Spec{
 		//DebugNormals:      true,
 		//DebugIsometricFOV: 8,
 		//DebugIsometricDir: Z,
 
 		Recursion: 3,
-		NumPass:   10,
+		NumPass:   40,
 		Width:     1024 / 4,
 		Height:    1024 / 4,
 
@@ -45,7 +45,7 @@ func main() {
 			gopher.ScaleToSize(0.28).Rotate(Ey, -80*Deg).WithCenterBottom(V(-0.04, 0, -0.045)),
 			//gopher.ScaleToSize(0.28).Rotate(Ey, -80*Deg).WithCenterBottom(V(0.04, 0, 0.1)),
 		},
-		Camera: Projective(45*Deg, V(0, 0.25, 0.88), 0, 0, ),
+		Camera: Projective(45*Deg, V(0, 0.25, 0.88), 0, 0),
 	})
 }
 

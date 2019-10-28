@@ -6,6 +6,9 @@ import (
 	"github.com/barnex/bruteray/util"
 )
 
+// TODO: change API: Or, And accept multiple args,
+// build balanced tree
+
 // And returns the intersection (boolean AND) of two objects.
 func And(a, b Interface) Interface {
 	return &and{a, b}
@@ -16,24 +19,29 @@ type and struct {
 }
 
 func (o *and) Intersect(r *Ray) HitRecord {
-	a := andMarch(o.a, o.b, r)
-	b := andMarch(o.b, o.a, r)
+	a := andMarch(o.a, o.b, r, inf)
+	max := inf
+	if a.T > 0 {
+		max = a.T // potential early return: solution a may occlude solution b
+	}
+	b := andMarch(o.b, o.a, r, max)
 	return tracer.Frontmost(&a, &b)
 }
 
 // March along the ray until we find an intersection with a that is inside b.
-// TODO: we could pass a maxT beyond which we can stop searching.
-func andMarch(a, b Interface, r *Ray) HitRecord {
+// Do not march further than maxT. (maxT is the position of an earlier solution.
+// It would occlude, so there is no point in searching beyond it.)
+func andMarch(a, b Interface, r *Ray, maxT float64) HitRecord {
 	backup := r.Start
-	defer setStart(r, backup)
 
 	tOff := 0.0
 	h := a.Intersect(r)
 	ttl := 100 // hack: time-to-life neede in case a ray hits parallel to a surface and takes forever to escape
-	for h.T > 0 && ttl != 0 {
+	for h.T > 0 && ttl != 0 && h.T < maxT {
 		ttl--
 		if b.Inside(r.At(h.T)) {
 			h.T += tOff
+			setStart(r, backup)
 			return h
 		}
 		deltaT := h.T + Tiny
@@ -41,6 +49,7 @@ func andMarch(a, b Interface, r *Ray) HitRecord {
 		r.Start = r.At(deltaT)
 		h = a.Intersect(r)
 	}
+	setStart(r, backup)
 	return HitRecord{}
 }
 
@@ -80,8 +89,12 @@ type or struct {
 }
 
 func (o *or) Intersect(r *Ray) HitRecord {
-	a := orMarch(o.a, o.b, r)
-	b := orMarch(o.b, o.a, r)
+	a := orMarch(o.a, o.b, r, inf)
+	max := inf
+	if a.T > 0 {
+		max = a.T // potentinal early return: solution a may occlude solution b.
+	}
+	b := orMarch(o.b, o.a, r, max)
 	return tracer.Frontmost(&a, &b)
 }
 
@@ -107,18 +120,19 @@ func (o *or) Bounds() BoundingBox {
 }
 
 // March along the ray until we find an intersection with a that is not inside b.
-// TODO: we could pass a maxT beyond which we can stop searching.
-func orMarch(a, b Interface, r *Ray) HitRecord {
+// Do not march further than maxT. (maxT is the position of an earlier solution.
+// It would occlude, so there is no point in searching beyond it.)
+func orMarch(a, b Interface, r *Ray, maxT float64) HitRecord {
 	backup := r.Start
-	defer setStart(r, backup)
 
 	tOff := 0.0
 	h := a.Intersect(r)
 	ttl := 100 // hack: time-to-life neede in case a ray hits parallel to a surface and takes forever to escape
-	for h.T > 0 && ttl != 0 {
+	for h.T > 0 && ttl != 0 && h.T < maxT {
 		ttl--
 		if !b.Inside(r.At(h.T)) {
 			h.T += tOff
+			setStart(r, backup)
 			return h
 		}
 		deltaT := h.T + Tiny
@@ -126,6 +140,7 @@ func orMarch(a, b Interface, r *Ray) HitRecord {
 		r.Start = r.At(deltaT)
 		h = a.Intersect(r)
 	}
+	setStart(r, backup)
 	return HitRecord{}
 }
 
@@ -139,7 +154,7 @@ type restrict struct {
 }
 
 func (o *restrict) Intersect(r *Ray) HitRecord {
-	return andMarch(o.orig, o.inside, r)
+	return andMarch(o.orig, o.inside, r, inf)
 }
 
 func (o *restrict) Bounds() BoundingBox {

@@ -3,8 +3,8 @@ package cameras
 import (
 	"fmt"
 	"math"
-	"math/rand"
 
+	"github.com/barnex/bruteray/random"
 	. "github.com/barnex/bruteray/tracer/types"
 )
 
@@ -21,18 +21,27 @@ type projective struct {
 	FocalLen  float64
 	Focus     float64
 	Aperture  float64
-	Diaphragm func(rng *rand.Rand) (x, y float64)
+	Diaphragm func(u, v float64) (x, y float64)
 }
 
 func NewProjective(fov float64, pos Vec, yaw, pitch float64) *Transformed {
 	return Translate(YawPitchRoll(Projective(fov), yaw, pitch, 0), pos)
 }
 
+func NewProjectiveAperture(fov, aperture, focus float64, pos Vec, yaw, pitch float64) *Transformed {
+	return Translate(YawPitchRoll(ProjectiveAperture(fov, aperture, focus), yaw, pitch, 0), pos)
+}
+
 func Projective(fov float64) Camera {
+	return ProjectiveAperture(fov, 0, 1)
+}
+
+func ProjectiveAperture(fov, aperture, focus float64) Camera {
 	return YawPitchRoll(&projective{ // hack: historically camera looks along -z. TODO: rm (but do in api).
 		FocalLen:  fovToFocalLen(fov),
-		Focus:     1,
-		Diaphragm: diaCircle,
+		Focus:     focus,
+		Aperture:  aperture,
+		Diaphragm: random.UniformDisk,
 	}, 180*Deg, 0, 0)
 }
 
@@ -51,9 +60,9 @@ func (c *projective) RayFrom(ctx *Ctx, u, v float64) *Ray {
 
 	r.Start = Vec{0, 0, 0}
 	if c.Aperture > 0 {
-		xs, ys := c.Diaphragm(ctx.Rng)
-		r.Start[0] += xs * c.Aperture
-		r.Start[1] += ys * c.Aperture
+			xs, ys := c.Diaphragm(ctx.GenerateLens())
+			r.Start[0] += xs * c.Aperture
+			r.Start[1] += ys * c.Aperture
 	}
 
 	end := Vec{
@@ -68,31 +77,31 @@ func (c *projective) RayFrom(ctx *Ctx, u, v float64) *Ray {
 	return r
 }
 
-// diaCircle draws a point from the unit disk.
-// TODO: ctx.SampleDisk
-func diaCircle(rng *rand.Rand) (x, y float64) {
-	x, y = diaSquare(rng)
-	for math.Sqrt(x*x+y*y) > 1 {
-		x, y = diaSquare(rng)
-	}
-	return x, y
-}
-
-// diaHex draws a point from the unit hexagon.
-func diaHex(rng *rand.Rand) (x, y float64) {
-	const sqrt3 = 1.73205080756888
-	x, y = diaSquare(rng)
-	for math.Abs(y) > sqrt3/2 || math.Abs(x+y/sqrt3) > 1 || math.Abs(x-y/sqrt3) > 1 {
-		x, y = diaSquare(rng)
-	}
-	return x, y
-}
-
-func diaSquare(rng *rand.Rand) (x, y float64) {
-	x = 2*rng.Float64() - 1
-	y = 2*rng.Float64() - 1
-	return x, y
-}
+//// diaCircle draws a point from the unit disk.
+//// TODO: ctx.SampleDisk
+//func diaCircle(rng *rand.Rand) (x, y float64) {
+//	x, y = diaSquare(rng)
+//	for math.Sqrt(x*x+y*y) > 1 {
+//		x, y = diaSquare(rng)
+//	}
+//	return x, y
+//}
+//
+//// diaHex draws a point from the unit hexagon.
+//func diaHex(rng *rand.Rand) (x, y float64) {
+//	const sqrt3 = 1.73205080756888
+//	x, y = diaSquare(rng)
+//	for math.Abs(y) > sqrt3/2 || math.Abs(x+y/sqrt3) > 1 || math.Abs(x-y/sqrt3) > 1 {
+//		x, y = diaSquare(rng)
+//	}
+//	return x, y
+//}
+//
+//func diaSquare(rng *rand.Rand) (x, y float64) {
+//	x = 2*rng.Float64() - 1
+//	y = 2*rng.Float64() - 1
+//	return x, y
+//}
 
 func checkUV(u, v float64) {
 	if u < 0 || u > 1 || v < 0 || v > 1 {

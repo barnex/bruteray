@@ -15,15 +15,28 @@ import (
 	imagef "github.com/barnex/bruteray/image"
 	"github.com/barnex/bruteray/image/ppm"
 	"github.com/barnex/bruteray/sampler"
+
+	"net/http"
+	_ "net/http/pprof"
 )
 
 var (
-	flagHTTP = flag.String("http", "", "HTTP port")
+	flagHTTP   = flag.String("http", "", "HTTP port")
+	flagHalton = flag.Bool("halton", false, "Use Halton Quasi Monte Carlo")
 )
 
 func Render(spec Spec) {
 	flag.Parse()
+	//if *flagHalton {
+	//	tracer.RandomSequence = random.NewHalton23
+	//}else{
+	//	tracer.RandomSequence = random.PseudoRandom
+	//}
 	spec.InitDefaults()
+
+	if *flagPProf != "" {
+		go http.ListenAndServe(*flagPProf, nil)
+	}
 
 	switch {
 	default:
@@ -36,29 +49,34 @@ func Render(spec Spec) {
 
 func renderLocal(spec Spec) {
 	//print("rendering:", *flagO, Width, "x", Height, ",", NumPass, "passes, ", Recursion, "recursion depth...")
-	s := sampler.NewAdaptive(spec.ImageFunc(), spec.Width, spec.Height, true)
+	s := sampler.New(spec.ImageFunc(), spec.Width, spec.Height, true)
+	pixs := 1 / float64(spec.Width) //??
 
-	passBeforeSave := 0
-	i := 0
-	for i < spec.NumPass {
-		passBeforeSave++
+	passBeforeSave := 1
+	totalPasses := 0
+	for totalPasses < spec.NumPass {
 		s.Sample(passBeforeSave)
-		i += passBeforeSave
+		totalPasses += passBeforeSave
+
+		passBeforeSave++
 		printTime("render")
-		print(s.Stats())
+		//print(s.Stats())
 
 		//pp := Postprocess.ApplyTo(s.StoredImage(), imagef.PixelSize(s.Bounds().Dx(), s.Bounds().Dy()))
 		//printTime("postprocess")
 		//		check(save(pp, ""))
 
-		check(save(s.StoredImage(), ""))
+		img := spec.PostProcess.ApplyTo(s.Image(), pixs)
+		check(save(img, ""))
+		check(savePPM(noExt(*flagO)+".ppm", img))
 		printTime("encode")
 
-		check(save(s.SamplingImage(), "-sampling"))
-		printTime("sampling image")
+		//check(save(s.SamplingImage(), "-sampling"))
+		//printTime("sampling image")
 	}
 
-	check(savePPM(noExt(*flagO)+".ppm", s.StoredImage()))
+	img := spec.PostProcess.ApplyTo(s.Image(), pixs)
+	check(savePPM(noExt(*flagO)+".ppm", img))
 
 	print("DONE\n")
 }

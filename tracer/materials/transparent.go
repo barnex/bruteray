@@ -6,6 +6,7 @@ import (
 	. "github.com/barnex/bruteray/tracer"
 )
 
+// TODO: always consume recursion
 func Transparent(t texture.Texture, consumeRecursion bool) Material {
 	return &transparent{t, consumeRecursion}
 }
@@ -17,16 +18,14 @@ type transparent struct {
 	useRec bool
 }
 
-func (m *transparent) Eval(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color {
+func (m *transparent) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	pos := r.At(h.T + Tiny)
 	r2 := ctx.Ray()
 	r2.Start = pos
 	r2.Dir = r.Dir
 	defer ctx.PutRay(r2)
-	if !m.useRec {
-		recDepth++
-	}
-	return s.Eval(ctx, r2, recDepth).Mul3(m.t.At(h.Local)) // do not consume recursion depth
+	// No caustics please
+	return s.EvalMinusLights(ctx, r2).Mul3(m.t.At(h.Local))
 }
 
 func (m *transparent) Filter(r *Ray, h HitRecord, background Color) Color {

@@ -16,6 +16,7 @@ import (
 func TestExpFog(t *testing.T) {
 	OnePass(t,
 		NewSceneWithMedia(
+			1,
 			[]Medium{
 				ExpFog(0.1, Color{1, 1, 1}, math.Inf(1)),
 			},
@@ -36,6 +37,7 @@ func TestExpFog(t *testing.T) {
 func TestExpFog_Height(t *testing.T) {
 	OnePass(t,
 		NewSceneWithMedia(
+			1,
 			[]Medium{
 				ExpFog(2, Color{1, 1, 1}, 0.5),
 			},
@@ -56,6 +58,7 @@ func TestExpFog_Height(t *testing.T) {
 func TestExpFog_Height2(t *testing.T) {
 	OnePass(t,
 		NewSceneWithMedia(
+			1,
 			[]Medium{
 				ExpFog(0.1, Color{1, 1, 1}, 1.7),
 			},
@@ -72,13 +75,15 @@ func TestExpFog_Height2(t *testing.T) {
 	)
 }
 
+// Infinite pysical fog.
 func TestFog(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Slow")
 	}
 	w := materials.Matte(color.White)
-	NPass(t,
+	NPassSize(t,
 		NewSceneWithMedia(
+			1,
 			[]Medium{
 				Fog(0.1, math.Inf(1)),
 			},
@@ -91,20 +96,22 @@ func TestFog(t *testing.T) {
 			Sheet(w, -0.2),
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -10*Deg),
-		1,
-		1000,
-		DefaultTolerance,
+		1000, // numPass
+		150,  // width
+		100,  // height
+		0.5,  // tolerance
 	)
 }
 
-// Finite height exponential fog, camera outside.
+// Finite height physical fog, camera outside.
 func TestFog_Height(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Slow")
 	}
 	w := materials.Matte(color.White)
-	NPass(t,
+	NPassSize(t,
 		NewSceneWithMedia(
+			1,
 			[]Medium{
 				Fog(0.3, 1.5),
 			},
@@ -117,9 +124,10 @@ func TestFog_Height(t *testing.T) {
 			//Sheet(w, 0),
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 2, 2}, 0, -30*Deg),
-		1,
-		10,
-		DefaultTolerance,
+		1000, // numPass
+		150,  // width
+		100,  // height
+		0.5,  // tolerance (noisy)
 	)
 }
 
@@ -128,22 +136,25 @@ func TestFog_Height2(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Slow")
 	}
-	NPass(t,
+	w := materials.Matte(color.White)
+	NPassSize(t,
 		NewSceneWithMedia(
+			1,
 			[]Medium{
-				Fog(0.1, 1.7),
+				Fog(0.3, 1.5),
 			},
 			[]Light{
-				lights.PointLight(Color{1, 1, 1}, Vec{1, 2, 0}),
+				lights.PointLight(Color{1, 1, 1}, Vec{1, 1.5, 0}),
 			},
-			Sphere(Checkers(White, Magenta), 1, Vec{0, 0.5, 0}),
-			Sphere(Checkers(White, Green), 2, Vec{1, 1, -1}),
-			Sphere(Checkers(White, Green), 3, Vec{-3, 1.5, -2}),
-			Sheet(Checkers(White, Cyan), 0),
+			Sphere(w, 1, Vec{0, 0.5, 0}),
+			//Sphere(w, 2, Vec{1, 1, -1}),
+			//Sphere(w, 3, Vec{-3, 1.5, -2}),
+			//Sheet(w, 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, 10*Deg),
-		1,
-		1000,
-		DefaultTolerance,
+		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -30*Deg),
+		1000, // numPass
+		150,  // width
+		100,  // height
+		0.5,  // tolerance (noisy)
 	)
 }

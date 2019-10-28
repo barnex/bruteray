@@ -29,34 +29,63 @@ import (
 )
 
 const (
-	TestdataDir      = "../testdata"
 	DefaultTolerance = 1e-6
 	DefaultWidth     = 300
 	DefaultHeight    = 200
 )
 
-func QuadView(t *testing.T, s *Scene, c Camera, fov float64, tolerance float64) {
+func Compare(t testing.TB, tolerance float64, img image.Image) {
 	t.Helper()
-	testGolden(t, 1, renderQuadView(s, c, fov, 1, 1, DefaultWidth, DefaultHeight), tolerance)
+	fname := testName() + ".png"
+	got := path.Join(testdataDir(), "got", fname)
+	want := path.Join(testdataDir(), fname)
+	Save(t, img, got)
+	if deviation := DiffImg(t, got, want); deviation > tolerance {
+		t.Errorf("difference between %v and %v = %v, want < %v", got, want, deviation, tolerance)
+	}
 }
 
-func QuadViewN(t *testing.T, s *Scene, c Camera, fov float64, recDepth, nPass int, tolerance float64) {
-	t.Helper()
-	t.Parallel()
-	testGolden(t, 1, renderQuadView(s, c, fov, recDepth, nPass, DefaultWidth, DefaultHeight), tolerance)
-}
-
-// OnePass renders a scene in default size and with one monte-carlo pass,
-// compares to golden testdata.
+// OnePass renders a scene with default size and one monte-carlo pass,
+// and compares the result to testdata.
 func OnePass(t *testing.T, s *Scene, c Camera, tolerance float64) {
 	t.Helper()
 	t.Parallel()
-	testGolden(t, 1, renderNPass(s, c, 1, 1, DefaultWidth, DefaultHeight), tolerance)
+	Compare(t, tolerance, renderNPass(s, c, 1, DefaultWidth, DefaultHeight))
+}
+
+// NPass is like OnePass but allows to set the number of monte-carlo passes.
+func NPass(t *testing.T, s *Scene, c Camera, numPass int, tolerance float64) {
+	t.Helper()
+	t.Parallel()
+	Compare(t, tolerance, renderNPass(s, c, numPass, DefaultWidth, DefaultHeight))
+}
+
+// NPassSize is like NPass, but allows to set the image size.
+// Intended to run costly tests at lower resolution.
+func NPassSize(t *testing.T, s *Scene, c Camera, numPass, width, height int, tolerance float64) {
+	t.Helper()
+	t.Parallel()
+	Compare(t, tolerance, renderNPass(s, c, numPass, width, height))
+}
+
+// QuadView renders the scene from 4 points of view
+// 	- the camera
+//	- the X, Y and Z direction, orthgraphically
+// and compares the result to testdata.
+func QuadView(t *testing.T, s *Scene, c Camera, fov float64, tolerance float64) {
+	t.Helper()
+	Compare(t, tolerance, renderQuadView(s, c, fov, 1, DefaultWidth, DefaultHeight))
+}
+
+// QuadViewN is like QuadView but allows to set the number of passes.
+func QuadViewN(t *testing.T, s *Scene, c Camera, fov float64, nPass int, tolerance float64) {
+	t.Helper()
+	t.Parallel()
+	Compare(t, tolerance, renderQuadView(s, c, fov, nPass, DefaultWidth, DefaultHeight))
 }
 
 func Benchmark(b *testing.B, s *Scene, c Camera, tolerance float64) {
 	b.Helper()
-	recDepth := 3
 	width := DefaultWidth
 	height := DefaultHeight
 	numPix := width * height
@@ -66,43 +95,32 @@ func Benchmark(b *testing.B, s *Scene, c Camera, tolerance float64) {
 	b.ResetTimer()
 	var img image.Image
 	for i := 0; i < b.N; i++ {
-		img = renderNPass(s, c, recDepth, 1, width, height)
+		img = renderNPass(s, c, 1, width, height)
 	}
 	b.StopTimer()
 	//_ = img
-	testGolden(b, 1, img, tolerance)
+	Compare(b, tolerance, img)
 }
 
-func NPass(t *testing.T, s *Scene, c Camera, recDepth, numPass int, tolerance float64) {
-	t.Helper()
-	t.Parallel()
-	testGolden(t, 1, renderNPass(s, c, recDepth, numPass, DefaultWidth, DefaultHeight), tolerance)
+func renderNPass(s *Scene, c Camera, numPass, width, height int) image.Image {
+	antiAlias := (numPass > 1)
+	return sampler.Uniform(s.ImageFunc(c), numPass, width, height, antiAlias)
 }
 
-func NPassSize(t *testing.T, s *Scene, c Camera, recDepth, numPass, width, height int, tolerance float64) {
-	t.Helper()
-	t.Parallel()
-	testGolden(t, 1, renderNPass(s, c, recDepth, numPass, width, height), tolerance)
-}
-
-func renderNPass(s *Scene, c Camera, recDepth, numPass, width, height int) image.Image {
-	return sampler.Uniform(s.ImageFunc(c, recDepth), numPass, width, height)
-}
-
-func renderQuadView(s *Scene, c Camera, fov float64, recDepth, numPass, w, h int) image.Image {
+func renderQuadView(s *Scene, c Camera, fov float64, numPass, w, h int) image.Image {
 	comp := image.NewNRGBA(image.Rect(0, 0, 2*w, 2*h))
 
 	drawAt(comp, 0, 0,
-		renderNPass(s, c, recDepth, numPass, w, h),
+		renderNPass(s, c, numPass, w, h),
 	)
 	drawAt(comp, w, h,
-		renderNPass(s, cameras.NewIsometric(Y, fov), recDepth, numPass, w, h),
+		renderNPass(s, cameras.NewIsometric(Y, fov), numPass, w, h),
 	)
 	drawAt(comp, 0, h,
-		renderNPass(s, cameras.NewIsometric(X, fov), recDepth, numPass, w, h),
+		renderNPass(s, cameras.NewIsometric(X, fov), numPass, w, h),
 	)
 	drawAt(comp, w, 0,
-		renderNPass(s, cameras.NewIsometric(Z, fov), recDepth, numPass, w, h),
+		renderNPass(s, cameras.NewIsometric(Z, fov), numPass, w, h),
 	)
 
 	return comp
@@ -112,17 +130,6 @@ func drawAt(dst draw.Image, x, y int, src image.Image) {
 	w := src.Bounds().Dx()
 	h := src.Bounds().Dy()
 	draw.Draw(dst, image.Rect(x, y, x+w, y+h), src, image.Pt(0, 0), draw.Src)
-}
-
-func testGolden(t testing.TB, skip int, img image.Image, tolerance float64) {
-	t.Helper()
-	fname := Caller(skip+1) + ".png"
-	got := path.Join(TestdataDir, "got", fname)
-	want := path.Join(TestdataDir, fname)
-	Save(t, img, got)
-	if deviation := DiffImg(t, got, want); deviation > tolerance {
-		t.Errorf("difference between %v and %v = %v, want < %v", got, want, deviation, tolerance)
-	}
 }
 
 func DiffImg(t testing.TB, a, b string) float64 {
@@ -192,18 +199,40 @@ func save(img image.Image, fname string) error {
 	return err
 }
 
-// Caller returns a name based on the calling function, skipping `skip` call frames. E.g.:
+// testName returns a name based on the calling Test function. E.g.:
 // 	github.com/barnex/bruteray/object.TestSphere -> object.sphere
-func Caller(skip int) string {
-	pc, _, _, ok := runtime.Caller(skip + 1)
-	if !ok {
-		panic("runtime.Caller failed")
+func testName() string {
+	for skip := 0; ; skip++ {
+		pc, _, _, ok := runtime.Caller(skip)
+		if !ok {
+			panic("runtime.Caller failed")
+		}
+		caller := path.Base(runtime.FuncForPC(pc).Name()) // without package directory
+		noPkg := path.Ext(caller)[1:]                     // without package
+		if !(strings.HasPrefix(noPkg, "Test") || strings.HasPrefix(noPkg, "Benchmark")) {
+			continue
+		}
+		name := strings.Replace(caller, "_test", "", 1)
+		name = strings.Replace(name, "Test", "", 1)
+		name = strings.ToLower(name)
+		return name
 	}
-	name := strings.ToLower(runtime.FuncForPC(pc).Name())
-	name = path.Base(name)
-	name = strings.Replace(name, "_test", "", 1)
-	name = strings.Replace(name, "test", "", 1)
-	return name
+}
+
+// testdataDir walks up the filesystem starting from the working directory
+// in search of an existing subdirectory called "testdata".
+func testdataDir() string {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	for dir := wd; dir != "/"; dir = path.Dir(dir) {
+		testDir := path.Join(dir, "testdata")
+		if _, err := os.Stat(testDir); err == nil {
+			return testDir
+		}
+	}
+	panic("no directory named testdata found in " + wd)
 }
 
 func checkRay(r *Ray) {

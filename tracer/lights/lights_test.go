@@ -31,7 +31,6 @@ import (
 //			objects.RectangleWithVertices(white, Vec{s, 0, 0}, Vec{s, 0, s}, Vec{s, s, 0}),
 //		),
 //		cameras.NewProjective(90*Deg, Vec{.250, .250001, 0.9}),
-//		1, // recDepth
 //		1, // nPass,
 //		0.8,
 //	)
@@ -51,6 +50,7 @@ func TestRectangleLight(t *testing.T) {
 
 	test.NPass(t,
 		NewScene(
+			1,
 			[]Light{
 				RectangleLight(brightness, L, L, Vec{s / 2, s - dy, s / 2}),
 			},
@@ -62,7 +62,6 @@ func TestRectangleLight(t *testing.T) {
 			objects.RectangleWithVertices(white, Vec{s, 0, 0}, Vec{s, 0, s}, Vec{s, s, 0}),
 		),
 		cameras.NewProjective(90*Deg, Vec{.250, .250001, 0.9}, 0, 0),
-		1,    // recDepth
 		5000, // nPass,
 		0.8,
 	)
@@ -73,6 +72,7 @@ func TestRectangleLight2(t *testing.T) {
 
 	test.NPassSize(t,
 		NewScene(
+			1,
 			[]Light{
 				RectangleLight(Color{0, 1, 1}.EV(7), .2, .2, Vec{0, 2, 0}),
 			},
@@ -80,9 +80,9 @@ func TestRectangleLight2(t *testing.T) {
 			test.Sheet(white, 3),
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 1, 4}, 0, 0),
-		1, 50, // recDepth, nPass
+		50,       //  nPass
 		150, 100, // size
-		0.06,
+		0.1,
 	)
 }
 
@@ -91,6 +91,7 @@ func TestRectangleLight3(t *testing.T) {
 
 	test.NPassSize(t,
 		NewScene(
+			1,
 			[]Light{
 				//DiskLight(Color{0, 1, 1}.EV(5), .5, Vec{0, 0.03, 0}),
 				RectangleLight(Color{0, 1, 1}.EV(5), .5, .5, Vec{0.5, 0.03, 0}),
@@ -98,7 +99,7 @@ func TestRectangleLight3(t *testing.T) {
 			test.Sheet(white, 0),
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 1, 0}, 0, -90*Deg),
-		1, 50, // recDepth, nPass
+		100,      // nPass
 		150, 100, // size
 		3, // noisy
 	)
@@ -109,6 +110,7 @@ func TestDiskLight(t *testing.T) {
 
 	test.NPassSize(t,
 		NewScene(
+			1,
 			[]Light{
 				DiskLight(Color{0, 1, 1}.EV(5), .5, Vec{0.5, 0.03, 0}),
 				//RectangleLight(Color{0, 1, 1}.EV(5), .5, .5, Vec{0, 0.03, 0}),
@@ -116,7 +118,7 @@ func TestDiskLight(t *testing.T) {
 			test.Sheet(white, 0),
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 1, 0}, 0, -90*Deg),
-		1, 50, // recDepth, nPass
+		50,       // nPass
 		150, 100, // size
 		3, // noisy
 	)
@@ -127,6 +129,7 @@ func TestTransformed(t *testing.T) {
 
 	test.NPassSize(t,
 		NewScene(
+			1,
 			[]Light{
 				Transformed(
 					RectangleLight(Color{0, 1, 1}.EV(7), .2, .2, Vec{-2, 2, 0}),
@@ -137,9 +140,9 @@ func TestTransformed(t *testing.T) {
 			test.Sheet(white, 3),
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 1, 4}, 0, 0),
-		1, 50, // recDepth, nPass
+		100,      // nPass
 		150, 100, // size
-		0.06,
+		0.08,
 	)
 }
 
@@ -150,6 +153,7 @@ func TestSunLight(t *testing.T) {
 	white := materials.Matte(Color{1, 1, 1})
 	test.NPassSize(t,
 		NewScene(
+			1,
 			[]Light{
 				SunLight(Color{1, 1, 1}.EV(1), 1.5, 0*Deg, 20*Deg),
 			},
@@ -158,7 +162,7 @@ func TestSunLight(t *testing.T) {
 			test.Sheet(white, 0),
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, 0),
-		1, 1000, // recDepth, nPass
+		1000,   // nPass
 		60, 40, // size
 		0.9, // noisy
 	)
@@ -171,6 +175,7 @@ func TestSunLight_Brightness(t *testing.T) {
 	white := materials.Matte(Color{1, 1, 1})
 	test.NPassSize(t,
 		NewScene(
+			1,
 			[]Light{
 				SunLight(Color{.2, .5, .7}, 0.1, 0*Deg, 90*Deg),
 			},
@@ -179,7 +184,7 @@ func TestSunLight_Brightness(t *testing.T) {
 			test.Sheet(white, 0),
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, 0),
-		1, 50, // recDepth nPass
+		50,       // nPass
 		300, 200, // size
 		0.2, // noisy edges
 	)
@@ -191,6 +196,7 @@ func TestSunLight_Position(t *testing.T) {
 	angDiam := 30 * Deg
 	test.NPassSize(t,
 		NewScene(
+			1,
 			[]Light{
 				// Sun at various positions along the horizon
 				SunLight(Color{1, 1, 1}.EV(1), angDiam, 0*Deg, 0*Deg),
@@ -215,7 +221,7 @@ func TestSunLight_Position(t *testing.T) {
 			test.Sheet(test.Normal, 0),
 		),
 		cameras.EnvironmentMap(Vec{0, 1, 0}),
-		1, 1, //recDepth, nPass
+		1,        // nPass
 		400, 400, // size
 		test.DefaultTolerance,
 	)

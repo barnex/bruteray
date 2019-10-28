@@ -14,14 +14,24 @@ func Box(m Material, width, height, depth float64, center Vec) Interface {
 			Min: Vec{-width / 2, -height / 2, -depth / 2},
 			Max: Vec{width / 2, height / 2, depth / 2},
 		}.translated(center),
-		origin: center,
+		//origin: center, // TODO: remove
 		mat:    m,
+	}
+}
+
+func BoxWithBounds(m Material, min, max Vec) Interface {
+	return &box{
+		bounds: BoundingBox{
+			Min: min,
+			Max: max,
+		},
+		mat: m,
 	}
 }
 
 type box struct {
 	bounds BoundingBox
-	origin Vec
+	//origin Vec
 	mat    Material
 }
 
@@ -39,7 +49,7 @@ func (b *box) Intersect(r *Ray) HitRecord {
 		return HitRecord{}
 	}
 	p := r.At(t)
-	return HitRecord{T: t, Normal: b.normal(p), Material: b.mat, Local: p.Sub(b.origin)}
+	return HitRecord{T: t, Normal: b.normal(p), Material: b.mat, Local: p.Sub(b.bounds.Min)}
 }
 
 func (b *box) normal(p Vec) Vec {

@@ -7,24 +7,24 @@ import (
 )
 
 func BlendMap(t texture.Texture, a, b Material) Func {
-	return func(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color {
+	return func(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 		key1 := t.At(h.Local).R
 		key2 := 1 - key1
 		var ca, cb Color
 		if key1 > 0 {
-			ca = a.Eval(ctx, s, r, recDepth, h)
+			ca = a.Eval(ctx, s, r, h)
 		}
 		if key2 > 0 {
-			cb = b.Eval(ctx, s, r, recDepth, h)
+			cb = b.Eval(ctx, s, r, h)
 		}
 		return ca.Mul(key1).MAdd(key2, cb)
 	}
 }
 
-type Func func(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color
+type Func func(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color
 
-func (f Func) Eval(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color {
-	return f(ctx, s, r, recDepth, h)
+func (f Func) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+	return f(ctx, s, r, h)
 }
 
 // Blend mixes two materials with certain weights. E.g.:
@@ -46,8 +46,8 @@ type blend struct {
 	matB Material
 }
 
-func (m *blend) Eval(ctx *Ctx, s *Scene, r *Ray, recDepth int, h HitCoords) Color {
-	ca := m.matA.Eval(ctx, s, r, recDepth, h)
-	cb := m.matB.Eval(ctx, s, r, recDepth, h)
+func (m *blend) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+	ca := m.matA.Eval(ctx, s, r, h)
+	cb := m.matB.Eval(ctx, s, r, h)
 	return ca.Mul(m.a).MAdd(m.b, cb)
 }

@@ -38,6 +38,24 @@ func Cylinder(m Material, diam, height float64, center Vec) Interface {
 	}
 }
 
+func CylinderDir(m Material, dir int, diam, height float64, center Vec) Interface {
+	r := diam / 2
+	a := Vec{1, 1, 1}
+	a[dir] = 0
+	bMin := Vec{-r, -r, -r}
+	bMin[dir] = -height / 2
+	return &quadric{
+		mat:    m,
+		origin: center,
+		a:      a,
+		b:      r * r,
+		bounds: BoundingBox{
+			Min: bMin,
+			Max: bMin.Mul(-1),
+		}.translated(center).withMargin(Tiny),
+	}
+}
+
 func CylinderWithCaps(m Material, diam, height float64, center Vec) Interface {
 	return And(Cylinder(m, diam, height, center), Box(m, diam, height, diam, center))
 }

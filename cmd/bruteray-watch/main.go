@@ -11,6 +11,7 @@ import (
 
 var (
 	flagSleep = flag.Duration("i", 30*time.Millisecond, "poll time")
+	flagRace  = flag.Bool("race", false, "build with -race")
 )
 
 func main() {
@@ -72,7 +73,7 @@ func rerun(fname string, args []string) {
 
 func compile(fname string) error {
 	dir := path.Dir(fname)
-	cmd := exec.Command("go", "build", path.Base(fname))
+	cmd := exec.Command("go", "build", "-race="+fmt.Sprint(*flagRace), path.Base(fname))
 	cmd.Dir = dir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

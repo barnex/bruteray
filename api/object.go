@@ -13,12 +13,28 @@ func Backdrop(m Material) Object {
 	return Object{objects.Backdrop(m)}
 }
 
+func Bounded(orig Object) Object {
+	return Object{objects.Bounded(orig.Interface)}
+}
+
 func Box(m Material, dx, dy, dz float64, center Vec) Object {
 	return Object{objects.Box(m, dx, dy, dz, center)}
 }
 
+func BoxWithBounds(m Material, min, max Vec) Object {
+	return Object{objects.BoxWithBounds(m, min, max)}
+}
+
 func Cylinder(m Material, diam, height float64, center Vec) Object {
 	return Object{objects.Cylinder(m, diam, height, center)}
+}
+
+func CylinderZ(m Material, diam, height float64, center Vec) Object {
+	return Object{objects.CylinderDir(m, Z, diam, height, center)}
+}
+
+func CylinderX(m Material, diam, height float64, center Vec) Object {
+	return Object{objects.CylinderDir(m, X, diam, height, center)}
 }
 
 func CylinderWithCaps(m Material, diam, height float64, center Vec) Object {
@@ -81,6 +97,14 @@ func (o Object) CenterFront() Vec {
 	return o.Bounds().CenterFront()
 }
 
+func (o Object) CenterTop() Vec {
+	return o.Bounds().CenterTop()
+}
+
+func (o Object) CenterBottom() Vec {
+	return o.Bounds().CenterBottom()
+}
+
 func (o Object) WithCenter(pos Vec) Object {
 	delta := pos.Sub(o.Bounds().Center())
 	return o.Translate(delta)
@@ -92,8 +116,11 @@ func (o Object) WithCenterBottom(pos Vec) Object {
 }
 
 func (o Object) Rotate(axis Vec, radians float64) Object {
-	c := o.Bounds().Center()
-	return o.Transform(geom.Rotate(c, axis, radians))
+	return o.RotateAt(o.Center(), axis, radians)
+}
+
+func (o Object) RotateAt(center Vec, axis Vec, radians float64) Object {
+	return o.Transform(geom.Rotate(center, axis, radians))
 }
 
 func (o Object) Translate(delta Vec) Object {
@@ -102,6 +129,10 @@ func (o Object) Translate(delta Vec) Object {
 
 func (o Object) Scale(s float64) Object {
 	return o.Transform(geom.Scale(o.Center(), s))
+}
+
+func (o Object) ScaleAt(center Vec, s float64) Object {
+	return o.Transform(geom.Scale(center, s))
 }
 
 func (o Object) Transform(tr *geom.AffineTransform) Object {

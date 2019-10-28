@@ -5,11 +5,9 @@ import "github.com/barnex/bruteray/image"
 type Image = image.Image
 
 type Params struct {
-	Bloom struct {
-		Gaussian BloomParams
-		Airy     BloomParams
-		Star     BloomParams
-	}
+	Gaussian BloomParams
+	Airy     BloomParams
+	Star     BloomParams
 }
 
 type BloomParams struct {
@@ -19,13 +17,13 @@ type BloomParams struct {
 }
 
 func (p *Params) ApplyTo(img Image, pixelSize float64) Image {
-	if b := p.Bloom.Gaussian; b.Radius != 0 {
+	if b := p.Gaussian; b.Radius != 0 {
 		img = ApplyGaussianBloom(img, pixelSize, b.Radius, b.Amplitude, b.Threshold)
 	}
-	if b := p.Bloom.Airy; b.Radius != 0 {
+	if b := p.Airy; b.Radius != 0 {
 		img = ApplyAiryBloom(img, pixelSize, b.Radius, b.Amplitude, b.Threshold)
 	}
-	if b := p.Bloom.Star; b.Radius != 0 {
+	if b := p.Star; b.Radius != 0 {
 		img = ApplyStarBloom(img, pixelSize, b.Radius, b.Amplitude, b.Threshold)
 	}
 	return img

@@ -62,16 +62,30 @@ func (p *parser) parse() ([]geom.Vec, [][3]int) {
 		}
 	}
 
-	faces := make([][3]int, numFace)
+	faces := make([][3]int, 0, numFace)
 	for i := 0; i < numFace; i++ {
 		fields := strings.Fields(p.readLine())
-		if n := p.atoi(fields[0]); n != 3 {
-			p.panicf("need 3 vertices, have: %v", n)
+
+		numV := p.atoi(fields[0])
+		if !(numV == 3 || numV == 4) {
+			p.panicf("need 3 or 4 vertices, have: %v", numV)
 		}
+
+		var f [3]int
 		for c := 0; c < 3; c++ {
 			idx := p.atoi(fields[c+1])
-			faces[i][c] = idx
+			f[c] = idx
 		}
+		faces = append(faces, f)
+
+		if numV == 4 {
+			faces = append(faces, [3]int{
+				p.atoi(fields[3]),
+				p.atoi(fields[4]),
+				p.atoi(fields[1]),
+			})
+		}
+
 	}
 	return vertex, faces
 }

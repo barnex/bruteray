@@ -21,6 +21,7 @@ import (
 func TestMatte_Shadow(t *testing.T) {
 	test.QuadView(t,
 		NewScene(
+			1,
 			[]Light{
 				lights.PointLight(color.White.EV(2), Vec{1, 1, 0}),
 			},
@@ -36,6 +37,7 @@ func TestMatte_Shadow(t *testing.T) {
 func TestReflective(t *testing.T) {
 	test.QuadViewN(t,
 		NewScene(
+			3,
 			[]Light{
 				lights.PointLight(color.White.EV(2), Vec{1, 1, 0}),
 			},
@@ -44,9 +46,8 @@ func TestReflective(t *testing.T) {
 			test.Sphere(Reflective(color.Color{1, 1, 1}), 1, Vec{1, 0, 0.5}),
 			test.Sphere(test.Checkers2, 2, Vec{-2, 0.5, 1}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0.5, 1.8}, 0, -10*Deg, ),
+		cameras.NewProjective(90*Deg, Vec{0, 0.5, 1.8}, 0, -10*Deg),
 		8, // isometric fov
-		3, // recDepth
 		1, // nPass
 		test.DefaultTolerance,
 	)
@@ -56,6 +57,7 @@ func TestRefractive(t *testing.T) {
 	t.Skip("Looks wrong?")
 	test.QuadViewN(t,
 		NewScene(
+			9,
 			[]Light{
 				lights.PointLight(color.White.EV(2), Vec{1, 1, 2}),
 			},
@@ -70,9 +72,8 @@ func TestRefractive(t *testing.T) {
 			test.Sphere(Refractive(2.00), 1, Vec{+2, 0, 0}), // looks wrong
 			test.Sphere(Refractive(10.0), 1, Vec{+3, 0, 0}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0.3, 3.5}, 0, -10*Deg, ),
+		cameras.NewProjective(90*Deg, Vec{0, 0.3, 3.5}, 0, -10*Deg),
 		8, // isometric fov
-		9, // recDepth
 		1, // nPass
 		test.DefaultTolerance,
 	)
@@ -81,6 +82,7 @@ func TestRefractive(t *testing.T) {
 func TestTransparent(t *testing.T) {
 	test.QuadViewN(t,
 		NewScene(
+			3,
 			[]Light{
 				test.PointLight(Vec{0, 2, 0}),
 			},
@@ -89,7 +91,6 @@ func TestTransparent(t *testing.T) {
 		),
 		cameras.NewProjective(90*Deg, Vec{0, 1, 2.5}, 0, 0),
 		6,   // isometric fov
-		3,   // recDepth
 		1,   // nPass
 		0.7, // tolerance
 	)
