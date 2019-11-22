@@ -26,6 +26,7 @@ func (m *transparent) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	defer ctx.PutRay(r2)
 	// No caustics please
 	return s.EvalMinusLights(ctx, r2).Mul3(m.t.At(h.Local))
+	//return s.Eval(ctx, r2).Mul3(m.t.At(h.Local))
 }
 
 func (m *transparent) Filter(r *Ray, h HitRecord, background Color) Color {

@@ -6,16 +6,18 @@ import (
 	. "github.com/barnex/bruteray/tracer/types"
 )
 
-func Fog(density float64, height float64) Medium {
+func Fog(density float64, height float64, numLight int) Medium {
 	return &fog{
-		density: density,
-		height:  height,
+		density:  density,
+		height:   height,
+		numLight: numLight,
 	}
 }
 
 type fog struct {
-	density float64
-	height  float64
+	density  float64
+	height   float64
+	numLight int
 }
 
 // TODO: not correct when camera is in fog?
@@ -35,7 +37,10 @@ func (m *fog) Filter(ctx *Ctx, s *Scene, r *Ray, tMax float64, orig Color) Color
 	sec := ctx.Ray()
 	//defer ctx.PutRay(sec)
 
-	for _, l := range s.Lights() {
+	for i, l := range s.Lights() {
+		if i == m.numLight {
+			break
+		}
 		lpos, intens := l.Sample(ctx, p)
 		if intens == (Color{}) {
 			continue

@@ -65,6 +65,7 @@ var (
 	Flat        = materials.Flat
 	Shiny       = materials.Shiny
 	Blend       = materials.Blend
+	BlendMap    = materials.BlendMap
 	//ReflectFresnel = materials.ReflectFresnel
 
 	ExpFog = media.ExpFog

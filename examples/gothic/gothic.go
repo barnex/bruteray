@@ -3,10 +3,12 @@ package main
 import (
 	. "github.com/barnex/bruteray/api"
 	"github.com/barnex/bruteray/geom"
+	"github.com/barnex/bruteray/post"
+	"github.com/barnex/bruteray/texture"
 )
 
 func main() {
-	wall := Matte(C(1, 0.9, 0.8).Mul(0.5))
+	wall := Matte(C(1, 0.9, 0.8).Mul(0.3))
 
 	H1 := 6.0
 	W1 := 6.0
@@ -27,6 +29,7 @@ func main() {
 		),
 	)
 
+	//glassT1 := White
 	glassT1 := LoadTexture("/home/arne/assets/stained1.jpg")
 	glassT2 := glassT1
 	glassT3 := glassT1
@@ -73,17 +76,15 @@ func main() {
 		glass3.Translate(V(+W1/4+winB/2, 0, 0)),
 	)
 
-	statue := Matte(White.EV(-.6))
-
-	piedestal := Box(statue, 1.7, 0.6, 1.7, O).WithCenterBottom(O)
+	piedestal := Box(wall, 1.7, 0.6, 1.7, O).WithCenterBottom(O)
 
 	//indirect ray goes through window, forgets it's indirect and
 	//uses scene.EvalAll instead of NonLuminous
 	Render(Spec{
-		Recursion:    2,
-		Width:        1920,
-		Height:       1080,
-		NumPass:      300,
+		Recursion:    4,
+		Width:        1920 / 2,
+		Height:       1920 / 3,
+		NumPass:      900,
 		DebugNormals: 0,
 		Objects: []Object{
 
@@ -96,40 +97,48 @@ func main() {
 			),
 
 			piedestal,
-			//ObjFile(
-			//	map[string]Material{
-			//		"Eye-White":    Shiny(White, 0.1),
-			//		"Material":     Shiny(Black, 0.05),
-			//		"Material.001": Shiny(Black, 0.05),
-			//		"NoseTop":      statue,
-			//		"Tooth":        Shiny(White, 0.1),
-			//		"SkinColor":    Matte(White.EV(-1.3)),
-			//		"Body":         Matte(White.EV(-1.0)),
-			//	},
-			//	"/home/arne/assets/gopher.obj",
-			//	geom.Scale(O, 0.5),
-			//	geom.Rotate(O, Ey, -90*Deg),
-			//).WithCenterBottom(piedestal.CenterTop()),
 			ObjFile(
-				map[string]Material{"": statue},
+				map[string]Material{"": Shiny(White.EV(-.9), 0.03)},
 				"/home/arne/assets/Alucy.obj",
 				geom.Scale(O, 5./1000.),
 				geom.Rotate(O, Ey, 90*Deg),
-			).WithCenterBottom(piedestal.CenterTop()),
+			).WithCenterBottom(piedestal.CenterTop()).Rotate(Ey, -30*Deg),
 
-			Rectangle(Matte(White.EV(-2)), 100, 100, V(0, .01, 0)),
-			Backdrop(Flat(C(0.8, 0.8, 1.0).EV(-0.6))),
+			Rectangle(
+				BlendMap(
+					texture.Checkers(4, 4, White, Black),
+					Matte(White.EV(-1)),
+					Shiny(White.EV(-4), 0.06),
+				),
+				W1, W1, V(0, .01, 0)),
+			Rectangle(Flat(White.EV(-2)), 100, 100, V(0, .001, 0)),
+			//Backdrop(Flat(C(0.8, 0.8, 1.0).EV(-0.6))),
+			Backdrop(Flat(C(0.8, 0.8, 1.0).EV(1.0))),
+			Box(Flat(Black), 6, 6, 0.01, V(0, 3, 4)),
 		},
 		Lights: []Light{
-			SunLight(C(1, 0.9, 0.7).EV(1.3), 0.8*Deg, 13*Deg, 12*Deg),
-			//SunLight(C(1, 0.9, 0.7).EV(0.6), .8*Deg, -110*Deg, 35*Deg),
-			//PointLight(White.EV(4), V(1, H1, 4)),
+			//SunLight(C(1, 0.9, 0.7).EV(1.1), 0.8*Deg, 3.5*Deg, 18*Deg),
+			SunLight(C(1, 0.9, 0.7).EV(0.9), 0.8*Deg, -126*Deg, 18*Deg),
+			PointLight(C(1, 1, 1).EV(3.9), V(0.8, 4.5, 1.5)),
 		},
 
 		Media: []Medium{
-			Fog(0.025, H2),
+			Fog(0.05, H2, 1),
 		},
 
-		Camera: Projective(70*Deg, O, 0, 0).Translate(V(1, 2.4, 7.0)),
+		Camera: ProjectiveAperture(50*Deg, 0.04, 2.30, O, 0, -1*Deg).Translate(V(0.4, 3.9, 2.8)),
+
+		PostProcess: post.Params{
+			Gaussian: post.BloomParams{
+				Radius:    0.02,
+				Threshold: 1.5,
+				Amplitude: 0.005,
+			},
+			//Airy: post.BloomParams{
+			//	Radius:    0.002,
+			//	Threshold: 5,
+			//	Amplitude: 0.002,
+			//},
+		},
 	})
 }
