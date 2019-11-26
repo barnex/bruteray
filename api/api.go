@@ -58,15 +58,15 @@ var (
 	DiskLight      = lights.DiskLight
 	SunLight       = lights.SunLight
 
-	Matte       = materials.Matte
-	Reflective  = materials.Reflective
-	Refractive  = materials.Refractive
-	Transparent = materials.Transparent
-	Flat        = materials.Flat
-	Shiny       = materials.Shiny
-	Blend       = materials.Blend
-	BlendMap    = materials.BlendMap
-	//ReflectFresnel = materials.ReflectFresnel
+	Matte          = materials.Matte
+	Reflective     = materials.Reflective
+	Refractive     = materials.Refractive
+	Transparent    = materials.Transparent
+	Flat           = materials.Flat
+	Shiny          = materials.Shiny
+	Blend          = materials.Blend
+	BlendMap       = materials.BlendMap
+	ReflectFresnel = materials.ReflectFresnel
 
 	ExpFog = media.ExpFog
 	Fog    = media.Fog

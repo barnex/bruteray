@@ -30,6 +30,10 @@ func main() {
 	)
 
 	//glassT1 := White
+
+	marbleT := LoadTexture("/home/arne/assets/marble2t.jpg")
+	marble := ReflectFresnel(1.3, Matte(marbleT))
+	_ = marble
 	glassT1 := LoadTexture("/home/arne/assets/stained1.jpg")
 	glassT2 := glassT1
 	glassT3 := glassT1
@@ -98,11 +102,13 @@ func main() {
 
 			piedestal,
 			ObjFile(
-				map[string]Material{"": Shiny(White.EV(-.9), 0.03)},
+				map[string]Material{"": marble},
 				"/home/arne/assets/Alucy.obj",
 				geom.Scale(O, 5./1000.),
 				geom.Rotate(O, Ey, 90*Deg),
-			).WithCenterBottom(piedestal.CenterTop()).Rotate(Ey, -30*Deg),
+			).WithCenterBottom(piedestal.CenterTop()).Rotate(Ey, -15*Deg).Remap(
+				func(v Vec) Vec { return v },
+			),
 
 			Rectangle(
 				BlendMap(
@@ -117,22 +123,22 @@ func main() {
 			Box(Flat(Black), 6, 6, 0.01, V(0, 3, 4)),
 		},
 		Lights: []Light{
-			//SunLight(C(1, 0.9, 0.7).EV(1.1), 0.8*Deg, 3.5*Deg, 18*Deg),
-			SunLight(C(1, 0.9, 0.7).EV(0.9), 0.8*Deg, -126*Deg, 18*Deg),
-			PointLight(C(1, 1, 1).EV(3.9), V(0.8, 4.5, 1.5)),
+			SunLight(C(1, 0.9, 0.7).EV(1.1), 0.4*Deg, 3.5*Deg, 4*Deg),
+			SunLight(C(1, 0.9, 0.7).EV(0.8), 0.8*Deg, -126*Deg, 18*Deg),
+			PointLight(C(1, 1, 1).EV(3.8), V(0.8, 4.5, 1.5)),
 		},
 
 		Media: []Medium{
-			Fog(0.05, H2, 1),
+			Fog(0.3, H2, 1),
 		},
 
-		Camera: ProjectiveAperture(50*Deg, 0.04, 2.30, O, 0, -1*Deg).Translate(V(0.4, 3.9, 2.8)),
+		Camera: ProjectiveAperture(50*Deg, 0.02, 2.30, O, 0, -1*Deg).Translate(V(0.4, 3.9, 2.8)),
 
 		PostProcess: post.Params{
 			Gaussian: post.BloomParams{
-				Radius:    0.02,
+				Radius:    0.03,
 				Threshold: 1.5,
-				Amplitude: 0.005,
+				Amplitude: 0.02,
 			},
 			//Airy: post.BloomParams{
 			//	Radius:    0.002,

@@ -127,6 +127,10 @@ func (o Object) Translate(delta Vec) Object {
 	return o.Transform(geom.Translate(delta))
 }
 
+func (o Object) Remap(f func(Vec) Vec) Object {
+	return Object{objects.Remap(o.Interface, f)}
+}
+
 func (o Object) Scale(s float64) Object {
 	return o.Transform(geom.Scale(o.Center(), s))
 }

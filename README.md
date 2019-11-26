@@ -1,6 +1,4 @@
-# BruteRay  [![GoDoc](https://godoc.org/github.com/barnex/bruteray/api?status.svg)](https://godoc.org/github.com/barnex/bruteray/api)
-
-![fig](mascot.jpg) 
+# ![fig](mascot.png) BruteRay  [![GoDoc](https://godoc.org/github.com/barnex/bruteray/api?status.svg)](https://godoc.org/github.com/barnex/bruteray/api)
 
 Physics-based ray tracer in Go.
 
@@ -9,7 +7,7 @@ Physics-based ray tracer in Go.
 
 ![Newell teapot ray-traced in golang (go)](shots/2024-teapot.jpg) 
 ![Damaliscus Korrigum skull ray traced in Golang (Go), with volumetric scattering](shots/2027-damaliscus.jpg) 
-![Stanford Lucy ray-traced in Go with volumetric scattering](shots/2029-lucy.jpg) 
+![Stanford Lucy ray-traced in Go with volumetric scattering](shots/2030-lucy.jpg) 
 ![Stanford Dragon ray-traced in Go](shots/2026-pool.jpg) 
 ![Moebius strip ray-traced in Go](shots/2010-uvmap.jpg) 
 ![fig](shots/cementary.jpg) 
