@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/barnex/bruteray/image"
-	"github.com/barnex/bruteray/image/ppm"
+	"github.com/barnex/bruteray/imagef"
+	"github.com/barnex/bruteray/imagef/ppm"
 	. "github.com/barnex/bruteray/tracer/types"
 )
 
@@ -32,10 +32,10 @@ func TestEncode48BE(t *testing.T) {
 	ppm.Encode48BE(w, testImg())
 }
 
-func testImg() image.Image {
+func testImg() imagef.Image {
 	const W, H = 30, 20
 	const max = 1<<16 - 1
-	img := image.MakeImage(W, H)
+	img := imagef.MakeImage(W, H)
 	for i := 0; i < W; i++ {
 		for j := 0; j < H; j++ {
 			img[j][i] = Color{R: float64(i) / W, G: float64(j) / H, B: 0}

@@ -3,18 +3,18 @@ package texture
 import (
 	"log"
 
-	. "github.com/barnex/bruteray/color"
 	"github.com/barnex/bruteray/geom"
-	"github.com/barnex/bruteray/image"
+	"github.com/barnex/bruteray/imagef"
+	. "github.com/barnex/bruteray/imagef/colorf"
 )
 
 func MustLoad(file string) Texture {
-	img := image.MustLoad(file)
+	img := imagef.MustLoad(file)
 	return &bilinear{img}
 }
 
 func HeightMap(file string) Texture {
-	img, err := image.Load(file, image.Linear)
+	img, err := imagef.Load(file, imagef.Linear)
 	if err != nil {
 		log.Fatalln("heightmap: read", file, ":", err)
 	}
@@ -37,7 +37,7 @@ type panned struct {
 }
 
 func (p *panned) AtUV(u, v float64) Color {
-	return p.orig.At(geom.Vec{u*p.iScaleU-p.deltaU, v*p.iScaleV-p.deltaV, 0})
+	return p.orig.At(geom.Vec{u*p.iScaleU - p.deltaU, v*p.iScaleV - p.deltaV, 0})
 }
 
 func (p *panned) At(P geom.Vec) Color {

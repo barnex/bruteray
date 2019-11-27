@@ -31,6 +31,6 @@ func main() {
 				"Material.001": Shiny(Gray(0.0), 0.1),
 			}, "../../../../../assets/gopher.obj").ScaleToSize(1).Rotate(Ey, -80*Deg).WithCenterBottom(V(0, 0, 0)),
 		},
-		Camera: Projective(90*Deg, V(0, 0.5, 1.5), 0, 0, ),
+		Camera: Projective(90*Deg, V(0, 0.5, 1.5), 0, 0),
 	})
 }

@@ -1,7 +1,7 @@
 package materials
 
 import (
-	. "github.com/barnex/bruteray/color"
+	. "github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/texture"
 	. "github.com/barnex/bruteray/tracer"
 )
@@ -18,14 +18,14 @@ type transparent struct {
 	useRec bool
 }
 
-func (m *transparent) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+func (m *transparent) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	pos := r.At(h.T + Tiny)
 	r2 := ctx.Ray()
 	r2.Start = pos
 	r2.Dir = r.Dir
 	defer ctx.PutRay(r2)
 	// No caustics please
-	return s.EvalMinusLights(ctx, r2).Mul3(m.t.At(h.Local))
+	return s.LightFieldIndirect(ctx, r2).Mul3(m.t.At(h.Local))
 	//return s.Eval(ctx, r2).Mul3(m.t.At(h.Local))
 }
 

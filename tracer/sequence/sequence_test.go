@@ -1,23 +1,8 @@
-package random
+package sequence
 
 import (
 	"fmt"
 )
-
-//func TestExampleHaltonDisk(t *testing.T) {
-//	for i := 1; i < 100; i++ {
-//		fmt.Println(UniformDisk(Halton(2, i), Halton(3, i*3)))
-//	}
-//}
-
-//func TestCosineSphere(t *testing.T) {
-//	n := geom.Vec{1, 1, 0}.Normalized()
-//	for i := 1; i < 1000; i++ {
-//		u, v := Halton(2, i), Halton(3, i*3)
-//		S := CosineSphere(u, v, n)
-//		fmt.Println(S[0], S[1], S[2])
-//	}
-//}
 
 func ExampleHalton_2() {
 	for i := 0; i < 10; i++ {

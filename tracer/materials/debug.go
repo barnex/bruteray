@@ -4,11 +4,11 @@ package materials
 import (
 	"math"
 
-	"github.com/barnex/bruteray/color"
+	"github.com/barnex/bruteray/imagef/colorf"
 	. "github.com/barnex/bruteray/tracer"
 )
 
-//. "github.com/barnex/bruteray/color"
+//. "github.com/barnex/bruteray/imagef/colorf"
 
 func Normal() Material {
 	return shadeNormal{}

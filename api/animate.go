@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/barnex/bruteray/sampler"
+	"github.com/barnex/bruteray/tracer"
 )
 
 func Animate(numFrame int, f func(frame int) Spec) {
@@ -22,7 +22,7 @@ func renderFrame(spec Spec, i int) {
 	spec.InitDefaults()
 
 	aa := (spec.NumPass > 1)
-	s := sampler.NewAdaptive(spec.ImageFunc(), spec.Width, spec.Height, aa)
+	s := tracer.NewSampler(spec.ImageFunc(), spec.Width, spec.Height, aa)
 
 	for i := 0; i < spec.NumPass; i++ {
 		s.Sample(1) // TODO: Sample(N) is broken for high N
@@ -36,6 +36,6 @@ func renderFrame(spec Spec, i int) {
 		fmt.Println(err)
 	}
 	fname := path.Join(dir, fmt.Sprintf("%05d.jpg", i))
-	check(savef(s.StoredImage(), path.Join(dir, "last.jpg"), ""))
-	check(savef(s.StoredImage(), fname, ""))
+	check(savef(s.Image(), path.Join(dir, "last.jpg"), ""))
+	check(savef(s.Image(), fname, ""))
 }

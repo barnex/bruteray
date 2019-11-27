@@ -12,9 +12,9 @@ import (
 	"path"
 	"time"
 
-	imagef "github.com/barnex/bruteray/image"
-	"github.com/barnex/bruteray/image/ppm"
-	"github.com/barnex/bruteray/sampler"
+	"github.com/barnex/bruteray/imagef"
+	"github.com/barnex/bruteray/imagef/ppm"
+	"github.com/barnex/bruteray/tracer"
 
 	"net/http"
 	_ "net/http/pprof"
@@ -49,7 +49,7 @@ func Render(spec Spec) {
 
 func renderLocal(spec Spec) {
 	//print("rendering:", *flagO, Width, "x", Height, ",", NumPass, "passes, ", Recursion, "recursion depth...")
-	s := sampler.New(spec.ImageFunc(), spec.Width, spec.Height, true)
+	s := tracer.NewSampler(spec.ImageFunc(), spec.Width, spec.Height, true)
 	pixs := 1 / float64(spec.Width) //??
 
 	passBeforeSave := 1

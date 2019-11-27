@@ -1,10 +1,11 @@
-package image
+// Package imagef provides a floating-point image implementation.
+package imagef
 
 import (
 	"image"
 	"image/color"
 
-	colorf "github.com/barnex/bruteray/color"
+	"github.com/barnex/bruteray/imagef/colorf"
 )
 
 type Image [][]colorf.Color
@@ -20,10 +21,20 @@ func MakeImage(w, h int) Image {
 
 // Bounds implements image.Image
 func (i Image) Bounds() image.Rectangle {
+	w, h := i.Size()
+	return image.Rect(0, 0, w, h)
+}
+
+func (i Image) Size() (width, height int) {
 	if len(i) == 0 {
-		return image.Rect(0, 0, 0, 0)
+		return 0, 0
 	}
-	return image.Rect(0, 0, len(i[0]), len(i))
+	return len(i[0]), len(i)
+}
+
+func (i Image) NumPixels() int {
+	w, h := i.Size()
+	return w * h
 }
 
 // At implements image.Image

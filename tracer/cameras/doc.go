@@ -1,17 +1,27 @@
 /*
-Package cameras provides various implementations of the camera interface (tracer.Camera).
-This interface defines one method: mapping a 2D position from the image sensor onto a Ray:
+Package cameras provides various implementations of the camera interface tracer.Camera.
 
-	type Camera interface{
-		RayFrom(ctx *Ctx, u, v float64) *Ray
-	}
 
-The context (ctx) must be used to generate random numbes, if needed
-(e.g., for lens samples).
+Projection type and view direction
+
+A camera implementation is characterized by
+   - the kind of projection (plane, spherical, isometric, ...)
+   - the camera position and view direction
+
+Constructors return a camera located at position (0,0,0) and looking
+in the -Z direction. These can then be changed via the methods
+   Translate
+   YawPitchRoll
+
+Internally, projection and position are separated wrapping a transform
+(change in view direction and position) around an implementation
+that has a fixed view direction and only cares about the type of projection.
+All constructors return a pre-wrapped camera, which can be conveniently tranformed.
+
 
 Axes and handedness
 
-The convention in this package is that the X asis points to the right of the screen,
+The convention in this package is that the X axis points to the right of the screen,
 the Y axis points up, and the Z axis points towards the viewer.
 
 This makes the coordinate system right-handed.

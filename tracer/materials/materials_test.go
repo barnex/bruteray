@@ -5,7 +5,7 @@ package materials_test
 import (
 	"testing"
 
-	"github.com/barnex/bruteray/color"
+	"github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/tracer/cameras"
 	"github.com/barnex/bruteray/tracer/lights"
 	"github.com/barnex/bruteray/tracer/test"
@@ -23,13 +23,13 @@ func TestMatte_Shadow(t *testing.T) {
 		NewScene(
 			1,
 			[]Light{
-				lights.PointLight(color.White.EV(2), Vec{1, 1, 0}),
+				lights.PointLight(colorf.White.EV(2), Vec{1, 1, 0}),
 			},
-			test.Sheet(Matte(color.White), -0.5),
-			test.Sphere(Matte(color.White), 1, Vec{0, 0, 0}),
-			test.Sphere(Matte(color.White), 1, Vec{2, 2, 0}),
+			test.Sheet(Matte(colorf.White), -0.5),
+			test.Sphere(Matte(colorf.White), 1, Vec{0, 0, 0}),
+			test.Sphere(Matte(colorf.White), 1, Vec{2, 2, 0}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0.5, 3}, 0, 0),
+		cameras.Projective(90*Deg).Translate(Vec{0, 0.5, 3}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -39,17 +39,17 @@ func TestReflective(t *testing.T) {
 		NewScene(
 			3,
 			[]Light{
-				lights.PointLight(color.White.EV(2), Vec{1, 1, 0}),
+				lights.PointLight(colorf.White.EV(2), Vec{1, 1, 0}),
 			},
 			test.Sheet(test.Checkers4, -0.5),
-			test.Sphere(Reflective(color.Color{1, 1, 0.5}), 1, Vec{0, 0, 0}),
-			test.Sphere(Reflective(color.Color{1, 1, 1}), 1, Vec{1, 0, 0.5}),
+			test.Sphere(Reflective(Color{1, 1, 0.5}), 1, Vec{0, 0, 0}),
+			test.Sphere(Reflective(Color{1, 1, 1}), 1, Vec{1, 0, 0.5}),
 			test.Sphere(test.Checkers2, 2, Vec{-2, 0.5, 1}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0.5, 1.8}, 0, -10*Deg),
-		8, // isometric fov
-		1, // nPass
-		test.DefaultTolerance,
+		cameras.Projective(90*Deg).Translate(Vec{0, 0.5, 1.8}).YawPitchRoll(0, -10*Deg, 0),
+		8,    // isometric fov
+		1,    // nPass
+		0.01, // noisy normals under grazing incidence
 	)
 }
 
@@ -59,10 +59,10 @@ func TestRefractive(t *testing.T) {
 		NewScene(
 			9,
 			[]Light{
-				lights.PointLight(color.White.EV(2), Vec{1, 1, 2}),
+				lights.PointLight(colorf.White.EV(2), Vec{1, 1, 2}),
 			},
 			test.Sheet(test.Checkers4, -0.5),
-			test.Sheet(test.Flat(color.Color{0.5, 0.5, 0.8}), 20000000),
+			test.Sheet(test.Flat(Color{0.5, 0.5, 0.8}), 20000000),
 
 			test.Sphere(Refractive(1.0001), 1, Vec{-3, 0, 0}),
 			test.Sphere(Refractive(1.05), 1, Vec{-2, 0, 0}),
@@ -72,7 +72,7 @@ func TestRefractive(t *testing.T) {
 			test.Sphere(Refractive(2.00), 1, Vec{+2, 0, 0}), // looks wrong
 			test.Sphere(Refractive(10.0), 1, Vec{+3, 0, 0}),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 0.3, 3.5}, 0, -10*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 0.3, 3.5}).YawPitchRoll(0, -10*Deg, 0),
 		8, // isometric fov
 		1, // nPass
 		test.DefaultTolerance,
@@ -86,10 +86,10 @@ func TestTransparent(t *testing.T) {
 			[]Light{
 				test.PointLight(Vec{0, 2, 0}),
 			},
-			test.Sphere(Transparent(color.Color{0, 1, 0}, false), 1, Vec{0, 0.9, 0}),
-			test.Sheet(Matte(color.White), 0), // floor
+			test.Sphere(Transparent(colorf.Color{0, 1, 0}, false), 1, Vec{0, 0.9, 0}),
+			test.Sheet(Matte(colorf.White), 0), // floor
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2.5}, 0, 0),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 2.5}),
 		6,   // isometric fov
 		1,   // nPass
 		0.7, // tolerance

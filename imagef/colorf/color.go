@@ -1,4 +1,5 @@
-package color
+// Package colorf provides a floating-point color implementation.
+package colorf
 
 import (
 	"math"

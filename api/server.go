@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"sync"
 
-	imagef "github.com/barnex/bruteray/image"
-	"github.com/barnex/bruteray/sampler"
+	"github.com/barnex/bruteray/imagef"
+	"github.com/barnex/bruteray/tracer"
 	//. "github.com/barnex/bruteray/tracer/types"
 )
 
@@ -28,7 +28,7 @@ type server struct {
 
 	mu        sync.Mutex
 	cancel    chan struct{}
-	smplr     *sampler.Sampler
+	smplr     *tracer.Sampler
 	smplrView View // View currently being rendred by smplr
 	smplrNum  int
 }
@@ -90,7 +90,7 @@ func decodeView(r io.ReadCloser) (View, error) {
 func (s *server) renderPreview(v View) imagef.Image {
 	spec := v.ApplyTo(s.spec)
 	nPass := 1
-	img := sampler.Uniform(spec.ImageFunc(), nPass, v.Width, v.Height, v.AntiAlias)
+	img := tracer.Uniform(spec.ImageFunc(), nPass, v.Width, v.Height, v.AntiAlias)
 	return img
 }
 
@@ -126,7 +126,7 @@ func (s *server) prepareBakery(v View) (chan struct{}, error) {
 
 	if s.smplr == nil || s.smplrView != v {
 		spec := v.ApplyTo(s.spec)
-		s.smplr = sampler.New(spec.ImageFunc(), v.Width, v.Height, v.AntiAlias)
+		s.smplr = tracer.NewSampler(spec.ImageFunc(), v.Width, v.Height, v.AntiAlias)
 		s.smplrView = v
 		s.smplrNum = 1
 	}

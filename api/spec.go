@@ -1,8 +1,7 @@
 package api
 
 import (
-	"github.com/barnex/bruteray/color"
-	"github.com/barnex/bruteray/post"
+	"github.com/barnex/bruteray/imagef/post"
 	"github.com/barnex/bruteray/tracer"
 	"github.com/barnex/bruteray/tracer/cameras"
 	"github.com/barnex/bruteray/tracer/materials"
@@ -56,7 +55,7 @@ func (s *Spec) InitDefaults() {
 		s.NumPass = 1
 	}
 	if s.Camera == nil {
-		s.Camera = Projective(90*Deg, Vec{0, 1, 0}, 0, 0)
+		s.Camera = Projective(90 * Deg).Translate(V(0, 1, 0))
 	}
 	if s.Width == 0 && s.Height == 0 {
 		s.Width = defaultImageWidth
@@ -74,12 +73,12 @@ func (s *Spec) InitDefaults() {
 	if s.DebugNormals == 2 {
 		s.applyMaterial(materials.Blend(
 			0.3, test.Normal2,
-			0.7, materials.Transparent(color.Color{1, 1, 1}, true),
+			0.7, materials.Transparent(C(1, 1, 1), true),
 		))
 		s.Recursion = 20
 	}
 	if s.DebugIsometricFOV != 0 {
-		s.Camera = cameras.NewIsometric(s.DebugIsometricDir, s.DebugIsometricFOV)
+		s.Camera = cameras.Isometric(s.DebugIsometricDir, s.DebugIsometricFOV)
 	}
 	if s.Recursion == 0 {
 		s.Recursion = defaultRecursion

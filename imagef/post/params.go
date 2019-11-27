@@ -1,8 +1,7 @@
+// Package post implements image post-processing effects, like bloom.
 package post
 
-import "github.com/barnex/bruteray/image"
-
-type Image = image.Image
+import "github.com/barnex/bruteray/imagef"
 
 type Params struct {
 	Gaussian BloomParams
@@ -16,7 +15,7 @@ type BloomParams struct {
 	Threshold float64
 }
 
-func (p *Params) ApplyTo(img Image, pixelSize float64) Image {
+func (p *Params) ApplyTo(img imagef.Image, pixelSize float64) imagef.Image {
 	if b := p.Gaussian; b.Radius != 0 {
 		img = ApplyGaussianBloom(img, pixelSize, b.Radius, b.Amplitude, b.Threshold)
 	}
@@ -29,7 +28,7 @@ func (p *Params) ApplyTo(img Image, pixelSize float64) Image {
 	return img
 }
 
-func ApplyGaussianBloom(img Image, pixelSize, radius, amplitude, threshold float64) Image {
+func ApplyGaussianBloom(img imagef.Image, pixelSize, radius, amplitude, threshold float64) imagef.Image {
 	widthPix := radius / pixelSize
 	numPix := int(5*widthPix) + 1
 	K := Gaussian(numPix, widthPix)
@@ -38,7 +37,7 @@ func ApplyGaussianBloom(img Image, pixelSize, radius, amplitude, threshold float
 	return img2
 }
 
-func ApplyAiryBloom(img Image, pixelSize, radius, amplitude, threshold float64) Image {
+func ApplyAiryBloom(img imagef.Image, pixelSize, radius, amplitude, threshold float64) imagef.Image {
 	widthPix := radius / pixelSize
 	numPix := int(8*widthPix) + 1
 	K := Airy(numPix, widthPix)
@@ -47,7 +46,7 @@ func ApplyAiryBloom(img Image, pixelSize, radius, amplitude, threshold float64) 
 	return img2
 }
 
-func ApplyStarBloom(img Image, pixelSize, radius, amplitude, threshold float64) Image {
+func ApplyStarBloom(img imagef.Image, pixelSize, radius, amplitude, threshold float64) imagef.Image {
 	widthPix := radius / pixelSize
 	numPix := int(widthPix)
 	K := starKernel(numPix)

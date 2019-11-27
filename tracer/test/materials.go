@@ -1,24 +1,24 @@
 package test
 
 import (
-	"github.com/barnex/bruteray/color"
+	"github.com/barnex/bruteray/imagef/colorf"
 	. "github.com/barnex/bruteray/tracer/types"
 )
 
 var (
-	Blue    = WithShadows(color.Blue)
-	Cyan    = WithShadows(color.Cyan)
-	Gray    = WithShadows(color.Gray(0.5))
-	Green   = WithShadows(color.Green)
-	Magenta = WithShadows(color.Magenta)
-	White   = WithShadows(color.White)
-	Yellow  = WithShadows(color.Yellow)
+	Blue    = WithShadows(colorf.Blue)
+	Cyan    = WithShadows(colorf.Cyan)
+	Gray    = WithShadows(colorf.Gray(0.5))
+	Green   = WithShadows(colorf.Green)
+	Magenta = WithShadows(colorf.Magenta)
+	White   = WithShadows(colorf.White)
+	Yellow  = WithShadows(colorf.Yellow)
 	// No Red, used to show back faces
 
 	Checkers1 = Checkers(White, Magenta)
 	Checkers2 = Checkers(White, Cyan)
 	Checkers3 = Checkers(White, Green)
-	Checkers4 = Checkers(WithShadows(color.Gray(0.4)), WithShadows(color.Gray(0.7)))
+	Checkers4 = Checkers(WithShadows(colorf.Gray(0.4)), WithShadows(colorf.Gray(0.7)))
 )
 
 // Flat is a minimal implementation of material.Flat,
@@ -27,7 +27,7 @@ var (
 type Flat Color
 
 // Eval implements Material.
-func (m Flat) Eval(_ *Ctx, _ *Scene, r *Ray,  h HitCoords) Color {
+func (m Flat) Shade(_ *Ctx, _ *Scene, r *Ray, h HitCoords) Color {
 	return Color(m)
 }
 
@@ -40,13 +40,13 @@ var Normal Material = &normal{1, 1, 1}
 type normal Color
 
 // Eval implements Material.
-func (m *normal) Eval(ctx *Ctx, s *Scene, r *Ray,  h HitCoords) Color {
+func (m *normal) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	checkRay(r)
 	v := h.Normal.Dot(r.Dir)
 	if v < 0 {
 		return Color(*m).Mul(-v) // towards cam
 	} else {
-		return color.Red.Mul(v) // away from cam
+		return colorf.Red.Mul(v) // away from cam
 	}
 }
 
@@ -55,7 +55,7 @@ var Normal2 = normal2{}
 type normal2 struct{}
 
 // Eval implements Material.
-func (normal2) Eval(ctx *Ctx, s *Scene, r *Ray,  h HitCoords) Color {
+func (normal2) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	checkRay(r)
 	v := h.Normal.Dot(r.Dir)
 	if v < 0 {
@@ -74,13 +74,13 @@ type transparent struct {
 	add   Color
 }
 
-func (m *transparent) Eval(ctx *Ctx, s *Scene, r *Ray,  h HitCoords) Color {
+func (m *transparent) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	pos := r.At(h.T + Tiny)
 	r2 := ctx.Ray()
 	r2.Start = pos
 	r2.Dir = r.Dir
 	defer ctx.PutRay(r2)
-	return s.Eval(ctx, r2,).Mul3(m.trans).Add(m.add)
+	return s.LightField(ctx, r2).Mul3(m.trans).Add(m.add)
 }
 
 // WithShadows returns a non-physical material similar to Normal,
@@ -97,7 +97,7 @@ type matte struct {
 }
 
 // Eval implements tracer.Material.
-func (m matte) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+func (m matte) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	var acc Color
 
 	//normal := flipTowards(h.Normal, r.Dir)
@@ -123,7 +123,7 @@ func (m matte) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 		acc = acc.Add(intens.Mul(cosTheta))
 	}
 	acc = acc.Mul(0.6).Add(Color{0.4, 0.4, 0.4})
-	return m.reflectivity.Eval(ctx, s, r, h).Mul3(acc)
+	return m.reflectivity.Shade(ctx, s, r, h).Mul3(acc)
 }
 
 // blend evaluates to 50% a plus 50% b.
@@ -132,9 +132,9 @@ type blend struct {
 }
 
 // Eval implements Material.
-func (m *blend) Eval(ctx *Ctx, s *Scene, r *Ray,  h HitCoords) Color {
-	a := m.a.Eval(ctx, s, r,  h)
-	b := m.b.Eval(ctx, s, r,  h)
+func (m *blend) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+	a := m.a.Shade(ctx, s, r, h)
+	b := m.b.Shade(ctx, s, r, h)
 	return a.Mul(0.5).MAdd(0.5, b)
 }
 
@@ -149,13 +149,13 @@ type checkers struct {
 }
 
 // Eval implements material
-func (m *checkers) Eval(ctx *Ctx, s *Scene, r *Ray,  h HitCoords) Color {
+func (m *checkers) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	checkRay(r)
 	u := h.Local[0]
 	v := h.Local[1]
 	if (int(u*2+10000)+int(v*2+10000))%2 == 0 {
-		return m.a.Eval(ctx, s, r,  h)
+		return m.a.Shade(ctx, s, r, h)
 	} else {
-		return m.b.Eval(ctx, s, r,  h)
+		return m.b.Shade(ctx, s, r, h)
 	}
 }

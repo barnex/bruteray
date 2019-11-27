@@ -3,7 +3,7 @@ package tracer
 import (
 	"math"
 
-	. "github.com/barnex/bruteray/color"
+	. "github.com/barnex/bruteray/imagef/colorf"
 )
 
 // Scene is the ray tracer's central data type.
@@ -62,7 +62,7 @@ func NewSceneWithMedia(recDepth int, media []Medium, lights []Light, objs ...Obj
 func (s *Scene) ImageFunc(c Camera) ImageFunc {
 	return func(ctx *Ctx, u, v float64) Color {
 		r := c.RayFrom(ctx, u, v)
-		c := s.Eval(ctx, r)
+		c := s.LightField(ctx, r)
 		ctx.PutRay(r)
 		return c
 	}
@@ -70,32 +70,32 @@ func (s *Scene) ImageFunc(c Camera) ImageFunc {
 
 type ImageFunc func(c *Ctx, u, v float64) Color
 
-// Eval returns the light field of all objects in scene.
-func (s *Scene) Eval(ctx *Ctx, r *Ray) Color {
-	return s.eval(s.objectsAndLights, ctx, r)
+// LightField returns the light field of all objects in scene.
+func (s *Scene) LightField(ctx *Ctx, r *Ray) Color {
+	return s.lightField(s.objectsAndLights, ctx, r)
 }
 
-// EvalMinusLights returns the light field the Scene's objects
+// LightFieldIndirect returns the light field the Scene's objects
 // but replaces the light sources by black.
 // This is used by Bi-directional path tracing which adds light sources separately.
-func (s *Scene) EvalMinusLights(ctx *Ctx, r *Ray) Color {
-	return s.eval(s.objectsMinusLights, ctx, r)
+func (s *Scene) LightFieldIndirect(ctx *Ctx, r *Ray) Color {
+	return s.lightField(s.objectsMinusLights, ctx, r)
 }
 
-// eval returns the light field of an arbitrary group of objects.
-func (s *Scene) eval(who []Object, ctx *Ctx, r *Ray) Color {
-	if s.RecursionDepth == ctx.currentRecursionDepth {
+// lightField returns the light field of an arbitrary group of objects.
+func (s *Scene) lightField(who []Object, ctx *Ctx, r *Ray) Color {
+	if s.RecursionDepth == ctx.CurrentRecursionDepth {
 		return Color{} // reached maximum recursion depth
 	}
 	ctx.Stats.NumRays++
-	ctx.currentRecursionDepth++ // enter recursive evaluation
+	ctx.CurrentRecursionDepth++ // enter recursive evaluation
 
 	front := intersectFrontmost(who, r)
 	//if front.Material == nil { // TODO: this test should not be neccesary
 	//return Color{}
 	//}
 
-	brightness := front.Material.Eval(ctx, s, r, HitCoords{
+	brightness := front.Material.Shade(ctx, s, r, HitCoords{
 		T:      front.T,
 		Normal: front.Normal.Normalized(), // Scale surface normal to unit length now that we are sure we are going to use it
 		Local:  front.Local,
@@ -105,7 +105,7 @@ func (s *Scene) eval(who []Object, ctx *Ctx, r *Ray) Color {
 		brightness = m.Filter(ctx, s, r, front.T, brightness)
 	}
 
-	ctx.currentRecursionDepth-- // exit recursive evaluation
+	ctx.CurrentRecursionDepth-- // exit recursive evaluation
 	return brightness
 }
 
@@ -144,7 +144,7 @@ func intersectFrontmost(objs []Object, r *Ray) HitRecord {
 		//if Check {
 		//	CheckHit(o, r, &hit) // DEBUG
 		//}
-		if hit.T > 0 && !(hit.T > front.T) { // handles inf correctly
+		if hit.T > 0 && hit.T <= front.T { // handles inf and NaN correctly
 			front = hit
 		}
 	}
@@ -163,6 +163,6 @@ func (b *black) Intersect(r *Ray) HitRecord {
 	return h
 }
 
-func (b *black) Eval(*Ctx, *Scene, *Ray, HitCoords) Color {
+func (b *black) Shade(*Ctx, *Scene, *Ray, HitCoords) Color {
 	return Color{}
 }

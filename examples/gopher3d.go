@@ -97,7 +97,7 @@ func main() {
 			//	media.ExpFog(0.15, White),
 			//},
 
-			Camera: Projective(90*Deg, V(0.3, 0.5, -1.5), 180*Deg, 0*Deg, ),
+			Camera: Projective(90*Deg, V(0.3, 0.5, -1.5), 180*Deg, 0*Deg),
 		}
 	})
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	. "github.com/barnex/bruteray/api"
-	"github.com/barnex/bruteray/post"
+	"github.com/barnex/bruteray/imagef/post"
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 			box().Rotate(Ey, 180*Deg).WithCenterBottom(V(0, -1, 0)),
 			Backdrop(Flat(C(0.95, 0.95, 1).EV(-2.9))), // TODO: segfault without
 		},
-		Camera: ProjectiveAperture(80*Deg, 0.004, 0.70, V(0, 0.25, 0.5), 6*Deg, -24*Deg),
+		Camera: ProjectiveAperture(80*Deg, 0.004, 0.70).Translate(V(0, 0.25, 0.5)).YawPitchRoll(6*Deg, -24*Deg, 0),
 
 		PostProcess: post.Params{
 			Gaussian: post.BloomParams{

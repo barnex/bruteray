@@ -15,6 +15,6 @@ type flat struct {
 // dimly luminous surfaces like computer screens, the sky, etc.
 func Flat(t texture.Texture) Material { return &flat{t} }
 
-func (m *flat) Eval(_ *Ctx, _ *Scene, r *Ray, h HitCoords) Color {
+func (m *flat) Shade(_ *Ctx, _ *Scene, r *Ray, h HitCoords) Color {
 	return m.texture.At(h.Local)
 }

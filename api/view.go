@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/barnex/bruteray/geom"
 	"github.com/barnex/bruteray/tracer/cameras"
 )
 
@@ -22,8 +23,8 @@ type View struct {
 func (v *View) ApplyTo(s Spec) Spec {
 	s.Width = v.Width
 	s.Height = v.Height
-	s.Camera = cameras.YawPitchRoll(s.Camera, v.CamYaw, v.CamPitch, 0)
-	s.Camera = cameras.Translate(s.Camera, v.CamPos)
+	s.Camera = cameras.Transform(s.Camera, geom.YawPitchRoll(v.CamYaw, v.CamPitch, 0).A, v.CamPos)
+
 	s.DebugNormals = v.DebugNormals
 
 	if v.DebugIsometric {

@@ -116,3 +116,9 @@ func Sinc(x float64) float64 {
 }
 
 const pi = math.Pi
+
+func Check(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

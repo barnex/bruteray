@@ -7,11 +7,13 @@ Physics-based ray tracer in Go.
 
 ![Newell teapot ray-traced in golang (go)](shots/2024-teapot.jpg) 
 ![Damaliscus Korrigum skull ray traced in Golang (Go), with volumetric scattering](shots/2027-damaliscus.jpg) 
+[![Trefoil knot video](shots/trefoil-poster.jpg)](https://vimeo.com/349036783)
 ![Stanford Lucy ray-traced in Go with volumetric scattering](shots/2030-lucy.jpg) 
 ![Stanford Dragon ray-traced in Go](shots/2026-pool.jpg) 
 ![Moebius strip ray-traced in Go](shots/2010-uvmap.jpg) 
 ![fig](shots/cementary.jpg) 
 ![fig](shots/principia.jpg) 
+![fig](shots/2031-sinc.jpg) 
 ![fig](shots/bouy.jpg) 
 ![fig](shots/063.jpg) 
 ![fig](shots/check.jpg) 

@@ -1,11 +1,10 @@
-package image
+package imagef
 
 import (
 	"image"
 	"image/color"
-	"math"
 
-	colorf "github.com/barnex/bruteray/color"
+	colorf "github.com/barnex/bruteray/imagef/colorf"
 )
 
 type ImageGray [][]float64
@@ -26,7 +25,7 @@ func (i ImageGray) Bounds() image.Rectangle {
 }
 
 // At implements image.Image
-func (img ImageGray) At(i, j int) color.Color {
+func (img ImageGray) At(i, j int) colorf.Color {
 	c := img[j][i]
 	return colorf.Color{c, c, c}
 }
@@ -34,10 +33,4 @@ func (img ImageGray) At(i, j int) color.Color {
 // ColorModel implements image.Image
 func (i ImageGray) ColorModel() color.Model {
 	return nil
-}
-
-func PixelSize(w, h int) float64 {
-	wf, hf := float64(w), float64(h)
-	minf := math.Min(wf, hf)
-	return 1 / minf
 }

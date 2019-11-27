@@ -8,10 +8,9 @@ import (
 	"math"
 	"os"
 
-	"github.com/barnex/bruteray/color"
 	"github.com/barnex/bruteray/geom"
+	"github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/tracer"
-	"github.com/barnex/bruteray/tracer/cameras"
 	"github.com/barnex/bruteray/tracer/lights"
 	"github.com/barnex/bruteray/tracer/materials"
 	"github.com/barnex/bruteray/tracer/media"
@@ -31,8 +30,7 @@ var (
 )
 
 type (
-	Camera   = cameras.Transformed
-	Color    = color.Color
+	Color    = colorf.Color
 	Light    = tracer.Light
 	Material = tracer.Material
 	Medium   = tracer.Medium
@@ -43,15 +41,15 @@ var (
 	And = objects.And
 	Not = objects.Not
 
-	Black   = color.Black
-	Blue    = color.Blue
-	Cyan    = color.Cyan
-	Gray    = color.Gray
-	Green   = color.Green
-	Magenta = color.Magenta
-	Red     = color.Red
-	White   = color.White
-	Yellow  = color.Yellow
+	Black   = colorf.Black
+	Blue    = colorf.Blue
+	Cyan    = colorf.Cyan
+	Gray    = colorf.Gray
+	Green   = colorf.Green
+	Magenta = colorf.Magenta
+	Red     = colorf.Red
+	White   = colorf.White
+	Yellow  = colorf.Yellow
 
 	RectangleLight = lights.RectangleLight
 	PointLight     = lights.PointLight
@@ -76,18 +74,6 @@ var (
 	Ez = geom.Ez
 	O  = geom.O
 )
-
-func Projective(fov float64, pos Vec, yaw, pitch float64) *Camera {
-	return cameras.NewProjective(fov, pos, yaw, pitch)
-}
-
-func ProjectiveAperture(fov, aperture, focus float64, pos Vec, yaw, pitch float64) *Camera {
-	return cameras.NewProjectiveAperture(fov, aperture, focus, pos, yaw, pitch)
-}
-
-func EnvironmentMap(pos Vec) *Camera {
-	return cameras.EnvironmentMap(pos)
-}
 
 func V(x, y, z float64) Vec {
 	return Vec{x, y, z}

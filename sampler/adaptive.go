@@ -1,5 +1,6 @@
 package sampler
 
+/*
 import (
 	"fmt"
 	"image"
@@ -9,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	colorf "github.com/barnex/bruteray/color"
-	imagef "github.com/barnex/bruteray/image"
+	"github.com/barnex/bruteray/imagef"
+	colorf "github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/tracer"
 	"github.com/barnex/bruteray/util"
 )
@@ -254,7 +255,7 @@ type stratifiedStdDev struct{ *Adaptive }
 type stratifiedStdErr struct{ *Adaptive }
 
 // At implements image.Image
-func (s stratifiedImage) At(i, j int) color.Color {
+func (s stratifiedImage) At(i, j int) colorf.Color {
 	return s.Color64At(i, j)
 }
 
@@ -263,12 +264,14 @@ func (s *Adaptive) Color64At(i, j int) colorf.Color {
 }
 
 // At implements image.Image
-func (s stratifiedStdDev) At(i, j int) color.Color {
+func (s stratifiedStdDev) At(i, j int) colorf.Color {
 	c := float64(math.Sqrt(s.varianceGamma(i, j)))
 	return colorf.Color{c, c, c}
 }
 
-func (s stratifiedStdErr) At(i, j int) color.Color {
+func (s stratifiedStdErr) At(i, j int) colorf.Color {
 	c := float64(s.stdErr(i, j))
 	return colorf.Color{c, c, c}
 }
+
+*/

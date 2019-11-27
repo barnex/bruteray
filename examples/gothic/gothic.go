@@ -3,7 +3,7 @@ package main
 import (
 	. "github.com/barnex/bruteray/api"
 	"github.com/barnex/bruteray/geom"
-	"github.com/barnex/bruteray/post"
+	"github.com/barnex/bruteray/imagef/post"
 	"github.com/barnex/bruteray/texture"
 )
 
@@ -132,7 +132,7 @@ func main() {
 			Fog(0.3, H2, 1),
 		},
 
-		Camera: ProjectiveAperture(50*Deg, 0.02, 2.30, O, 0, -1*Deg).Translate(V(0.4, 3.9, 2.8)),
+		Camera: ProjectiveAperture(50*Deg, 0.02, 2.30).Translate(V(0.4, 3.9, 2.8)).YawPitchRoll(0, -1*Deg, 0),
 
 		PostProcess: post.Params{
 			Gaussian: post.BloomParams{

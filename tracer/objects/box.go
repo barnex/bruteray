@@ -15,7 +15,7 @@ func Box(m Material, width, height, depth float64, center Vec) Interface {
 			Max: Vec{width / 2, height / 2, depth / 2},
 		}.translated(center),
 		//origin: center, // TODO: remove
-		mat:    m,
+		mat: m,
 	}
 }
 
@@ -32,7 +32,7 @@ func BoxWithBounds(m Material, min, max Vec) Interface {
 type box struct {
 	bounds BoundingBox
 	//origin Vec
-	mat    Material
+	mat Material
 }
 
 func (s *box) Bounds() BoundingBox {

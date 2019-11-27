@@ -3,8 +3,8 @@ package materials
 import (
 	"math"
 
-	. "github.com/barnex/bruteray/color"
 	"github.com/barnex/bruteray/geom"
+	. "github.com/barnex/bruteray/imagef/colorf"
 	. "github.com/barnex/bruteray/tracer"
 	. "github.com/barnex/bruteray/util"
 )
@@ -21,13 +21,13 @@ type reflective struct {
 	c Color
 }
 
-func (m *reflective) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+func (m *reflective) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	pos := r.At(h.T - Tiny)
 	r2 := ctx.Ray()
 	defer ctx.PutRay(r2)
 	r2.Start = pos
 	r2.Dir = reflect(r.Dir, h.Normal)
-	return s.Eval(ctx, r2).Mul3(m.c)
+	return s.LightField(ctx, r2).Mul3(m.c)
 }
 
 // ReflectFresnel is a transparent material with index of refraction n,
@@ -47,15 +47,15 @@ type reflectFresnel struct {
 	trans Material
 }
 
-func (s *reflectFresnel) Eval(ctx *Ctx, e *Scene, r *Ray, h HitCoords) Color {
+func (s *reflectFresnel) Shade(ctx *Ctx, e *Scene, r *Ray, h HitCoords) Color {
 	pos, norm := r.At(h.T-Tiny), h.Normal
 	r2 := ctx.Ray()
 	r2.Start = pos
 	r2.Dir = reflect(r.Dir, norm)
 	R := fresnelReflection(1, s.n, math.Abs(norm.Dot(r.Dir)))
 	T := 1 - R
-	trans := s.trans.Eval(ctx, e, r, h)
-	refl := e.Eval(ctx, r2)
+	trans := s.trans.Shade(ctx, e, r, h)
+	refl := e.LightField(ctx, r2)
 	ctx.PutRay(r2)
 	return refl.Mul(R).MAdd(T, trans)
 }

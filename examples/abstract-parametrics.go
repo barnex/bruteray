@@ -49,7 +49,7 @@ func main() {
 				Translate(V(-0.5, 0, -1.5)),
 		},
 
-		Camera: Projective(60*Deg, Vec{0.1, 1.3, 2.5}, 0, -15*Deg, ),
+		Camera: Projective(60*Deg, Vec{0.1, 1.3, 2.5}, 0, -15*Deg),
 	})
 }
 

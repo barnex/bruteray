@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/barnex/bruteray/color"
+	"github.com/barnex/bruteray/imagef/colorf"
 	. "github.com/barnex/bruteray/tracer/cameras"
 	"github.com/barnex/bruteray/tracer/test"
 	. "github.com/barnex/bruteray/tracer/types"
@@ -14,6 +14,30 @@ func focalLenToFOV(l float64) float64 {
 	return 2 * math.Atan(0.5/l)
 }
 
+var (
+	red   = test.Flat(colorf.Red)
+	green = test.Flat(colorf.Green)
+	blue  = test.Flat(colorf.Blue)
+	white = test.Flat(colorf.White)
+)
+
+func TestTranslate(t *testing.T) {
+	cam := Isometric(Z, 3).Translate(Vec{1, 0, 0})
+	radius := 0.10
+	test.OnePass(t,
+		NewScene(
+			1,
+			[]Light{},
+			test.Sphere(white, radius, Vec{0, 0, 0}),
+			test.Sphere(red, radius, Vec{1, 0, 0}),
+			test.Sphere(green, radius, Vec{0, 1, 0}),
+			test.Sphere(blue, radius, Vec{0, 0, 1}),
+		),
+		cam,
+		test.DefaultTolerance,
+	)
+}
+
 func TestTransform(t *testing.T) {
 	t.Skip("TODO")
 	radius := 0.10
@@ -21,18 +45,12 @@ func TestTransform(t *testing.T) {
 		NewScene(
 			1,
 			[]Light{},
-			test.Sphere(test.Flat(color.White), radius, Vec{0, 0, 0}),
-			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
-			test.Sphere(test.Flat(color.Green), radius, Vec{0, 1, 0}),
-			test.Sphere(test.Flat(color.Blue), radius, Vec{0, 0, 1}),
+			test.Sphere(white, radius, Vec{0, 0, 0}),
+			test.Sphere(red, radius, Vec{1, 0, 0}),
+			test.Sphere(green, radius, Vec{0, 1, 0}),
+			test.Sphere(blue, radius, Vec{0, 0, 1}),
 		),
-		Translate(
-			YawPitchRoll(
-				Projective(focalLenToFOV(1)),
-				-0.4, 0.2, 0.5,
-			),
-			Vec{0, 0, 5},
-		),
+		Projective(focalLenToFOV(1)).YawPitchRoll(-0.4, 0.2, 0.5).Translate(Vec{0, 0, 5}),
 		test.DefaultTolerance,
 	)
 }
@@ -50,30 +68,62 @@ func TestEnvironmentMap(t *testing.T) {
 		NewScene(
 			1,
 			[]Light{},
-			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
-			test.Sphere(test.Flat(color.Green), radius, Vec{0, 1, 0}),
-			test.Sphere(test.Flat(color.Blue), radius, Vec{0, 0, 1}),
+			test.Sphere(red, radius, Vec{1, 0, 0}),
+			test.Sphere(green, radius, Vec{0, 1, 0}),
+			test.Sphere(blue, radius, Vec{0, 0, 1}),
 		),
-		EnvironmentMap(Vec{0, 0.0, 0}),
+		EnvironmentMap(),
 		1,
 		400, 400,
 		test.DefaultTolerance,
 	)
 }
 
-func TestIsometric(t *testing.T) {
-	cam := NewIsometric(Z, 3)
-	cam.Pitch(-90 * Deg)
-	cam.Translate(Vec{1, 0, 0})
+func TestIsometricZ(t *testing.T) {
+	cam := Isometric(Z, 3)
 	radius := 0.10
 	test.OnePass(t,
 		NewScene(
 			1,
 			[]Light{},
-			test.Sphere(test.Flat(color.White), radius, Vec{0, 0, 0}),
-			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
-			test.Sphere(test.Flat(color.Green), radius, Vec{0, 1, 0}),
-			test.Sphere(test.Flat(color.Blue), radius, Vec{0, 0, 1}),
+			test.Sphere(white, radius, Vec{0, 0, 0}),
+			test.Sphere(red, radius, Vec{1, 0, 0}),
+			test.Sphere(green, radius, Vec{0, 1, 0}),
+			test.Sphere(blue, radius, Vec{0, 0, 1}),
+		),
+		cam,
+		test.DefaultTolerance,
+	)
+}
+
+func TestIsometricX(t *testing.T) {
+	cam := Isometric(X, 3)
+	radius := 0.10
+	test.OnePass(t,
+		NewScene(
+			1,
+			[]Light{},
+			test.Sphere(white, radius, Vec{0, 0, 0}),
+			test.Sphere(red, radius, Vec{1, 0, 0}),
+			test.Sphere(green, radius, Vec{0, 1, 0}),
+			test.Sphere(blue, radius, Vec{0, 0, 1}),
+		),
+		cam,
+		test.DefaultTolerance,
+	)
+}
+
+func TestIsometricY(t *testing.T) {
+	cam := Isometric(Y, 3)
+	radius := 0.10
+	test.OnePass(t,
+		NewScene(
+			1,
+			[]Light{},
+			test.Sphere(white, radius, Vec{0, 0, 0}),
+			test.Sphere(red, radius, Vec{1, 0, 0}),
+			test.Sphere(green, radius, Vec{0, 1, 0}),
+			test.Sphere(blue, radius, Vec{0, 0, 1}),
 		),
 		cam,
 		test.DefaultTolerance,
@@ -89,12 +139,12 @@ func TestProjective_Handedness(t *testing.T) {
 		NewScene(
 			1,
 			[]Light{},
-			test.Sphere(test.Flat(color.White), radius, Vec{0, 0, 0}),
-			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
-			test.Sphere(test.Flat(color.Green), radius, Vec{0, 1, 0}),
-			test.Sphere(test.Flat(color.Blue), radius, Vec{0, 0, 1}),
+			test.Sphere(white, radius, Vec{0, 0, 0}),
+			test.Sphere(red, radius, Vec{1, 0, 0}),
+			test.Sphere(green, radius, Vec{0, 1, 0}),
+			test.Sphere(blue, radius, Vec{0, 0, 1}),
 		),
-		NewProjective(focalLenToFOV(1), Vec{0, 1, 5}, 0, 0),
+		Projective(focalLenToFOV(1)).Translate(Vec{0, 1, 5}),
 		test.DefaultTolerance,
 	)
 }
@@ -118,11 +168,11 @@ func TestProjective_FOV(t *testing.T) {
 		NewScene(
 			1,
 			[]Light{},
-			test.Sphere(test.Flat(color.White), radius, Vec{0, 0, 0}),
-			test.Sphere(test.Flat(color.Red), radius, Vec{1, 0, 0}),
-			test.Sphere(test.Flat(color.Red), radius, Vec{-1, 0, 0}),
+			test.Sphere(white, radius, Vec{0, 0, 0}),
+			test.Sphere(red, radius, Vec{1, 0, 0}),
+			test.Sphere(red, radius, Vec{-1, 0, 0}),
 		),
-		NewProjective(focalLenToFOV(2), Vec{0, 0, 4}, 0, 0),
+		Projective(focalLenToFOV(2)).Translate(Vec{0, 0, 4}),
 		test.DefaultTolerance,
 	)
 }

@@ -3,8 +3,8 @@ package texture
 import (
 	"math"
 
-	. "github.com/barnex/bruteray/color"
 	. "github.com/barnex/bruteray/geom"
+	. "github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/util"
 )
 

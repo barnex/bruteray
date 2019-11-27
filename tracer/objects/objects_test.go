@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/barnex/bruteray/color"
 	"github.com/barnex/bruteray/geom"
+	"github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/tracer/cameras"
 	"github.com/barnex/bruteray/tracer/test"
 	. "github.com/barnex/bruteray/tracer/types"
@@ -28,7 +28,7 @@ func TestAnd(t *testing.T) {
 			),
 			test.Sheet(test.Checkers1, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 1.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 1.5}),
 		4,
 		test.DefaultTolerance,
 	)
@@ -47,7 +47,7 @@ func TestAnd_Bounds(t *testing.T) {
 			),
 			test.Sheet(test.Normal, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 1.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 1.5}),
 		4,
 		test.DefaultTolerance,
 	)
@@ -66,7 +66,7 @@ func TestAndNot(t *testing.T) {
 			),
 			test.Sheet(test.Checkers1, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 1.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 1.5}),
 		4,
 		test.DefaultTolerance,
 	)
@@ -90,7 +90,7 @@ func TestAndNot_Box(t *testing.T) {
 			),
 			test.Sheet(test.Checkers1, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 1.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 1.5}),
 		4,
 		test.DefaultTolerance,
 	)
@@ -111,7 +111,7 @@ func BenchmarkAndNot(b *testing.B) {
 			),
 			test.Sheet(test.Checkers1, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 1.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 1.5}),
 		test.DefaultTolerance,
 	)
 }
@@ -129,7 +129,7 @@ func TestAndNot_Bounds(t *testing.T) {
 			),
 			test.Sheet(test.Normal, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 1.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 1.5}),
 		4,
 		test.DefaultTolerance,
 	)
@@ -148,7 +148,7 @@ func TestAndNot_Hollow(t *testing.T) {
 			),
 			test.Sheet(test.Checkers1, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 1.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 1.5}),
 		4,
 		test.DefaultTolerance,
 	)
@@ -159,9 +159,9 @@ func TestBackdrop(t *testing.T) {
 		NewScene(
 			1,
 			[]Light{},
-			Backdrop(test.Checkers(test.Flat(color.White), test.Flat(color.Blue))),
+			Backdrop(test.Checkers(test.Flat(colorf.White), test.Flat(colorf.Blue))),
 		),
-		cameras.NewProjective(fov, Vec{0, 1, 0}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 1, 0}),
 		test.DefaultTolerance,
 	)
 }
@@ -178,7 +178,7 @@ func TestBox(t *testing.T) {
 			Box(test.Checkers1, 1, 1, 3, Vec{1.5, 0.5, 0}),
 			test.Sheet(test.Checkers2, 0),
 		),
-		cameras.NewProjective(fov, Vec{0, 2, 5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 2, 5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -196,7 +196,7 @@ func TestCylinder(t *testing.T) {
 
 			test.Sheet(test.Checkers2, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0.7, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0.7, 2.5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -211,7 +211,7 @@ func TestCylinder_Bounds(t *testing.T) {
 			WithBounds(Cylinder(test.Normal, 1.5, 2, Vec{1, 0.25, -1})),
 			test.Sheet(test.Normal, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0.7, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0.7, 2.5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -226,7 +226,7 @@ func TestDisk_Bounds(t *testing.T) {
 			WithBounds(Disk(test.Normal, 2, Vec{2, 2, -1})),
 			test.Sheet(test.Normal, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0.7, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0.7, 2.5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -243,7 +243,7 @@ func TestDisk_Shadow(t *testing.T) {
 			Disk(test.Checkers1, 2, Vec{2, 3, -1}),
 			test.Sheet(test.Checkers4, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0.7, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0.7, 2.5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -295,7 +295,7 @@ func TestIsoSurface_Const(t *testing.T) {
 			),
 			test.Sheet(test.Checkers2, -0.001), // offset so it does not bleed with surface at y=0
 		),
-		cameras.NewProjective(fov, Vec{1, 1.2, 2.5}, 0, -20*Deg),
+		cameras.Projective(fov).Translate(Vec{1, 1.2, 2.5}).YawPitchRoll(0, -20*Deg, 0),
 		5,
 		test.DefaultTolerance,
 	)
@@ -318,7 +318,7 @@ func TestIsoSurface_Discontinuous(t *testing.T) {
 			}),
 			test.Sheet(test.Blue, -0.001),
 		),
-		cameras.NewProjective(fov, Vec{1.4, 1.2, 3.1}, 0, -20*Deg),
+		cameras.Projective(fov).Translate(Vec{1.4, 1.2, 3.1}).YawPitchRoll(0, -20*Deg, 0),
 		7,
 		test.DefaultTolerance,
 	)
@@ -341,7 +341,7 @@ func TestIsoSurface_Sinc(t *testing.T) {
 			}),
 			test.Sheet(test.Checkers2, 0.001), // offset so shadow rays start in the box
 		),
-		cameras.NewProjective(fov, Vec{1, 1.2, 3.1}, 0, -20*Deg),
+		cameras.Projective(fov).Translate(Vec{1, 1.2, 3.1}).YawPitchRoll(0, -20*Deg, 0),
 		5,
 		test.DefaultTolerance,
 	)
@@ -359,7 +359,7 @@ func TestMesh_Bunny(t *testing.T) {
 				geom.Scale(O, 20), geom.Translate(Vec{0, -0.7, 0})),
 			test.Sheet(test.Checkers2, 0),
 		),
-		cameras.NewProjective(fov, Vec{0, 1.5, 3.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 1.5, 3.5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -376,7 +376,7 @@ func TestMesh_Teapot(t *testing.T) {
 				geom.Scale(O, 0.25), geom.Rotate(O, Ex, -90*Deg)),
 			test.Sheet(test.Checkers2, 0),
 		),
-		cameras.NewProjective(fov, Vec{0, 1.5, 3.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 1.5, 3.5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -390,7 +390,7 @@ func BenchmarkMesh_Teapot(b *testing.B) {
 			PlyFile(test.Normal, "../../assets/teapot.ply",
 				geom.Scale(O, 0.25), geom.Rotate(O, Ex, -90*Deg), geom.Rotate(O, Ey, -20*Deg)),
 		),
-		cameras.NewProjective(fov, Vec{0, 1.2, 3.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 1.2, 3.5}),
 		test.DefaultTolerance,
 	)
 }
@@ -407,7 +407,7 @@ func TestSphere(t *testing.T) {
 
 			test.Sheet(test.Checkers2, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0.7, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0.7, 2.5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -422,7 +422,7 @@ func TestSphere_Bounds(t *testing.T) {
 			WithBounds(Sphere(test.Normal, 1.5, Vec{1, 0.25, -1})),
 			test.Sheet(test.Normal, -0.50001),
 		),
-		cameras.NewProjective(fov, Vec{0, 0.7, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0.7, 2.5}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -468,7 +468,7 @@ func TestTransformed_Cylinder(t *testing.T) {
 			)),
 			test.Sheet(test.Checkers2, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0.5, 0.7, 3}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0.5, 0.7, 3}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -515,7 +515,7 @@ func TestTransformed_Rotate(t *testing.T) {
 			),
 			test.Sheet(test.Checkers2, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 1, 3}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 1, 3}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -540,7 +540,7 @@ func TestTransformed_Bounds_Cylinder(t *testing.T) {
 			))),
 			test.Sheet(test.Normal, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0.5, 0.7, 3}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0.5, 0.7, 3}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -567,7 +567,7 @@ func BenchmarkTransformed_Cylinder(b *testing.B) {
 			)),
 			test.Sheet(test.Checkers2, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0.8, 0.7, 2.2}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0.8, 0.7, 2.2}),
 		test.DefaultTolerance,
 	)
 }
@@ -598,7 +598,7 @@ func BenchmarkTransformed_Optimize(b *testing.B) {
 			[]Light{},
 			WithBounds(t5),
 		),
-		cameras.NewProjective(fov, Vec{0.8, 0.7, 2.2}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0.8, 0.7, 2.2}),
 		test.DefaultTolerance,
 	)
 }
@@ -612,9 +612,9 @@ func TestTree(t *testing.T) {
 			[]Light{},
 			Tree(randomSpheres(300, 0.3)...),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 2.5}),
 		5,
-		test.DefaultTolerance,
+		2e-5,
 	)
 }
 
@@ -625,7 +625,7 @@ func TestTree_Bounds(t *testing.T) {
 			[]Light{},
 			WithBounds(Tree(randomSpheres(300, 0.3)...)),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 2.5}),
 		5,
 		test.DefaultTolerance,
 	)
@@ -638,17 +638,17 @@ func BenchmarkTree10(b *testing.B) {
 			[]Light{},
 			Tree(randomSpheres(10, 0.1)...),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 2.5}),
 		test.DefaultTolerance,
 	)
 }
 
 func BenchmarkTree100(b *testing.B) {
 	test.Benchmark(b,
-		NewScene(1,[]Light{},
+		NewScene(1, []Light{},
 			Tree(randomSpheres(100, 0.1)...),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 2.5}),
 		test.DefaultTolerance,
 	)
 }
@@ -660,7 +660,7 @@ func BenchmarkTree1000(b *testing.B) {
 			[]Light{},
 			Tree(randomSpheres(1000, 0.1)...),
 		),
-		cameras.NewProjective(fov, Vec{0, 0, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0, 2.5}),
 		test.DefaultTolerance,
 	)
 }
@@ -712,9 +712,9 @@ func TestTriangle(t *testing.T) {
 			Triangle(test.Checkers3, Vec{0, 0, 0}, Vec{0, 1, 0}, Vec{1, 0, 1}),
 			test.Sheet(test.Checkers4, -0.0001),
 		),
-		cameras.NewProjective(fov, Vec{0, 1, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 1, 2.5}),
 		8,
-		test.DefaultTolerance,
+		0.001,
 	)
 }
 
@@ -736,7 +736,7 @@ func TestParametric_Cylinder(t *testing.T) {
 			}),
 			test.Sheet(test.Checkers2, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 0.5, 1.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 0.5, 1.5}),
 		3,
 		test.DefaultTolerance,
 	)
@@ -762,7 +762,7 @@ func TestParametric_Torus(t *testing.T) {
 			}),
 			test.Sheet(test.Checkers2, -0.5),
 		),
-		cameras.NewProjective(fov, Vec{0, 1, 0}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 1, 0}),
 		8,
 		test.DefaultTolerance,
 	)
@@ -781,7 +781,7 @@ func TestQuadrilateral(t *testing.T) {
 			Quadrilateral(test.Blue, Vec{0, 1, 0}, Vec{-1, 2, 0}, Vec{-2, 0, 0}, Vec{0, 0, 0}),
 			test.Sheet(test.Checkers4, -0.0001),
 		),
-		cameras.NewProjective(fov, Vec{0, 1, 2.5}, 0, 0),
+		cameras.Projective(fov).Translate(Vec{0, 1, 2.5}),
 		8,
 		test.DefaultTolerance,
 	)

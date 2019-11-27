@@ -23,22 +23,23 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/barnex/bruteray/sampler"
+	"github.com/barnex/bruteray/imagef"
+	"github.com/barnex/bruteray/tracer"
 	"github.com/barnex/bruteray/tracer/cameras"
 	. "github.com/barnex/bruteray/tracer/types"
 )
 
 const (
-	DefaultTolerance = 1e-6
+	DefaultTolerance = 1e-5
 	DefaultWidth     = 300
 	DefaultHeight    = 200
 )
 
 func Compare(t testing.TB, tolerance float64, img image.Image) {
 	t.Helper()
-	fname := testName() + ".png"
-	got := path.Join(testdataDir(), "got", fname)
-	want := path.Join(testdataDir(), fname)
+	fname := TestName() + ".png"
+	got := path.Join(Testdata(), "got", fname)
+	want := path.Join(Testdata(), fname)
 	Save(t, img, got)
 	if deviation := DiffImg(t, got, want); deviation > tolerance {
 		t.Errorf("difference between %v and %v = %v, want < %v", got, want, deviation, tolerance)
@@ -102,9 +103,9 @@ func Benchmark(b *testing.B, s *Scene, c Camera, tolerance float64) {
 	Compare(b, tolerance, img)
 }
 
-func renderNPass(s *Scene, c Camera, numPass, width, height int) image.Image {
+func renderNPass(s *Scene, c Camera, numPass, width, height int) imagef.Image {
 	antiAlias := (numPass > 1)
-	return sampler.Uniform(s.ImageFunc(c), numPass, width, height, antiAlias)
+	return tracer.Uniform(s.ImageFunc(c), numPass, width, height, antiAlias)
 }
 
 func renderQuadView(s *Scene, c Camera, fov float64, numPass, w, h int) image.Image {
@@ -114,13 +115,13 @@ func renderQuadView(s *Scene, c Camera, fov float64, numPass, w, h int) image.Im
 		renderNPass(s, c, numPass, w, h),
 	)
 	drawAt(comp, w, h,
-		renderNPass(s, cameras.NewIsometric(Y, fov), numPass, w, h),
+		renderNPass(s, cameras.Isometric(Y, fov), numPass, w, h),
 	)
 	drawAt(comp, 0, h,
-		renderNPass(s, cameras.NewIsometric(X, fov), numPass, w, h),
+		renderNPass(s, cameras.Isometric(X, fov), numPass, w, h),
 	)
 	drawAt(comp, w, 0,
-		renderNPass(s, cameras.NewIsometric(Z, fov), numPass, w, h),
+		renderNPass(s, cameras.Isometric(Z, fov), numPass, w, h),
 	)
 
 	return comp
@@ -136,7 +137,10 @@ func DiffImg(t testing.TB, a, b string) float64 {
 	t.Helper()
 	A := readImg(t, a)
 	B := readImg(t, b)
+	return Diff(A, B)
+}
 
+func Diff(A, B image.Image) float64 {
 	delta := 0
 	for y := 0; y < A.Bounds().Max.Y; y++ {
 		for x := 0; x < A.Bounds().Max.X; x++ {
@@ -159,27 +163,30 @@ func diff(a, b uint32) int {
 }
 
 func readImg(t testing.TB, fname string) image.Image {
+	fname = abs(fname)
 	t.Helper()
 	f, err := os.Open(fname)
-	if err != nil {
-		t.Fatal(err)
-	}
+	Check(t, err)
 	defer f.Close()
 	img, _, err := image.Decode(bufio.NewReader(f))
-	if err != nil {
-		t.Fatal(err)
-	}
+	Check(t, err)
 	return img
 }
 
 func Save(t testing.TB, img image.Image, fname string) {
 	t.Helper()
-	if err := save(img, fname); err != nil {
-		t.Fatal(err)
+	Check(t, save(img, abs(fname)))
+}
+
+func abs(fname string) string {
+	if !path.IsAbs(fname) {
+		return path.Join(Testdata(), fname)
 	}
+	return fname
 }
 
 func save(img image.Image, fname string) error {
+	fname = abs(fname)
 	f, err := os.Create(fname)
 	if err != nil {
 		return err
@@ -199,10 +206,10 @@ func save(img image.Image, fname string) error {
 	return err
 }
 
-// testName returns a name based on the calling Test function. E.g.:
+// TestName returns a name based on the calling Test function. E.g.:
 // 	github.com/barnex/bruteray/object.TestSphere -> object.sphere
-func testName() string {
-	for skip := 0; ; skip++ {
+func TestName() string {
+	for skip := 1; ; skip++ {
 		pc, _, _, ok := runtime.Caller(skip)
 		if !ok {
 			panic("runtime.Caller failed")
@@ -219,9 +226,9 @@ func testName() string {
 	}
 }
 
-// testdataDir walks up the filesystem starting from the working directory
+// Testdata walks up the filesystem starting from the working directory
 // in search of an existing subdirectory called "testdata".
-func testdataDir() string {
+func Testdata() string {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -239,5 +246,12 @@ func checkRay(r *Ray) {
 	const tol = 1 / 1024.
 	if math.Abs(1-r.Dir.Len()) > tol {
 		panic(fmt.Sprintf("BUG: unnormalized ray dir: %v (len=%v)", r.Dir, r.Dir.Len()))
+	}
+}
+
+func Check(t testing.TB, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatal(err)
 	}
 }

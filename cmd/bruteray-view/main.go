@@ -22,7 +22,7 @@ import (
 
 	"github.com/barnex/bruteray/api"
 	"github.com/barnex/bruteray/geom"
-	imagef "github.com/barnex/bruteray/image"
+	"github.com/barnex/bruteray/imagef"
 
 	. "github.com/barnex/bruteray/tracer/types"
 

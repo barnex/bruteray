@@ -14,8 +14,10 @@ import (
 //
 // The camera's veritical (V) axis spans 180 degrees,
 // from looking along the -Y axis to looking along the +Y axis.
-func EnvironmentMap(pos Vec) *Transformed {
-	return Translate(envMap{}, pos)
+//
+// The camera can be rotated and translated after construction, if desired.
+func EnvironmentMap() *WithTransform {
+	return translate(envMap{}, O)
 }
 
 type envMap struct{}
@@ -24,14 +26,13 @@ type envMap struct{}
 func (envMap) RayFrom(ctx *Ctx, u, v float64) *Ray {
 	//checkUV(u, v) TODO: fails with AA!
 
+	r := ctx.Ray()
 	phi := -u * 2 * Pi      // 0..2*pi. center pixel looks along -z. +x is to the right
 	theta := (v - 0.5) * Pi // -pi/2..pi/2
-	x := math.Sin(phi) * math.Cos(theta)
-	z := math.Cos(phi) * math.Cos(theta)
-	y := math.Sin(theta)
-
-	r := ctx.Ray()
-	r.Dir = Vec{x, y, z}
-
+	r.Dir = Vec{
+		math.Sin(phi) * math.Cos(theta),
+		math.Sin(theta),
+		math.Cos(phi) * math.Cos(theta),
+	}
 	return r
 }

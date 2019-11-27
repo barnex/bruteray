@@ -1,8 +1,8 @@
 package tracer
 
 import (
-	. "github.com/barnex/bruteray/color"
 	. "github.com/barnex/bruteray/geom"
+	. "github.com/barnex/bruteray/imagef/colorf"
 )
 
 // A Camera maps pixel positions to Rays.
@@ -19,7 +19,8 @@ type Camera interface {
 	RayFrom(ctx *Ctx, u, v float64) *Ray
 }
 
-// TODO: rename surface?
+// An Object is any thing that can be rendered.
+// E.g., a glass sphere, a white rectangle, ...
 type Object interface {
 	Intersect(r *Ray) HitRecord
 }
@@ -62,15 +63,12 @@ type Light interface {
 // A Material determines the color of a surface fragment.
 type Material interface {
 
-	// Eval returns the color of the seen by Ray r which intersects
+	// Shade returns the brightness seen by Ray r which intersects
 	// the scene at the given hit coordinates.
-	// If the implementation uses recursion by calling s.Eval,
-	// it must pass the recursion depth recDepth unmodified.
-	// Scene.Eval takes care to decrement the recursion depth
-	// and terminate recursion.
 	//
-	//TODO: rename: Shade?
-	Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color
+	// Implementations may call s.LightField recursively,
+	// recursion depth is limited automatically through the context ctx.
+	Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color
 }
 
 // HitCoords record where a Ray intersected an Object.

@@ -2,9 +2,9 @@ package lights
 
 import (
 	"github.com/barnex/bruteray/geom"
-	"github.com/barnex/bruteray/random"
 	"github.com/barnex/bruteray/tracer/materials"
 	"github.com/barnex/bruteray/tracer/objects"
+	"github.com/barnex/bruteray/tracer/sequence"
 	. "github.com/barnex/bruteray/tracer/types"
 )
 
@@ -14,7 +14,7 @@ func RectangleLight(brightness Color, w, h float64, center Vec) Light {
 
 func DiskLight(brightness Color, diam float64, center Vec) Light {
 	relSurf := Pi / 4 // Surface area relative to enclosing rectangle.
-	return planarLight(brightness, diam, diam, center, relSurf, objects.Cylinder(nil, diam, Inf, center), random.UniformDisk)
+	return planarLight(brightness, diam, diam, center, relSurf, objects.Cylinder(nil, diam, Inf, center), sequence.UniformDisk)
 }
 
 // SunLight constructs a far-away circlular light source, like the sun.

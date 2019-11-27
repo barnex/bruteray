@@ -3,8 +3,8 @@ package materials
 import (
 	"math/rand"
 
-	"github.com/barnex/bruteray/random"
 	"github.com/barnex/bruteray/texture"
+	"github.com/barnex/bruteray/tracer/sequence"
 	. "github.com/barnex/bruteray/tracer/types"
 )
 
@@ -51,7 +51,7 @@ func Matte(t texture.Texture) Material {
 }
 
 // Eval implements tracer.Material.
-func (m *matte) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+func (m *matte) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	var acc Color
 
 	normal := flipTowards(h.Normal, r.Dir)
@@ -88,8 +88,8 @@ func (m *matte) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	sec.Start = p.MAdd(Tiny, normal)
 	//sec.Dir = randVecCos(ctx.Rng, normal)
 	u, v := ctx.Generate2()
-	sec.Dir = random.CosineSphere(u, v, normal)
-	acc = acc.Add(s.EvalMinusLights(ctx, sec)) // does not include explicit lights
+	sec.Dir = sequence.CosineSphere(u, v, normal)
+	acc = acc.Add(s.LightFieldIndirect(ctx, sec)) // does not include explicit lights
 	ctx.PutRay(sec)
 
 	refl := m.texture.At(h.Local)

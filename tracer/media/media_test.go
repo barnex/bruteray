@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/barnex/bruteray/color"
+	"github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/tracer/cameras"
 	"github.com/barnex/bruteray/tracer/lights"
 	"github.com/barnex/bruteray/tracer/materials"
@@ -28,7 +28,7 @@ func TestExpFog(t *testing.T) {
 			Sphere(Checkers(White, Green), 1, Vec{-1, 0, -5}),
 			Sheet(Checkers(White, Cyan), -0.2),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -10*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 2}).YawPitchRoll(0, -10*Deg, 0),
 		DefaultTolerance,
 	)
 }
@@ -49,7 +49,7 @@ func TestExpFog_Height(t *testing.T) {
 			Sphere(Checkers(White, Green), 3, Vec{-3, 1.5, -2}),
 			Sheet(Checkers(White, Cyan), 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -10*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 2}).YawPitchRoll(0, -10*Deg, 0),
 		DefaultTolerance,
 	)
 }
@@ -70,7 +70,7 @@ func TestExpFog_Height2(t *testing.T) {
 			Sphere(Checkers(White, Green), 3, Vec{-3, 1.5, -2}),
 			Sheet(Checkers(White, Cyan), 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, 10*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 2}).YawPitchRoll(0, 10*Deg, 0),
 		DefaultTolerance,
 	)
 }
@@ -80,12 +80,13 @@ func TestFog(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Slow")
 	}
-	w := materials.Matte(color.White)
+	w := materials.Matte(colorf.White)
+	numLights := 1
 	NPassSize(t,
 		NewSceneWithMedia(
 			1,
 			[]Medium{
-				Fog(0.1, math.Inf(1)),
+				Fog(0.1, math.Inf(1), numLights),
 			},
 			[]Light{
 				lights.PointLight(Color{1, 1, 1}, Vec{1, 0.5, 0}),
@@ -95,7 +96,7 @@ func TestFog(t *testing.T) {
 			Sphere(w, 1, Vec{-1, 0, -5}),
 			Sheet(w, -0.2),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -10*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 2}).YawPitchRoll(0, -10*Deg, 0),
 		1000, // numPass
 		150,  // width
 		100,  // height
@@ -108,12 +109,13 @@ func TestFog_Height(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Slow")
 	}
-	w := materials.Matte(color.White)
+	w := materials.Matte(colorf.White)
+	numLights := 1
 	NPassSize(t,
 		NewSceneWithMedia(
 			1,
 			[]Medium{
-				Fog(0.3, 1.5),
+				Fog(0.3, 1.5, numLights),
 			},
 			[]Light{
 				lights.PointLight(Color{1, 1, 1}, Vec{1, 1.5, 0}),
@@ -123,7 +125,7 @@ func TestFog_Height(t *testing.T) {
 			//Sphere(w, 3, Vec{-3, 1.5, -2}),
 			//Sheet(w, 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 2, 2}, 0, -30*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 2, 2}).YawPitchRoll(0, -30*Deg, 0),
 		1000, // numPass
 		150,  // width
 		100,  // height
@@ -136,12 +138,13 @@ func TestFog_Height2(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Slow")
 	}
-	w := materials.Matte(color.White)
+	w := materials.Matte(colorf.White)
+	numLights := 1
 	NPassSize(t,
 		NewSceneWithMedia(
 			1,
 			[]Medium{
-				Fog(0.3, 1.5),
+				Fog(0.3, 1.5, numLights),
 			},
 			[]Light{
 				lights.PointLight(Color{1, 1, 1}, Vec{1, 1.5, 0}),
@@ -151,7 +154,7 @@ func TestFog_Height2(t *testing.T) {
 			//Sphere(w, 3, Vec{-3, 1.5, -2}),
 			//Sheet(w, 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, -30*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 2}).YawPitchRoll(0, -30*Deg, 0),
 		1000, // numPass
 		150,  // width
 		100,  // height

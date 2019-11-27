@@ -45,7 +45,7 @@ func main() {
 				geom.Rotate(O, Ey, 90*Deg),
 			).WithCenterBottom(O),
 		},
-		Camera: Projective(90*Deg, Vec{0.3, 0.9, 1.9}, 20*Deg, 0*Deg, ),
+		Camera: Projective(90*Deg, Vec{0.3, 0.9, 1.9}, 20*Deg, 0*Deg),
 	})
 }
 

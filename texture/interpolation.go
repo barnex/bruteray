@@ -8,23 +8,23 @@ package texture
 import (
 	"math"
 
-	"github.com/barnex/bruteray/color"
 	"github.com/barnex/bruteray/geom"
-	"github.com/barnex/bruteray/image"
+	"github.com/barnex/bruteray/imagef"
+	"github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/util"
 )
 
-func Nearest(img image.Image) Texture {
+func Nearest(img imagef.Image) Texture {
 	return &nearest{img}
 }
 
-type nearest struct{ img image.Image }
+type nearest struct{ img imagef.Image }
 
-func (n *nearest) At(p geom.Vec) color.Color {
+func (n *nearest) At(p geom.Vec) colorf.Color {
 	return n.AtUV(p[0], p[1])
 }
 
-func (n *nearest) AtUV(u, v float64) color.Color {
+func (n *nearest) AtUV(u, v float64) colorf.Color {
 	img := n.img
 	w := img.Bounds().Dx()
 	h := img.Bounds().Dy()
@@ -33,20 +33,20 @@ func (n *nearest) AtUV(u, v float64) color.Color {
 	return atIndex(img, i, j)
 }
 
-type bilinear struct{ img image.Image }
+type bilinear struct{ img imagef.Image }
 
-func (n *bilinear) At(p geom.Vec) color.Color {
+func (n *bilinear) At(p geom.Vec) colorf.Color {
 	return n.AtUV(p[0], p[1])
 }
 
 // https://en.wikipedia.org/wiki/Bilinear_interpolation
-func (f *bilinear) AtUV(u, v float64) color.Color {
+func (f *bilinear) AtUV(u, v float64) colorf.Color {
 	img := f.img
 	w := img.Bounds().Dx()
 	h := img.Bounds().Dy()
 
 	if u != u || v != v { //NaN
-		return color.Color{}
+		return colorf.Color{}
 	}
 
 	X := warp(u) * float64(w-1)
@@ -69,7 +69,7 @@ func (f *bilinear) AtUV(u, v float64) color.Color {
 	c10 := atIndex(img, x1, y0)
 	c11 := atIndex(img, x1, y1)
 
-	return color.Color{
+	return colorf.Color{
 		R: bilin(c00.R, c01.R, c10.R, c11.R, x, y),
 		G: bilin(c00.G, c01.G, c10.G, c11.G, x, y),
 		B: bilin(c00.B, c01.B, c10.B, c11.B, x, y),
@@ -91,6 +91,6 @@ func bilin(f00, f01, f10, f11, x, y float64) float64 {
 	return f00*(1-x)*(1-y) + f10*x*(1-y) + f01*(1-x)*y + f11*x*y
 }
 
-func atIndex(img image.Image, i, j int) color.Color {
+func atIndex(img imagef.Image, i, j int) colorf.Color {
 	return img[j][i]
 }

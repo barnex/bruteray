@@ -3,8 +3,8 @@ package lights
 import (
 	"testing"
 
-	"github.com/barnex/bruteray/color"
 	"github.com/barnex/bruteray/geom"
+	"github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/tracer/cameras"
 	"github.com/barnex/bruteray/tracer/materials"
 	"github.com/barnex/bruteray/tracer/objects"
@@ -42,7 +42,7 @@ import (
 // the same brightness, and uses recursion depth 2.
 func TestRectangleLight(t *testing.T) {
 	t.Skip("Slow")
-	brightness := color.White.EV(2)
+	brightness := colorf.White.EV(2)
 	s := .500
 	L := .350
 	dy := 0.0001
@@ -61,7 +61,7 @@ func TestRectangleLight(t *testing.T) {
 			objects.RectangleWithVertices(white, Vec{0, 0, 0}, Vec{0, 0, s}, Vec{0, s, 0}),
 			objects.RectangleWithVertices(white, Vec{s, 0, 0}, Vec{s, 0, s}, Vec{s, s, 0}),
 		),
-		cameras.NewProjective(90*Deg, Vec{.250, .250001, 0.9}, 0, 0),
+		cameras.Projective(90*Deg).Translate(Vec{.250, .250001, 0.9}),
 		5000, // nPass,
 		0.8,
 	)
@@ -79,7 +79,7 @@ func TestRectangleLight2(t *testing.T) {
 			test.Sheet(white, 0),
 			test.Sheet(white, 3),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 4}, 0, 0),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 4}),
 		50,       //  nPass
 		150, 100, // size
 		0.1,
@@ -98,7 +98,7 @@ func TestRectangleLight3(t *testing.T) {
 			},
 			test.Sheet(white, 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 0}, 0, -90*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 0}).YawPitchRoll(0, -90*Deg, 0),
 		100,      // nPass
 		150, 100, // size
 		3, // noisy
@@ -117,7 +117,7 @@ func TestDiskLight(t *testing.T) {
 			},
 			test.Sheet(white, 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 0}, 0, -90*Deg),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 0}).YawPitchRoll(0, -90*Deg, 0),
 		50,       // nPass
 		150, 100, // size
 		3, // noisy
@@ -139,7 +139,7 @@ func TestTransformed(t *testing.T) {
 			test.Sheet(white, 0),
 			test.Sheet(white, 3),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 4}, 0, 0),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 4}),
 		100,      // nPass
 		150, 100, // size
 		0.08,
@@ -161,7 +161,7 @@ func TestSunLight(t *testing.T) {
 			test.Sphere(white, 2, Vec{1, 1, -1}),
 			test.Sheet(white, 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, 0),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 2}),
 		1000,   // nPass
 		60, 40, // size
 		0.9, // noisy
@@ -183,7 +183,7 @@ func TestSunLight_Brightness(t *testing.T) {
 			test.Sphere(materials.Flat(Color{.2, .5, .7}), 2, Vec{1, 1, -1}),
 			test.Sheet(white, 0),
 		),
-		cameras.NewProjective(90*Deg, Vec{0, 1, 2}, 0, 0),
+		cameras.Projective(90*Deg).Translate(Vec{0, 1, 2}),
 		50,       // nPass
 		300, 200, // size
 		0.2, // noisy edges
@@ -220,7 +220,7 @@ func TestSunLight_Position(t *testing.T) {
 			},
 			test.Sheet(test.Normal, 0),
 		),
-		cameras.EnvironmentMap(Vec{0, 1, 0}),
+		cameras.EnvironmentMap().Translate(Vec{0, 1, 0}),
 		1,        // nPass
 		400, 400, // size
 		test.DefaultTolerance,

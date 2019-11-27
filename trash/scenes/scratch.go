@@ -3,7 +3,7 @@
 package main
 
 import (
-	//"github.com/barnex/bruteray/color"
+	//"github.com/barnex/bruteray/imagef/colorf"
 	//"github.com/barnex/bruteray/tracer/cameras"
 	//"github.com/barnex/bruteray/tracer/lights"
 	//"github.com/barnex/bruteray/tracer/materials"

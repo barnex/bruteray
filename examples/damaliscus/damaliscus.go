@@ -2,7 +2,7 @@ package main
 
 import (
 	. "github.com/barnex/bruteray/api"
-	"github.com/barnex/bruteray/post"
+	"github.com/barnex/bruteray/imagef/post"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 			//ExpFog(1, White, 1),
 		},
 
-		Camera: ProjectiveAperture(75*Deg, 0.004, 0.50, V(-0.05, 0.15, 0.4), 0*Deg, -12*Deg),
+		Camera: ProjectiveAperture(75*Deg, 0.004, 0.50).Translate(V(-0.05, 0.15, 0.4)).YawPitchRoll(0*Deg, -12*Deg, 0),
 
 		PostProcess: post.Params{
 			Gaussian: post.BloomParams{

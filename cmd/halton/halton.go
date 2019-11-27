@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/barnex/bruteray/random"
+	"github.com/barnex/bruteray/tracer/sequence"
 )
 
 var (
@@ -26,14 +26,14 @@ func main() {
 	i0 := *i
 	max := *s * (i0 + *n)
 	for i := i0; i < max; i += *s {
-		u := random.Halton(*a, i)
-		v := random.Halton(*b, i)
+		u := sequence.Halton(*a, i)
+		v := sequence.Halton(*b, i)
 		if *rnd {
 			u = rand.Float64()
 			v = rand.Float64()
 		}
 		if *disk {
-			u, v = random.UniformDisk(u, v)
+			u, v = sequence.UniformDisk(u, v)
 			u = u/2 + 0.5
 			v = v/2 + 0.5
 		}

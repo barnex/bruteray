@@ -101,6 +101,6 @@ func BenchmarkCSG_Torture(b *testing.B) {
 			//Fog(0.07, H2),
 		},
 
-		Camera: Projective(90*Deg, O, 0, 0).Translate(V(0, 4, 8)),
+		Camera: Projective(90 * Deg).Translate(V(0, 4, 8)),
 	})
 }

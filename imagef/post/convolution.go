@@ -3,12 +3,12 @@ package post
 import (
 	"math"
 
-	"github.com/barnex/bruteray/color"
-	"github.com/barnex/bruteray/image"
+	"github.com/barnex/bruteray/imagef"
+	"github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/util"
 )
 
-func AddConvolution(dst, src, kern image.Image, amplitude, offset float64) image.Image {
+func AddConvolution(dst, src, kern imagef.Image, amplitude, offset float64) imagef.Image {
 	w, h := src.Bounds().Dx(), src.Bounds().Dy()
 
 	kw, kh := kern.Bounds().Dx(), kern.Bounds().Dy()
@@ -59,35 +59,35 @@ func AddConvolution(dst, src, kern image.Image, amplitude, offset float64) image
 	return dst
 }
 
-func Gaussian(pixels int, width float64) image.Image {
-	return kernel(pixels, func(u, v float64) color.Color {
+func Gaussian(pixels int, width float64) imagef.Image {
+	return kernel(pixels, func(u, v float64) colorf.Color {
 		r2 := (u*u + v*v) / (width * width)
 		c := math.Exp(-r2)
-		return color.Color{c, c, c}
+		return colorf.Color{c, c, c}
 	})
 }
 
-func Airy(pixels int, width float64) image.Image {
-	return kernel(pixels, func(u, v float64) color.Color {
+func Airy(pixels int, width float64) imagef.Image {
+	return kernel(pixels, func(u, v float64) colorf.Color {
 
 		r := math.Sqrt((u*u + v*v)) / width
 		if r == 0 {
-			return color.Color{1, 1, 1}
+			return colorf.Color{1, 1, 1}
 		}
 		R := airy((500. / 700.) * r)
 		G := airy((500. / 500.) * r)
 		B := airy((500. / 450.) * r)
-		return color.Color{R, G, B}
+		return colorf.Color{R, G, B}
 	})
 }
 func airy(r float64) float64 {
 	return util.Sqr(2 * math.J1(r) / r)
 }
 
-func kernel(pixels int, f func(u, v float64) color.Color) image.Image {
+func kernel(pixels int, f func(u, v float64) colorf.Color) imagef.Image {
 	n := 2*pixels + 1
 	center := n / 2
-	k := image.MakeImage(n, n)
+	k := imagef.MakeImage(n, n)
 	for iky := 0; iky < n; iky++ {
 		v := float64(iky - center)
 		for ikx := 0; ikx < n; ikx++ {
@@ -98,14 +98,14 @@ func kernel(pixels int, f func(u, v float64) color.Color) image.Image {
 	return k
 }
 
-func starKernel(pixels int) image.Image {
+func starKernel(pixels int) imagef.Image {
 	n := 2*pixels + 1
-	k := image.MakeImage(n, n)
+	k := imagef.MakeImage(n, n)
 	for i := 2; i < pixels-1; i++ {
 
 		v := util.Sqr(float64(pixels-i) / float64(pixels))
 
-		col := color.Color{v, v, v}
+		col := colorf.Color{v, v, v}
 
 		c := pixels
 		k[c][c+i] = col

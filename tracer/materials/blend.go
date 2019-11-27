@@ -1,7 +1,7 @@
 package materials
 
 import (
-	. "github.com/barnex/bruteray/color"
+	. "github.com/barnex/bruteray/imagef/colorf"
 	"github.com/barnex/bruteray/texture"
 	. "github.com/barnex/bruteray/tracer"
 )
@@ -12,10 +12,10 @@ func BlendMap(t texture.Texture, a, b Material) Func {
 		key2 := 1 - key1
 		var ca, cb Color
 		if key1 > 0 {
-			ca = a.Eval(ctx, s, r, h)
+			ca = a.Shade(ctx, s, r, h)
 		}
 		if key2 > 0 {
-			cb = b.Eval(ctx, s, r, h)
+			cb = b.Shade(ctx, s, r, h)
 		}
 		return ca.Mul(key1).MAdd(key2, cb)
 	}
@@ -23,7 +23,7 @@ func BlendMap(t texture.Texture, a, b Material) Func {
 
 type Func func(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color
 
-func (f Func) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+func (f Func) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
 	return f(ctx, s, r, h)
 }
 
@@ -46,8 +46,8 @@ type blend struct {
 	matB Material
 }
 
-func (m *blend) Eval(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
-	ca := m.matA.Eval(ctx, s, r, h)
-	cb := m.matB.Eval(ctx, s, r, h)
+func (m *blend) Shade(ctx *Ctx, s *Scene, r *Ray, h HitCoords) Color {
+	ca := m.matA.Shade(ctx, s, r, h)
+	cb := m.matB.Shade(ctx, s, r, h)
 	return ca.Mul(m.a).MAdd(m.b, cb)
 }

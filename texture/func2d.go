@@ -1,8 +1,8 @@
 package texture
 
 import (
-	. "github.com/barnex/bruteray/color"
 	. "github.com/barnex/bruteray/geom"
+	. "github.com/barnex/bruteray/imagef/colorf"
 )
 
 // Func2D adapts a function to a 2D texture.

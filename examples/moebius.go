@@ -55,7 +55,7 @@ func main() {
 			Backdrop(Flat(C(0.6, 0.8, 1.0).EV(-2))),
 		},
 
-		Camera: Projective(60*Deg, Vec{0, 2, 5}, 0, -25*Deg, ),
+		Camera: Projective(60*Deg, Vec{0, 2, 5}, 0, -25*Deg),
 	})
 
 	//tex := texture.Pan(

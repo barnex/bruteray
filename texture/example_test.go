@@ -3,7 +3,7 @@ package texture_test
 //
 //import (
 //	"github.com/barnex/bruteray/builder"
-//	"github.com/barnex/bruteray/color"
+//	"github.com/barnex/bruteray/imagef/colorf"
 //	. "github.com/barnex/bruteray/tracer/geom"
 //	. "github.com/barnex/bruteray/material"
 //	"github.com/barnex/bruteray/test"

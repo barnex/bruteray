@@ -1,4 +1,4 @@
-package image
+package imagef
 
 import (
 	"bufio"
@@ -6,14 +6,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/barnex/bruteray/color"
+	"github.com/barnex/bruteray/imagef/colorf"
 
 	_ "image/jpeg"
 	_ "image/png"
 )
 
 func MustLoad(fname string) Image {
-	img, err := Load(fname, color.SRGBToLinear)
+	img, err := Load(fname, colorf.SRGBToLinear)
 	if err != nil {
 		log.Fatalf("Error loading %q: %v", fname, err)
 	}
@@ -22,7 +22,7 @@ func MustLoad(fname string) Image {
 
 func Load(fname string, colorspace func(float64) float64) (Image, error) {
 	if colorspace == nil {
-		colorspace = color.SRGBToLinear
+		colorspace = colorf.SRGBToLinear
 	}
 	f, err := os.Open(fname)
 	if err != nil {
@@ -42,7 +42,7 @@ func Load(fname string, colorspace func(float64) float64) (Image, error) {
 		for x := 0; x < w; x++ {
 			r, g, b, _ := srgb.At(x, y).RGBA()
 			Y := h - 1 - y
-			img[Y][x] = color.Color{
+			img[Y][x] = colorf.Color{
 				colorspace(float64(r) / 0xffff),
 				colorspace(float64(g) / 0xffff),
 				colorspace(float64(b) / 0xffff),

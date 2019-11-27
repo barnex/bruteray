@@ -34,4 +34,4 @@ func (o *backdrop) Bounds() BoundingBox {
 
 // hack. allows spec to idendify and remove backdrop
 // when showing debugNormals
-func(o*backdrop)IsBackdrop(){}
+func (o *backdrop) IsBackdrop() {}

@@ -1,17 +1,18 @@
+// Package PPM provides support for images in the NetPBM format, as defined by https://en.wikipedia.org/wiki/Netpbm_format.
 package ppm
 
 import (
 	"fmt"
 	"io"
 
-	"github.com/barnex/bruteray/color"
-	"github.com/barnex/bruteray/image"
+	"github.com/barnex/bruteray/imagef"
+	"github.com/barnex/bruteray/imagef/colorf"
 )
 
 const ppmMaxCol = (1 << 16) - 1
 
 //https://en.wikipedia.org/wiki/Netpbm_format
-func EncodeAscii16(w io.Writer, img image.Image) error {
+func EncodeAscii16(w io.Writer, img imagef.Image) error {
 	if err := writeHeader(w, "P3", img); err != nil {
 		return err
 	}
@@ -29,7 +30,7 @@ func EncodeAscii16(w io.Writer, img image.Image) error {
 	return nil
 }
 
-func Encode48BE(w io.Writer, img image.Image) error {
+func Encode48BE(w io.Writer, img imagef.Image) error {
 	if err := writeHeader(w, "P6", img); err != nil {
 		return err
 	}
@@ -55,7 +56,7 @@ func encodeUint16BE(buf []byte, x uint16) {
 	buf[1] = byte(x)
 }
 
-func writeHeader(w io.Writer, format string, img image.Image) error {
+func writeHeader(w io.Writer, format string, img imagef.Image) error {
 	if _, err := fmt.Fprintln(w, format); err != nil {
 		return err
 	}
@@ -69,7 +70,7 @@ func writeHeader(w io.Writer, format string, img image.Image) error {
 }
 
 func trunc(c float64) int {
-	c = color.LinearToSRGB(c)
+	c = colorf.LinearToSRGB(c)
 	i := int(c * ppmMaxCol)
 	if i > ppmMaxCol {
 		i = ppmMaxCol

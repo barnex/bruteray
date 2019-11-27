@@ -1,4 +1,4 @@
-package random
+package sequence
 
 import (
 	"math"
@@ -6,8 +6,8 @@ import (
 	"github.com/barnex/bruteray/geom"
 )
 
-// UniformDisk transforms a point (u,v) from the unit square to the unit disk.
-// If the original (u, v) is uniformly distributed, then the result is uniform too.
+// UniformDisk maps a point (u,v) from the unit square to the unit disk,
+// preserving uniformity.
 //
 // This is used for sampling a disk-shaped light source.
 func UniformDisk(u, v float64) (x, y float64) {
@@ -21,7 +21,7 @@ func UniformDisk(u, v float64) (x, y float64) {
 // CosineSphere transforms a point (u,v) from the unit square to a vector
 // on the heimsphere around the given normal, cosine weighted.
 // I.e. the resulting vectors are distributed proportionally to the cosine of the angle with the normal,
-// assuming that the original (u,v) is unifmormly distributed.
+// assuming that the original (u,v) are uniformly distributed.
 //
 // This is used for cosine-weighted importance sampling. E.g. for Lambertian scattering (materials.Matte).
 func CosineSphere(u, v float64, normal geom.Vec) geom.Vec {

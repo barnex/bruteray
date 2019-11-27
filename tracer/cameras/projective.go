@@ -4,47 +4,54 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/barnex/bruteray/random"
+	"github.com/barnex/bruteray/geom"
+	"github.com/barnex/bruteray/tracer/sequence"
 	. "github.com/barnex/bruteray/tracer/types"
 )
 
+// Projective constructs a camera like ProjectiveAperture,
+// but with zero aperture. I.e. a pinhole camera.
+func Projective(FOV float64) *WithTransform {
+	return ProjectiveAperture(FOV, 0, 1)
+}
+
 // A projective Camera projects onto a flat image sensor.
-// Rays go through a "lens" at distance FocalLen from the sensor.
-// Thus, FocalLen determines the Field Of View (FOV):
+// FOV is the horizontal Field Of View, in radians.
+//
+// This camera optionally has a finite-size lens aperture
+// which creates depth of field. If a non-zero Aperture is set,
+// focusDist should be set to the distance from the camera to focus on.
+//
+// The camera is located at (0,0,0) and looks along the -Z direction.
+// It can be rotated and translated if desired.
+func ProjectiveAperture(FOV, aperture, focusDist float64) *WithTransform {
+	if aperture == 0 && focusDist == 0 {
+		focusDist = 1 // irrelevant as long as > 0
+	}
+	return Transform(
+		&projective{
+			focalLen:  fovToFocalLen(FOV),
+			focusDist: focusDist,
+			aperture:  aperture,
+			diaphragm: sequence.UniformDisk,
+		},
+		geom.YawPitchRoll(180*Deg, 0, 0).A, // hack: historically camera looks along -z.
+		O,
+	)
+
+}
+
+type projective struct {
+	focalLen  float64                           // lens focal length, determines Field Of View
+	focusDist float64                           // distance from lens to focal plane. Irrelevant if aperture == 0.
+	aperture  float64                           // radius of lens opening. 0 means pinhole camera
+	diaphragm func(u, v float64) (x, y float64) // aperture shape. transforms lens samples [0..1] to positions on the lens [-1..1]
+}
+
+// fovToFocalLen converts a Field Of View (in radians) to focal length
+// corresponding to a sensor of size 1.
 //
 // 	FOV = 2*atan(f/2)
-//
-// This camera optionally has a finite-size lens Apterture
-// which creates depth of field. If a non-zero Aperture is set,
-// Focus should be set to the distance from the camera to focus on.
-type projective struct {
-	FocalLen  float64
-	Focus     float64
-	Aperture  float64
-	Diaphragm func(u, v float64) (x, y float64)
-}
-
-func NewProjective(fov float64, pos Vec, yaw, pitch float64) *Transformed {
-	return Translate(YawPitchRoll(Projective(fov), yaw, pitch, 0), pos)
-}
-
-func NewProjectiveAperture(fov, aperture, focus float64, pos Vec, yaw, pitch float64) *Transformed {
-	return Translate(YawPitchRoll(ProjectiveAperture(fov, aperture, focus), yaw, pitch, 0), pos)
-}
-
-func Projective(fov float64) Camera {
-	return ProjectiveAperture(fov, 0, 1)
-}
-
-func ProjectiveAperture(fov, aperture, focus float64) Camera {
-	return YawPitchRoll(&projective{ // hack: historically camera looks along -z. TODO: rm (but do in api).
-		FocalLen:  fovToFocalLen(fov),
-		Focus:     focus,
-		Aperture:  aperture,
-		Diaphragm: random.UniformDisk,
-	}, 180*Deg, 0, 0)
-}
-
 func fovToFocalLen(fov float64) float64 {
 	if fov <= 0 || fov >= Pi {
 		panic(fmt.Sprintf("camera: invalid field-of-view: %f (%f deg): need: 0 < fov < pi", fov, fov/Deg))
@@ -59,49 +66,23 @@ func (c *projective) RayFrom(ctx *Ctx, u, v float64) *Ray {
 	r := ctx.Ray()
 
 	r.Start = Vec{0, 0, 0}
-	if c.Aperture > 0 {
-			xs, ys := c.Diaphragm(ctx.GenerateLens())
-			r.Start[0] += xs * c.Aperture
-			r.Start[1] += ys * c.Aperture
+	if c.aperture > 0 {
+		xs, ys := c.diaphragm(ctx.GenerateLens())
+		r.Start[0] += xs * c.aperture
+		r.Start[1] += ys * c.aperture
 	}
 
 	end := Vec{
 		-(u - 0.5),
 		+(v - 0.5),
-		c.FocalLen,
+		c.focalLen,
 	}
-	if c.Focus != 0 {
-		end = end.Mul(c.Focus)
+	if c.focusDist != 0 {
+		end = end.Mul(c.focusDist)
 	}
 	r.Dir = end.Sub(r.Start).Normalized()
 	return r
 }
-
-//// diaCircle draws a point from the unit disk.
-//// TODO: ctx.SampleDisk
-//func diaCircle(rng *rand.Rand) (x, y float64) {
-//	x, y = diaSquare(rng)
-//	for math.Sqrt(x*x+y*y) > 1 {
-//		x, y = diaSquare(rng)
-//	}
-//	return x, y
-//}
-//
-//// diaHex draws a point from the unit hexagon.
-//func diaHex(rng *rand.Rand) (x, y float64) {
-//	const sqrt3 = 1.73205080756888
-//	x, y = diaSquare(rng)
-//	for math.Abs(y) > sqrt3/2 || math.Abs(x+y/sqrt3) > 1 || math.Abs(x-y/sqrt3) > 1 {
-//		x, y = diaSquare(rng)
-//	}
-//	return x, y
-//}
-//
-//func diaSquare(rng *rand.Rand) (x, y float64) {
-//	x = 2*rng.Float64() - 1
-//	y = 2*rng.Float64() - 1
-//	return x, y
-//}
 
 func checkUV(u, v float64) {
 	if u < 0 || u > 1 || v < 0 || v > 1 {
